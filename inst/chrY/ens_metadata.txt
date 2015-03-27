@@ -1,0 +1,12 @@
+name	value
+Db type	EnsDb
+Type of Gene ID	Ensembl Gene ID
+Supporting package	ensembldb
+Db created by	ensembldb package from Bioconductor
+script_version	0.1.2
+Creation time	Wed Mar 18 09:30:54 2015
+ensembl_version	75
+ensembl_host	manny.i-med.ac.at
+Organism	homo_sapiens
+genome_build	GRCh37
+DBSCHEMAVERSION	1.0
