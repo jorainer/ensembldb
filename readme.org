@@ -1,0 +1,111 @@
+#+TITLE:ensembldb: make an annotation package from Ensembl
+#+AUTHOR: Johannes Rainer
+#+email: johannes.rainer@eurac.edu
+#+OPTIONS: ^:{}
+#+PROPERTY: exports code
+#+PROPERTY: session *R*
+#+PROPERTY: noweb yes
+#+PROPERTY: results output
+#+PROPERTY: tangle yes
+#+STARTUP: overview
+#+INFOJS_OPT: view:t toc:t ltoc:t mouse:underline buttons:0 path:http://thomasf.github.io/solarized-css/org-info.min.js
+#+HTML_HEAD: <link rel='stylesheet' type='text/css' href='http://thomasf.github.io/solarized-css/solarized-light.min.css' />
+#+LATEX_HEADER: \usepackage[backend=bibtex,style=nature,hyperref=true]{biblatex}
+#+LATEX_HEADER: \usepackage{parskip}
+#+LATEX_HEADER: \usepackage{tabu}
+#+LATEX_HEADER: \setlength{\textwidth}{17.0cm}
+#+LATEX_HEADER: \setlength{\hoffset}{-2.5cm}
+#+LATEX_HEADER: \setlength{\textheight}{22cm}
+#+LATEX_HEADER: \setlength{\voffset}{-1.5cm}
+#+LATEX_HEADER: \addbibresource{~/Documents/Unison/bib/references.bib}
+# #+LATEX_HEADER: \usepackage{verbatim}
+#+LATEX_HEADER: \usepackage{inconsolata}
+#+LATEX_HEADER: \definecolor{lightgrey}{HTML}{F0F0F0}
+#+LATEX_HEADER: \definecolor{solarizedlightbg}{HTML}{FCF4DC}
+#+LATEX_HEADER: \makeatletter
+# #+LATEX_HEADER: \def\verbatim@font{\scriptsize\ttfamily}
+#+LATEX_HEADER: \makeatother
+-----
+
+* =ensembldb=: make an annotation data base from Ensembl.
+
+This package allows to generate an SQLite based annotation database for a user defined species extracted from the Ensembl database. In addition, the package provides all functionality to work with such a database (i.e. retrieve data from the database).
+
+A simple example to create such an database for all human genes defined in Ensembl version 75 is:
+
+#+BEGIN_SRC R :results silent :exports code :eval never
+  library( ensembldb )
+
+  ## get all human gene/transcript/exon annotations from Ensembl (75)
+  ## the resulting tables will be stored by default to the current working
+  ## directory
+  fetchTablesFromEnsembl( 75, ensemblapi="/home/bioinfo/ensembl/75/API/ensembl/modules",
+                         species="human" )
+
+  ## These tables can then be processed to generate a SQLite database
+  ## containing the annotations
+  DBFile <- makeEnsemblSQLiteFromTables()
+
+  ## and finally we can generate the package
+  makeEnsembldbPackage( ensdb=DBFile, version="0.0.1", maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
+                       author="J Rainer" )
+
+#+END_SRC
+
+This package can then be installed (e.g. using =R CMD INSTALL Hsapiens.Ensembl75=) and used to retrieve annotations:
+
+#+BEGIN_SRC R :results silent :exports code :eval never
+  library( Hsapiens.Ensembl75 )
+
+  ## show some information from the database:
+  Hsapiens.Ensembl75
+
+  ## get all annotations for genes encoded on chromosome Y:
+  genes( Hsapiens.Ensembl75, filter=list( SeqnameFilter( "Y" ) ) )
+
+#+END_SRC
+
+For more details refer to the help pages of the package in =R=.
+
+** Requirements
+
+The package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site /ensembldb.ensembl.org/). Thus, it is required the Ensembl Perl API to be installed, along with Bioperl.
+
+
+** TODOs							   :noexport:
+
+*** DONE Check and clean the script to fetch the data
+    CLOSED: [2015-02-16 Mon 07:01]
+    - State "DONE"       from "TODO"       [2015-02-16 Mon 07:01]
+*** DONE Check and clean the script to generate the database tables
+    CLOSED: [2015-02-16 Mon 11:30]
+    - State "DONE"       from "TODO"       [2015-02-16 Mon 11:30]
+*** DONE Check and clean the function to build the package
+    CLOSED: [2015-02-17 Tue 09:10]
+    - State "DONE"       from "TODO"       [2015-02-17 Tue 09:10]
+*** DONE Clean the join query builder
+    CLOSED: [2015-02-17 Tue 09:10]
+    - State "DONE"       from "TODO"       [2015-02-17 Tue 09:10]
+*** DONE Build the vignette
+    CLOSED: [2015-03-05 Thu 11:31]
+    - State "DONE"       from "TODO"       [2015-03-05 Thu 11:31]
+*** DONE Clean up the documentation
+    CLOSED: [2015-03-05 Thu 11:34]
+    - State "DONE"       from "TODO"       [2015-03-05 Thu 11:34]
+*** TODO Clean up the code
+*** DONE Run R CMD check on R-devel
+    CLOSED: [2015-03-05 Thu 13:04]
+    - State "DONE"       from "TODO"       [2015-03-05 Thu 13:04]
+*** TODO Run the =BiocCheck=
+
+#+BEGIN_EXAMPLE
+library(BiocCheck)
+pathToPkg <- file.path("..","MyPkg")
+BiocCheck(pathToPkg)
+#+END_EXAMPLE
+
++ There are some problems, especially related to the vignette.
+
+*** TODO Submit to Bioconductor
+
++ [ ] Initial contact <2015-03-05>.

@@ -1,0 +1,2 @@
+seq_name	seq_length	is_circular
+Y	59373566	0

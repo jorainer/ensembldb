@@ -1,0 +1,16 @@
+Package: @PKGNAME@
+Title: @PKGTITLE@
+Description: @PKGDESCRIPTION@
+Version: @PKGVERSION@
+Author: @AUTHOR@
+Maintainer: @MAINTAINER@
+Depends: ensembldb
+Imports: GenomicFeatures
+License: @LIC@
+organism: @ORGANISM@
+species: @SPECIES@
+provider: @PROVIDER@
+provider_version: @PROVIDERVERSION@
+release_date: @RELEASEDATE@
+resource_url: @SOURCEURL@
+biocViews: AnnotationData, EnsDb, @ORGANISMBIOCVIEW@

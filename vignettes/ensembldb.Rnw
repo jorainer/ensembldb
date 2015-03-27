@@ -1,0 +1,316 @@
+% Created 2015-03-19 Thu 12:50
+%\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
+%\VignetteKeywords{annotation, database}
+%\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
+%\VignettePackage{ensembldb}
+%\VignetteEngine{knitr::knitr}
+\documentclass[11pt]{article}
+
+<<style,results='asis', echo=FALSE, eval=TRUE>>=
+BiocStyle::latex()
+@ %def
+
+\author{Johannes Rainer}
+\date{Modified: 19 March, 2015. Compiled: \today}
+\title{Generating and using Ensembl based annotation packages}
+\hypersetup{
+ pdfauthor={Johannes Rainer},
+ pdftitle={Generating and using Ensembl based annotation packages},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.0.50.1 (Org mode 8.3beta)},
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+
+\section{Introduction}
+\label{sec-1}
+
+The \texttt{ensembldb} package provides functions to create and use transcript centric annotation databases/packages. The annotation for the databases are directly fetched from Ensembl \footnote{\url{http://www.ensembl.org}} using their Perl API.
+The functionality and data is similar to that of the \texttt{TxDb} packages from the \texttt{GenomicFeatures} package, but, in addition to retrieve all gene/transcript models and annotations from the database, the \texttt{ensembldb} package provides also a filter framework allowing to retrieve annotations for specific entries like genes encoded on a chromosome region or transcript models of lincRNA genes.
+In the databases, along with the gene and transcript models and their chromosomal coordinates, additional annotations including the gene name (symbol) and NCBI Entrezgene identifiers as well as the gene and transcript biotypes are stored too (see Section \ref{section.database.layout} for the database layout and an overview of available attributes/columns).
+
+Another main goal of this package is to generate \emph{versioned} annotation packages, i.e. annotation packages that are build for a specific Ensembl release, and are also named according to that (e.g. \texttt{EnsDb.Hsapiens.v75} for human gene definitions of the Ensembl code database version 75). This ensures reproducibility, as it allows to load annotations from a specific Ensembl release also if newer versions of annotation packages/releases are available. It also allows to load multiple annotation packages at the same time in order to e.g. compare gene models between Ensembl releases.
+
+In the example below we load an Ensembl based annotation package for Homo sapiens, Ensembl version 75. The connection to the database is bound to the variable \texttt{EnsDb.Hsapiens.v75}.
+
+<<warning=FALSE, message=FALSE>>=
+library(EnsDb.Hsapiens.v75)
+
+## print some informations for this package
+EnsDb.Hsapiens.v75
+
+## for what organism was the database generated?
+organism(EnsDb.Hsapiens.v75)
+@ %def
+
+\section{Using \texttt{ensembldb} annotation packages to retrieve specific annotations}
+\label{sec-2}
+
+The \texttt{ensembldb} package provides a set of filter objects allowing to specify which entries should be fetched from the database. The complete list of filters, which can be used individually or can be combined, is shown below (in alphabetical order):
+
+\begin{itemize}
+\item \texttt{ExonidFilter}: allows to filter the result based on the (Ensembl) exon identifiers.
+\item \texttt{EntrezidFilter}: allows to filter results based on NCBI Entrezgene identifiers of the genes.
+\item \texttt{GenebiotypeFilter}: allows to filter for the gene biotypes defined in the Ensembl database; use the \texttt{listGenebiotypes} method to list all available biotypes.
+\item \texttt{GeneidFilter}: allows to filter based on the Ensembl gene IDs.
+\item \texttt{GenenameFilter}: allows to filter based on the names (symbols) of the genes.
+\item \texttt{SeqendFilter}: filter based on the chromosomal end coordinate of the exons, transcripts or genes (correspondingly set \texttt{feature}"exon"=, \texttt{feature}"tx"= or \texttt{feature}"gene"=).
+\item \texttt{SeqnameFilter}: filter by the name of the chromosomes the genes are encoded on.
+\item \texttt{SeqstartFilter}: filter based on the chromosomal start coordinates of the exons, transcripts or genes (correspondingly set \texttt{feature}"exon"=, \texttt{feature}"tx"= or \texttt{feature}"gene"=).
+\item \texttt{SeqstrandFilter}: filter for the chromosome strand on which the genes are encoded.
+\item \texttt{TxbiotypeFilter}: filter on the transcript biotype defined in Ensembl; use the \texttt{listTxbiotypes} method to list all available biotypes.
+\item \texttt{TxidFilter}: filter on the Ensembl transcript identifiers.
+\end{itemize}
+
+Each of the filter classes can take a single value or a vector of values (with the exception of the \texttt{SeqendFilter} and \texttt{SeqstartFilter}) for comparison. In addition, it is possible to specify the \emph{condition} for the filter, e.g. \texttt{condition}"="= to retrieve all entries matching the filter value, \texttt{condition}"!="= to negate the filter or also \texttt{condition}"like"= to allow partial matching. The \texttt{condition} parameter for \texttt{SeqendFilter} and \texttt{SeqendFilter} can take the values \texttt{=}, \texttt{>}, \texttt{>=}, \texttt{<} and \texttt{<=} (since these filters base on numeric values).
+
+A simple example would be to get all transcripts for the gene \emph{BCL2L11}. To this end we specify a \texttt{GenenameFilter} with the value ="BCL2L11"\texttt{. As a result we get a =GRanges} object with \texttt{start}, \texttt{end}, \texttt{strand} and \texttt{seqname} of the \texttt{GRanges} object being the start coordinate, end coordinate, chromosome name and strand for the respective transcripts. All additional annotations are available as metadata columns. Alternatively, by setting \texttt{return.type}"DataFrame"=, or \texttt{return.type}"data.frame"= the method would return a \texttt{DataFrame} object or \texttt{data.frame}.
+
+<<>>=
+Tx <- transcripts(EnsDb.Hsapiens.v75, filter=list(GenenameFilter("BCL2L11")))
+
+Tx
+
+## as this is a GRanges object we can access e.g. the start coordinates with
+head(start(Tx))
+
+## or extract the biotype with
+head(Tx$tx_biotype)
+@ %def
+
+The parameter \texttt{columns} of the \texttt{exons}, \texttt{genes} and \texttt{transcripts} method allow to specify which database attributes (columns) should be retrieved. Note that these are not restricted to columns of the corresponding database table (e.g. columns of database table \emph{gene} for \texttt{genes}). To get an overview of database tables and available columns the function \texttt{listTables} can be used. The method \texttt{listColumns} on the other hand lists columns for the specified database table.
+
+<<>>=
+## list all database tables along with their columns
+listTables(EnsDb.Hsapiens.v75)
+
+## list columns from a specific table
+listColumns(EnsDb.Hsapiens.v75, "tx")
+@ %def
+
+Thus, we could retrieve all transcripts of the biotype \emph{nonsense\_mediated\_decay} (which, according to the definitions by Ensembl are transcribed, but most likely not translated in a protein, but rather degraded after transcription) along with the name of the gene for each transcript. Note that we are changing here the \texttt{return.type} to \texttt{DataFrame}, so the method will return a \texttt{DataFrame} with the results instead of the default \texttt{GRanges}.
+
+<<>>=
+Tx <- transcripts(EnsDb.Hsapiens.v75,
+		  columns=c(listColumns(EnsDb.Hsapiens.v75 , "tx"), "gene_name"),
+		  filter=list(TxbiotypeFilter("nonsense_mediated_decay")),
+		  return.type="DataFrame")
+nrow(Tx)
+Tx
+@ %def
+
+To get an overview of allowed/available gene and transcript biotype the functions \texttt{listGenebiotypes} and \texttt{listTxbiotypes} can be used.
+
+<<>>=
+## Get all gene biotypes from the database. The GenebiotypeFilter
+## allows to filter on these values.
+listGenebiotypes(EnsDb.Hsapiens.v75)
+
+## Get all transcript biotypes from the database.
+listTxbiotypes(EnsDb.Hsapiens.v75)
+@ %def
+
+Data can be fetched in an analogous way using the \texttt{exons} and \texttt{genes} methods. In the example below we retrieve \texttt{gene\_name}, \texttt{entrezid} and the \texttt{gene\_biotype} of all genes in the database which names start with ="BCL2"=.
+
+<<>>=
+## We're going to fetch all genes which names start with BCL. To this end
+## we define a GenenameFilter with partial matching, i.e. condition "like"
+## and a % for any character/string.
+BCLs <- genes(EnsDb.Hsapiens.v75,
+	      columns=c("gene_name", "entrezid", "gene_biotype"),
+	      filter=list(GenenameFilter("BCL%", condition="like")),
+	      return.type="DataFrame")
+nrow(BCLs)
+BCLs
+@ %def
+
+Sometimes it might be useful to know the length of genes or transcripts (i.e. the total sum of nucleotides covered by their exons). Below we calculate the mean length of transcripts from protein coding genes on chromosomes X and Y as well as the average length of snoRNA, snRNA and rRNA transcripts encoded on these chromosomes.
+
+<<>>=
+## determine the average length of snRNA, snoRNA and rRNA genes encoded on
+## chromosomes X and Y.
+mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
+	      filter=list(GenebiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
+		  SeqnameFilter(c("X", "Y")))))
+
+## determine the average length of protein coding genes encoded on the same
+## chromosomes.
+mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
+	      filter=list(GenebiotypeFilter("protein_coding"),
+		  SeqnameFilter(c("X", "Y")))))
+@ %def
+
+Not unexpectedly, transcripts of protein coding genes are longer than those of snRNA, snoRNA or rRNA genes.
+
+
+\section{Extracting gene/transcript/exon models for RNASeq feature counting}
+\label{sec-3}
+
+For the feature counting step of an RNAseq experiment, the gene or transcript models (defined by the chromosomal start and end positions of their exons) have to be known. To extract these from an Ensembl based annotation package, the \texttt{exonsBy}, \texttt{genesBy} and \texttt{transcriptsBy} methods can be used in an analogous way as in \texttt{TxDb} packages generated by the \texttt{GenomicFeatures} package.
+However, the \texttt{transcriptsBy} method does not, in contrast to the method in the \texttt{GenomicFeatures} package, allow to return transcripts by ="cds"\texttt{. While the annotation packages built by the =ensembldb} contain the chromosomal start and end coordinates of the coding region (for protein coding genes) they do not assign an ID to each CDS.
+
+A simple use case is to retrieve all genes encoded on chromosomes X and Y from the database.
+
+<<>>=
+TxByGns <- transcriptsBy(EnsDb.Hsapiens.v75, by="gene",
+			 filter=list(SeqnameFilter(c("X", "Y")))
+			 )
+TxByGns
+@ %def
+
+Since Ensembl contains also definitions of genes that are on chromosome variants (supercontigs), it is advisable to specify the chromosome names for which the gene models should be returned.
+
+In a real use case, we might thus want to retrieve all genes encoded on the \emph{standard} chromosomes. In addition it is advisable to use a \texttt{GeneidFilter} to restrict to Ensembl genes only, as also \emph{LRG} (Locus Reference Genomic) genes\footnote{\url{http://www.lrg-sequence.org}} are defined in the database, which are partially redundant with Ensembl genes.
+
+<<eval=FALSE>>=
+## will just get exons for all genes on chromosomes 1 to 22, X and Y.
+## Note: want to get rid of the "LRG" genes!!!
+EnsGenes <- exonsBy(EnsDb.Hsapiens.v75, by="gene",
+		    filter=list(SeqnameFilter(c(1:22, "X", "Y")),
+			GeneidFilter("ENSG%", "like")))
+@ %def
+
+The code above returns a \texttt{GRangesList} that can be used directly as an input for the \texttt{summarizeOverlaps} function from the \texttt{GenomicAlignments} package \footnote{\url{http://www.ncbi.nlm.nih.gov/pubmed/23950696}}.
+
+Alternatively, the above \texttt{GRangesList} can be transformed to a \texttt{data.frame} in \emph{SAF} format that can be used as an input to the \texttt{featureCounts} function of the \texttt{Rsubread} package \footnote{\url{http://www.ncbi.nlm.nih.gov/pubmed/24227677}}.
+
+<<eval=FALSE>>=
+## Transforming the GRangesList into a data.frame in SAF format
+EnsGenes.SAF <- toSAF(EnsGenes)
+@ %def
+
+Note that the ID by which the \texttt{GRangesList} is split is used in the SAF formatted \texttt{data.frame} as the \texttt{GeneID}. In the example below this would be the Ensembl gene IDs, while the start, end coordinates (along with the strand and chromosomes) are those of the the exons.
+
+In addition, the \texttt{disjointExons} function (similar to the one defined in \texttt{GenomicFeatures}) can be used to generate a \texttt{GRanges} of non-overlapping exon parts which can be used in the \texttt{DEXSeq} package.
+
+<<eval=FALSE>>=
+## Create a GRanges of non-overlapping exon parts.
+DJE <- disjointExons(EnsDb.Hsapiens.v75,
+		     filter=list(SeqnameFilter(c(1:22, "X", "Y")),
+			  GeneidFilter("ENSG%", "like")))
+@ %def
+
+
+
+\section{Important notes}
+\label{sec-4}
+
+These notes might explain eventually unexpected results (and, more importantly, help avoiding them):
+
+\begin{itemize}
+\item The ordering of the results returned by the \texttt{genes}, \texttt{exons}, \texttt{transcripts} methods can be specified with the \texttt{order.by} parameter. The ordering of the results does however \textbf{not} correspond to the ordering of values in submitted filter objects.
+
+\item Results of \texttt{exonsBy}, \texttt{transcriptsBy} are always ordered by the \texttt{by} argument.
+\end{itemize}
+
+
+\section{Building an transcript centric database package based on Ensembl annotation}
+\label{sec-5}
+
+The code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, fetching data from the Ensembl database takes quite some time, thus, in this section only the code is displayed, but not executed.
+
+
+\subsection{Requirements}
+\label{sec-5-1}
+
+The package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site \emph{ensembldb.ensembl.org}). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see \footnote{\url{http://www.ensembl.org/info/docs/api/api_installation.html}} for details).
+
+
+\subsection{Building an annotation package}
+\label{sec-5-2}
+
+The functions below use the Ensembl Perl API to fetch the required data directly from the Ensembl core databases. Thus, the path to the Perl API specific for the desired Ensembl version needs to be added to the \texttt{PERL5LIB} environment variable.
+
+An annotation package containing all human genes for Ensembl version 75 can be created using the code in the block below.
+
+<<eval=FALSE>>=
+library(ensembldb)
+
+## get all human gene/transcript/exon annotations from Ensembl (75)
+## the resulting tables will be stored by default to the current working
+## directory
+fetchTablesFromEnsembl(75, species="human")
+
+## These tables can then be processed to generate a SQLite database
+## containing the annotations (again, the function assumes the required
+## txt files to be present in the current working directory)
+DBFile <- makeEnsemblSQLiteFromTables()
+
+## and finally we can generate the package
+makeEnsembldbPackage(ensdb=DBFile, version="0.99.3",
+		     maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
+		     author="J Rainer")
+@ %def
+
+The generated package can then be build using \texttt{R CMD build EnsDb.Hsapiens.v75} and installed with \texttt{R CMD INSTALL EnsDb.Hsapiens.v75*}.
+
+
+\section{Database layout\label{section.database.layout}}
+\label{sec-6}
+
+The database consists of the following tables and attributes (the layout is also shown in Figure \ref{fig.database.layout}):
+
+\begin{itemize}
+\item \textbf{gene}: all gene specific annotations.
+\begin{itemize}
+\item \texttt{gene\_id}: the Ensembl ID of the gene.
+\item \texttt{gene\_name}: the name (symbol) of the gene.
+\item \texttt{entrezid}: the NCBI Entrezgene ID(s) of the gene. Note that this can be a \texttt{;} separated list of IDs for genes that are mapped to more than one Entrezgene.
+\item \texttt{gene\_biotype}: the biotype of the gene.
+\item \texttt{gene\_seq\_start}: the start coordinate of the gene on the sequence (usually a chromosome).
+\item \texttt{gene\_seq\_end}: the end coordinate of the gene on the sequence.
+\item \texttt{seq\_name}: the name of the sequence (usually the chromosome name).
+\item \texttt{seq\_strand}: the strand on which the gene is encoded.
+\item \texttt{seq\_coord\_system}: the coordinate system of the sequence.
+\end{itemize}
+
+\item \textbf{tx}: all transcript related annotations.
+\begin{itemize}
+\item \texttt{tx\_id}: the Ensembl transcript ID.
+\item \texttt{tx\_biotype}: the biotype of the transcript.
+\item \texttt{tx\_seq\_start}: the start coordinate of the transcript.
+\item \texttt{tx\_seq\_end}: the end coordinate of the transcript.
+\item \texttt{tx\_cds\_seq\_start}: the start coordinate of the coding region of the transcript (NULL for non-coding transcripts).
+\item \texttt{tx\_cds\_seq\_end}: the end coordinate of the coding region of the transcript.
+\item \texttt{gene\_id}: the gene to which the transcript belongs.
+\end{itemize}
+
+\item \textbf{exon}: all exon related annotation.
+\begin{itemize}
+\item \texttt{exon\_id}: the Ensembl exon ID.
+\item \texttt{exon\_seq\_start}: the start coordinate of the exon.
+\item \texttt{exon\_seq\_end}: the end coordinate of the exon.
+\end{itemize}
+
+\item \textbf{tx2exon}: provides the n:m mapping between transcripts and exons.
+\begin{itemize}
+\item \texttt{tx\_id}: the Ensembl transcript ID.
+\item \texttt{exon\_id}: the Ensembl exon ID.
+\item \texttt{exon\_idx}: the index of the exon in the corresponding transcript, always from 5' to 3' of the transcript.
+\end{itemize}
+
+\item \textbf{chromosome}: provides some information about the chromosomes.
+\begin{itemize}
+\item \texttt{seq\_name}: the name of the sequence/chromosome.
+\item \texttt{seq\_length}: the length of the sequence.
+\item \texttt{is\_circular}: whether the sequence in circular.
+\end{itemize}
+
+\item \textbf{information}: some additional, internal, informations (Genome build, Ensembl version etc).
+\begin{itemize}
+\item \texttt{key}
+\item \texttt{value}
+\end{itemize}
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=14cm]{images/dblayout.png}
+\caption{\label{fig.database.layout}Database layout.}
+\end{figure}
+% Emacs 25.0.50.1 (Org mode 8.3beta)
+\end{document}

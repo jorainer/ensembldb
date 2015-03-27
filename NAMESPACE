@@ -1,0 +1,27 @@
+import( methods )
+import( BiocGenerics )
+importFrom( DBI, dbDriver )
+importFrom( Biobase, createPackage )
+importFrom( GenomeInfoDb, Seqinfo )
+importFrom( AnnotationDbi, dbconn )
+import( RSQLite )
+import( GenomicFeatures )
+import( GenomicRanges )
+
+#exportPattern("^[[:alpha:]]+")
+export( fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage )
+exportClasses( EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
+              GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
+              SeqstrandFilter, SeqstartFilter, SeqendFilter )
+## for EnsFilter
+exportMethods( column, print, show, where )
+## for class EnsDb:
+exportMethods( dbconn, condition, buildQuery, exons, exonsBy, genes, lengthOf,
+              listColumns, listGenebiotypes, listTxbiotypes, listTables, organism,
+              seqinfo, toSAF, transcripts, transcriptsBy, disjointExons )
+## constructors
+export( EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
+       TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,
+       SeqendFilter, EnsDb )
+
+

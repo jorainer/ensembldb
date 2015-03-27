@@ -1,0 +1,9 @@
+##import(AnnotationDbi)
+import(GenomicFeatures)
+import( ensembldb )
+
+### Don't export @TXDBOBJNAME@ (the object defined in this
+### package): it is created and dynamically exported at load time (refer
+### to R/zzz.R for the details).
+
+
