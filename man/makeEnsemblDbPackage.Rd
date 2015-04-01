@@ -16,7 +16,7 @@
 
 fetchTablesFromEnsembl(version, ensemblapi, user="anonymous",
                        host="ensembldb.ensembl.org", pass="",
-                       species="human")
+                       port=5306, species="human")
 
 makeEnsemblSQLiteFromTables(path=".", dbname)
 
@@ -43,6 +43,9 @@ makeEnsembldbPackage(ensdb, version, maintainer, author,
   }
   \item{ pass }{
     The password for the Ensembl database.
+  }
+  \item{ port }{
+    The port to be used to connect to the Ensembl database.
   }
   \item{ species }{
     The species for which the annotations should be retrieved.
