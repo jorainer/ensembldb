@@ -14,13 +14,14 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.1.2";
+my $script_version = "0.1.3";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::ApiVersion;
 my $user = "anonymous";
 my $host = "ensembldb.ensembl.org";
+my $port = 5306;
 my $pass = "";
 my $registry = 'Bio::EnsEMBL::Registry';
 my $ensembl_version="none";
@@ -32,56 +33,64 @@ my $coord_system_version="unknown";
 my @gene_ids = ();
 
 my %option=();
-getopts("e:hH:P:U:s:",\%option);
-if( $option{ h } ){
+getopts("e:hH:P:p:U:s:",\%option);
+if($option{ h }){
   ## print help and exit.
-  print( "\nget_gene_transcript_exon_tables version ".$script_version.".\n" );
-  print( "Retrieves gene/transcript/exon annotations from Ensembl and stores it as tabulator delimited text files.\n\n" );
-  print( "usage: perl get_gene_transcript_exon_tables -e:hH:P:U:s:\n" );
-  print( "-e (required): the Ensembl version (e.g. -e 75). The function will internally check if the submitted version matches the Ensembl API version and database queried.\n" );
-  print( "-H (optional): the hostname of the Ensembl database; defaults to ensembldb.ensembl.org.\n" );
-  print( "-h (optional): print this help message.\n" );
-  print( "-P (optional): the password to access the Ensembl database.\n" );
-  print( "-U (optional): the username to access the Ensembl database.\n" );
-  print( "-s (optional): the species; defaults to human.\n" );
-  print( "\n\nThe script will generate the following tables:\n" );
-  print( "- ens_gene.txt: contains all genes defined in Ensembl.\n" );
-  print( "- ens_transcript.txt: contains all transcripts of all genes.\n" );
-  print( "- ens_exon.txt: contains all (unique) exons, along with their genomic alignment.\n" );
-  print( "- ens_tx2exon.txt: relates transcript ids to exon ids (m:n), along with the index of the exon in the respective transcript (since the same exon can be part of different transcripts and have a different index in each transcript).\n" );
-  print( "- ens_chromosome.txt: the information of all chromosomes (chromosome/sequence/contig names). \n" );
-  print( "- ens_metadata.txt\n" );
+  print("\nget_gene_transcript_exon_tables version ".$script_version.".\n");
+  print("Retrieves gene/transcript/exon annotations from Ensembl and stores it as tabulator delimited text files.\n\n");
+  print("usage: perl get_gene_transcript_exon_tables -e:hH:P:U:s:\n");
+  print("-e (required): the Ensembl version (e.g. -e 75). The function will internally check if the submitted version matches the Ensembl API version and database queried.\n");
+  print("-H (optional): the hostname of the Ensembl database; defaults to ensembldb.ensembl.org.\n");
+  print("-h (optional): print this help message.\n");
+  print("-p (optional): the port to access the Ensembl database.\n");
+  print("-P (optional): the password to access the Ensembl database.\n");
+  print("-U (optional): the username to access the Ensembl database.\n");
+  print("-s (optional): the species; defaults to human.\n");
+  print("\n\nThe script will generate the following tables:\n");
+  print("- ens_gene.txt: contains all genes defined in Ensembl.\n");
+  print("- ens_transcript.txt: contains all transcripts of all genes.\n");
+  print("- ens_exon.txt: contains all (unique) exons, along with their genomic alignment.\n");
+  print("- ens_tx2exon.txt: relates transcript ids to exon ids (m:n), along with the index of the exon in the respective transcript (since the same exon can be part of different transcripts and have a different index in each transcript).\n");
+  print("- ens_chromosome.txt: the information of all chromosomes (chromosome/sequence/contig names). \n");
+  print("- ens_metadata.txt\n");
   exit 0;
 }
 
-if( defined($option{ s } ) ){
+if(defined($option{ s })){
 	$species=$option{ s };
 }
-if( defined( $option{ U } ) ){
+if(defined($option{ U })){
 	$user=$option{ U };
 }
-if( defined( $option{ H } ) ){
+if(defined($option{ H })){
 	$host=$option{ H };
 }
-if( defined( $option{ P } ) ){
+if(defined($option{ P })){
 	$pass=$option{ P };
 }
-if( defined( $option{ e } ) ){
-	$ensembl_version=$option{ e };
+if(defined($option{ p })){
+  $port=$option{ p };
 }
-else{
-	die("the ensembl version has to be specified with the -e parameter (e.g. -e 75)");
+if(defined($option{ e })){
+	$ensembl_version=$option{ e };
+}else{
+	die("The ensembl version has to be specified with the -e parameter (e.g. -e 75)");
 }
 
 my $api_version="".software_version()."";
-if( $ensembl_version ne $api_version ){
+if($ensembl_version ne $api_version){
     die "The submitted Ensembl version (".$ensembl_version.") does not match the version of the Ensembl API (".$api_version."). Please configure the environment variable ENS to point to the correct API.";
 }
 
+print "Connecting to ".$host." at port ".$port."\n";
+
+# $registry->load_registry_from_db(-host => $host, -user => $user,
+# 				 -pass => $pass, -port => $port,
+# 				 -verbose => "1");
 $registry->load_registry_from_db(-host => $host, -user => $user,
-				 -pass => $pass, -verbose => "1" );
-my $gene_adaptor = $registry->get_adaptor( $species, $ensembl_database, "gene" );
-my $slice_adaptor = $registry->get_adaptor( $species, $ensembl_database, "slice" );
+				 -pass => $pass, -port => $port);
+my $gene_adaptor = $registry->get_adaptor($species, $ensembl_database, "gene");
+my $slice_adaptor = $registry->get_adaptor($species, $ensembl_database, "slice");
 
 ## determine the species:
 my $species_id = $gene_adaptor->db->species_id;
@@ -107,7 +116,7 @@ print EXON "exon_id\texon_seq_start\texon_seq_end\n";
 open(T2E , ">ens_tx2exon.txt");
 print T2E "tx_id\texon_id\texon_idx\n";
 
-open( CHR , ">ens_chromosome.txt" );
+open(CHR , ">ens_chromosome.txt");
 print CHR "seq_name\tseq_length\tis_circular\n";
 
 ##OK now running the stuff:
@@ -116,18 +125,18 @@ my %done_chromosomes=();
 my %done_exons=();  ## to keep track of which exons have already been saved.
 my $counta = 0;
 @gene_ids = @{$gene_adaptor->list_stable_ids()};
-foreach my $gene_id ( @gene_ids ){
+foreach my $gene_id (@gene_ids){
   $counta++;
-  if( ($counta % 2000) == 0 ){
+  if(($counta % 2000) == 0){
     print "processed $counta genes\n";
   }
   my $orig_gene;
 
-  $orig_gene = $gene_adaptor->fetch_by_stable_id( $gene_id );
-  if( defined $orig_gene ){
+  $orig_gene = $gene_adaptor->fetch_by_stable_id($gene_id);
+  if(defined $orig_gene){
     my $do_transform=1;
     my $gene  = $orig_gene->transform("chromosome");
-    if( !defined $gene ){
+    if(!defined $gene){
       ## gene is not on known defined chromosomes!
       $gene = $orig_gene;
       $do_transform=0;
@@ -137,7 +146,7 @@ foreach my $gene_id ( @gene_ids ){
     my $strand = $gene->strand;
 
     ## check if we did already fetch some info for that chromosome
-    if( exists( $done_chromosomes{ $chrom } ) ){
+    if(exists($done_chromosomes{ $chrom })){
       ## don't do anything...
     }else{
       $done_chromosomes{ $chrom } = "done";
@@ -146,11 +155,11 @@ foreach my $gene_id ( @gene_ids ){
       my $length = $chr_slice->length;
       my $is_circular = $chr_slice->is_circular;
       print CHR "$name\t$length\t$is_circular\n";
-      my $chr_slice_again = $slice_adaptor->fetch_by_region( 'chromosome', $chrom );
-      if( defined( $chr_slice_again ) ){
+      my $chr_slice_again = $slice_adaptor->fetch_by_region('chromosome', $chrom);
+      if(defined($chr_slice_again)){
 	$coord_system_version = $chr_slice_again->coord_system()->version();
       }
-      # if( defined $chr_slice ){
+      # if(defined $chr_slice){
       # 	my $name = $chr_slice->seq_region_name;
       # 	my $length = $chr_slice->length;
       # 	my $is_circular = $chr_slice->is_circular;
@@ -164,30 +173,30 @@ foreach my $gene_id ( @gene_ids ){
 
     ## get information for the gene.
     my $gene_external_name= $gene->external_name;
-    if( !defined( $gene_external_name ) ){
+    if(!defined($gene_external_name)){
       $gene_external_name="";
     }
     my $gene_biotype = $gene->biotype;
     my $gene_seq_start = $gene->start;
     my $gene_seq_end = $gene->end;
     ## get entrezgene ID, if any...
-    my $all_entries = $gene->get_all_DBLinks( "EntrezGene" );
+    my $all_entries = $gene->get_all_DBLinks("EntrezGene");
     my %entrezgene_hash=();
-    foreach my $dbe ( @{$all_entries} ){
+    foreach my $dbe (@{$all_entries}){
       $entrezgene_hash{ $dbe->primary_id } = 1;
     }
     my $hash_size = keys %entrezgene_hash;
     my $entrezid = "";
-    if( $hash_size > 0 ){
-      $entrezid = join( ";", keys %entrezgene_hash );
+    if($hash_size > 0){
+      $entrezid = join(";", keys %entrezgene_hash);
     }
     print GENE "$gene_id\t$gene_external_name\t$entrezid\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\n";
 
     ## process transcript(s)
     my @transcripts = @{ $gene->get_all_Transcripts };
     ## ok looping through the transcripts
-    foreach my $transcript ( @transcripts ){
-      if( $do_transform==1 ){
+    foreach my $transcript (@transcripts){
+      if($do_transform==1){
 	## just to be shure that we have the transcript in chromosomal coordinations.
 	$transcript = $transcript->transform("chromosome");
       }
@@ -196,11 +205,11 @@ foreach my $gene_id ( @gene_ids ){
 
       ## caution!!! will get undef if transcript is non-coding!
       my $tx_cds_start = $transcript->coding_region_start;
-      if( !defined( $tx_cds_start ) ){
+      if(!defined($tx_cds_start)){
 	$tx_cds_start = "NULL";
       }
       my $tx_cds_end = $transcript->coding_region_end;
-      if( !defined( $tx_cds_end ) ){
+      if(!defined($tx_cds_end)){
 	$tx_cds_end = "NULL";
       }
       my $tx_id = $transcript->stable_id;
@@ -212,11 +221,11 @@ foreach my $gene_id ( @gene_ids ){
 ##      print G2T "$gene_id\t$tx_id\n";
 
       ## process exon(s)
-      ##my @exons = @{ $transcript->get_all_Exons( -constitutive => 1 ) };
-      my @exons = @{ $transcript->get_all_Exons( ) };  ## exons always returned 5' 3' of transcript!
+      ##my @exons = @{ $transcript->get_all_Exons(-constitutive => 1) };
+      my @exons = @{ $transcript->get_all_Exons() };  ## exons always returned 5' 3' of transcript!
       my $current_exon_idx = 1;
       foreach my $exon (@exons){
-	if( $do_transform==1 ){
+	if($do_transform==1){
 	  $exon->transform("chromosome");
 	}
 	my $exon_start = $exon->start;
@@ -225,7 +234,7 @@ foreach my $gene_id ( @gene_ids ){
 
 	## write info, but only if we didn't already saved this exon (exon can be
 	## part of more than one transcript).
-	if( exists( $done_exons{ $exon_id } ) ){
+	if(exists($done_exons{ $exon_id })){
 	  ## don't do anything.
 	}else{
 	  $done_exons{ $exon_id } = 1;
@@ -243,7 +252,7 @@ foreach my $gene_id ( @gene_ids ){
 
 ## want to save:
 ## data, ensembl host, species, ensembl version, genome build?
-open( INFO , ">ens_metadata.txt");
+open(INFO , ">ens_metadata.txt");
 print INFO "name\tvalue\n";
 print INFO "Db type\tEnsDb\n";
 print INFO "Type of Gene ID\tEnsembl Gene ID\n";
@@ -257,13 +266,13 @@ print INFO "Organism\t$species_ens\n";
 print INFO "genome_build\t$coord_system_version\n";
 print INFO "DBSCHEMAVERSION\t1.0\n";
 
-close( INFO );
+close(INFO);
 
-close( GENE );
-close( TRANSCRIPT );
-close( EXON );
-##close( G2T );
-close( T2E );
-close( CHR );
+close(GENE);
+close(TRANSCRIPT);
+close(EXON);
+##close(G2T);
+close(T2E);
+close(CHR);
 
 

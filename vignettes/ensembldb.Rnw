@@ -1,9 +1,9 @@
-% Created 2015-03-19 Thu 12:50
 %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
 %\VignetteKeywords{annotation, database}
 %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
 %\VignettePackage{ensembldb}
 %\VignetteEngine{knitr::knitr}
+% Created 2015-04-01 Wed 12:06
 \documentclass[11pt]{article}
 
 <<style,results='asis', echo=FALSE, eval=TRUE>>=
@@ -11,19 +11,17 @@ BiocStyle::latex()
 @ %def
 
 \author{Johannes Rainer}
-\date{Modified: 19 March, 2015. Compiled: \today}
+\date{Modified: 1 April, 2015. Compiled: \today}
 \title{Generating and using Ensembl based annotation packages}
 \hypersetup{
- pdfauthor={Johannes Rainer},
- pdftitle={Generating and using Ensembl based annotation packages},
- pdfkeywords={},
- pdfsubject={},
- pdfcreator={Emacs 25.0.50.1 (Org mode 8.3beta)},
- pdflang={English}}
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 25.0.50.1 (Org mode 8.2.10)}}
 \begin{document}
 
 \maketitle
 \tableofcontents
+
 
 
 \section{Introduction}
@@ -241,12 +239,14 @@ fetchTablesFromEnsembl(75, species="human")
 DBFile <- makeEnsemblSQLiteFromTables()
 
 ## and finally we can generate the package
-makeEnsembldbPackage(ensdb=DBFile, version="0.99.3",
+makeEnsembldbPackage(ensdb=DBFile, version="0.99.12",
 		     maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
 		     author="J Rainer")
 @ %def
 
 The generated package can then be build using \texttt{R CMD build EnsDb.Hsapiens.v75} and installed with \texttt{R CMD INSTALL EnsDb.Hsapiens.v75*}.
+
+To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the \emph{Ensembl genomes} should be specified as a host, i.e. setting \texttt{host}"mysql-eg-publicsql.ebi.ac.uk"=, \texttt{port=4157} and species to e.g. \texttt{species}"arabidopsis thaliana"=.
 
 
 \section{Database layout\label{section.database.layout}}
@@ -312,5 +312,5 @@ The database consists of the following tables and attributes (the layout is also
 \includegraphics[width=14cm]{images/dblayout.png}
 \caption{\label{fig.database.layout}Database layout.}
 \end{figure}
-% Emacs 25.0.50.1 (Org mode 8.3beta)
+% Emacs 25.0.50.1 (Org mode 8.2.10)
 \end{document}

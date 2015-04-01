@@ -1,0 +1,336 @@
+#+TITLE: Generating and using Ensembl based annotation packages
+#+AUTHOR:    Johannes Rainer
+#+EMAIL:     johannes.rainer@eurac.edu
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS: ^:{}
+#+PROPERTY: exports code
+#+PROPERTY: session *R*
+
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+latex: %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
+#+latex: %\VignetteKeywords{annotation, database}
+#+latex: %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
+#+latex: %\VignettePackage{ensembldb}
+#+latex: %\VignetteEngine{knitr::knitr}
+
+#+NAME: style
+#+BEGIN_SRC R :ravel results='asis', echo=FALSE, eval=TRUE
+BiocStyle::latex()
+#+END_SRC
+
+
+* How to export this to a =Rnw= vignette			   :noexport:
+
+Use =ox-ravel= from the =orgmode-accessories= package to export this file to a =Rnw= file. After export edit the generated =Rnw= in the following way:
+
+1) Delete all =\usepackage= commands.
+2) Move the =<<style>>= code chunk before the =\begin{document}= and before =\author=.
+3) Move all =%\Vignette...= lines at the start of the file (even before =\documentclass=).
+4) Replace =\date= with =\date{Modified: 21 October, 2013. Compiled: \today}=
+
+Note: use =:ravel= followed by the properties for the code chunk headers, e.g. =:ravel results='hide'=. Other options for knitr style options are:
++ =results=: ='hide'= (hides all output, not warnings or messages), ='asis'=, ='markup'= (the default).
++ =warning=: =TRUE= or =FALSE= whether warnings should be displayed.
++ =message=: =TRUE= or =FALSE=, same as above.
++ =include=: =TRUE= or =FALSE=, whether the output should be included into the final document (code is still evaluated).
+
+* Introduction
+
+The =ensembldb= package provides functions to create and use transcript centric annotation databases/packages. The annotation for the databases are directly fetched from Ensembl [fn:1] using their Perl API.
+The functionality and data is similar to that of the =TxDb= packages from the =GenomicFeatures= package, but, in addition to retrieve all gene/transcript models and annotations from the database, the =ensembldb= package provides also a filter framework allowing to retrieve annotations for specific entries like genes encoded on a chromosome region or transcript models of lincRNA genes.
+In the databases, along with the gene and transcript models and their chromosomal coordinates, additional annotations including the gene name (symbol) and NCBI Entrezgene identifiers as well as the gene and transcript biotypes are stored too (see Section [[section.database.layout]] for the database layout and an overview of available attributes/columns).
+
+Another main goal of this package is to generate /versioned/ annotation packages, i.e. annotation packages that are build for a specific Ensembl release, and are also named according to that (e.g. =EnsDb.Hsapiens.v75= for human gene definitions of the Ensembl code database version 75). This ensures reproducibility, as it allows to load annotations from a specific Ensembl release also if newer versions of annotation packages/releases are available. It also allows to load multiple annotation packages at the same time in order to e.g. compare gene models between Ensembl releases.
+
+In the example below we load an Ensembl based annotation package for Homo sapiens, Ensembl version 75. The connection to the database is bound to the variable =EnsDb.Hsapiens.v75=.
+
+#+BEGIN_SRC R :ravel warning=FALSE, message=FALSE
+  library(EnsDb.Hsapiens.v75)
+
+  ## print some informations for this package
+  EnsDb.Hsapiens.v75
+
+  ## for what organism was the database generated?
+  organism(EnsDb.Hsapiens.v75)
+#+END_SRC
+
+* Using =ensembldb= annotation packages to retrieve specific annotations
+
+The =ensembldb= package provides a set of filter objects allowing to specify which entries should be fetched from the database. The complete list of filters, which can be used individually or can be combined, is shown below (in alphabetical order):
+
++ =ExonidFilter=: allows to filter the result based on the (Ensembl) exon identifiers.
++ =EntrezidFilter=: allows to filter results based on NCBI Entrezgene identifiers of the genes.
++ =GenebiotypeFilter=: allows to filter for the gene biotypes defined in the Ensembl database; use the =listGenebiotypes= method to list all available biotypes.
++ =GeneidFilter=: allows to filter based on the Ensembl gene IDs.
++ =GenenameFilter=: allows to filter based on the names (symbols) of the genes.
++ =SeqendFilter=: filter based on the chromosomal end coordinate of the exons, transcripts or genes (correspondingly set =feature="exon"=, =feature="tx"= or =feature="gene"=).
++ =SeqnameFilter=: filter by the name of the chromosomes the genes are encoded on.
++ =SeqstartFilter=: filter based on the chromosomal start coordinates of the exons, transcripts or genes (correspondingly set =feature="exon"=, =feature="tx"= or =feature="gene"=).
++ =SeqstrandFilter=: filter for the chromosome strand on which the genes are encoded.
++ =TxbiotypeFilter=: filter on the transcript biotype defined in Ensembl; use the =listTxbiotypes= method to list all available biotypes.
++ =TxidFilter=: filter on the Ensembl transcript identifiers.
+
+Each of the filter classes can take a single value or a vector of values (with the exception of the =SeqendFilter= and =SeqstartFilter=) for comparison. In addition, it is possible to specify the /condition/ for the filter, e.g. =condition="="= to retrieve all entries matching the filter value, =condition="!="= to negate the filter or also =condition="like"= to allow partial matching. The =condition= parameter for =SeqendFilter= and =SeqendFilter= can take the values ===, =>=, =>==, =<= and =<== (since these filters base on numeric values).
+
+A simple example would be to get all transcripts for the gene /BCL2L11/. To this end we specify a =GenenameFilter= with the value ="BCL2L11"=. As a result we get a =GRanges= object with =start=, =end=, =strand= and =seqname= of the =GRanges= object being the start coordinate, end coordinate, chromosome name and strand for the respective transcripts. All additional annotations are available as metadata columns. Alternatively, by setting =return.type="DataFrame"=, or =return.type="data.frame"= the method would return a =DataFrame= object or =data.frame=.
+
+#+BEGIN_SRC R
+  Tx <- transcripts(EnsDb.Hsapiens.v75, filter=list(GenenameFilter("BCL2L11")))
+
+  Tx
+
+  ## as this is a GRanges object we can access e.g. the start coordinates with
+  head(start(Tx))
+
+  ## or extract the biotype with
+  head(Tx$tx_biotype)
+#+END_SRC
+
+The parameter =columns= of the =exons=, =genes= and =transcripts= method allow to specify which database attributes (columns) should be retrieved. Note that these are not restricted to columns of the corresponding database table (e.g. columns of database table /gene/ for =genes=). To get an overview of database tables and available columns the function =listTables= can be used. The method =listColumns= on the other hand lists columns for the specified database table.
+
+#+BEGIN_SRC R
+  ## list all database tables along with their columns
+  listTables(EnsDb.Hsapiens.v75)
+
+  ## list columns from a specific table
+  listColumns(EnsDb.Hsapiens.v75, "tx")
+#+END_SRC
+
+Thus, we could retrieve all transcripts of the biotype /nonsense_mediated_decay/ (which, according to the definitions by Ensembl are transcribed, but most likely not translated in a protein, but rather degraded after transcription) along with the name of the gene for each transcript. Note that we are changing here the =return.type= to =DataFrame=, so the method will return a =DataFrame= with the results instead of the default =GRanges=.
+
+#+BEGIN_SRC R
+  Tx <- transcripts(EnsDb.Hsapiens.v75,
+                    columns=c(listColumns(EnsDb.Hsapiens.v75 , "tx"), "gene_name"),
+                    filter=list(TxbiotypeFilter("nonsense_mediated_decay")),
+                    return.type="DataFrame")
+  nrow(Tx)
+  Tx
+#+END_SRC
+
+To get an overview of allowed/available gene and transcript biotype the functions =listGenebiotypes= and =listTxbiotypes= can be used.
+
+#+BEGIN_SRC R
+  ## Get all gene biotypes from the database. The GenebiotypeFilter
+  ## allows to filter on these values.
+  listGenebiotypes(EnsDb.Hsapiens.v75)
+
+  ## Get all transcript biotypes from the database.
+  listTxbiotypes(EnsDb.Hsapiens.v75)
+#+END_SRC
+
+Data can be fetched in an analogous way using the =exons= and =genes= methods. In the example below we retrieve =gene_name=, =entrezid= and the =gene_biotype= of all genes in the database which names start with ="BCL2"=.
+
+#+BEGIN_SRC R
+  ## We're going to fetch all genes which names start with BCL. To this end
+  ## we define a GenenameFilter with partial matching, i.e. condition "like"
+  ## and a % for any character/string.
+  BCLs <- genes(EnsDb.Hsapiens.v75,
+                columns=c("gene_name", "entrezid", "gene_biotype"),
+                filter=list(GenenameFilter("BCL%", condition="like")),
+                return.type="DataFrame")
+  nrow(BCLs)
+  BCLs
+#+END_SRC
+
+Sometimes it might be useful to know the length of genes or transcripts (i.e. the total sum of nucleotides covered by their exons). Below we calculate the mean length of transcripts from protein coding genes on chromosomes X and Y as well as the average length of snoRNA, snRNA and rRNA transcripts encoded on these chromosomes.
+
+#+BEGIN_SRC R
+  ## determine the average length of snRNA, snoRNA and rRNA genes encoded on
+  ## chromosomes X and Y.
+  mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
+                filter=list(GenebiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
+                    SeqnameFilter(c("X", "Y")))))
+
+  ## determine the average length of protein coding genes encoded on the same
+  ## chromosomes.
+  mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
+                filter=list(GenebiotypeFilter("protein_coding"),
+                    SeqnameFilter(c("X", "Y")))))
+#+END_SRC
+
+Not unexpectedly, transcripts of protein coding genes are longer than those of snRNA, snoRNA or rRNA genes.
+
+
+* Extracting gene/transcript/exon models for RNASeq feature counting
+
+For the feature counting step of an RNAseq experiment, the gene or transcript models (defined by the chromosomal start and end positions of their exons) have to be known. To extract these from an Ensembl based annotation package, the =exonsBy=, =genesBy= and =transcriptsBy= methods can be used in an analogous way as in =TxDb= packages generated by the =GenomicFeatures= package.
+However, the =transcriptsBy= method does not, in contrast to the method in the =GenomicFeatures= package, allow to return transcripts by ="cds"=. While the annotation packages built by the =ensembldb= contain the chromosomal start and end coordinates of the coding region (for protein coding genes) they do not assign an ID to each CDS.
+
+A simple use case is to retrieve all genes encoded on chromosomes X and Y from the database.
+
+#+BEGIN_SRC R
+  TxByGns <- transcriptsBy(EnsDb.Hsapiens.v75, by="gene",
+                           filter=list(SeqnameFilter(c("X", "Y")))
+                           )
+  TxByGns
+#+END_SRC
+
+Since Ensembl contains also definitions of genes that are on chromosome variants (supercontigs), it is advisable to specify the chromosome names for which the gene models should be returned.
+
+In a real use case, we might thus want to retrieve all genes encoded on the /standard/ chromosomes. In addition it is advisable to use a =GeneidFilter= to restrict to Ensembl genes only, as also /LRG/ (Locus Reference Genomic) genes[fn:3] are defined in the database, which are partially redundant with Ensembl genes.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
+  ## Note: want to get rid of the "LRG" genes!!!
+  EnsGenes <- exonsBy(EnsDb.Hsapiens.v75, by="gene",
+                      filter=list(SeqnameFilter(c(1:22, "X", "Y")),
+                          GeneidFilter("ENSG%", "like")))
+#+END_SRC
+
+The code above returns a =GRangesList= that can be used directly as an input for the =summarizeOverlaps= function from the =GenomicAlignments= package [fn:4].
+
+Alternatively, the above =GRangesList= can be transformed to a =data.frame= in /SAF/ format that can be used as an input to the =featureCounts= function of the =Rsubread= package [fn:5].
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  ## Transforming the GRangesList into a data.frame in SAF format
+  EnsGenes.SAF <- toSAF(EnsGenes)
+
+#+END_SRC
+
+Note that the ID by which the =GRangesList= is split is used in the SAF formatted =data.frame= as the =GeneID=. In the example below this would be the Ensembl gene IDs, while the start, end coordinates (along with the strand and chromosomes) are those of the the exons.
+
+In addition, the =disjointExons= function (similar to the one defined in =GenomicFeatures=) can be used to generate a =GRanges= of non-overlapping exon parts which can be used in the =DEXSeq= package.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  ## Create a GRanges of non-overlapping exon parts.
+  DJE <- disjointExons(EnsDb.Hsapiens.v75,
+                       filter=list(SeqnameFilter(c(1:22, "X", "Y")),
+                            GeneidFilter("ENSG%", "like")))
+
+#+END_SRC
+
+
+
+* Important notes
+
+These notes might explain eventually unexpected results (and, more importantly, help avoiding them):
+
++ The ordering of the results returned by the =genes=, =exons=, =transcripts= methods can be specified with the =order.by= parameter. The ordering of the results does however *not* correspond to the ordering of values in submitted filter objects.
+
++ Results of =exonsBy=, =transcriptsBy= are always ordered by the =by= argument.
+
+
+* Building an transcript centric database package based on Ensembl annotation
+
+The code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, fetching data from the Ensembl database takes quite some time, thus, in this section only the code is displayed, but not executed.
+
+
+** Requirements
+
+The package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site /ensembldb.ensembl.org/). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see [fn:2] for details).
+
+
+** Building an annotation package
+
+The functions below use the Ensembl Perl API to fetch the required data directly from the Ensembl core databases. Thus, the path to the Perl API specific for the desired Ensembl version needs to be added to the =PERL5LIB= environment variable.
+
+An annotation package containing all human genes for Ensembl version 75 can be created using the code in the block below.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  library(ensembldb)
+
+  ## get all human gene/transcript/exon annotations from Ensembl (75)
+  ## the resulting tables will be stored by default to the current working
+  ## directory
+  fetchTablesFromEnsembl(75, species="human")
+
+  ## These tables can then be processed to generate a SQLite database
+  ## containing the annotations (again, the function assumes the required
+  ## txt files to be present in the current working directory)
+  DBFile <- makeEnsemblSQLiteFromTables()
+
+  ## and finally we can generate the package
+  makeEnsembldbPackage(ensdb=DBFile, version="0.99.12",
+                       maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
+                       author="J Rainer")
+
+#+END_SRC
+
+The generated package can then be build using =R CMD build EnsDb.Hsapiens.v75= and installed with =R CMD INSTALL EnsDb.Hsapiens.v75*=.
+
+To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting =host="mysql-eg-publicsql.ebi.ac.uk"=, =port=4157= and species to e.g. =species="arabidopsis thaliana"=.
+
+
+* Database layout<<section.database.layout>>
+
+The database consists of the following tables and attributes (the layout is also shown in Figure [[fig.database.layout]]):
+
++ *gene*: all gene specific annotations.
+  - =gene_id=: the Ensembl ID of the gene.
+  - =gene_name=: the name (symbol) of the gene.
+  - =entrezid=: the NCBI Entrezgene ID(s) of the gene. Note that this can be a =;= separated list of IDs for genes that are mapped to more than one Entrezgene.
+  - =gene_biotype=: the biotype of the gene.
+  - =gene_seq_start=: the start coordinate of the gene on the sequence (usually a chromosome).
+  - =gene_seq_end=: the end coordinate of the gene on the sequence.
+  - =seq_name=: the name of the sequence (usually the chromosome name).
+  - =seq_strand=: the strand on which the gene is encoded.
+  - =seq_coord_system=: the coordinate system of the sequence.
+
++ *tx*: all transcript related annotations.
+  - =tx_id=: the Ensembl transcript ID.
+  - =tx_biotype=: the biotype of the transcript.
+  - =tx_seq_start=: the start coordinate of the transcript.
+  - =tx_seq_end=: the end coordinate of the transcript.
+  - =tx_cds_seq_start=: the start coordinate of the coding region of the transcript (NULL for non-coding transcripts).
+  - =tx_cds_seq_end=: the end coordinate of the coding region of the transcript.
+  - =gene_id=: the gene to which the transcript belongs.
+
++ *exon*: all exon related annotation.
+  - =exon_id=: the Ensembl exon ID.
+  - =exon_seq_start=: the start coordinate of the exon.
+  - =exon_seq_end=: the end coordinate of the exon.
+
++ *tx2exon*: provides the n:m mapping between transcripts and exons.
+  - =tx_id=: the Ensembl transcript ID.
+  - =exon_id=: the Ensembl exon ID.
+  - =exon_idx=: the index of the exon in the corresponding transcript, always from 5' to 3' of the transcript.
+
++ *chromosome*: provides some information about the chromosomes.
+  - =seq_name=: the name of the sequence/chromosome.
+  - =seq_length=: the length of the sequence.
+  - =is_circular=: whether the sequence in circular.
+
++ *information*: some additional, internal, informations (Genome build, Ensembl version etc).
+  - =key=
+  - =value=
+
+#+ATTR_LATEX: :center :placement [H] :width 14cm
+#+NAME: fig.database.layout
+#+CAPTION: Database layout.
+[[file:images/dblayout.png]]
+
+
+
+* Footnotes
+
+[fn:1] http://www.ensembl.org
+
+[fn:2] http://www.ensembl.org/info/docs/api/api_installation.html
+
+[fn:3] http://www.lrg-sequence.org
+
+[fn:4] http://www.ncbi.nlm.nih.gov/pubmed/23950696
+
+[fn:5] http://www.ncbi.nlm.nih.gov/pubmed/24227677
+
+
+* TODOs								   :noexport:
+
+** DONE Fix the =ensembldb:::EnsDb= call in /zzz.R/ of the package template!
+   CLOSED: [2015-04-01 Wed 12:05]
+   - State "DONE"       from "TODO"       [2015-04-01 Wed 12:05]
+
+The =EnsDb= construction function is exported, thus there is no need for the =:::=.
+
+** TODO Implement the =fiveUTRsByTranscript= and =threeUTRsByTranscript= methods.
+** DONE Implement the =distjointExons= method.
+   CLOSED: [2015-03-25 Wed 09:43]
+   - State "DONE"       from "TODO"       [2015-03-25 Wed 09:43]
+** DONE Fix return value for =organism=
+   CLOSED: [2015-03-27 Fri 12:10]
+   - State "DONE"       from "TODO"       [2015-03-27 Fri 12:10]
+
+The return value should be /Genus species/, i.e. without =_= in between.

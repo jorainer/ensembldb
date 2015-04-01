@@ -1,4 +1,21 @@
-VERSION 0.99.11
+VERSION 0.99.13
+--------------
+
+NEW FEATURES
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Added argument "port" to the fetchTablesFromEnsembl to allow specifying the MySQL port
+      of the database.
+
+
+DEPRECATED AND DEFUNCT
+
+BUG FIXES
+
+
+
+VERSION 0.99.12
 --------------
 
 NEW FEATURES
