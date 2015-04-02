@@ -334,3 +334,10 @@ The =EnsDb= construction function is exported, thus there is no need for the =::
    - State "DONE"       from "TODO"       [2015-03-27 Fri 12:10]
 
 The return value should be /Genus species/, i.e. without =_= in between.
+** DONE Check =utils::news=, =?news=
+   CLOSED: [2015-04-02 Thu 08:50]
+   - State "DONE"       from "TODO"       [2015-04-02 Thu 08:50]
+** TODO build the database based on an Ensembl gtf file
+
++ That would be the pre-requisite to write recipes for the =AnnotationHub= package.
+** TODO Include recipe to =AnnotationHub=

@@ -1,7 +1,14 @@
-VERSION 0.99.13
---------------
+CHANGES IN VERSION 0.99.14
+--------------------------
 
-NEW FEATURES
+BUG FIXES
+
+    o Fixed a problem when reading tables fetched from Ensembl that contained ' or #.
+
+
+
+CHANGES IN VERSION 0.99.13
+--------------------------
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
@@ -9,158 +16,12 @@ SIGNIFICANT USER-VISIBLE CHANGES
       of the database.
 
 
-DEPRECATED AND DEFUNCT
 
-BUG FIXES
-
-
-
-VERSION 0.99.12
---------------
-
-NEW FEATURES
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-DEPRECATED AND DEFUNCT
+CHANGES IN VERSION 0.99.12
+--------------------------
 
 BUG FIXES
 
     o argument "x" for method organism changed to "object".
 
 
-VERSION 0.99.11
---------------
-
-NEW FEATURES
-
-    o Exporting the EnsDb constructor.
-
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o Added a running example to generate a SQLite database from tables
-      fetched from Ensembl.
-
-DEPRECATED AND DEFUNCT
-
-
-BUG FIXES
-
-
-
-VERSION 0.99.10
---------------
-
-NEW FEATURES
-
-    o Query builder is now a little optimized and tries to avoid expensive
-      joins whenever possible.
-    o Implemented the disjointExons method.
-
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o Argument with.tables added to the column and where methods.
-
-DEPRECATED AND DEFUNCT
-
-
-BUG FIXES
-
-
-
-VERSION 0.99.6
---------------
-
-NEW FEATURES
-
-    o Added methods listGenebiotypes and listTxbiotypes to list all available
-      gene and transcript biotypes.
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o Added more details to the Filter classes man page.
-    o Method getWhat is no longer exported.
-    o Parameters attributes were replaced by columns to be consistent with the
-      GenomicFeatures package.
-    o Parameter group.by has been removed as it was not used.
-
-DEPRECATED AND DEFUNCT
-
-    o Method connection is replaced by method dbconn.
-    o Method species is replaced by method organism.
-    o Method listAttributes is replaced with listColumns.
-    o Method attribute is replaced with column.
-    o All parameters attributes are replaced with columns.
-
-BUG FIXES
-
-    o Perl script fetches now also sequence length for non-chromosomes.
-    o Escaping single quotes in Filter values that might have caused an SQL error.
-
-
-
-
-VERSION 0.99.5
---------------
-
-NEW FEATURES
-
-    o Added return.type "DataFrame" to all methods.
-
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o Default return type for all methods is now GRanges.
-
-DEPRECATED AND DEFUNCT
-
-BUG FIXES
-
-    o Fixed a bug in genes without specifying a filter.
-
-
-
-
-VERSION 0.99.4
---------------
-
-NEW FEATURES
-
-    o Method species to return the species name from the database.
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-DEPRECATED AND DEFUNCT
-
-BUG FIXES
-
-    o Added missing documentation entry for method seqinfo.
-
-
-
-
-VERSION 0.99.3
---------------
-
-NEW FEATURES
-
-    o Unit tests included.
-
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o Method "tables" was renamed to "listTables".
-
-
-DEPRECATED AND DEFUNCT
-
-BUG FIXES
-
-
-
-
-VERSION 0.99.0
---------------
-
-    o That's the initial release.
