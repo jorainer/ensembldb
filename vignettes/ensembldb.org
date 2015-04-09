@@ -57,6 +57,7 @@ In the example below we load an Ensembl based annotation package for Homo sapien
   organism(EnsDb.Hsapiens.v75)
 #+END_SRC
 
+
 * Using =ensembldb= annotation packages to retrieve specific annotations
 
 The =ensembldb= package provides a set of filter objects allowing to specify which entries should be fetched from the database. The complete list of filters, which can be used individually or can be combined, is shown below (in alphabetical order):
