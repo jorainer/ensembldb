@@ -251,7 +251,9 @@ An annotation package containing all human genes for Ensembl version 75 can be c
 
 The generated package can then be build using =R CMD build EnsDb.Hsapiens.v75= and installed with =R CMD INSTALL EnsDb.Hsapiens.v75*=.
 
-To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting =host="mysql-eg-publicsql.ebi.ac.uk"=, =port=4157= and species to e.g. =species="arabidopsis thaliana"=.
+To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting =host = "mysql-eg-publicsql.ebi.ac.uk"= , =port=4157= and species to e.g. =species = "arabidopsis thaliana"= .
+
+Alternatively, an EnsDb SQLite file can also be generated with the =ensDbFromGtf= function from a GTF file from Ensembl. However, since these GTF files do not provide the chromosome lengths and the NCBI Entrezgene IDs, these information will not be available in the database.
 
 
 * Database layout<<section.database.layout>>

@@ -246,7 +246,9 @@ makeEnsembldbPackage(ensdb=DBFile, version="0.99.12",
 
 The generated package can then be build using \texttt{R CMD build EnsDb.Hsapiens.v75} and installed with \texttt{R CMD INSTALL EnsDb.Hsapiens.v75*}.
 
-To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the \emph{Ensembl genomes} should be specified as a host, i.e. setting \texttt{host}"mysql-eg-publicsql.ebi.ac.uk"=, \texttt{port=4157} and species to e.g. \texttt{species}"arabidopsis thaliana"=.
+To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the \emph{Ensembl genomes} should be specified as a host, i.e. setting \texttt{host="mysql-eg-publicsql.ebi.ac.uk"}, \texttt{port=4157} and species to e.g. \texttt{species="arabidopsis thaliana"}.
+
+Alternatively, an EnsDb SQLite file can also be generated with the \texttt{ensDbFromGtf} function from a GTF file from Ensembl. However, since these GTF files do not provide the chromosome lengths and the NCBI Entrezgene IDs, these information will not be available in the database.
 
 
 \section{Database layout\label{section.database.layout}}
