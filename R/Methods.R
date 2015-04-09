@@ -109,6 +109,10 @@ setMethod("organism", "EnsDb", function(object){
     return(Species)
 })
 
+setMethod("metadata", "EnsDb", function(x, ...){
+    Res <- dbGetQuery(dbconn(x), "select * from metadata")
+    return(Res)
+})
 #####
 ## Validation
 ##

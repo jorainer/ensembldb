@@ -12,6 +12,8 @@
 \alias{lengthOf}
 \alias{lengthOf,GRangesList-method}
 \alias{lengthOf,EnsDb-method}
+\alias{metadata}
+\alias{metadata,EnsDb-method}
 \alias{seqinfo}
 \alias{seqinfo,EnsDb-method}
 \alias{organism}
@@ -58,6 +60,8 @@ EnsDb(x)
 \S4method{listTxbiotypes}{EnsDb}(x, ...)
 
 \S4method{listTables}{EnsDb}(x, ...)
+
+\S4method{metadata}{EnsDb}(x, ...)
 
 \S4method{organism}{EnsDb}(object)
 
@@ -120,7 +124,8 @@ EnsDb(x)
     For \code{EnsDb}: the file name of the SQLite database.
 
     For \code{lengthOf}: either an \code{EnsDb} or a
-    \code{GRangesList} object. For all other methods an \code{EnsDb} instance.
+    \code{GRangesList} object. For all other methods an \code{EnsDb}
+    instance.
   }
 
 }
@@ -176,6 +181,12 @@ EnsDb(x)
       list being the database table names).
     }
 
+    \item{metadata}{
+      returns a \code{data.frame} with the metadata information from the
+      database, i.e. informations about the Ensembl version or Genome
+      build the database was build upon.
+    }
+
     \item{organism}{
       returns the organism name (e.g. \code{"homo_sapiens"}).
     }
@@ -223,6 +234,10 @@ EnsDb(x)
       and the elements being the attribute (column) names of the table.
     }
 
+    \item{For \code{metadata}}{
+      A \code{data.frame}.
+    }
+
     \item{For \code{organism}}{
       A character string.
     }
@@ -254,6 +269,9 @@ listTables(EnsDb.Hsapiens.v75)
 
 ## for what species is this database?
 organism(EnsDb.Hsapiens.v75)
+
+## get some more information from the database
+metadata(EnsDb.Hsapiens.v75)
 
 ######    buildQuery
 ##
