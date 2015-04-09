@@ -1,10 +1,11 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use an Ensembl based annotation database
-Version: 0.99.14
+Version: 0.99.15
 Author: J. Rainer
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
-Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb, AnnotationDbi
+Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb, AnnotationDbi,
+	 rtracklayer, S4Vectors
 Depends: BiocGenerics, GenomicRanges, GenomicFeatures
 Suggests: knitr, BiocStyle, EnsDb.Hsapiens.v75 (>= 0.99.7), RUnit
 VignetteBuilder: knitr
@@ -19,6 +20,6 @@ Description: The package provides functions to create and use
         specific entries like genes encoded on a chromosome region or
         transcript models of lincRNA genes.
 Collate: Classes.R dbhelpers.R Methods.R Methods-Filter.R loadEnsDb.R
-        makeEnsemblDbPackage.R zzz.R
+        makeEnsemblDbPackage.R EnsDbFromGTF.R zzz.R
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL

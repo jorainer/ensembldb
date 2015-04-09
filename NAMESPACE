@@ -1,27 +1,30 @@
-import( methods )
-import( BiocGenerics )
-importFrom( DBI, dbDriver )
-importFrom( Biobase, createPackage )
-importFrom( GenomeInfoDb, Seqinfo )
-importFrom( AnnotationDbi, dbconn )
-import( RSQLite )
-import( GenomicFeatures )
-import( GenomicRanges )
+import(methods)
+import(BiocGenerics)
+import(S4Vectors)
+importFrom(DBI, dbDriver)
+importFrom(Biobase, createPackage)
+importFrom(GenomeInfoDb, Seqinfo)
+importFrom(AnnotationDbi, dbconn)
+importFrom(rtracklayer, import)
+import(RSQLite)
+import(GenomicFeatures)
+import(GenomicRanges)
 
 #exportPattern("^[[:alpha:]]+")
-export( fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage )
-exportClasses( EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
+export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
+       ensDbFromGtf)
+exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
-              SeqstrandFilter, SeqstartFilter, SeqendFilter )
+              SeqstrandFilter, SeqstartFilter, SeqendFilter)
 ## for EnsFilter
-exportMethods( column, print, show, where )
+exportMethods(column, print, show, where)
 ## for class EnsDb:
-exportMethods( dbconn, condition, buildQuery, exons, exonsBy, genes, lengthOf,
+exportMethods(dbconn, condition, buildQuery, exons, exonsBy, genes, lengthOf,
               listColumns, listGenebiotypes, listTxbiotypes, listTables, organism,
-              seqinfo, toSAF, transcripts, transcriptsBy, disjointExons )
+              seqinfo, toSAF, transcripts, transcriptsBy, disjointExons, metadata)
 ## constructors
-export( EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
+export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
        TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,
-       SeqendFilter, EnsDb )
+       SeqendFilter, EnsDb)
 
 

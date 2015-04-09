@@ -1,3 +1,15 @@
+CHANGES IN VERSION 0.99.15
+--------------------------
+
+NEW FEATURES
+
+    o metadata method to extract the information from the metadata database table.
+
+    o ensDbFromGtf function to generate a EnsDb SQLite file from an (Ensembl)
+      GTF file.
+
+
+
 CHANGES IN VERSION 0.99.14
 --------------------------
 
