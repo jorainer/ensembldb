@@ -221,7 +221,9 @@ The code in this section is not supposed to be automatically executed when the v
 
 ** Requirements
 
-The package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site /ensembldb.ensembl.org/). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see [fn:2] for details).
+The =fetchTablesFromEnsembl= function of the package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site /ensembldb.ensembl.org/). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see [fn:2] for details).
+
+Alternatively, the =ensDbFromGtf= builds an EnsDb SQLite file from an Ensembl GTF file and thus doesn't depend on the Ensembl Perl API.
 
 
 ** Building an annotation package
@@ -251,11 +253,33 @@ An annotation package containing all human genes for Ensembl version 75 can be c
 #+END_SRC
 
 The generated package can then be build using =R CMD build EnsDb.Hsapiens.v75= and installed with =R CMD INSTALL EnsDb.Hsapiens.v75*=.
+Note that we could directly generate an =EnsDb= instance by loading the database file, i.e. by calling =edb <- EnsDb(DBFile)= and work with that annotation object.
 
-To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting =host = "mysql-eg-publicsql.ebi.ac.uk"= , =port=4157= and species to e.g. =species = "arabidopsis thaliana"= .
+To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting =host = "mysql-eg-publicsql.ebi.ac.uk"=, =port=4157= and species to e.g. =species = "arabidopsis thaliana"=.
 
-Alternatively, an EnsDb SQLite file can also be generated with the =ensDbFromGtf= function from a GTF file from Ensembl. However, since these GTF files do not provide the chromosome lengths and the NCBI Entrezgene IDs, these information will not be available in the database.
+An alternative way to build the required annotation database is to use the =ensDbFromGtf= function, that extracts most of the required data from a GTF file that can be downloaded from Ensembl (e.g. from ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens for human gene definitions from Ensembl version 75; for plant genomes etc files can be retrieved from ftp://ftp.ensemblgenomes.org). All information except the chromosome lengths and the NCBI Entrezgene IDs can be extracted from these GTF files. The function also tries to retrieve chromosome length information automatically from Ensembl.
 
+Below we create the annotation from a gtf file that we fetch directly from Ensembl.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  library(ensembl)
+
+  ## the GTF file can be downloaded from
+  ## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/
+  gtffile <- "Homo_sapiens.GRCh37.75.gtf.gz"
+  ## generate the SQLite database file
+  DB <- ensDbFromGtf(gtf=gtffile, verbose=TRUE)
+
+  ## load the DB file directly
+  EDB <- EnsDb(DB)
+
+  ## alternatively, build the annotation package
+  ## and finally we can generate the package
+  makeEnsembldbPackage(ensdb=DB, version="0.99.12",
+                       maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
+                       author="J Rainer")
+
+#+END_SRC
 
 * Database layout<<section.database.layout>>
 
@@ -340,7 +364,13 @@ The return value should be /Genus species/, i.e. without =_= in between.
 ** DONE Check =utils::news=, =?news=
    CLOSED: [2015-04-02 Thu 08:50]
    - State "DONE"       from "TODO"       [2015-04-02 Thu 08:50]
-** TODO build the database based on an Ensembl gtf file
+** DONE build the database based on an Ensembl gtf file
+   CLOSED: [2015-04-10 Fri 07:02]
+   - State "DONE"       from "TODO"       [2015-04-10 Fri 07:02]
+   - That would be the pre-requisite to write recipes for the =AnnotationHub= package.
+   - The only missing data is the sequence lengths.
+** TODO Use the =GenomicFeatures= =fetchChromLengthsFromEnsembl= to retrieve chromosome lengths for GTF import
 
-+ That would be the pre-requisite to write recipes for the =AnnotationHub= package.
++ Ideally, automatically run this script, if there is any error just skip, but do not stop. To do that, use the =try= call.
+
 ** TODO Include recipe to =AnnotationHub=

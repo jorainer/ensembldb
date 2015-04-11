@@ -1,3 +1,20 @@
+CHANGES IN VERSION 0.99.16
+--------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Added argument outfile to ensDbFromGtf that allows to manually specify the file
+      name of the database file.
+
+    o ensDbFromGtf tries now to automatically fetch the sequence lengths from Ensembl.
+
+
+BUG FIXES
+
+    o Fixed the function that extracts the genome build version from the gtf file name.
+
+
+
 CHANGES IN VERSION 0.99.15
 --------------------------
 
