@@ -15,7 +15,8 @@
 }
 \usage{
 
-ensDbFromGtf(gtf, path=".", verbose=FALSE)
+ensDbFromGtf(gtf, outfile, path=".", organism, genomeVersion,
+             version, verbose=FALSE)
 
 fetchTablesFromEnsembl(version, ensemblapi, user="anonymous",
                        host="ensembldb.ensembl.org", pass="",
@@ -53,6 +54,13 @@ makeEnsembldbPackage(ensdb, version, maintainer, author,
   system. The Ensembl perl API version has to fit the version.
   }
 
+  \item{genomeVersion}{
+    For \code{ensDbFromGtf}: the version of the genome
+    (e.g. \code{"GRCh37"}). If not provided the function will try
+    to guess it from the file name (assuming file name convention of
+    Ensembl GTF files).
+  }
+
   \item{gtf}{
     The GTF file name.
   }
@@ -67,6 +75,18 @@ makeEnsembldbPackage(ensdb, version, maintainer, author,
 
   \item{ maintainer }{
     The maintainer of the package.
+  }
+
+  \item{organism}{
+    For \code{ensDbFromGtf}: the organism name
+    (e.g. \code{"Homo_sapiens"}). If not provided the function will try
+    to guess it from the file name (assuming file name convention of
+    Ensembl GTF files).
+  }
+
+  \item{outfile}{
+    The desired file name of the SQLite file. If not provided the name
+    of the GTF file will be used.
   }
 
   \item{ pass }{
@@ -96,8 +116,10 @@ makeEnsembldbPackage(ensdb, version, maintainer, author,
   }
 
   \item{ version }{
-    For \code{fetchTablesFromEnsembl}: the Ensembl version for which the
-    annotation should be retrieved (e.g. 75).
+    For \code{fetchTablesFromEnsembl} and \code{ensDbFromGtf}: the
+    Ensembl version for which the annotation should be retrieved
+    (e.g. 75). The \code{ensDbFromGtf} function will try to guess the
+    Ensembl version from the GTF file name if not provided.
 
     For \code{makeEnsemblDbPackage}: the version for the package.
   }
@@ -154,6 +176,16 @@ makeEnsembldbPackage(ensdb=DBFile, version="0.0.1",
                      maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
                      author="J Rainer")
 
+## Build an annotation file from a GTF file.
+## the GTF file can be downloaded from
+## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/
+gtffile <- "Homo_sapiens.GRCh37.75.gtf.gz"
+## generate the SQLite database file
+DB <- ensDbFromGtf(gtf=paste0(ensemblhost, gtffile), verbose=TRUE)
+
+## load the DB file directly
+EDB <- EnsDb(DB)
+
 }
 
 ## Generate a sqlite database for genes encoded on chromosome Y
@@ -163,6 +195,7 @@ DBFile <- makeEnsemblSQLiteFromTables( path=chrY ,dbname=tempfile() )
 edb <- EnsDb( DBFile )
 
 edb
+
 
 }
 \keyword{ data }
