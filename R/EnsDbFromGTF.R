@@ -8,7 +8,7 @@
 ## + The CDS features in the GTF are somewhat problematic, while we're used to get just the
 ##   coding start and end for a transcript from the Ensembl perl API, here we get the coding
 ##   start and end for each exon.
-ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, version, verbose=FALSE){
+ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, verbose=FALSE){
     options(useFancyQuotes=FALSE)
     if(verbose)
         cat("importing gtf file...")
@@ -65,22 +65,79 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     }
 
     ## here on -> call ensDbFromGRanges.
+    dbname <- ensDbFromGRanges(GTF, outfile=outfile, path=path, organism=organism,
+                               genomeVersion=genomeVersion, version=ensemblVersion, verbose=verbose)
 
     gtfFilename <- unlist(strsplit(gtf, split=.Platform$file.sep))
     gtfFilename <- gtfFilename[length(gtfFilename)]
-    Metadata <- buildMetadata(organism, ensemblVersion, host=gtfFilename,
-                              sourceFile=gtfFilename, genomeVersion=genomeVersion)
+    ## updating the Metadata information...
+    lite <- dbDriver("SQLite")
+    con <- dbConnect(lite, dbname = dbname )
+    bla <- dbGetQuery(con, paste0("update metadata set value='", gtfFilename,"' where name='source_file';"))
+    dbDisconnect(con)
+    return(dbname)
+}
+
+#### build a EnsDb SQLite database from the GRanges.
+## we can however not get all of the information from the GRanges (yet), for example,
+## the seqinfo might not be available in all GRanges objects. Also, there is no way
+## we can guess the organism or the Ensembl version from the GRanges, thus, this
+## information has to be provided by the user.
+## x: the GRanges object or file name. If file name, the function tries to guess
+##    the organism, genome build and ensembl version from the file name, if not
+##    provided.
+##
+ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
+                             verbose=FALSE){
+    if(class(x)!="GRanges")
+        stop("This method can only be called on GRanges objects!")
+    ## check for missing parameters
+    if(missing(organism)){
+        stop("The organism has to be specified (e.g. using organism=\"Homo_sapiens\")")
+    }
+    if(missing(version)){
+        stop("The Ensembl version has to be specified!")
+    }
+
+    ## checking the seqinfo in the GRanges object...
+    Seqinfo <- seqinfo(x)
+    fetchSeqinfo <- FALSE
+    ## check if we've got some information...
+    if(any(is.na(seqlengths(Seqinfo)))){
+        fetchSeqinfo <- TRUE   ## means we have to fetch the seqinfo ourselfs...
+    }
+    if(missing(genomeVersion)){
+        ## is there a seqinfo in x that I could use???
+        if(!fetchSeqinfo){
+            genomeVersion <- unique(genome(Seqinfo))
+            if(is.na(genomeVersion) | length(genomeVersion) > 1){
+                stop("The genome version has to be specified as it can not be extracted from the seqinfo!")
+            }
+        }else{
+            stop("The genome version has to be specified!")
+        }
+    }
     if(missing(outfile)){
-        gtffile <- unlist(strsplit(gtf, split=.Platform$file.sep))
-        dbfile <- sub(".gtf.gz$", ".sqlite", gtffile[length(gtffile)])
-        dbname <- paste0(path, .Platform$file.sep, dbfile)
-        ## dbfilename <- paste0("EnsDb.",substring(organism, 1, 1),
-        ##                      unlist(strsplit(organism, split="_"))[ 2 ], ".v",
-        ##                      ensemblVersion, ".sqlite")
+        ## use the organism, genome version and ensembl version as the file name.
+        outfile <- paste0(c(organism, genomeVersion, version, "sqlite"), collapse=".")
+        if(missing(path))
+            path <- "."
+        dbname <- paste0(path, .Platform$file.sep, outfile)
     }else{
+        if(!missing(path))
+            warning("outfile specified, thus I will discard the path argument.")
         dbname <- outfile
     }
-    ####
+
+    ## that's quite some hack
+    ## transcript biotype?
+    if(any(colnames(mcols(x))=="transcript_biotype")){
+        txBiotypeCol <- "transcript_biotype"
+    }else{
+        ## that's a little weird, but it seems that certain gtf files from Ensembl
+        ## provide the transcript biotype in the element "source"
+        txBiotypeCol <- "source"
+    }
 
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
     on.exit(dbDisconnect(con))
@@ -89,6 +146,8 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     if(verbose){
         cat("processing metadata...")
     }
+    Metadata <- buildMetadata(organism, version, host="unknown",
+                              sourceFile="GRanges object")
     dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE, row.names=FALSE)
     if(verbose)
         cat("OK\n")
@@ -103,12 +162,12 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     ## want to have: gene_id, gene_name, entrezid, gene_biotype, gene_seq_start,
     ##               gene_seq_end, seq_name, seq_strand, seq_coord_system.
     reqCols <- c("gene_id", "gene_name", "gene_biotype")
-    if(!any(reqCols %in% colnames(mcols(GTF))))
-        stop(paste0("One or more required fields are not defined in the GTF! Need ",
+    if(!any(reqCols %in% colnames(mcols(x))))
+        stop(paste0("One or more required fields are not defined in the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% colnames(mcols(GTF))], collapse=","),
+                    paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
                     "."))
-    genes <- as.data.frame(GTF[GTF$type == "gene", reqCols])
+    genes <- as.data.frame(x[x$type == "gene", reqCols])
     genes <- cbind(genes, entrezid=rep(NA, nrow(genes)),
                    seq_coord_system=rep(NA, nrow(genes)))
     colnames(genes)[1:5] <- c("seq_name", "gene_seq_start", "gene_seq_end", "width",
@@ -134,14 +193,14 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     ## want to have: tx_id, tx_biotype, tx_seq_start, tx_seq_end, tx_cds_seq_start,
     ##               tx_cds_seq_end, gene_id
     reqCols <- c("transcript_id", "gene_id", txBiotypeCol)
-    if(!any(reqCols %in% colnames(mcols(GTF))))
-        stop(paste0("One or more required fields are not defined in the GTF! Need ",
+    if(!any(reqCols %in% colnames(mcols(x))))
+        stop(paste0("One or more required fields are not defined in the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% colnames(mcols(GTF))], collapse=","),
+                    paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
                     "."))
-    tx <- as.data.frame(GTF[GTF$type == "transcript" , reqCols])[ , -c(1, 4, 5)]
+    tx <- as.data.frame(x[x$type == "transcript" , reqCols])[ , -c(1, 4, 5)]
     ## process the CDS features to get the cds start and end of the transcript.
-    CDS <- as.data.frame(GTF[GTF$type == "CDS", "transcript_id"])
+    CDS <- as.data.frame(x[x$type == "CDS", "transcript_id"])
     cdsStarts <- aggregate(CDS[, "start"], by=list(CDS$transcript_id), FUN=min, na.rm=TRUE)
     cdsEnds <- aggregate(CDS[, "end"], by=list(CDS$transcript_id), FUN=max, na.rm=TRUE)
     idx <- match(cdsStarts[, 1], tx$transcript_id)
@@ -168,12 +227,12 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     if(verbose)
         cat("processing exons...")
     reqCols <- c("exon_id", "transcript_id", "exon_number")
-    if(!any(reqCols %in% colnames(mcols(GTF))))
-        stop(paste0("One or more required fields are not defined in the GTF! Need ",
+    if(!any(reqCols %in% colnames(mcols(x))))
+        stop(paste0("One or more required fields are not defined in the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% colnames(mcols(GTF))], collapse=","),
+                    paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
                     "."))
-    exons <- as.data.frame(GTF[GTF$type == "exon", reqCols])[, -c(1, 4, 5)]
+    exons <- as.data.frame(x[x$type == "exon", reqCols])[, -c(1, 4, 5)]
     ## for table tx2exon we want to have:
     ##    tx_id, exon_id, exon_idx
     t2e <- unique(exons[ , c("transcript_id", "exon_id", "exon_number")])
@@ -192,18 +251,25 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     ## process chromosomes
     if(verbose)
         cat("processing chromosomes...")
-    ## problem is I don't have these available...
-    chroms <- data.frame(seq_name=unique(as.character(genes$seq_name)))
-    chroms <- cbind(chroms, seq_length=rep(NA, nrow(chroms)),
-                    is_circular=rep(NA, nrow(chroms)))
-    rownames(chroms) <- chroms$seq_name
-    ## now trying to get the sequence lengths directly from Ensembl using internal
-    ## functions from the GenomicFeatures package. I will use "try" to not break
-    ## the call if no seqlengths are available.
-    seqlengths <- tryGetSeqinfoFromEnsembl(organism, ensemblVersion, seqnames=chroms$seq_name)
-    if(nrow(seqlengths)>0){
-        seqlengths <- seqlengths[seqlengths[, "name"] %in% rownames(chroms), ]
-        chroms[seqlengths[, "name"], "seq_length"] <- seqlengths[, "length"]
+    if(fetchSeqinfo){
+        ## problem is I don't have these available...
+        chroms <- data.frame(seq_name=unique(as.character(genes$seq_name)))
+        chroms <- cbind(chroms, seq_length=rep(NA, nrow(chroms)),
+                        is_circular=rep(NA, nrow(chroms)))
+        rownames(chroms) <- chroms$seq_name
+        ## now trying to get the sequence lengths directly from Ensembl using internal
+        ## functions from the GenomicFeatures package. I will use "try" to not break
+        ## the call if no seqlengths are available.
+        seqlengths <- tryGetSeqinfoFromEnsembl(organism, version, seqnames=chroms$seq_name,
+                                               verbose=verbose)
+        if(nrow(seqlengths)>0){
+            seqlengths <- seqlengths[seqlengths[, "name"] %in% rownames(chroms), ]
+            chroms[seqlengths[, "name"], "seq_length"] <- seqlengths[, "length"]
+        }
+    }else{
+        ## have seqinfo available.
+        chroms <- data.frame(seq_name=seqnames(Seqinfo), seq_length=seqlengths(Seqinfo),
+                             is_circular=isCircular(Seqinfo))
     }
     ## write the table.
     dbWriteTable(con, name="chromosome", chroms, overwrite=TRUE, row.names=FALSE)
@@ -221,177 +287,70 @@ ensDbFromGtf <- function(gtf, outfile, path=".", organism, genomeVersion, versio
     dbGetQuery(con, "create index t2e_exon_id_idx on tx2exon (exon_id);")
     if(verbose)
         cat("OK\n")
+    if(verbose)
+        cat("Verifying validity of the information in the database:\n")
+    checkValidEnsDb(EnsDb(dbname), verbose=verbose)
     return(dbname)
 }
 
-#### build a EnsDb SQLite database from the GRanges.
-## we can however not get all of the information from the GRanges...
-## x: the GRanges object or file name. If file name, the function tries to guess
-##    the organism, genome build and ensembl version from the file name, if not
-##    provided.
-##
-## ensDbFromGRanges <- function(x, organism, genomeVersion, ensemblVersion){
-##     if(is.character(x)){
-##         xfile <- x
-##         load(x)
-##     }
-##     ## check for missing parameters
 
-##     if(missing(outfile)){
-##         gtffile <- unlist(strsplit(gtf, split=.Platform$file.sep))
-##         dbfile <- sub(".gtf.gz$", ".sqlite", gtffile[length(gtffile)])
-##         dbname <- paste0(path, .Platform$file.sep, dbfile)
-##         ## dbfilename <- paste0("EnsDb.",substring(organism, 1, 1),
-##         ##                      unlist(strsplit(organism, split="_"))[ 2 ], ".v",
-##         ##                      ensemblVersion, ".sqlite")
-##     }else{
-##         dbname <- outfile
-##     }
-##     ####
+## helper function that checks that the gene, transcript and exon data in the
+## EnsDb database is correct (i.e. transcript within gene coordinates, exons within
+## transcript coordinates, cds within transcript)
+checkValidEnsDb <- function(x, verbose=FALSE){
+    if(verbose){
+        cat("Checking transcripts...")
+    }
+    tx <- transcripts(x, columns=c("gene_id", "tx_id", "gene_seq_start", "gene_seq_end",
+                             "tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
+                             "tx_cds_seq_end"), return.type="DataFrame")
+    ## check if the tx are inside the genes...
+    isInside <- tx$tx_seq_start >= tx$gene_seq_start & tx$tx_seq_end <= tx$gene_seq_end
+    if(any(!isInside))
+        stop("Start and end coordinates for ", sum(!isInside),
+             "transcripts are not within the gene coordinates!")
+    ## check cds coordinates
+    notInside <- which(!(tx$tx_cds_seq_start >= tx$tx_seq_start & tx$tx_cds_seq_end <= tx$tx_seq_end))
+    if(length(notInside) > 0){
+        stop("The CDS start and end coordinates for ", length(notInside),
+             " transcripts are not within the transcript coordinates!")
+    }
+    rm(tx)
+    if(verbose)
+        cat("OK\nChecking exons...")
+    ex <- exons(x, columns=c("exon_id", "tx_id", "exon_seq_start", "exon_seq_end",
+                       "tx_seq_start", "tx_seq_end", "seq_strand", "exon_idx"),
+                return.type="data.frame")
+    ## check if exons are within tx
+    isInside <- ex$exon_seq_start >= ex$tx_seq_start & ex$exon_seq_end <= ex$tx_seq_end
+    if(any(!isInside))
+        stop("Start and end coordinates for ", sum(!isInside),
+             " exons are not within the transcript coordinates!")
+    ## checking the exon index...
+    extmp <- ex[ex$seq_strand==1, c("exon_idx", "tx_id", "exon_seq_start")]
+    extmp <- extmp[order(extmp$exon_seq_start), ]
+    extmp.split <- split(extmp[ , c("exon_idx")], f=factor(extmp$tx_id))
+    Different <- unlist(lapply(extmp.split, FUN=function(z){
+                                   return(any(z != seq(1, length(z))))
+                               }))
+    if(any(Different)){
+        stop("Provided exon index in transcript does not match with ordering of the exons by chromosomal coordinates for",
+             sum(Different), "of the", length(Different), "transcripts encoded on the + strand!")
+    }
+    extmp <- ex[ex$seq_strand==-1, c("exon_idx", "tx_id", "exon_seq_end")]
+    extmp <- extmp[order(extmp$exon_seq_end, decreasing=TRUE), ]
+    extmp.split <- split(extmp[ , c("exon_idx")], f=factor(extmp$tx_id))
+    Different <- unlist(lapply(extmp.split, FUN=function(z){
+                                   return(any(z != seq(1, length(z))))
+                               }))
+    if(any(Different)){
+        stop("Provided exon index in transcript does not match with ordering of the exons by chromosomal coordinates for",
+             sum(Different), "of the", length(Different), "transcripts encoded on the - strand!")
+    }
+    if(verbose)
+        cat("OK\n")
+}
 
-##     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
-##     on.exit(dbDisconnect(con))
-##     ## ----------------------------
-##     ## metadata table:
-##     if(verbose){
-##         cat("processing metadata...")
-##     }
-##     Metadata <- buildMetadata(organism, ensemblVersion, host=gtfFilename,
-##                               sourceFile=gtfFilename)
-##     dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE, row.names=FALSE)
-##     if(verbose)
-##         cat("OK\n")
-##     ## ----------------------------
-##     ##
-##     ## process genes
-##     ## we're lacking NCBI Entrezids and also the coord system, but these are not
-##     ## required columns anyway...
-##     if(verbose){
-##         cat("processing genes...")
-##     }
-##     ## want to have: gene_id, gene_name, entrezid, gene_biotype, gene_seq_start,
-##     ##               gene_seq_end, seq_name, seq_strand, seq_coord_system.
-##     reqCols <- c("gene_id", "gene_name", "gene_biotype")
-##     if(!any(reqCols %in% colnames(mcols(GTF))))
-##         stop(paste0("One or more required fields are not defined in the GTF! Need ",
-##                     paste(reqCols, collapse=","), " but got only ",
-##                     paste(reqCols[reqCols %in% colnames(mcols(GTF))], collapse=","),
-##                     "."))
-##     genes <- as.data.frame(GTF[GTF$type == "gene", reqCols])
-##     genes <- cbind(genes, entrezid=rep(NA, nrow(genes)),
-##                    seq_coord_system=rep(NA, nrow(genes)))
-##     colnames(genes)[1:5] <- c("seq_name", "gene_seq_start", "gene_seq_end", "width",
-##                               "seq_strand")
-##     ## transforming seq_strand from +/- to +1, -1.
-##     strand <- rep(0L, nrow(genes))
-##     strand[as.character(genes$seq_strand) == "+"] <- 1L
-##     strand[as.character(genes$seq_strand) == "-"] <- -1L
-##     genes[ , "seq_strand"] <- strand
-##     ## rearranging data.frame...
-##     genes <- genes[ , c("gene_id", "gene_name", "entrezid", "gene_biotype",
-##                         "gene_seq_start", "gene_seq_end", "seq_name",
-##                         "seq_strand", "seq_coord_system")]
-##     dbWriteTable(con, name="gene", genes, overwrite=TRUE, row.names=FALSE)
-##     if(verbose){
-##         cat("OK\n")
-##     }
-##     ## ----------------------------
-##     ##
-##     ## process transcripts
-##     if(verbose)
-##         cat("processing transcripts...")
-##     ## want to have: tx_id, tx_biotype, tx_seq_start, tx_seq_end, tx_cds_seq_start,
-##     ##               tx_cds_seq_end, gene_id
-##     reqCols <- c("transcript_id", "gene_id", txBiotypeCol)
-##     if(!any(reqCols %in% colnames(mcols(GTF))))
-##         stop(paste0("One or more required fields are not defined in the GTF! Need ",
-##                     paste(reqCols, collapse=","), " but got only ",
-##                     paste(reqCols[reqCols %in% colnames(mcols(GTF))], collapse=","),
-##                     "."))
-##     tx <- as.data.frame(GTF[GTF$type == "transcript" , reqCols])[ , -c(1, 4, 5)]
-##     ## process the CDS features to get the cds start and end of the transcript.
-##     CDS <- as.data.frame(GTF[GTF$type == "CDS", "transcript_id"])
-##     cdsStarts <- aggregate(CDS[, "start"], by=list(CDS$transcript_id), FUN=min, na.rm=TRUE)
-##     cdsEnds <- aggregate(CDS[, "end"], by=list(CDS$transcript_id), FUN=max, na.rm=TRUE)
-##     idx <- match(cdsStarts[, 1], tx$transcript_id)
-##     tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)), tx_cds_seq_end=rep(NA, nrow(tx)))
-##     tx[idx, "tx_cds_seq_start"] <- cdsStarts[, 2]
-##     tx[idx, "tx_cds_seq_end"] <- cdsEnds[, 2]
-##     colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id", "tx_biotype",
-##                       "tx_cds_seq_start", "tx_cds_seq_end")
-##     ## rearranging data.frame:
-##     tx <- tx[ , c("tx_id", "tx_biotype", "tx_seq_start", "tx_seq_end",
-##                   "tx_cds_seq_start", "tx_cds_seq_end", "gene_id")]
-##     ## write the table.
-##     dbWriteTable(con, name="tx", tx, overwrite=TRUE, row.names=FALSE)
-##     rm(tx)
-##     rm(CDS)
-##     rm(cdsStarts)
-##     rm(cdsEnds)
-##     if(verbose){
-##         cat("OK\n")
-##     }
-##     ## ----------------------------
-##     ##
-##     ## process exons
-##     if(verbose)
-##         cat("processing exons...")
-##     reqCols <- c("exon_id", "transcript_id", "exon_number")
-##     if(!any(reqCols %in% colnames(mcols(GTF))))
-##         stop(paste0("One or more required fields are not defined in the GTF! Need ",
-##                     paste(reqCols, collapse=","), " but got only ",
-##                     paste(reqCols[reqCols %in% colnames(mcols(GTF))], collapse=","),
-##                     "."))
-##     exons <- as.data.frame(GTF[GTF$type == "exon", reqCols])[, -c(1, 4, 5)]
-##     ## for table tx2exon we want to have:
-##     ##    tx_id, exon_id, exon_idx
-##     t2e <- unique(exons[ , c("transcript_id", "exon_id", "exon_number")])
-##     colnames(t2e) <- c("tx_id", "exon_id", "exon_idx")
-##     ## for table exons we want to have:
-##     ##    exon_id, exon_seq_start, exon_seq_end
-##     exons <- unique(exons[ , c("exon_id", "start", "end")])
-##     colnames(exons) <- c("exon_id", "exon_seq_start", "exon_seq_end")
-##     ## writing the tables.
-##     dbWriteTable(con, name="exon", exons, overwrite=TRUE, row.names=FALSE)
-##     dbWriteTable(con, name="tx2exon", t2e, overwrite=TRUE, row.names=FALSE)
-##     if(verbose)
-##         cat("OK\n")
-##     ## ----------------------------
-##     ##
-##     ## process chromosomes
-##     if(verbose)
-##         cat("processing chromosomes...")
-##     ## problem is I don't have these available...
-##     chroms <- data.frame(seq_name=unique(as.character(genes$seq_name)))
-##     chroms <- cbind(chroms, seq_length=rep(NA, nrow(chroms)),
-##                     is_circular=rep(NA, nrow(chroms)))
-##     rownames(chroms) <- chroms$seq_name
-##     ## now trying to get the sequence lengths directly from Ensembl using internal
-##     ## functions from the GenomicFeatures package. I will use "try" to not break
-##     ## the call if no seqlengths are available.
-##     seqlengths <- tryGetSeqinfoFromEnsembl(organism, ensemblVersion, seqnames=chroms$seq_name)
-##     if(nrow(seqlengths)>0){
-##         seqlengths <- seqlengths[seqlengths[, "name"] %in% rownames(chroms), ]
-##         chroms[seqlengths[, "name"], "seq_length"] <- seqlengths[, "length"]
-##     }
-##     ## write the table.
-##     dbWriteTable(con, name="chromosome", chroms, overwrite=TRUE, row.names=FALSE)
-##     rm(genes)
-##     if(verbose)
-##         cat("OK\n")
-##     if(verbose)
-##         cat("generating index...")
-##     ## generating all indices...
-##     dbGetQuery(con, "create index seq_name_idx on chromosome (seq_name);")
-##     dbGetQuery(con, "create index gene_id_idx on gene (gene_id);")
-##     dbGetQuery(con, "create index tx_id_idx on tx (tx_id);")
-##     dbGetQuery(con, "create index exon_id_idx on exon (exon_id);")
-##     dbGetQuery(con, "create index t2e_tx_id_idx on tx2exon (tx_id);")
-##     dbGetQuery(con, "create index t2e_exon_id_idx on tx2exon (exon_id);")
-##     if(verbose)
-##         cat("OK\n")
-##     return(dbname)
-## }
 
 ## organism is expected to be e.g. Homo_sapiens, so the full organism name, with
 ## _ as a separator
@@ -427,7 +386,8 @@ tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames, verbose
     return(matrix(ncol=2, nrow=0))
 }
 
-buildMetadata <- function(organism, ensemblVersion, genomeVersion, host, sourceFile){
+buildMetadata <- function(organism="", ensemblVersion="", genomeVersion="",
+                          host="", sourceFile=""){
     MetaData <- data.frame(matrix(ncol=2, nrow=11))
     colnames(MetaData) <- c("name", "value")
     MetaData[1, ] <- c("Db type", "EnsDb")

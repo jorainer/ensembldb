@@ -1,3 +1,13 @@
+CHANGES IN VERSION 0.99.17
+--------------------------
+
+NEW FEATURES
+
+    o Added new function ensDbFromGRanges that builds an EnsDB database from information
+      provided in a GRanges object (e.g. retrieved from the AnnotationHub).
+
+
+
 CHANGES IN VERSION 0.99.16
 --------------------------
 

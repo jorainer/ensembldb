@@ -223,7 +223,7 @@ The code in this section is not supposed to be automatically executed when the v
 
 The =fetchTablesFromEnsembl= function of the package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site /ensembldb.ensembl.org/). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see [fn:2] for details).
 
-Alternatively, the =ensDbFromGtf= builds an EnsDb SQLite file from an Ensembl GTF file and thus doesn't depend on the Ensembl Perl API.
+Alternatively, the =ensDbFromGRanges= and =ensDbFromGtf= functions allow to build EnsDb SQLite files from a =GRanges= object or an Ensembl GTF file and thus doesn't depend on the Ensembl Perl API. Such =GRanges= objects could for example be retrieved with the =AnnotationHub= package.
 
 
 ** Building an annotation package
@@ -280,6 +280,24 @@ Below we create the annotation from a gtf file that we fetch directly from Ensem
                        author="J Rainer")
 
 #+END_SRC
+
+The third way to generate an =EnsDb= database is /via/ a =GRanges= object that contains all the required information. Such =GRanges= can for example be loaded using the =AnnotationHub= package.
+In the example below we load a =GRanges= containing gene definitions for genes encoded on chromosome Y and generate a EnsDb SQLite database from that information.
+
+#+BEGIN_SRC R
+  ## Generate a sqlite database from a GRanges object specifying
+  ## genes encoded on chromosome Y
+  load(system.file("YGRanges.RData", package="ensembldb"))
+  Y
+
+  DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
+                         organism="Homo_sapiens")
+
+  edb <- EnsDb(DB)
+  edb
+
+#+END_SRC
+
 
 * Database layout<<section.database.layout>>
 
@@ -369,8 +387,13 @@ The return value should be /Genus species/, i.e. without =_= in between.
    - State "DONE"       from "TODO"       [2015-04-10 Fri 07:02]
    - That would be the pre-requisite to write recipes for the =AnnotationHub= package.
    - The only missing data is the sequence lengths.
-** TODO Use the =GenomicFeatures= =fetchChromLengthsFromEnsembl= to retrieve chromosome lengths for GTF import
+** DONE Use the =GenomicFeatures= =fetchChromLengthsFromEnsembl= to retrieve chromosome lengths for GTF import
+   CLOSED: [2015-04-14 Tue 11:36]
+   - State "DONE"       from "TODO"       [2015-04-14 Tue 11:36]
 
 + Ideally, automatically run this script, if there is any error just skip, but do not stop. To do that, use the =try= call.
 
 ** TODO Include recipe to =AnnotationHub=
+** DONE Implement a function to build an EnsDb from a GRanges object.
+   CLOSED: [2015-04-14 Tue 11:35]
+   - State "DONE"       from "TODO"       [2015-04-14 Tue 11:35]
