@@ -3,7 +3,7 @@ import(BiocGenerics)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
 importFrom(Biobase, createPackage)
-importFrom(GenomeInfoDb, Seqinfo)
+importFrom(GenomeInfoDb, Seqinfo, isCircular, genome)
 importFrom(AnnotationDbi, dbconn)
 importFrom(rtracklayer, import)
 import(RSQLite)
@@ -12,7 +12,7 @@ import(GenomicRanges)
 
 #exportPattern("^[[:alpha:]]+")
 export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
-       ensDbFromGtf)
+       ensDbFromGtf, ensDbFromGRanges)
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
               SeqstrandFilter, SeqstartFilter, SeqendFilter)

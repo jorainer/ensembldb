@@ -3,8 +3,7 @@
 %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
 %\VignettePackage{ensembldb}
 %\VignetteEngine{knitr::knitr}
-
-% Created 2015-04-11 Sat 08:55
+% Created 2015-04-14 Tue 13:50
 \documentclass[11pt]{article}
 
 <<style,results='asis', echo=FALSE, eval=TRUE>>=
@@ -12,7 +11,7 @@ BiocStyle::latex()
 @ %def
 
 \author{Johannes Rainer}
-\date{Modified: 11 April, 2015. Compiled: \today}
+\date{Modified: 14 April, 2015. Compiled: \today}
 \title{Generating and using Ensembl based annotation packages}
 \hypersetup{
   pdfkeywords={},
@@ -210,7 +209,7 @@ These notes might explain eventually unexpected results (and, more importantly, 
 \section{Building an transcript centric database package based on Ensembl annotation}
 \label{sec-5}
 
-The code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, fetching data from the Ensembl database or ftp servers takes quite some time, thus, in this section only the code is displayed, but not executed.
+The code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, fetching data from the Ensembl database takes quite some time, thus, in this section only the code is displayed, but not executed.
 
 
 \subsection{Requirements}
@@ -218,7 +217,7 @@ The code in this section is not supposed to be automatically executed when the v
 
 The \texttt{fetchTablesFromEnsembl} function of the package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site \emph{ensembldb.ensembl.org}). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see \footnote{\url{http://www.ensembl.org/info/docs/api/api_installation.html}} for details).
 
-Alternatively, the \texttt{ensDbFromGtf} builds an EnsDb SQLite file from an Ensembl GTF file and thus doesn't depend on the Ensembl Perl API.
+Alternatively, the \texttt{ensDbFromGRanges} and \texttt{ensDbFromGtf} functions allow to build EnsDb SQLite files from a \texttt{GRanges} object or an Ensembl GTF file and thus doesn't depend on the Ensembl Perl API. Such \texttt{GRanges} objects could for example be retrieved with the \texttt{AnnotationHub} package.
 
 
 \subsection{Building an annotation package}
@@ -250,7 +249,7 @@ makeEnsembldbPackage(ensdb=DBFile, version="0.99.12",
 The generated package can then be build using \texttt{R CMD build EnsDb.Hsapiens.v75} and installed with \texttt{R CMD INSTALL EnsDb.Hsapiens.v75*}.
 Note that we could directly generate an \texttt{EnsDb} instance by loading the database file, i.e. by calling \texttt{edb <- EnsDb(DBFile)} and work with that annotation object.
 
-To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the \emph{Ensembl genomes} should be specified as a host, i.e. setting \texttt{host="mysql-eg-publicsql.ebi.ac.uk"}, \texttt{port=4157} and species to e.g. \texttt{species="arabidopsis thaliana"}.
+To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the \emph{Ensembl genomes} should be specified as a host, i.e. setting \texttt{host = "mysql-eg-publicsql.ebi.ac.uk"}, \texttt{port=4157} and species to e.g. \texttt{species = "arabidopsis thaliana"}.
 
 An alternative way to build the required annotation database is to use the \texttt{ensDbFromGtf} function, that extracts most of the required data from a GTF file that can be downloaded from Ensembl (e.g. from \url{ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens} for human gene definitions from Ensembl version 75; for plant genomes etc files can be retrieved from \url{ftp://ftp.ensemblgenomes.org}). All information except the chromosome lengths and the NCBI Entrezgene IDs can be extracted from these GTF files. The function also tries to retrieve chromosome length information automatically from Ensembl.
 
@@ -274,6 +273,23 @@ makeEnsembldbPackage(ensdb=DB, version="0.99.12",
 		     maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
 		     author="J Rainer")
 @ %def
+
+The third way to generate an \texttt{EnsDb} database is \emph{via} a \texttt{GRanges} object that contains all the required information. Such \texttt{GRanges} can for example be loaded using the \texttt{AnnotationHub} package.
+In the example below we load a \texttt{GRanges} containing gene definitions for genes encoded on chromosome Y and generate a EnsDb SQLite database from that information.
+
+<<>>=
+## Generate a sqlite database from a GRanges object specifying
+## genes encoded on chromosome Y
+load(system.file("YGRanges.RData", package="ensembldb"))
+Y
+
+DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
+		       organism="Homo_sapiens")
+
+edb <- EnsDb(DB)
+edb
+@ %def
+
 
 \section{Database layout\label{section.database.layout}}
 \label{sec-6}
