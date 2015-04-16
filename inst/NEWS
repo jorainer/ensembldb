@@ -1,3 +1,15 @@
+CHANGES IN VERSION 0.99.18
+--------------------------
+
+BUG FIXES
+
+    o Fixed a problem in processing GTF files without header information.
+
+    o Fixed a bug failing to throw an error if not all required feature types are
+      available in the GTF.
+
+
+
 CHANGES IN VERSION 0.99.17
 --------------------------
 

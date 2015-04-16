@@ -18,11 +18,12 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, v
         cat("done\n")
     ## check what we've got...
     ## all wanted features?
-    if(!any(wanted.features %in% levels(GTF$type)))
+    if(any(!(wanted.features %in% levels(GTF$type)))){
         stop(paste0("One or more required types are not in the gtf file. Need ",
                     paste(wanted.features, collapse=","), " but got only ",
                     paste(wanted.features[wanted.features %in% levels(GTF$type)], collapse=","),
                     "."))
+    }
     ## transcript biotype?
     if(any(colnames(mcols(GTF))=="transcript_biotype")){
         txBiotypeCol <- "transcript_biotype"
@@ -35,10 +36,14 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, v
     ## first read the header...
     tmp <- readLines(gtf, n=10)
     tmp <- tmp[grep(tmp, pattern="^#")]
-    tmp <- gsub(tmp, pattern="^#", replacement="")
-    tmp <- gsub(tmp, pattern="^!", replacement="")
-    Header <- do.call(rbind, strsplit(tmp, split=" ", fixed=TRUE))
-    colnames(Header) <- c("name", "value")
+    haveHeader <- FALSE
+    if(length(tmp) > 0){
+        tmp <- gsub(tmp, pattern="^#", replacement="")
+        tmp <- gsub(tmp, pattern="^!", replacement="")
+        Header <- do.call(rbind, strsplit(tmp, split=" ", fixed=TRUE))
+        colnames(Header) <- c("name", "value")
+        haveHeader <- TRUE
+    }
     ## getting the species name and the ensembl version from the GTF file name
     fromFile <- FALSE
     if(missing(organism) | missing(version) | missing(genomeVersion))
@@ -58,10 +63,12 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, v
             stop("The GTF file name is not as expected: <Organism>.<genome version>.<Ensembl version>.gtf!")
         }
     }
-    if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"]){
-        stop(paste0("The GTF file name is not as expected: <Organism>.<genome version>.<Ensembl version>.gtf!",
-                    " I've got genome version ", genomeVersion, " but in the header of the GTF file ",
-                    Header[Header[, "name"] == "genome-version", "value"], " is specified!"))
+    if(haveHeader){
+        if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"]){
+            stop(paste0("The GTF file name is not as expected: <Organism>.<genome version>.<Ensembl version>.gtf!",
+                        " I've got genome version ", genomeVersion, " but in the header of the GTF file ",
+                        Header[Header[, "name"] == "genome-version", "value"], " is specified!"))
+        }
     }
 
     ## here on -> call ensDbFromGRanges.
