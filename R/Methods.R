@@ -236,7 +236,7 @@ setMethod("cleanColumns", "EnsDb", function(x,
                                                  unlist(listTables(x)),
                                                  clean=FALSE),
                                    use.names=TRUE)
-           )
+          )
         bm <- columns %in% full.columns
         removed <- columns[ !bm ]
     }else{
@@ -277,7 +277,7 @@ setMethod("tablesByDegree", "EnsDb", function(x,
     ##                      tx2exon=c("tx", "exon"),
     ##                      exon="tx2exon",
     ##                      chromosome="gene"
-    ##                           ))
+    ##                          ))
     ## Tab <- names(sort(degree(DBgraph), decreasing=TRUE))
     Table.order <- c(gene=1, tx=2, tx2exon=3, exon=4, chromosome=5, metadata=6)
     ##Table.order <- c(gene=2, tx=1, tx2exon=3, exon=4, chromosome=5, metadata=6)
@@ -305,6 +305,8 @@ setMethod("genes", "EnsDb", function(x,
     }
     if(missing(filter)){
         filter=list()
+    }else{
+        filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
@@ -322,7 +324,7 @@ setMethod("genes", "EnsDb", function(x,
                       strand=Rle(Res$seq_strand),
                       seqinfo=SI[ unique(Res$seq_name) ],
                       Res[ , metacols, drop=FALSE ]
-                     )
+                    )
         names(GR) <- Res$gene_id
         return(GR)
     }
@@ -348,6 +350,8 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
     }
     if(missing(filter)){
         filter=list()
+    }else{
+        filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type,
@@ -366,7 +370,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                       strand=Rle(Res$seq_strand),
                       seqinfo=SI[ unique(Res$seq_name) ],
                       Res[ , metacols, drop=FALSE ]
-                     )
+                    )
         names(GR) <- Res$tx_id
         return(GR)
     }
@@ -397,6 +401,8 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
     }
     if(missing(filter)){
         filter=list()
+    }else{
+        filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type,
@@ -415,7 +421,7 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
                       strand=Rle(Res$seq_strand),
                       seqinfo=SI[ unique(Res$seq_name) ],
                       Res[ , metacols, drop=FALSE ]
-                     )
+                    )
         names(GR) <- Res$exon_id
         return(GR)
     }
@@ -462,6 +468,8 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     ##Res <- getWhat(dbconn(x), columns=columns, filter=filter, order.by=paste0("seq_name,gene_seq_start,",by ,"_id,exon_idx"))
     if(missing(filter)){
         filter=list()
+    }else{
+        filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter, order.by=order.by, skip.order.check=TRUE)
     SI <- SI[ unique(Res$seq_name) ]
@@ -475,7 +483,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
                   ranges=IRanges(start=Res$exon_seq_start, end=Res$exon_seq_end),
                   seqinfo=SI,
                   Res[ , columns.metadata, drop=FALSE ]
-                 )
+                )
     ## now that GR is ordered as we wanted; once we split it it will be ordered by
     ## the value which we used for splitting.
     return(split(GR, Res[ , paste0(by, "_id") ]))
@@ -507,6 +515,8 @@ setMethod("transcriptsBy", "EnsDb", function(x, by=c("gene", "exon"),
     SI <- seqinfo(x)
     if(missing(filter)){
         filter=list()
+    }else{
+        filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns,
                    filter=filter,
@@ -520,7 +530,7 @@ setMethod("transcriptsBy", "EnsDb", function(x, by=c("gene", "exon"),
                   ranges=IRanges(start=Res$tx_seq_start, end=Res$tx_seq_end),
                   seqinfo=SI,
                   Res[ , columns.metadata, drop=FALSE ]
-                 )
+                )
     ## now that GR is ordered as we wanted; once we split it it will be ordered by
     ## the value which we used for splitting.
     return(split(GR, Res[ , paste0(by, "_id") ]))
@@ -538,7 +548,7 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
     ## get the exons by gene or transcript from the database...
     suppressWarnings(
         GRL <- exonsBy(x, by=of, filter=filter)
-       )
+      )
     return(lengthOf(GRL))
 })
 
@@ -651,8 +661,11 @@ setMethod("getWhat", "EnsDb",
 ## that's basically a copy of the code from the GenomicFeatures package.
 setMethod("disjointExons", "EnsDb",
           function(x, aggregateGenes=FALSE, includeTranscripts=TRUE, filter, ...){
-              if( missing( filter ) )
+              if(missing(filter)){
                   filter <- list()
+              }else{
+                  filter <- checkFilter(filter)
+              }
 
               exonsByGene <- exonsBy(x, by="gene", filter=filter)
               exonicParts <- disjoin(unlist(exonsByGene, use.names=FALSE))
@@ -681,7 +694,7 @@ setMethod("disjointExons", "EnsDb",
               values <- DataFrame(gene_id)
 
               if (includeTranscripts) {
-                  exonsByTx <- exonsBy(x, by="tx", filter=filter )
+                  exonsByTx <- exonsBy(x, by="tx", filter=filter)
                   foET <- findOverlaps(exonicParts, exonsByTx)
                   values$tx_name <- GenomicFeatures:::.listNames(names(exonsByTx), as.list(foET))
               }
@@ -689,9 +702,29 @@ setMethod("disjointExons", "EnsDb",
               exonicParts <- exonicParts[orderByGeneName]
               exonic_part <- unlist(lapply(exonic_rle, seq_len), use.names=FALSE)
               exonicParts$exonic_part <- exonic_part
-              return( exonicParts )
+              return(exonicParts)
           }
-          )
+         )
 
 
+### utility functions
+## checkFilter:
+## checks the filter argument and ensures that a list of Filter object is returned
+checkFilter <- function(x){
+    if(class(x)=="list"){
+        ## check if all elements are Filter classes.
+        IsAFilter <- unlist(lapply(x, function(z){
+                                        return(inherits(z, what="BasicFilter"))
+                                    }))
+        if(any(!IsAFilter))
+            stop("One of more elements in filter are not filter objects!")
+    }else{
+        if(inherits(x, what="BasicFilter")){
+            x <- list(x)
+        }else{
+            stop("filter has to be a filter object or a list of filter objects!")
+        }
+    }
+    return(x)
+}
 

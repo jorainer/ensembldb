@@ -19,6 +19,7 @@ test_transcriptsBy <- function(){
 }
 
 test_exons <- function(){
+    Exns <- exons(DB, filter=SeqnameFilter("X"))
     Exns <- exons(DB, filter=list(SeqnameFilter("X")))
 }
 
@@ -31,5 +32,24 @@ test_dbfunctionality <- function(){
     TBT <- listTxbiotypes(DB)
 }
 
+## test if we get the expected exceptions if we're not submitting
+## correct filter objects
+test_filterExceptions <- function(){
+    checkException(genes(DB, filter="d"))
+    checkException(genes(DB, filter=list(SeqnameFilter("X"),
+                                 "z")))
+    checkException(transcripts(DB, filter="d"))
+    checkException(transcripts(DB, filter=list(SeqnameFilter("X"),
+                                 "z")))
+    checkException(exons(DB, filter="d"))
+    checkException(exons(DB, filter=list(SeqnameFilter("X"),
+                                 "z")))
+    checkException(exonsBy(DB, filter="d"))
+    checkException(exonsBy(DB, filter=list(SeqnameFilter("X"),
+                                 "z")))
+    checkException(transcriptsBy(DB, filter="d"))
+    checkException(transcriptsBy(DB, filter=list(SeqnameFilter("X"),
+                                 "z")))
+}
 
 

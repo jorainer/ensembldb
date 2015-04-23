@@ -89,8 +89,8 @@
   }
 
   \item{filter}{
-    List of \code{\linkS4class{BasicFilter}} object(s) to
-    select specific entries from the database (see examples below).
+    A filter object extending \code{\linkS4class{BasicFilter}} or a list
+    of such object(s) to select specific entries from the database (see examples below).
   }
 
   \item{includeTranscripts}{
@@ -283,12 +283,12 @@ library(EnsDb.Hsapiens.v75)
 ######   genes
 ##
 ## get all genes endcoded on chromosome Y
-AllY <- genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("Y")))
+AllY <- genes(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"))
 AllY
 
 ## return result as DataFrame.
 AllY.granges <- genes(EnsDb.Hsapiens.v75,
-                      filter=list(SeqnameFilter("Y")),
+                      filter=SeqnameFilter("Y"),
                       return.type="DataFrame")
 AllY.granges
 
@@ -296,7 +296,7 @@ AllY.granges
 ## coordinates, sort by chrom start of transcripts and return as
 ## GRanges.
 AllY.granges.tx <- genes(EnsDb.Hsapiens.v75,
-                         filter=list(SeqnameFilter("Y")),
+                         filter=SeqnameFilter("Y"),
                          columns=c("gene_id", "seq_name",
                              "seq_strand", "tx_id", "tx_biotype",
                              "tx_seq_start", "tx_seq_end"),
@@ -309,15 +309,15 @@ AllY.granges.tx
 ##
 ## get all transcripts of a gene
 Tx <- transcripts(EnsDb.Hsapiens.v75,
-                  filter=list(GeneidFilter("ENSG00000184895")),
+                  filter=GeneidFilter("ENSG00000184895"),
                   order.by="tx_seq_start")
 Tx
 
 ## get all transcripts of two genes along with some information on the
 ## gene and transcript
 Tx <- transcripts(EnsDb.Hsapiens.v75,
-                  filter=list(GeneidFilter(c("ENSG00000184895",
-                      "ENSG00000092377"))),
+                  filter=GeneidFilter(c("ENSG00000184895",
+                      "ENSG00000092377")),
                       columns=c("gene_id", "gene_seq_start",
                           "gene_seq_end", "gene_biotype", "tx_biotype"))
 Tx
@@ -328,8 +328,8 @@ Tx
 ##
 ## get all exons of the provided genes
 Exon <- exons(EnsDb.Hsapiens.v75,
-              filter=list(GeneidFilter(c("ENSG00000184895",
-                  "ENSG00000092377"))),
+              filter=GeneidFilter(c("ENSG00000184895",
+                  "ENSG00000092377")),
               order.by="exon_seq_start",
               columns=c( "gene_id", "gene_seq_start",
                   "gene_seq_end", "gene_biotype"))
@@ -341,12 +341,12 @@ Exon
 ##
 ## get all exons for transcripts encoded on chromosomes X and Y.
 ETx <- exonsBy(EnsDb.Hsapiens.v75, by="tx",
-               filter=list(SeqnameFilter(c("X", "Y"))))
+               filter=SeqnameFilter(c("X", "Y")))
 ETx
 ## get all exons for genes encoded on chromosome 1 to 22, X and Y and
 ## include additional annotation columns in the result
 EGenes <- exonsBy(EnsDb.Hsapiens.v75, by="gene",
-                  filter=list(SeqnameFilter(c("X", "Y"))),
+                  filter=SeqnameFilter(c("X", "Y")),
                   columns=c("gene_biotype", "gene_name"))
 EGenes
 
@@ -360,7 +360,7 @@ length(grep(names(EGenes), pattern="LRG"))
 #####    transcriptsBy
 ##
 TGenes <- transcriptsBy(EnsDb.Hsapiens.v75, by="gene",
-                        filter=list(SeqnameFilter(c("X", "Y"))))
+                        filter=SeqnameFilter(c("X", "Y")))
 TGenes
 
 ## convert this to a SAF formatted data.frame that can be used by the
