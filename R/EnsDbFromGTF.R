@@ -154,7 +154,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
         cat("processing metadata...")
     }
     Metadata <- buildMetadata(organism, version, host="unknown",
-                              sourceFile="GRanges object")
+                              sourceFile="GRanges object", genomeVersion=genomeVersion)
     dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE, row.names=FALSE)
     if(verbose)
         cat("OK\n")
