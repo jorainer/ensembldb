@@ -1,3 +1,20 @@
+CHANGES IN VERSION 1.1.2
+------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Added examples to the vignette for building an EnsDb using AnnotationHub along with
+      the matching genomic sequence.
+    o Added an example for fetching the sequences of genes, transcripts and exons to the vignette.
+
+
+BUG FIXES
+
+    o Fixed a bug in ensDbFromGRanges and ensDbFromGtf in which the genome build version
+      was not set even if provided.
+
+
+
 CHANGES IN VERSION 1.1.1
 ------------------------
 

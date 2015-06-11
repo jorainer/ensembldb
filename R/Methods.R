@@ -78,6 +78,9 @@ if(!isGeneric("where"))
     setGeneric("where", function(object, db, with.tables, ...)
         standardGeneric("where"))
 
+if(!isGeneric("suggestGenomePackage"))
+    setGeneric("suggestGenomePackage", function(object, ...)
+        standardGeneric("suggestGenomePackage"))
 
 ##***********************************************************************
 ##
@@ -154,6 +157,19 @@ setMethod("seqinfo", "EnsDb", function(x){
                   seqlengths=Chrs$seq_length,
                   isCircular=Chrs$is_circular==1, genome=Chr.build)
     return(SI)
+})
+
+### suggestGenomePackage
+## suggests the name of a Bioconductor Genome database package that fits the package's genome build
+suggestBSGenomePackage <- function(x, source="NCBI"){
+    Genome <- unique(genome(x))
+    Organism <- unlist(strsplit(organism(x), split=" ", fixed=TRUE))
+    OrgShort <- paste0(substr(Organism[1], 1, 1), Organism[-1], collapse="")
+    if(OrgShort=="Hsapiens"){
+    }
+}
+setMethod("suggestGenomePackage", "EnsDb", function(object, source="NCBI"){
+    return(suggestBSGenomePackage(x=object, source=source))
 })
 
 ### listTables

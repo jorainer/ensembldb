@@ -30,6 +30,7 @@ Use =ox-ravel= from the =orgmode-accessories= package to export this file to a =
 2) Move the =<<style>>= code chunk before the =\begin{document}= and before =\author=.
 3) Move all =%\Vignette...= lines at the start of the file (even before =\documentclass=).
 4) Replace =\date= with =\date{Modified: 21 October, 2013. Compiled: \today}=
+5) Eventually search for all problems with =texttt=, i.e. search for pattern ="==.
 
 Note: use =:ravel= followed by the properties for the code chunk headers, e.g. =:ravel results='hide'=. Other options for knitr style options are:
 + =results=: ='hide'= (hides all output, not warnings or messages), ='asis'=, ='markup'= (the default).
@@ -205,6 +206,61 @@ In addition, the =disjointExons= function (similar to the one defined in =Genomi
 
 
 
+* Retrieving sequences for gene/transcript/exon models
+
+The methods to retrieve exons, transcripts and genes (i.e. =exons=, =transcripts= and =genes=) return by default =GRanges= objects that can be used to retrieve sequences using the =getSeq= method e.g. from BSgenome packages. The basic workflow is thus identical to the one for =TxDb= packages, however, it is not straight forward to identify the BSgenome package with the matching genomic sequence. Most BSgenome packages are named according to the genome build identifier used in UCSC which does not (always) match the genome build name used by Ensembl.
+Using the Ensembl version provided by the =EnsDb=, the correct genomic sequence can however be retrieved easily from the =AnnotationHub=.
+
+First we load the =AnnotationHub= data and list all resources available for the specific Ensembl version and species. Next we load the =dna.toplevel.fa= fasta file and retrieve the sequences for all genes defined in the =EnsDb= package. These sequences represent the sequence between the chromosomal start and end coordinates of the gene.
+To retrieve the (exonic) sequence of transcripts (i.e. without introns) we first fetch all exons grouped by transcripts and then extract and paste the sequence of all of the transcripts' exons.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  ## load the AnnotationHub data
+  library(AnnotationHub)
+  library(EnsDb.Hsapiens.v75)
+  library(Rsamtools)
+  ah <- AnnotationHub()
+
+  edb <- EnsDb.Hsapiens.v75
+
+  ## get the Ensembl version
+  eVersion <- metadata(edb)[metadata(edb)$name=="ensembl_version", "value"]
+  ## query all available files for the Ensembl version
+  eData <- query(ah, c(organism(edb), paste0("release-", eVersion)))
+  eData
+
+  ## retrieve the *dna.toplevel.fa file; this might take some time.
+  Dna <- ah[["AH20439"]]
+  ## generate an index if none is available
+  if(is.na(index(Dna))){
+      indexFa(Dna)
+      Dna <- FaFile(path(Dna))
+  }
+
+  ## get start/end coordinates of all genes
+  genes <- genes(edb)
+  ## subset to all genes that are encoded on chromosomes for which
+  ## we do have DNA sequence available.
+  genes <- genes[seqnames(genes) %in% seqnames(seqinfo(Dna))]
+  ## get the gene sequences, i.e. the sequence including the sequence of
+  ## all of the gene's exons and introns
+  geneSeqs <- getSeq(Dna, genes)
+
+  ## to get the sequence of all transcripts (i.e. only their exonic sequence) we
+  ## fetch the exons grouped by transcripts.
+  ## get all exons by transcript for all genes defined by Ensembl. This excludes
+  ## eventual "LRG" genes, that might be encoded on a sequence for which we don't
+  ## have a DNA sequence.
+  txExons <- exonsBy(edb, "tx", filter=GeneidFilter("ENS%", condition="like"))
+  ## extract sequence of all of each transcripts' exons and join them into a single
+  ## sequence; this takes quite some time, so we just run it on the first 100.
+  txSeqs <- lapply(txExons[1:100], function(x){unlist(getSeq(Dna, x))})
+
+#+END_SRC
+
+
+
+
 * Important notes
 
 These notes might explain eventually unexpected results (and, more importantly, help avoiding them):
@@ -295,6 +351,35 @@ In the example below we load a =GRanges= containing gene definitions for genes e
 
   edb <- EnsDb(DB)
   edb
+
+#+END_SRC
+
+In the next example we create an =EnsDb= database using the =AnnotationHub= package and load also the corresponding genomic DNA sequence matching the Ensembl version. We thus first query the =AnnotationHub= package for all resources available for =Mus musculus= and the Ensembl release 77. Next we load the =gtf= file for the transcript definitions and the =dna.toplevel.fa= file for the DNA sequence. From the =GRanges= object representing the =gtf= file we can build and load an =EnsDb=.
+At last we retrieve the sequences of all exons using the =getSeq= method.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  ## load the AnnotationHub data
+  library(AnnotationHub)
+  ah <- AnnotationHub()
+
+  ## query all available files from Ensembl release 77 for
+  ## Mus musculus
+  query(ah, c("Mus musculus", "release-77"))
+
+  ## get the gtf file
+  Gtf <- ah[["AH28822"]]
+  ## create a EnsDb database file from the Gtf
+  DbFile <- ensDbFromGRanges(Gtf, organism="Mus_musculus", version=77)
+  ## we can either generate a database package, or directly load the data
+  Edb <- EnsDb(DbFile)
+
+  ## retrieve the toplevel DNA
+  Dna <- ah[["AH22042"]]
+
+  ## we next retrieve the sequence of all exons
+  library(Rsamtools)
+  exons <- exons(Edb)
+  exonSeq <- getSeq(Dna, exons)
 
 #+END_SRC
 
@@ -394,6 +479,19 @@ The return value should be /Genus species/, i.e. without =_= in between.
 + Ideally, automatically run this script, if there is any error just skip, but do not stop. To do that, use the =try= call.
 
 ** TODO Include recipe to =AnnotationHub=
+** CANCELED Implement a function to /guess/ the correct BSgenome package
+   CLOSED: [2015-06-11 Thu 08:45]
+   - State "CANCELED"   from "TODO"       [2015-06-11 Thu 08:45] \\
+     Drop that; better to fetch the sequence from AnnotationHub!
++ In the end it seems I have to do some hard-coding there...
+
+
+** TODO Implement a function to load the appropriate DNA sequence from AnnotationHub
+
++ [ ] Implement a method to retrieve the Ensembl version.
+Some code snippet:
+=query(ah, c(organism(edb), paste0("release-")))= and use =mcols()= on the result to search for =dna.toplevel.fa=.
+
 ** DONE Implement a function to build an EnsDb from a GRanges object.
    CLOSED: [2015-04-14 Tue 11:35]
    - State "DONE"       from "TODO"       [2015-04-14 Tue 11:35]

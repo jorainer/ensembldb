@@ -234,6 +234,9 @@
       noted above, an exon can be part of several transcripts and thus
       its position inside these transcript might differ.}
   }
+
+  Also, the vignette provides examples on how to retrieve sequences for
+  genes/transcripts/exons.
 }
 \note{
   Ensembl defines genes not only on standard chromosomes, but also on
