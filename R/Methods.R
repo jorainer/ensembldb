@@ -21,12 +21,21 @@ if(!isGeneric("genes"))
 if(!isGeneric("getWhat"))
     setGeneric("getWhat", function(x, ...)
         standardGeneric("getWhat"))
+if(!isGeneric("ensemblVersion"))
+    setGeneric("ensemblVersion", function(x)
+        standardGeneric("ensemblVersion"))
 if(!isGeneric("exons"))
     setGeneric("exons", function(x, ...)
         standardGeneric("exons"))
 if(!isGeneric("exonsBy"))
     setGeneric("exonsBy", function(x, ...)
         standardGeneric("exonsBy"))
+if(!isGeneric("getGenomeFaFile"))
+    setGeneric("getGenomeFaFile", function(x, ...)
+        standardGeneric("getGenomeFaFile"))
+if(!isGeneric("getMetadataValue"))
+    setGeneric("getMetadataValue", function(x, name)
+        standardGeneric("getMetadataValue"))
 if(!isGeneric("listColumns")){
     setGeneric("listColumns", function(x, ...)
         standardGeneric("listColumns"))
@@ -78,9 +87,6 @@ if(!isGeneric("where"))
     setGeneric("where", function(object, db, with.tables, ...)
         standardGeneric("where"))
 
-if(!isGeneric("suggestGenomePackage"))
-    setGeneric("suggestGenomePackage", function(object, ...)
-        standardGeneric("suggestGenomePackage"))
 
 ##***********************************************************************
 ##
@@ -148,6 +154,20 @@ setMethod("dbconn", "EnsDb", function(x){
     return(x@ensdb)
 })
 
+### ensemblVersion
+## returns the ensembl version of the package.
+setMethod("ensemblVersion", "EnsDb", function(x){
+    eVersion <- getMetadataValue(x, "ensembl_version")
+    return(eVersion)
+})
+### getMetadataValue
+## returns the metadata value for the specified name/key
+setMethod("getMetadataValue", "EnsDb", function(x, name){
+    if(missing(name))
+        stop("Argument name has to be specified!")
+    return(metadata(x)[metadata(x)$name==name, "value"])
+})
+
 ### seqinfo
 ## returns the sequence/chromosome information from the database.
 setMethod("seqinfo", "EnsDb", function(x){
@@ -159,17 +179,33 @@ setMethod("seqinfo", "EnsDb", function(x){
     return(SI)
 })
 
-### suggestGenomePackage
-## suggests the name of a Bioconductor Genome database package that fits the package's genome build
-suggestBSGenomePackage <- function(x, source="NCBI"){
-    Genome <- unique(genome(x))
-    Organism <- unlist(strsplit(organism(x), split=" ", fixed=TRUE))
-    OrgShort <- paste0(substr(Organism[1], 1, 1), Organism[-1], collapse="")
-    if(OrgShort=="Hsapiens"){
+### getGenomeFaFile
+## queries the dna.toplevel.fa file from AnnotationHub matching the current
+## Ensembl version
+setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
+    ah <- AnnotationHub()
+    queryCol <- "title"  ## the column we want to query
+    eData <- query(ah, c(organism(x), paste0("release-", ensemblVersion(x))))
+    idx <- grep(mcols(eData)[, queryCol], pattern=pattern)
+    if(length(idx) == 0){
+        stop(paste0("No genomic fasta file found in AnnotationHub for organism ",
+                    organism(x), " and Ensembl version ", ensemblVersion(x), "!\n",
+                    "Available resources are:",
+                    paste0(mcols(eData)[, queryCol], collapse="\n"), "\n"))
     }
-}
-setMethod("suggestGenomePackage", "EnsDb", function(object, source="NCBI"){
-    return(suggestBSGenomePackage(x=object, source=source))
+    if(length(idx) > 1){
+        warning(paste0("Found more than one matching file: ",
+                       paste0(mcols(eData)[idx, queryCol], collapse="\n"),
+                       "\nUsing only the first." ))
+        idx <- idx[1]
+    }
+    Dna <- ah[[names(eData)[idx]]]
+    ## generate an index if none is available
+    if(is.na(index(Dna))){
+        indexFa(Dna)
+        Dna <- FaFile(path(Dna))
+    }
+    return(Dna)
 })
 
 ### listTables

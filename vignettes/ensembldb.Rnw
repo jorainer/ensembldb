@@ -3,7 +3,7 @@
 %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
 %\VignettePackage{ensembldb}
 %\VignetteEngine{knitr::knitr}
-% Created 2015-06-11 Thu 08:32
+% Created 2015-06-12 Fri 09:21
 \documentclass[11pt]{article}
 
 <<style,results='asis', echo=FALSE, eval=TRUE>>=
@@ -11,7 +11,7 @@ BiocStyle::latex()
 @ %def
 
 \author{Johannes Rainer}
-\date{Modified: 11 June, 2015. Compiled: \today}
+\date{Modified: 12 June, 2015. Compiled: \today}
 \title{Generating and using Ensembl based annotation packages}
 \hypersetup{
  pdfauthor={Johannes Rainer},
@@ -24,8 +24,6 @@ BiocStyle::latex()
 
 \maketitle
 \tableofcontents
-
-
 
 
 \section{Introduction}
@@ -71,7 +69,7 @@ The \texttt{ensembldb} package provides a set of filter objects allowing to spec
 
 Each of the filter classes can take a single value or a vector of values (with the exception of the \texttt{SeqendFilter} and \texttt{SeqstartFilter}) for comparison. In addition, it is possible to specify the \emph{condition} for the filter, e.g. \texttt{condition="="} to retrieve all entries matching the filter value, \texttt{condition="!="} to negate the filter or also \texttt{condition="like"} to allow partial matching. The \texttt{condition} parameter for \texttt{SeqendFilter} and \texttt{SeqendFilter} can take the values \texttt{=}, \texttt{>}, \texttt{>=}, \texttt{<} and \texttt{<=} (since these filters base on numeric values).
 
-A simple example would be to get all transcripts for the gene \emph{BCL2L11}. To this end we specify a \texttt{GenenameFilter} with the value \texttt{"BCL2L11"}. As a result we get a \texttt{GRanges} object with \texttt{start}, \texttt{end}, \texttt{strand} and \texttt{seqname} of the \texttt{GRanges} object being the start coordinate, end coordinate, chromosome name and strand for the respective transcripts. All additional annotations are available as metadata columns. Alternatively, by setting \texttt{return.type="DataFrame"}, or \texttt{return.type="data.frame"} the method would return a \texttt{DataFrame} object or \texttt{data.frame}.
+A simple example would be to get all transcripts for the gene \emph{BCL2L11}. To this end we specify a \texttt{GenenameFilter} with the value ="BCL2L11"\texttt{. As a result we get a =GRanges} object with \texttt{start}, \texttt{end}, \texttt{strand} and \texttt{seqname} of the \texttt{GRanges} object being the start coordinate, end coordinate, chromosome name and strand for the respective transcripts. All additional annotations are available as metadata columns. Alternatively, by setting \texttt{return.type="DataFrame"}, or \texttt{return.type="data.frame"} the method would return a \texttt{DataFrame} object or \texttt{data.frame}.
 
 <<>>=
 Tx <- transcripts(EnsDb.Hsapiens.v75, filter=list(GenenameFilter("BCL2L11")))
@@ -203,34 +201,21 @@ DJE <- disjointExons(EnsDb.Hsapiens.v75,
 \label{sec:orgheadline4}
 
 The methods to retrieve exons, transcripts and genes (i.e. \texttt{exons}, \texttt{transcripts} and \texttt{genes}) return by default \texttt{GRanges} objects that can be used to retrieve sequences using the \texttt{getSeq} method e.g. from BSgenome packages. The basic workflow is thus identical to the one for \texttt{TxDb} packages, however, it is not straight forward to identify the BSgenome package with the matching genomic sequence. Most BSgenome packages are named according to the genome build identifier used in UCSC which does not (always) match the genome build name used by Ensembl.
-Using the Ensembl version provided by the \texttt{EnsDb}, the correct genomic sequence can however be retrieved easily from the \texttt{AnnotationHub}.
+Using the Ensembl version provided by the \texttt{EnsDb}, the correct genomic sequence can however be retrieved easily from the \texttt{AnnotationHub} using the \texttt{getGenomeFaFile}.
 
-First we load the \texttt{AnnotationHub} data and list all resources available for the specific Ensembl version and species. Next we load the \texttt{dna.toplevel.fa} fasta file and retrieve the sequences for all genes defined in the \texttt{EnsDb} package. These sequences represent the sequence between the chromosomal start and end coordinates of the gene.
+In the code block below we retrieve first the \texttt{FaFile} with the genomic DNA sequence, extract the genomic start and end coordinates for all genes defined in the package, subset to genes encoded on sequences available in the \texttt{FaFile} and extract all of their sequences.
+Note: these sequences represent the sequence between the chromosomal start and end coordinates of the gene.
 To retrieve the (exonic) sequence of transcripts (i.e. without introns) we first fetch all exons grouped by transcripts and then extract and paste the sequence of all of the transcripts' exons.
 
 <<eval=FALSE>>=
 ## load the AnnotationHub data
-library(AnnotationHub)
 library(EnsDb.Hsapiens.v75)
 library(Rsamtools)
-ah <- AnnotationHub()
-
 edb <- EnsDb.Hsapiens.v75
 
-## get the Ensembl version
-eVersion <- metadata(edb)[metadata(edb)$name=="ensembl_version", "value"]
-## query all available files for the Ensembl version
-eData <- query(ah, c(organism(edb), paste0("release-", eVersion)))
-eData
-
-## retrieve the *dna.toplevel.fa file; this might take some time.
-Dna <- ah[["AH20439"]]
-## generate an index if none is available
-if(is.na(index(Dna))){
-    indexFa(Dna)
-    Dna <- FaFile(path(Dna))
-}
-
+## get the FaFile with the genomic sequence matching the Ensembl version
+## using the AnnotationHub package.
+Dna <- getGenomeFaFile(edb)
 ## get start/end coordinates of all genes
 genes <- genes(edb)
 ## subset to all genes that are encoded on chromosomes for which

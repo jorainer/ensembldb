@@ -9,6 +9,14 @@ importFrom(rtracklayer, import)
 import(RSQLite)
 import(GenomicFeatures)
 import(GenomicRanges)
+## AnnotationHub
+importFrom(AnnotationHub, AnnotationHub)
+importClassesFrom(AnnotationHub, AnnotationHub)
+importMethodsFrom(AnnotationHub, query, mcols)
+## Rsamtools
+importClassesFrom(Rsamtools, FaFile, RsamtoolsFile)
+importMethodsFrom(Rsamtools, getSeq, indexFa)
+importFrom(Rsamtools, index)
 
 #exportPattern("^[[:alpha:]]+")
 export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
@@ -19,9 +27,10 @@ exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilte
 ## for EnsFilter
 exportMethods(column, print, show, where)
 ## for class EnsDb:
-exportMethods(dbconn, condition, buildQuery, exons, exonsBy, genes, lengthOf,
-              listColumns, listGenebiotypes, listTxbiotypes, listTables, organism,
-              seqinfo, toSAF, transcripts, transcriptsBy, disjointExons, metadata)
+exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, genes,
+              getGenomeFaFile, lengthOf, listColumns, listGenebiotypes, listTxbiotypes,
+              listTables, organism, seqinfo, toSAF, transcripts, transcriptsBy,
+              disjointExons, metadata)
 ## constructors
 export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
        TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,

@@ -7,6 +7,8 @@
 \alias{buildQuery,EnsDb-method}
 \alias{dbconn}
 \alias{dbconn,EnsDb-method}
+\alias{ensemblVersion}
+\alias{ensemblVersion,EnsDb-method}
 \alias{listColumns}
 \alias{listColumns,EnsDb-method}
 \alias{lengthOf}
@@ -51,6 +53,8 @@
 
 EnsDb(x)
 
+\S4method{ensemblVersion}{EnsDb}(x)
+
 \S4method{lengthOf}{EnsDb}(x, of="gene", filter=list())
 
 \S4method{listColumns}{EnsDb}(x, table, skip.keys=TRUE, ...)
@@ -82,7 +86,8 @@ EnsDb(x)
     supported columns.
   }
 
-  \item{filter}{list of \code{\linkS4class{BasicFilter}} instance(s) to
+  \item{filter}{
+    list of \code{\linkS4class{BasicFilter}} instance(s) to
     select specific entries from the database (see examples below).
   }
 
@@ -147,16 +152,20 @@ EnsDb(x)
   \describe{
 
     \item{buildQuery}{
-      helper function building the SQL query to be used to retrieve the
+      Helper function building the SQL query to be used to retrieve the
       wanted information. Usually there is no need to call this method.
     }
 
-    \item{dbconn}{returns the connection
-      to the internal SQL database.
+    \item{dbconn}{
+      Returns the connection to the internal SQL database.
+    }
+
+    \item{ensemblVersion}{
+      Returns the Ensembl version on which the package was built.
     }
 
     \item{lengthOf}{
-      retrieve the length of genes or transcripts from the
+      Retrieve the length of genes or transcripts from the
       database. The length is the sum of the lengths of all exons of a
       transcript or a gene. In the latter case the exons are first reduced
       so that the length corresponds to the part of the genomic sequence covered by
@@ -164,37 +173,39 @@ EnsDb(x)
     }
 
     \item{listColumns}{
-      lists all columns of all tables in the database, or, if
+      Lists all columns of all tables in the database, or, if
       \code{table} is specified, of the respective table.
     }
 
     \item{listGenebiotypes}{
-      lists all gene biotypes defined in the database.
+      Lists all gene biotypes defined in the database.
     }
 
     \item{listTxbiotypes}{
-      lists all transcript biotypes defined in the database.
+      Lists all transcript biotypes defined in the database.
     }
 
     \item{listTables}{
-      returns a named list of database table columns (names of the
+      Returns a named list of database table columns (names of the
       list being the database table names).
     }
 
     \item{metadata}{
-      returns a \code{data.frame} with the metadata information from the
+      Returns a \code{data.frame} with the metadata information from the
       database, i.e. informations about the Ensembl version or Genome
       build the database was build upon.
     }
 
     \item{organism}{
-      returns the organism name (e.g. \code{"homo_sapiens"}).
+      Returns the organism name (e.g. \code{"homo_sapiens"}).
     }
 
-    \item{seqinfo}{returns the sequence/chromosome information from the database.}
+    \item{seqinfo}{
+      Returns the sequence/chromosome information from the database.
+    }
 
     \item{show}{
-      displays some informations from the database.
+      Displays some informations from the database.
     }
 
   }
@@ -269,6 +280,9 @@ listTables(EnsDb.Hsapiens.v75)
 
 ## for what species is this database?
 organism(EnsDb.Hsapiens.v75)
+
+## what Ensembl version if the database based on?
+ensemblVersion(EnsDb.Hsapiens.v75)
 
 ## get some more information from the database
 metadata(EnsDb.Hsapiens.v75)

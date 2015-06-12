@@ -1,19 +1,21 @@
 \name{exonsBy}
 \Rdversion{1.1}
 \docType{class}
+\alias{disjointExons,EnsDb-method}
 \alias{exons}
 \alias{exons,EnsDb-method}
 \alias{exonsBy}
 \alias{exonsBy,EnsDb-method}
 \alias{genes}
 \alias{genes,EnsDb-method}
+\alias{getGenomeFaFile}
+\alias{getGenomeFaFile,EnsDb-method}
 \alias{toSAF}
 \alias{toSAF,GRangesList-method}
 \alias{transcripts}
 \alias{transcripts,EnsDb-method}
 \alias{transcriptsBy}
 \alias{transcriptsBy,EnsDb-method}
-\alias{disjointExons,EnsDb-method}
 
 \title{Retrieve annotation data from an Ensembl based package}
 \description{
@@ -45,6 +47,8 @@
                                 includeTranscripts=TRUE, filter, ...)
 
 \S4method{toSAF}{GRangesList}(x, ...)
+
+\S4method{getGenomeFaFile}{EnsDb}(x, pattern="dna.toplevel.fa")
 
 }
 \arguments{
@@ -110,6 +114,11 @@
   \item{order.type}{
     If the results should be ordered ascending
     (\code{asc}, default) or descending (\code{desc}).
+  }
+
+  \item{pattern}{
+    For method \code{getGenomeFaFile}: the pattern to be used to
+    identify the fasta file representing genomic DNA sequence.
   }
 
   \item{return.type}{
@@ -180,15 +189,6 @@
       and are added to the respective gene annotation.
     }
 
-    \item{toSAF}{
-      Reformats a \code{GRangesList} object into a
-      \code{data.frame} corresponding to a standard SAF (Simplified
-      Annotation Format) file (i.e. with column names \code{"GeneID"},
-      \code{"Chr"}, \code{"Start"}, \code{"End"} and
-      \code{"Strand"}). Note: this method makes only sense on a
-      \code{GRangesList} that groups features (exons, transcripts) by gene.
-    }
-
     \item{disjointExons}{
       This method is identical to
       \code{\link[GenomicFeatures]{disjointExons}} defined in the
@@ -198,6 +198,22 @@
       can be dropped with \code{aggregateGenes=FALSE}.
     }
 
+    \item{toSAF}{
+      Reformats a \code{GRangesList} object into a
+      \code{data.frame} corresponding to a standard SAF (Simplified
+      Annotation Format) file (i.e. with column names \code{"GeneID"},
+      \code{"Chr"}, \code{"Start"}, \code{"End"} and
+      \code{"Strand"}). Note: this method makes only sense on a
+      \code{GRangesList} that groups features (exons, transcripts) by gene.
+    }
+
+    \item{getGenomeFaFile}{
+      Returns a \code{\link[Rsamtools]{FaFile-class}} (defined in
+      \code{Rsamtools}) with the genomic sequence of the genome build
+      matching the Ensembl version of the \code{EnsDb} object. The file
+      is retrieved using the \code{AnnotationHub} package. See the
+      vignette for an example to work with such files.
+    }
   }
 }
 \details{
@@ -271,6 +287,8 @@
   For \code{disjointExons}: a \code{GRanges} of non-overlapping exon
   parts.
 
+  For \code{getGenomeFaFile}: a \code{\link[Rsamtools]{FaFile-class}}
+  object with the genomic DNA sequence.
 }
 \author{
   Johannes Rainer
