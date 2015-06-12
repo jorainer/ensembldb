@@ -209,34 +209,21 @@ In addition, the =disjointExons= function (similar to the one defined in =Genomi
 * Retrieving sequences for gene/transcript/exon models
 
 The methods to retrieve exons, transcripts and genes (i.e. =exons=, =transcripts= and =genes=) return by default =GRanges= objects that can be used to retrieve sequences using the =getSeq= method e.g. from BSgenome packages. The basic workflow is thus identical to the one for =TxDb= packages, however, it is not straight forward to identify the BSgenome package with the matching genomic sequence. Most BSgenome packages are named according to the genome build identifier used in UCSC which does not (always) match the genome build name used by Ensembl.
-Using the Ensembl version provided by the =EnsDb=, the correct genomic sequence can however be retrieved easily from the =AnnotationHub=.
+Using the Ensembl version provided by the =EnsDb=, the correct genomic sequence can however be retrieved easily from the =AnnotationHub= using the =getGenomeFaFile=.
 
-First we load the =AnnotationHub= data and list all resources available for the specific Ensembl version and species. Next we load the =dna.toplevel.fa= fasta file and retrieve the sequences for all genes defined in the =EnsDb= package. These sequences represent the sequence between the chromosomal start and end coordinates of the gene.
+In the code block below we retrieve first the =FaFile= with the genomic DNA sequence, extract the genomic start and end coordinates for all genes defined in the package, subset to genes encoded on sequences available in the =FaFile= and extract all of their sequences.
+Note: these sequences represent the sequence between the chromosomal start and end coordinates of the gene.
 To retrieve the (exonic) sequence of transcripts (i.e. without introns) we first fetch all exons grouped by transcripts and then extract and paste the sequence of all of the transcripts' exons.
 
 #+BEGIN_SRC R :ravel eval=FALSE
   ## load the AnnotationHub data
-  library(AnnotationHub)
   library(EnsDb.Hsapiens.v75)
   library(Rsamtools)
-  ah <- AnnotationHub()
-
   edb <- EnsDb.Hsapiens.v75
 
-  ## get the Ensembl version
-  eVersion <- metadata(edb)[metadata(edb)$name=="ensembl_version", "value"]
-  ## query all available files for the Ensembl version
-  eData <- query(ah, c(organism(edb), paste0("release-", eVersion)))
-  eData
-
-  ## retrieve the *dna.toplevel.fa file; this might take some time.
-  Dna <- ah[["AH20439"]]
-  ## generate an index if none is available
-  if(is.na(index(Dna))){
-      indexFa(Dna)
-      Dna <- FaFile(path(Dna))
-  }
-
+  ## get the FaFile with the genomic sequence matching the Ensembl version
+  ## using the AnnotationHub package.
+  Dna <- getGenomeFaFile(edb)
   ## get start/end coordinates of all genes
   genes <- genes(edb)
   ## subset to all genes that are encoded on chromosomes for which
@@ -478,7 +465,10 @@ The return value should be /Genus species/, i.e. without =_= in between.
 
 + Ideally, automatically run this script, if there is any error just skip, but do not stop. To do that, use the =try= call.
 
-** TODO Include recipe to =AnnotationHub=
+** CANCELED Include recipe to =AnnotationHub=
+   CLOSED: [2015-06-12 Fri 08:55]
+   - State "CANCELED"   from "TODO"       [2015-06-12 Fri 08:55] \\
+     Don't need that really. We can retrieve the GRanges object and build the EnsDb object or package based on that.
 ** CANCELED Implement a function to /guess/ the correct BSgenome package
    CLOSED: [2015-06-11 Thu 08:45]
    - State "CANCELED"   from "TODO"       [2015-06-11 Thu 08:45] \\
@@ -486,9 +476,10 @@ The return value should be /Genus species/, i.e. without =_= in between.
 + In the end it seems I have to do some hard-coding there...
 
 
-** TODO Implement a function to load the appropriate DNA sequence from AnnotationHub
-
-+ [ ] Implement a method to retrieve the Ensembl version.
+** DONE Implement a function to load the appropriate DNA sequence from AnnotationHub
+   CLOSED: [2015-06-12 Fri 08:55]
+   - State "DONE"       from "TODO"       [2015-06-12 Fri 08:55]
++ [X] Implement a method to retrieve the Ensembl version.
 Some code snippet:
 =query(ah, c(organism(edb), paste0("release-")))= and use =mcols()= on the result to search for =dna.toplevel.fa=.
 
