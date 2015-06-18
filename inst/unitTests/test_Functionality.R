@@ -52,4 +52,9 @@ test_filterExceptions <- function(){
                                  "z")))
 }
 
+test_promoters <- function(){
+    promoters(EnsDb.Hsapiens.v75, filter=GeneidFilter(c("ENSG00000184895",
+                                                    "ENSG00000092377")))
+}
+
 

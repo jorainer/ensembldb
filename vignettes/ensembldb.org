@@ -300,47 +300,6 @@ Note that we could directly generate an =EnsDb= instance by loading the database
 
 To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting =host = "mysql-eg-publicsql.ebi.ac.uk"=, =port=4157= and species to e.g. =species = "arabidopsis thaliana"=.
 
-An alternative way to build the required annotation database is to use the =ensDbFromGtf= function, that extracts most of the required data from a GTF file that can be downloaded from Ensembl (e.g. from ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens for human gene definitions from Ensembl version 75; for plant genomes etc files can be retrieved from ftp://ftp.ensemblgenomes.org). All information except the chromosome lengths and the NCBI Entrezgene IDs can be extracted from these GTF files. The function also tries to retrieve chromosome length information automatically from Ensembl.
-
-Below we create the annotation from a gtf file that we fetch directly from Ensembl.
-
-#+BEGIN_SRC R :ravel eval=FALSE
-  library(ensembl)
-
-  ## the GTF file can be downloaded from
-  ## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/
-  gtffile <- "Homo_sapiens.GRCh37.75.gtf.gz"
-  ## generate the SQLite database file
-  DB <- ensDbFromGtf(gtf=gtffile, verbose=TRUE)
-
-  ## load the DB file directly
-  EDB <- EnsDb(DB)
-
-  ## alternatively, build the annotation package
-  ## and finally we can generate the package
-  makeEnsembldbPackage(ensdb=DB, version="0.99.12",
-                       maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
-                       author="J Rainer")
-
-#+END_SRC
-
-The third way to generate an =EnsDb= database is /via/ a =GRanges= object that contains all the required information. Such =GRanges= can for example be loaded using the =AnnotationHub= package.
-In the example below we load a =GRanges= containing gene definitions for genes encoded on chromosome Y and generate a EnsDb SQLite database from that information.
-
-#+BEGIN_SRC R
-  ## Generate a sqlite database from a GRanges object specifying
-  ## genes encoded on chromosome Y
-  load(system.file("YGRanges.RData", package="ensembldb"))
-  Y
-
-  DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
-                         organism="Homo_sapiens")
-
-  edb <- EnsDb(DB)
-  edb
-
-#+END_SRC
-
 In the next example we create an =EnsDb= database using the =AnnotationHub= package and load also the corresponding genomic DNA sequence matching the Ensembl version. We thus first query the =AnnotationHub= package for all resources available for =Mus musculus= and the Ensembl release 77. Next we load the =gtf= file for the transcript definitions and the =dna.toplevel.fa= file for the DNA sequence. From the =GRanges= object representing the =gtf= file we can build and load an =EnsDb=.
 At last we retrieve the sequences of all exons using the =getSeq= method.
 
@@ -367,6 +326,47 @@ At last we retrieve the sequences of all exons using the =getSeq= method.
   library(Rsamtools)
   exons <- exons(Edb)
   exonSeq <- getSeq(Dna, exons)
+
+#+END_SRC
+
+In the example below we load a =GRanges= containing gene definitions for genes encoded on chromosome Y and generate a EnsDb SQLite database from that information.
+
+#+BEGIN_SRC R
+  ## Generate a sqlite database from a GRanges object specifying
+  ## genes encoded on chromosome Y
+  load(system.file("YGRanges.RData", package="ensembldb"))
+  Y
+
+  DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
+                         organism="Homo_sapiens")
+
+  edb <- EnsDb(DB)
+  edb
+
+#+END_SRC
+
+
+Alternatively we can build the annotation database using the =ensDbFromGtf= function, that extracts most of the required data from a GTF file which can be downloaded from Ensembl (e.g. from ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens for human gene definitions from Ensembl version 75; for plant genomes etc files can be retrieved from ftp://ftp.ensemblgenomes.org). All information except the chromosome lengths and the NCBI Entrezgene IDs can be extracted from these GTF files. The function also tries to retrieve chromosome length information automatically from Ensembl.
+
+Below we create the annotation from a gtf file that we fetch directly from Ensembl.
+
+#+BEGIN_SRC R :ravel eval=FALSE
+  library(ensembldb)
+
+  ## the GTF file can be downloaded from
+  ## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/
+  gtffile <- "Homo_sapiens.GRCh37.75.gtf.gz"
+  ## generate the SQLite database file
+  DB <- ensDbFromGtf(gtf=gtffile, verbose=TRUE)
+
+  ## load the DB file directly
+  EDB <- EnsDb(DB)
+
+  ## alternatively, build the annotation package
+  ## and finally we can generate the package
+  makeEnsembldbPackage(ensdb=DB, version="0.99.12",
+                       maintainer="Johannes Rainer <johannes.rainer@eurac.edu>",
+                       author="J Rainer")
 
 #+END_SRC
 
