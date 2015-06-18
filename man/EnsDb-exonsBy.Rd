@@ -41,9 +41,7 @@
 \S4method{transcriptsBy}{EnsDb}(x, by=c("gene", "exon"),
                                 columns=listColumns(x, "tx"), filter)
 
-\S4method{promoters}{EnsDb}(x, columns=listColumns(x, "tx"),
-                              filter, order.by, order.type="asc",
-                              return.type="GRanges")
+\S4method{promoters}{EnsDb}(x, upstream=2000, downstream=200, ...)
 
 \S4method{genes}{EnsDb}(x, columns=listColumns(x, "gene"), filter,
                         order.by, order.type="asc",
@@ -62,7 +60,8 @@
   (In alphabetic order)
 
   \item{...}{
-    Additional arguments. Not used.
+    For \code{promoters}: additional arguments to be passed to the
+    \code{transcripts} method.
   }
 
   \item{aggregateGenes}{
@@ -70,6 +69,17 @@
     that overlap multiple genes are dropped. When \code{TRUE}, all
     fragments are kept and the \code{gene_id} metadata column includes
     all gene IDs that overlap the exon fragment.
+  }
+
+  \item{by}{
+    For \code{exonsBy}: wheter exons sould be fetched by genes
+    or by transcripts; as in the corresponding function of the
+    \code{GenomicFeatures} package.
+    For \code{transcriptsBy}: whether
+    transcripts should be fetched by genes or by exons; fetching
+    transcripts by cds as supported by the
+    \code{\link[GenomicFeatures]{transcriptsBy}} method in the
+    \code{GenomicFeatures} package is currently not implemented.
   }
 
   \item{columns}{
@@ -87,15 +97,9 @@
     column names).
   }
 
-  \item{by}{
-    For \code{exonsBy}: wheter exons sould be fetched by genes
-    or by transcripts; as in the corresponding function of the
-    \code{GenomicFeatures} package.
-    For \code{transcriptsBy}: whether
-    transcripts should be fetched by genes or by exons; fetching
-    transcripts by cds as supported by the
-    \code{\link[GenomicFeatures]{transcriptsBy}} method in the
-    \code{GenomicFeatures} package is currently not implemented.
+  \item{downstream}{
+    For method \code{promoters}: the number of nucleotides downstream of
+    the transcription start site that should be included in the promoter region.
   }
 
   \item{filter}{
@@ -135,6 +139,11 @@
     transcript or exon, depending whether \code{genes},
     \code{transcripts} or \code{exons} was called). All additional
     columns are added as metadata columns to the GRanges object.
+  }
+
+  \item{upstream}{
+    For method \code{promoters}: the number of nucleotides upstream of
+    the transcription start site that should be included in the promoter region.
   }
 
   \item{x}{
@@ -354,7 +363,11 @@ Tx <- transcripts(EnsDb.Hsapiens.v75,
                           "gene_seq_end", "gene_biotype", "tx_biotype"))
 Tx
 
-
+######   promoters
+##
+## get the bona-fide promoters (2k up- to 200nt downstream of TSS)
+promoters(EnsDb.Hsapiens.v75, filter=GeneidFilter(c("ENSG00000184895",
+                                                    "ENSG00000092377")))
 
 ######   exons
 ##
