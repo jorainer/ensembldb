@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use an Ensembl based annotation database
-Version: 1.1.3
+Version: 1.1.4
 Author: J. Rainer
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
 Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb, AnnotationDbi,
