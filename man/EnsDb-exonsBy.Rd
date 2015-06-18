@@ -16,6 +16,8 @@
 \alias{transcripts,EnsDb-method}
 \alias{transcriptsBy}
 \alias{transcriptsBy,EnsDb-method}
+\alias{promoters}
+\alias{promoters,EnsDb-method}
 
 \title{Retrieve annotation data from an Ensembl based package}
 \description{
@@ -38,6 +40,10 @@
 
 \S4method{transcriptsBy}{EnsDb}(x, by=c("gene", "exon"),
                                 columns=listColumns(x, "tx"), filter)
+
+\S4method{promoters}{EnsDb}(x, columns=listColumns(x, "tx"),
+                              filter, order.by, order.type="asc",
+                              return.type="GRanges")
 
 \S4method{genes}{EnsDb}(x, columns=listColumns(x, "gene"), filter,
                         order.by, order.type="asc",
@@ -183,6 +189,11 @@
       the name of the gene or exon.
     }
 
+    \item{promoters}{
+      Retrieve promoter information from the database. Additional
+      columns from genes or exons associated with the promoters can be specified
+      and are added to the respective promoter annotation.
+    }
     \item{genes}{
       Retrieve gene information from the database. Additional
       columns from transcripts or exons associated with the genes can be specified

@@ -431,6 +431,17 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
     }
 })
 
+### promoters:
+## get promoter regions from the database.
+setMethod("promoters", "EnsDb",
+          function(x, upstream=2000, downstream=200, ...)
+          {
+              gr <- transcripts(x, ...)
+              trim(suppressWarnings(promoters(gr, 
+                                              upstream=upstream, 
+                                              downstream=downstream)))
+          }
+)
 
 ### exons:
 ## get exons from the database.
