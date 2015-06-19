@@ -248,6 +248,13 @@ To retrieve the (exonic) sequence of transcripts (i.e. without introns) we first
 
 
 
+* Interactive annotation lookup using the =shiny= web app
+
+In addition to the =genes=, =transcripts= and =exons= methods it is possibly to
+search interactively for gene/transcript/exon annotations using the internal,
+=shiny= based, web application. The application can be started with the
+=runEnsDbApp()= function.
+
 * Important notes
 
 These notes might explain eventually unexpected results (and, more importantly, help avoiding them):

@@ -3,14 +3,15 @@
 %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
 %\VignettePackage{ensembldb}
 %\VignetteEngine{knitr::knitr}
-% Created 2015-06-17 Wed 22:23
+
+% Created 2015-06-19 Fri 14:17
 \documentclass[11pt]{article}
 <<style,results='asis', echo=FALSE, eval=TRUE>>=
 BiocStyle::latex()
 @ %def
 
 \author{Johannes Rainer}
-\date{Modified: 17 June, 2015. Compiled: \today}
+\date{Modified: 19 June, 2015. Compiled: \today}
 \title{Generating and using Ensembl based annotation packages}
 \hypersetup{
  pdfauthor={Johannes Rainer},
@@ -23,7 +24,6 @@ BiocStyle::latex()
 
 \maketitle
 \tableofcontents
-
 
 
 
@@ -240,8 +240,16 @@ txSeqs <- lapply(txExons[1:100], function(x){unlist(getSeq(Dna, x))})
 
 
 
-\section{Important notes}
+\section{Interactive annotation lookup using the \texttt{shiny} web app}
 \label{sec:orgheadline5}
+
+In addition to the \texttt{genes}, \texttt{transcripts} and \texttt{exons} methods it is possibly to
+search interactively for gene/transcript/exon annotations using the internal,
+\texttt{shiny} based, web application. The application can be started with the
+\texttt{runEnsDbApp()} function.
+
+\section{Important notes}
+\label{sec:orgheadline6}
 
 These notes might explain eventually unexpected results (and, more importantly, help avoiding them):
 
@@ -253,13 +261,13 @@ These notes might explain eventually unexpected results (and, more importantly, 
 
 
 \section{Building an transcript centric database package based on Ensembl annotation}
-\label{sec:orgheadline8}
+\label{sec:orgheadline9}
 
 The code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, fetching data from the Ensembl database takes quite some time, thus, in this section only the code is displayed, but not executed.
 
 
 \subsection{Requirements}
-\label{sec:orgheadline6}
+\label{sec:orgheadline7}
 
 The \texttt{fetchTablesFromEnsembl} function of the package uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site \emph{ensembldb.ensembl.org}). Thus, to use the functionality to built databases, the Ensembl Perl API needs to be installed (see \footnote{\url{http://www.ensembl.org/info/docs/api/api_installation.html}} for details).
 
@@ -267,7 +275,7 @@ Alternatively, the \texttt{ensDbFromGRanges} and \texttt{ensDbFromGtf} functions
 
 
 \subsection{Building an annotation package}
-\label{sec:orgheadline7}
+\label{sec:orgheadline8}
 
 The functions below use the Ensembl Perl API to fetch the required data directly from the Ensembl core databases. Thus, the path to the Perl API specific for the desired Ensembl version needs to be added to the \texttt{PERL5LIB} environment variable.
 
@@ -366,7 +374,7 @@ makeEnsembldbPackage(ensdb=DB, version="0.99.12",
 
 
 \section{Database layout\label{orgtarget1}}
-\label{sec:orgheadline9}
+\label{sec:orgheadline10}
 
 The database consists of the following tables and attributes (the layout is also shown in Figure \ref{fig:orgparagraph1}):
 
