@@ -5,6 +5,8 @@ Version: 1.1.5
 Author: Johannes Rainer <johannes.rainer@eurac.edu>,
 	Tim Triche <tim.triche@usc.edu>
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
+URL: https://github.com/jotsetung/ensembldb
+BugReports: https://github.com/jotsetung/ensembldb/issues
 Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb, AnnotationDbi,
 	 rtracklayer, S4Vectors, AnnotationHub, Rsamtools
 Depends: BiocGenerics, GenomicRanges, GenomicFeatures
