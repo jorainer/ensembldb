@@ -311,7 +311,7 @@
   object with the genomic DNA sequence.
 }
 \author{
-  Johannes Rainer
+  Johannes Rainer, Tim Triche
 }
 \seealso{
   \code{\link{makeEnsembldbPackage}}, \code{\linkS4class{BasicFilter}},

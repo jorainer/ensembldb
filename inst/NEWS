@@ -1,3 +1,13 @@
+CHANGES IN VERSION 1.1.5
+------------------------
+
+NEW FEATURES
+
+    o Implemented a shiny web app to search for genes/transcripts/exons using
+      annotation of an EnsDb annotation package (function runEnsDbApp).
+
+
+
 CHANGES IN VERSION 1.1.4
 ------------------------
 

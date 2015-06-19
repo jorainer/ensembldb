@@ -20,7 +20,7 @@ importFrom(Rsamtools, index)
 
 #exportPattern("^[[:alpha:]]+")
 export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
-       ensDbFromGtf, ensDbFromGRanges)
+       ensDbFromGtf, ensDbFromGRanges, runEnsDbApp)
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
               SeqstrandFilter, SeqstartFilter, SeqendFilter)
