@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.1.6
+------------------------
+
+BUG FIXES
+
+    o Fix a bug in lengthOf that caused an error if no filter was supplied.
+
+
 CHANGES IN VERSION 1.1.5
 ------------------------
 

@@ -437,8 +437,8 @@ setMethod("promoters", "EnsDb",
           function(x, upstream=2000, downstream=200, ...)
           {
               gr <- transcripts(x, ...)
-              trim(suppressWarnings(promoters(gr, 
-                                              upstream=upstream, 
+              trim(suppressWarnings(promoters(gr,
+                                              upstream=upstream,
                                               downstream=downstream)))
           }
 )
@@ -775,6 +775,8 @@ setMethod("disjointExons", "EnsDb",
 ## checks the filter argument and ensures that a list of Filter object is returned
 checkFilter <- function(x){
     if(class(x)=="list"){
+        if(length(x)==0)
+            return(x)
         ## check if all elements are Filter classes.
         IsAFilter <- unlist(lapply(x, function(z){
                                         return(inherits(z, what="BasicFilter"))
