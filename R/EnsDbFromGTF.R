@@ -13,7 +13,7 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, v
     if(verbose)
         cat("importing gtf file...")
     wanted.features <- c("gene", "transcript", "exon", "CDS")
-    GTF <- import(con=gtf, format="gtf", feature.type=wanted.features, asRangedData=FALSE)
+    GTF <- import(con=gtf, format="gtf", feature.type=wanted.features)
     if(verbose)
         cat("done\n")
     ## check what we've got...
