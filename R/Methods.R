@@ -406,8 +406,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
         filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, order.type=order.type,
-                   group.by=group.by)
+                   order.by=order.by, order.type=order.type)
     if(return.type=="data.frame"){
         return(Res)
     }
@@ -468,8 +467,7 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
         filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, order.type=order.type,
-                   group.by=group.by)
+                   order.by=order.by, order.type=order.type)
     if(return.type=="data.frame"){
         return(Res)
     }
@@ -711,7 +709,7 @@ setMethod("buildQuery", "EnsDb",
 setMethod("getWhat", "EnsDb",
           function(x, columns=c("gene_id", "gene_biotype", "gene_name"),
                    filter=list(), order.by="", order.type="asc",
-                   group.by, skip.order.check=FALSE){
+                   group.by=NULL, skip.order.check=FALSE){
               return(.getWhat(x=x,
                               columns=columns,
                               filter=filter,

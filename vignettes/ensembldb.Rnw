@@ -11,7 +11,7 @@ BiocStyle::latex()
 @ %def
 
 \author{Johannes Rainer}
-\date{Modified: 19 June, 2015. Compiled: \today}
+\date{Modified: 9 October, 2015. Compiled: \today}
 \title{Generating and using Ensembl based annotation packages}
 \hypersetup{
  pdfauthor={Johannes Rainer},
@@ -431,7 +431,7 @@ The database consists of the following tables and attributes (the layout is also
 \end{itemize}
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=14cm]{images/dblayout.png}
 \caption{\label{fig:orgparagraph1}

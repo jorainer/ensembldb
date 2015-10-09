@@ -421,7 +421,7 @@ The database consists of the following tables and attributes (the layout is also
   - =key=
   - =value=
 
-#+ATTR_LATEX: :center :placement [H] :width 14cm
+#+ATTR_LATEX: :center :placement [h!] :width 14cm
 #+NAME: fig.database.layout
 #+CAPTION: Database layout.
 [[file:images/dblayout.png]]
