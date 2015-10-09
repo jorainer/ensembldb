@@ -1,15 +1,15 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use an Ensembl based annotation database
-Version: 1.1.8
+Version: 1.1.9
 Author: Johannes Rainer <johannes.rainer@eurac.edu>,
 	Tim Triche <tim.triche@usc.edu>
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
 URL: https://github.com/jotsetung/ensembldb
 BugReports: https://github.com/jotsetung/ensembldb/issues
-Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb, 
-         AnnotationDbi (>= 1.31.19), rtracklayer, S4Vectors, 
-         AnnotationHub, Rsamtools
+Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb,
+         AnnotationDbi (>= 1.31.19), rtracklayer, S4Vectors,
+         AnnotationHub, Rsamtools, IRanges
 Depends: BiocGenerics (>= 0.15.10), GenomicRanges, GenomicFeatures
 Suggests: knitr, BiocStyle, EnsDb.Hsapiens.v75 (>= 0.99.7), RUnit,
 	  shiny

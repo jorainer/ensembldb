@@ -9,13 +9,15 @@ importFrom(rtracklayer, import)
 import(RSQLite)
 import(GenomicFeatures)
 import(GenomicRanges)
+importFrom(IRanges, IRanges)
 ## AnnotationHub
 importFrom(AnnotationHub, AnnotationHub)
 importClassesFrom(AnnotationHub, AnnotationHub)
 importMethodsFrom(AnnotationHub, query, mcols)
 ## Rsamtools
 importClassesFrom(Rsamtools, FaFile, RsamtoolsFile)
-importMethodsFrom(Rsamtools, getSeq, indexFa)
+importFrom(Rsamtools, FaFile)
+importMethodsFrom(Rsamtools, getSeq, indexFa, path)
 importFrom(Rsamtools, index)
 
 #exportPattern("^[[:alpha:]]+")
@@ -35,5 +37,6 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, gen
 export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
        TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,
        SeqendFilter, EnsDb)
+
 
 
