@@ -1,2 +1,3 @@
 vignettes/ensembldb.org
 .git
+^\.travis\.yml$
