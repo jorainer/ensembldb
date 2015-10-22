@@ -1,4 +1,4 @@
-#+TITLE:ensembldb: build and use Ensembl based annotation packages
+# #+TITLE:ensembldb: build and use Ensembl based annotation packages
 #+AUTHOR: Johannes Rainer
 #+email: johannes.rainer@eurac.edu
 #+OPTIONS: ^:{}
@@ -8,7 +8,7 @@
 #+PROPERTY: results output
 #+PROPERTY: tangle yes
 #+STARTUP: overview
-#+INFOJS_OPT: view:t toc:t ltoc:t mouse:underline buttons:0 path:http://thomasf.github.io/solarized-css/org-info.min.js
+#+INFOJS_OPT: view:t toc:nil ltoc:t mouse:underline buttons:0 path:http://thomasf.github.io/solarized-css/org-info.min.js
 #+HTML_HEAD: <link rel='stylesheet' type='text/css' href='http://thomasf.github.io/solarized-css/solarized-light.min.css' />
 #+LATEX_HEADER: \usepackage[backend=bibtex,style=nature,hyperref=true]{biblatex}
 #+LATEX_HEADER: \usepackage{parskip}
@@ -25,7 +25,11 @@
 #+LATEX_HEADER: \makeatletter
 # #+LATEX_HEADER: \def\verbatim@font{\scriptsize\ttfamily}
 #+LATEX_HEADER: \makeatother
------
+
+# badges:
+[[http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html][http://www.bioconductor.org/shields/years-in-bioc/ensembldb.svg]]
+
+[[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][www.bioconductor.org/shields/build/release/bioc/ensembldb.svg]]
 
 * =ensembldb=: build and use Ensembl-based annotation packages
 
