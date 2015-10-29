@@ -348,6 +348,7 @@ setMethod("genes", "EnsDb", function(x,
                                      order.type="asc",
                                      return.type="GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
+    retColumns <- columns
     columns <- unique(c("gene_id", columns))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
     ## and gene_seq_end and seq_strand
@@ -362,7 +363,15 @@ setMethod("genes", "EnsDb", function(x,
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
-    if(return.type=="data.frame"){
+    if(return.type=="data.frame" | return.type=="DataFrame"){
+        notThere <- !(retColumns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ", paste(retColumns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        retColumns <- retColumns[!notThere]
+        Res <- Res[, retColumns]
+        if(return.type=="DataFrame")
+            Res <- DataFrame(Res)
         return(Res)
     }
     if(return.type=="GRanges"){
@@ -380,9 +389,6 @@ setMethod("genes", "EnsDb", function(x,
         names(GR) <- Res$gene_id
         return(GR)
     }
-    if(return.type=="DataFrame"){
-        return(DataFrame(Res))
-    }
 })
 
 ### transcripts:
@@ -391,6 +397,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                                            filter, order.by="", order.type="asc",
                                            return.type="GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
+    retColumns <- columns
     columns <- unique(c("tx_id", columns))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
     ## and gene_seq_end and seq_strand
@@ -407,7 +414,15 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
-    if(return.type=="data.frame"){
+    if(return.type=="data.frame" | return.type=="DataFrame"){
+        notThere <- !(retColumns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ", paste(retColumns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        retColumns <- retColumns[!notThere]
+        Res <- Res[, retColumns]
+        if(return.type=="DataFrame")
+            Res <- DataFrame(Res)
         return(Res)
     }
     if(return.type=="GRanges"){
@@ -424,9 +439,6 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                     )
         names(GR) <- Res$tx_id
         return(GR)
-    }
-    if(return.type=="DataFrame"){
-        return(DataFrame(Res))
     }
 })
 
@@ -448,6 +460,7 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
                                      order.by="", order.type="asc",
                                      return.type="GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
+    retColumns <- columns
     if(!any(columns %in% c(listColumns(x, "exon"), "exon_idx"))){
         ## have to have at least one column from the gene table...
         columns <- c("exon_id", columns)
@@ -468,7 +481,15 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
-    if(return.type=="data.frame"){
+    if(return.type=="data.frame" | return.type=="DataFrame"){
+        notThere <- !(retColumns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ", paste(retColumns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        retColumns <- retColumns[!notThere]
+        Res <- Res[, retColumns]
+        if(return.type=="DataFrame")
+            Res <- DataFrame(Res)
         return(Res)
     }
     if(return.type=="GRanges"){
@@ -485,9 +506,6 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
                     )
         names(GR) <- Res$exon_id
         return(GR)
-    }
-    if(return.type=="DataFrame"){
-        return(DataFrame(Res))
     }
 })
 

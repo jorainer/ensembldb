@@ -57,4 +57,26 @@ test_promoters <- function(){
                                                     "ENSG00000092377")))
 }
 
+test_return_columns_gene <- function(){
+    cols <- c("gene_name", "seq_name", "tx_id")
+    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
+    checkEquals(cols, colnames(Resu))
+    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
+    checkEquals(cols, colnames(Resu))
+}
+test_return_columns_tx <- function(){
+    cols <- c("tx_id", "exon_id", "tx_biotype")
+    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
+    checkEquals(cols, colnames(Resu))
+    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
+    checkEquals(cols, colnames(Resu))
+}
+test_return_columns_exon <- function(){
+    cols <- c("tx_id", "exon_id", "tx_biotype", "seq_name")
+    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
+    checkEquals(cols, colnames(Resu))
+    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
+    checkEquals(cols, colnames(Resu))
+}
+
 

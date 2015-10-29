@@ -1,3 +1,14 @@
+CHANGES IN VERSION 1.3.1
+------------------------
+
+BUG FIXES
+
+    o Ensuring that methods exons, genes and transcripts return columns in the
+      same order than provided with argument 'columns' for return.type 'data.frame'
+      or 'DataFrame'.
+
+
+
 CHANGES IN VERSION 1.1.9
 ------------------------
 
