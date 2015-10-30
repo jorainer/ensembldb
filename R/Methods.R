@@ -632,6 +632,174 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
 })
 
 
+## cdsBy... return coding region ranges by tx or by gene.
+setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
+                                     columns=NULL, filter,
+                                     use.names=FALSE){
+    by <- match.arg(by, c("tx", "gene"))
+    if(missing(filter)){
+        filter=list()
+    }else{
+        filter <- checkFilter(filter)
+    }
+    bySuff <- "_id"
+    if(by == "tx"){
+        ## adding exon_id, exon_idx to the columns.
+        columns <- unique(c(columns, "exon_id", "exon_idx"))
+        if(use.names)
+            warning("Not considering use.names as no transcript names are available.")
+    }else{
+        if(!is.null(columns))
+            warning(paste0("Discarding argument columns as this is not supported for by='gene'."))
+        columns <- NULL
+        if(use.names){
+            bySuff <- "_name"
+            columns <- "gene_name"
+        }
+    }
+    ## what do we need: we need columns tx_cds_seq_start and tx_cds_seq_end and exon_idx
+    fetchCols <- unique(c(paste0(by, bySuff), columns, "tx_cds_seq_start", "tx_cds_seq_end",
+                          "seq_name", "seq_strand", "exon_idx", "exon_id", "exon_seq_start",
+                          "exon_seq_end"))
+    by.id.full <- unlist(prefixColumns(x, columns=paste0(by, bySuff),
+                                       clean=FALSE), use.names=FALSE)
+    order.by <- paste0(by.id.full , ", case when seq_strand=1 then tx_seq_start when seq_strand=-1 then (tx_seq_end * -1) end")
+    ## get the seqinfo:
+    SI <- seqinfo(x)
+    Res <- getWhat(x, columns=fetchCols,
+                   filter=filter,
+                   order.by=order.by,
+                   skip.order.check=TRUE)
+    ## Remove rows with NA in tx_cds_seq_start
+    Res <- Res[!is.na(Res$tx_cds_seq_start), ]
+    ## Remove exons that are not within the cds.
+    Res <- Res[Res$exon_seq_end >= Res$tx_cds_seq_start & Res$exon_seq_start <= Res$tx_cds_seq_end,
+               , drop=FALSE]
+    ## Rename columns exon_idx to exon_rank, if present
+    if(any(colnames(Res) == "exon_idx")){
+        colnames(Res)[colnames(Res) == "exon_idx"] <- "exon_rank"
+        columns[columns == "exon_idx"] <- "exon_rank"
+    }
+    if(nrow(Res)==0)
+        stop("No cds available!")
+    cdsStarts <- pmax.int(Res$exon_seq_start, Res$tx_cds_seq_start)
+    cdsEnds <- pmin.int(Res$exon_seq_end, Res$tx_cds_seq_end)
+    SI <- SI[unique(Res$seq_name)]
+    ## Building the result.
+    if(length(columns) > 0){
+        GR <- GRanges(seqnames=Rle(Res$seq_name),
+                      strand=Rle(Res$seq_strand),
+                      ranges=IRanges(start=cdsStarts, end=cdsEnds),
+                      seqinfo=SI,
+                      Res[, columns, drop=FALSE])
+    }else{
+        GR <- GRanges(seqnames=Rle(Res$seq_name),
+                      strand=Rle(Res$seq_strand),
+                      ranges=IRanges(start=cdsStarts, end=cdsEnds),
+                      seqinfo=SI)
+    }
+    GR <- split(GR, Res[, paste0(by, bySuff)])
+    ## For "by gene" we reduce the redundant ranges; that way we loose however all additional
+    ## columns!
+    if(by == "gene")
+        GR <- reduce(GR)
+    return(GR)
+})
+
+
+## getUTRsByTranscript
+getUTRsByTranscript <- function(x, what, columns=NULL, filter){
+    if(missing(filter)){
+        filter=list()
+    }else{
+        filter <- checkFilter(filter)
+    }
+    columns <- unique(c(columns, "exon_id", "exon_idx"))
+    ## what do we need: we need columns tx_cds_seq_start and tx_cds_seq_end and exon_idx
+    fetchCols <- unique(c("tx_id", columns, "tx_cds_seq_start", "tx_cds_seq_end",
+                          "seq_name", "seq_strand", "exon_idx", "exon_id", "exon_seq_start",
+                          "exon_seq_end"))
+    by.id.full <- unlist(prefixColumns(x, columns=paste0("tx", "_id"),
+                                       clean=FALSE), use.names=FALSE)
+    order.by <- paste0(by.id.full ,
+                       ", case when seq_strand=1 then tx_seq_start when seq_strand=-1 then (tx_seq_end * -1) end")
+    ## get the seqinfo:
+    SI <- seqinfo(x)
+    Res <- getWhat(x, columns=fetchCols,
+                   filter=filter,
+                   order.by=order.by,
+                   skip.order.check=TRUE)
+    ## Remove rows with NA in tx_cds_seq_start
+    Res <- Res[!is.na(Res$tx_cds_seq_start), ]
+    ## Remove exons that are within the cds.
+    Res <- Res[Res$exon_seq_start < Res$tx_cds_seq_start | Res$exon_seq_end > Res$tx_cds_seq_end,
+             , drop=FALSE]
+    if(nrow(Res)==0)
+        stop("No cds available!")
+    ## Rename columns exon_idx to exon_rank, if present
+    if(any(colnames(Res) == "exon_idx")){
+        colnames(Res)[colnames(Res) == "exon_idx"] <- "exon_rank"
+        columns[columns == "exon_idx"] <- "exon_rank"
+    }
+    if(what == "five"){
+        ## All those on the forward strand for which the exon start is smaller
+        ## than the cds start and those on the reverse strand with an exon end
+        ## larger than the cds end.
+        Res <- Res[(Res$seq_strand > 0 & Res$exon_seq_start < Res$tx_cds_seq_start)
+                   | (Res$seq_strand < 0 & Res$exon_seq_end > Res$tx_cds_seq_end), , drop=FALSE]
+    }
+    if(what == "three"){
+        ## Other way round.
+        Res <- Res[(Res$seq_strand > 0 & Res$exon_seq_end > Res$tx_cds_seq_end)
+                   | (Res$seq_strand < 0 & Res$exon_seq_start < Res$tx_cds_seq_start), , drop=FALSE]
+    }
+    if(nrow(Res)==0)
+        stop("No cds available!")
+    utrStarts <- rep(0, nrow(Res))
+    utrEnds <- utrStarts
+    ## Increase the cds end by 1 and decrease the start by 1, thus, avoiding that the UTR
+    ## overlaps the cds
+    Res$tx_cds_seq_end <- Res$tx_cds_seq_end+1
+    Res$tx_cds_seq_start <- Res$tx_cds_seq_start-1
+    ## Start of exon is smaller than cds start:
+    bm <- which(Res$exon_seq_start <= Res$tx_cds_seq_start)
+    utrStarts[bm] <- Res$exon_seq_start[bm]
+    utrEnds[bm] <- pmin.int(Res$exon_seq_end[bm], Res$tx_cds_seq_start[bm])
+    ## End of exon is larger than cds end:
+    bm <- which(Res$exon_seq_end >= Res$tx_cds_seq_end)
+    utrStarts[bm] <- pmax.int(Res$exon_seq_start[bm], Res$tx_cds_seq_end[bm])
+    utrEnds[bm] <- Res$exon_seq_end[bm]
+    SI <- SI[unique(Res$seq_name)]
+    GR <- GRanges(seqnames=Rle(Res$seq_name),
+                  strand=Rle(Res$seq_strand),
+                  ranges=IRanges(start=utrStarts, end=utrEnds),
+                  seqinfo=SI,
+                  Res[, columns, drop=FALSE])
+    GR <- split(GR, Res[, "tx_id"])
+    return(GR)
+}
+
+## threeUTRsByTranscript
+setMethod("threeUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
+    if(missing(filter)){
+        filter=list()
+    }else{
+        filter <- checkFilter(filter)
+    }
+    return(getUTRsByTranscript(x=x, what="three", columns=columns, filter=filter))
+})
+
+## fiveUTRsByTranscript
+setMethod("fiveUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
+    if(missing(filter)){
+        filter=list()
+    }else{
+        filter <- checkFilter(filter)
+    }
+    return(getUTRsByTranscript(x=x, what="five", columns=columns, filter=filter))
+})
+
+
 ## toSAF... function to transform a GRangesList into a data.frame
 ## corresponding to the SAF format.
 ## assuming the names of the GRangesList to be the GeneID and the

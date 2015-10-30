@@ -2,6 +2,10 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{disjointExons,EnsDb-method}
+\alias{cdsBy}
+\alias{cdsBy,EnsDb-method}
+\alias{fiveUTRsByTranscript,EnsDb-method}
+\alias{threeUTRsByTranscript,EnsDb-method}
 \alias{exons}
 \alias{exons,EnsDb-method}
 \alias{exonsBy}
@@ -50,6 +54,13 @@
 \S4method{disjointExons}{EnsDb}(x, aggregateGenes=FALSE,
                                 includeTranscripts=TRUE, filter, ...)
 
+\S4method{cdsBy}{EnsDb}(x, by=c("tx", "gene"), columns=NULL, filter,
+                        use.names=FALSE)
+
+\S4method{fiveUTRsByTranscript}{EnsDb}(x, columns=NULL, filter)
+
+\S4method{threeUTRsByTranscript}{EnsDb}(x, columns=NULL, filter)
+
 \S4method{toSAF}{GRangesList}(x, ...)
 
 \S4method{getGenomeFaFile}{EnsDb}(x, pattern="dna.toplevel.fa")
@@ -80,6 +91,8 @@
     transcripts by cds as supported by the
     \code{\link[GenomicFeatures]{transcriptsBy}} method in the
     \code{GenomicFeatures} package is currently not implemented.
+    For \code{cdsBy}: whether cds should be fetched by transcript of by
+    gene.
   }
 
   \item{columns}{
@@ -95,6 +108,9 @@
     submitted to any of the methods (use \code{\link{listTables}} or
     \code{\link{listColumns}} methods for a complete list of allowed
     column names).
+
+    For \code{cdsBy}: this argument is only supported for for
+    \code{by="tx"}.
   }
 
   \item{downstream}{
@@ -104,7 +120,8 @@
 
   \item{filter}{
     A filter object extending \code{\linkS4class{BasicFilter}} or a list
-    of such object(s) to select specific entries from the database (see examples below).
+    of such object(s) to select specific entries from the database (see
+    examples below).
   }
 
   \item{includeTranscripts}{
@@ -144,6 +161,12 @@
   \item{upstream}{
     For method \code{promoters}: the number of nucleotides upstream of
     the transcription start site that should be included in the promoter region.
+  }
+
+  \item{use.names}{
+    For \code{cdsBy}: only for \code{by="gene"}: use the names of the
+    genes instead of their IDs as names of the resulting
+    \code{GRangesList}.
   }
 
   \item{x}{
@@ -216,6 +239,27 @@
       non-overlapping exon parts with metadata columns of \code{gene_id}
       and \code{exonic_part}. Exon parts that overlap more than one gene
       can be dropped with \code{aggregateGenes=FALSE}.
+    }
+
+    \item{cdsBy}{
+      Returns the coding region grouped either by transcript or by
+      gene. Each element in the \code{GRangesList} represents the cds
+      for one transcript or gene, with the individual ranges
+      corresponding to the coding part of its exons.
+      For \code{by="tx"} additional annotation columns can be added to
+      the individual \code{GRanges} (in addition to the default columns
+      \code{exon_id} and \code{exon_rank}).
+      Note that the \code{GRangesList} is sorted by its names.
+    }
+
+    \item{fiveUTRsByTranscript}{
+      Returns the 5' untranslated region for protein coding
+      transcripts.
+    }
+
+    \item{threeUTRsByTranscript}{
+      Returns the 3' untranslated region for protein coding
+      transcripts.
     }
 
     \item{toSAF}{
@@ -306,6 +350,20 @@
 
   For \code{disjointExons}: a \code{GRanges} of non-overlapping exon
   parts.
+
+  For \code{cdsBy}: a \code{GRangesList} with \code{GRanges} per either
+  transcript or exon specifying the start and end coordinates of the
+  coding region of the transcript or gene.
+
+  For \code{fiveUTRsByTranscript}: a \code{GRangesList} with
+  \code{GRanges} for each protein coding transcript representing the
+  start and end coordinates of full or partial exons that constitute the
+  5' untranslated region of the transcript.
+
+  For \code{threeUTRsByTranscript}: a \code{GRangesList} with
+  \code{GRanges} for each protein coding transcript representing the
+  start and end coordinates of full or partial exons that constitute the
+  3' untranslated region of the transcript.
 
   For \code{getGenomeFaFile}: a \code{\link[Rsamtools]{FaFile-class}}
   object with the genomic DNA sequence.
@@ -412,6 +470,25 @@ TGenes
 ## featureCounts function from the Rsubreader package.
 head(toSAF(TGenes))
 
+
+####    cdsBy
+## Get the coding region for all transcripts on chromosome Y.
+## Specifying also additional annotation columns (in addition to the default
+## exon_id and exon_rank).
+cds <- cdsBy(EnsDb.Hsapiens.v75, by="tx", filter=SeqnameFilter("Y"),
+             columns=c("tx_biotype", "gene_name"))
+
+####    the 5' untranslated regions:
+fUTRs <- fiveUTRsByTranscript(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"))
+
+####    the 3' untranslated regions with additional column gene_name.
+tUTRs <- threeUTRsByTranscript(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"),
+                               columns="gene_name")
+
 }
 \keyword{classes}
+
+
+
+
 
