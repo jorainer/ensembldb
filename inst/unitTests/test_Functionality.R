@@ -79,4 +79,175 @@ test_return_columns_exon <- function(){
     checkEquals(cols, colnames(Resu))
 }
 
+test_cdsBy <- function(){
+    do.plot <- FALSE
+    ## By tx
+    cs <- cdsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
+    tx <- exonsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
+    ## Check for the first if it makes sense:
+    whichTx <- names(cs)[1]
+    whichCs <- cs[[1]]
+    tx <- transcripts(DB, filter=TxidFilter(whichTx),
+                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
+                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id", "seq_strand"),
+                      return.type="data.frame")
+    checkSingleTx(tx=tx, cds=whichCs, do.plot=do.plot)
+    ## Next one:
+    whichTx <- names(cs)[2]
+    tx <- transcripts(DB, filter=TxidFilter(whichTx),
+                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
+                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id"), return.type="data.frame")
+    checkSingleTx(tx=tx, cds=cs[[2]], do.plot=do.plot)
+
+    ## Now for reverse strand:
+    cs <- cdsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
+    whichTx <- names(cs)[1]
+    whichCs <- cs[[1]]
+    tx <- transcripts(DB, filter=TxidFilter(whichTx),
+                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
+                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id"), return.type="data.frame")
+    ## order the guys by seq_start
+    whichCs <- whichCs[order(start(whichCs))]
+    checkSingleTx(tx=tx, cds=whichCs, do.plot=do.plot)
+    ## Next one:
+    whichTx <- names(cs)[2]
+    whichCs <- cs[[2]]
+    tx <- transcripts(DB, filter=TxidFilter(whichTx),
+                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
+                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id"), return.type="data.frame")
+    ## order the guys by seq_start
+    whichCs <- whichCs[order(start(whichCs))]
+    checkSingleTx(tx=tx, cds=whichCs, do.plot=do.plot)
+
+    ## Check adding columns
+    Test <- cdsBy(DB, filter=list(SeqnameFilter("Y")),
+                  columns=c("gene_biotype", "gene_name"))
+}
+
+test_cdsByGene <- function(){
+    do.plot <- FALSE
+    ## By gene.
+    cs <- cdsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")),
+                by="gene", columns=NULL)
+    checkSingleGene(cs[[1]], gene=names(cs)[[1]], do.plot=do.plot)
+    checkSingleGene(cs[[2]], gene=names(cs)[[2]], do.plot=do.plot)
+    ## - strand
+    cs <- cdsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")),
+                by="gene", columns=NULL)
+    checkSingleGene(cs[[1]], gene=names(cs)[[1]], do.plot=do.plot)
+    checkSingleGene(cs[[2]], gene=names(cs)[[2]], do.plot=do.plot)
+
+    ## looks good!
+    cs2 <- cdsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")),
+                by="gene", use.names=TRUE)
+}
+
+test_UTRs <- function(){
+    do.plot <- FALSE
+    fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
+    tUTRs <- threeUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
+    cds <- cdsBy(DB, "tx", filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
+    ## Check a TX:
+    tx <- names(fUTRs)[1]
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    tx <- names(fUTRs)[2]
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    tx <- names(fUTRs)[3]
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+
+    ## Reverse strand
+    fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
+    tUTRs <- threeUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
+    cds <- cdsBy(DB, "tx", filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
+    ## Check a TX:
+    tx <- names(fUTRs)[1]
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    tx <- names(fUTRs)[2]
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    tx <- names(fUTRs)[3]
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+}
+
+checkGeneUTRs <- function(f, t, c, tx, do.plot=FALSE){
+    if(any(strand(c) == "+")){
+        ## End of five UTR has to be smaller than any start of cds
+        checkTrue(max(end(f)) < min(start(c)))
+        ## 3'
+        checkTrue(min(start(t)) > max(end(c)))
+    }else{
+        ## 5'
+        checkTrue(min(start(f)) > max(end(c)))
+        ## 3'
+        checkTrue(max(end(t)) < min(start(c)))
+    }
+    ## just plot...
+    if(do.plot){
+        tx <- transcripts(DB, filter=TxidFilter(tx), columns=c("exon_seq_start", "exon_seq_end"),
+                          return.type="data.frame")
+        XL <- range(c(start(f), start(c), start(t), end(f), end(c), end(t)))
+        YL <- c(0, 4)
+        plot(4, 4, pch=NA, xlim=XL, ylim=YL, yaxt="n", ylab="", xlab="")
+        ## five UTR
+        rect(xleft=start(f), xright=end(f), ybottom=0.1, ytop=0.9, col="blue")
+        ## cds
+        rect(xleft=start(c), xright=end(c), ybottom=1.1, ytop=1.9)
+        ## three UTR
+        rect(xleft=start(t), xright=end(t), ybottom=2.1, ytop=2.9, col="red")
+        ## all exons
+        rect(xleft=tx$exon_seq_start, xright=tx$exon_seq_end, ybottom=3.1, ytop=3.9)
+    }
+}
+
+checkSingleGene <- function(whichCs, gene, do.plot=FALSE){
+    tx <- transcripts(DB, filter=GeneidFilter(gene),
+                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start", "tx_cds_seq_end", "tx_id",
+                                "exon_id", "exon_seq_start", "exon_seq_end"), return.type="data.frame")
+    XL <- range(tx[, c("tx_seq_start", "tx_seq_end")])
+    tx <- split(tx, f=tx$tx_id)
+    if(do.plot){
+        ##XL <- range(c(start(whichCs), end(whichCs)))
+        YL <- c(0, length(tx) + 1)
+        plot(4, 4, pch=NA, xlim=XL, ylim=YL, yaxt="n", ylab="", xlab="")
+        ## plot the txses
+        for(i in 1:length(tx)){
+            current <- tx[[i]]
+            rect(xleft=current$exon_seq_start, xright=current$exon_seq_end,
+                 ybottom=rep((i-1+0.1), nrow(current)), ytop=rep((i-0.1), nrow(current)))
+            ## coding:
+            rect(xleft=current$tx_cds_seq_start, xright=current$tx_cds_seq_end,
+                 ybottom=rep((i-1+0.1), nrow(current)), ytop=rep((i-0.1), nrow(current)),
+                 border="blue")
+        }
+        rect(xleft=start(whichCs), xright=end(whichCs), ybottom=rep(length(tx)+0.1, length(whichCs)),
+             ytop=rep(length(tx)+0.9, length(whichCs)), border="red")
+    }
+}
+
+checkSingleTx <- function(tx, cds, do.plot=FALSE){
+    rownames(tx) <- tx$exon_id
+    tx <- tx[cds$exon_id, ]
+    ## cds start and end have to be within the correct range.
+    checkTrue(all(start(cds) >= min(tx$tx_cds_seq_start)))
+    checkTrue(all(end(cds) <= max(tx$tx_cds_seq_end)))
+    ## For all except the first and the last we have to assume that exon_seq_start
+    ## is equal to start of cds.
+    checkTrue(all(start(cds)[-1] == tx$exon_seq_start[-1]))
+    checkTrue(all(end(cds)[-nrow(tx)] == tx$exon_seq_end[-nrow(tx)]))
+    ## just plotting the stuff...
+    if(do.plot){
+        XL <- range(tx[, c("exon_seq_start", "exon_seq_end")])
+        YL <- c(0, 4)
+        plot(3, 3, pch=NA, xlim=XL, ylim=YL, xlab="", yaxt="n", ylab="")
+        ## plotting the "real" exons:
+        rect(xleft=tx$exon_seq_start, xright=tx$exon_seq_end, ybottom=rep(0, nrow(tx)),
+             ytop=rep(1, nrow(tx)))
+        ## plotting the cds:
+        rect(xleft=start(cds), xright=end(cds), ybottom=rep(1.2, nrow(tx)),
+             ytop=rep(2.2, nrow(tx)), col="blue")
+    }
+}
 
