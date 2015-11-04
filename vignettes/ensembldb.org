@@ -693,12 +693,14 @@ For =tx=:
 For =gene=:
 - Could we get that using =reduce=?
 
-** TODO Implement the =fiveUTRsByTranscript= method.
+** DONE Implement the =fiveUTRsByTranscript= method.
+   CLOSED: [2015-10-30 Fri 15:05]
+   - State "DONE"       from "TODO"       [2015-10-30 Fri 15:05]
 
 
-
-** TODO Implement the =threeUTRsByTranscript= method.
-
+** DONE Implement the =threeUTRsByTranscript= method.
+   CLOSED: [2015-10-30 Fri 15:05]
+   - State "DONE"       from "TODO"       [2015-10-30 Fri 15:05]
 ** TODO Implement a method to use ensembldb for =Gviz=
 
 Do something similar to the .buildRange method for "TxDb" objects
@@ -706,5 +708,7 @@ Do something similar to the .buildRange method for "TxDb" objects
 might a =data.frame= do as well?).
 
 + Implement a method that builds a =data.frame= for =Gviz=.
-
-
++ Check =.getBiotypeColor= function in /Gviz.R/ line 681.
++ Check =GeneRegionTrack= constructor in /AllClasses.R/, line 897 -> =.buildRanges=
++ =getGeneRegionTrackForGviz= should ideally return a =GRanges=, setting also
+  the genome, seqinfo etc.
