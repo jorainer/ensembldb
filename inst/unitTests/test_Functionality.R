@@ -251,3 +251,63 @@ checkSingleTx <- function(tx, cds, do.plot=FALSE){
     }
 }
 
+
+##*****************************************************************
+## Gviz stuff
+notrun_test_genetrack_df <- function(){
+    do.plot <- FALSE
+    if(do.plot){
+        library(Gviz)
+        options(ucscChromosomeNames=FALSE)
+        data(geneModels)
+        geneModels$chromosome <- 7
+        chr <- 7
+        start <- min(geneModels$start)
+        end <- max(geneModels$end)
+        myGeneModels <- getGeneRegionTrackForGviz(DB, chromosome=chr, start=start,
+                                                  end=end)
+        ## chromosome has to be the same....
+        gtrack <- GenomeAxisTrack()
+        gvizTrack <- GeneRegionTrack(geneModels, name="Gviz")
+        ensdbTrack <- GeneRegionTrack(myGeneModels, name="ensdb")
+        plotTracks(list(gtrack, gvizTrack, ensdbTrack))
+        plotTracks(list(gtrack, gvizTrack, ensdbTrack), from=26700000, to=26780000)
+        ## Looks very nice...
+    }
+    ## Put the stuff below into the vignette:
+    ## Next we get all lincRNAs on chromosome Y
+    Lncs <- getGeneRegionTrackForGviz(DB,
+                                      filter=list(SeqnameFilter("Y"),
+                                                  GenebiotypeFilter("lincRNA")))
+    Prots <- getGeneRegionTrackForGviz(DB,
+                                       filter=list(SeqnameFilter("Y"),
+                                                   GenebiotypeFilter("protein_coding")))
+    if(do.plot){
+        plotTracks(list(gtrack, GeneRegionTrack(Lncs, name="lincRNAs"),
+                        GeneRegionTrack(Prots, name="proteins")))
+        plotTracks(list(gtrack, GeneRegionTrack(Lncs, name="lincRNAs"),
+                        GeneRegionTrack(Prots, name="proteins")),
+                   from=5000000, to=7000000, transcriptAnnotation="symbol")
+    }
+    ## is that the same than:
+    TestL <- getGeneRegionTrackForGviz(DB,
+                                      filter=list(GenebiotypeFilter("lincRNA")),
+                                      chromosome="Y", start=5000000, end=7000000)
+    TestP <- getGeneRegionTrackForGviz(DB,
+                                      filter=list(GenebiotypeFilter("protein_coding")),
+                                      chromosome="Y", start=5000000, end=7000000)
+    if(do.plot){
+        plotTracks(list(gtrack, GeneRegionTrack(Lncs, name="lincRNAs"),
+                        GeneRegionTrack(Prots, name="proteins"),
+                        GeneRegionTrack(TestL, name="compareL"),
+                        GeneRegionTrack(TestP, name="compareP")),
+                   from=5000000, to=7000000, transcriptAnnotation="symbol")
+    }
+    checkTrue(all(TestL$exon %in% Lncs$exon))
+    checkTrue(all(TestP$exon %in% Prots$exon))
+    ## Crazy amazing stuff
+    ## system.time(
+    ##     All <- getGeneRegionTrackForGviz(DB)
+    ## )
+}
+

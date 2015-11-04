@@ -30,6 +30,10 @@ if(!isGeneric("exons"))
 if(!isGeneric("exonsBy"))
     setGeneric("exonsBy", function(x, ...)
         standardGeneric("exonsBy"))
+
+setGeneric("getGeneRegionTrackForGviz", function(x, ...)
+    standardGeneric("getGeneRegionTrackForGviz"))
+
 if(!isGeneric("getGenomeFaFile"))
     setGeneric("getGenomeFaFile", function(x, ...)
         standardGeneric("getGenomeFaFile"))
@@ -657,15 +661,15 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
             columns <- "gene_name"
         }
     }
+    byId <- paste0(by, bySuff)
+    byIdFull <- unlist(prefixColumns(x, columns=byId,
+                                     clean=FALSE), use.names=FALSE)
+    order.by <- paste0(byIdFull , ", case when seq_strand=1 then tx_seq_start when seq_strand=-1 then (tx_seq_end * -1) end")
+    ## Query the data
     ## what do we need: we need columns tx_cds_seq_start and tx_cds_seq_end and exon_idx
-    fetchCols <- unique(c(paste0(by, bySuff), columns, "tx_cds_seq_start", "tx_cds_seq_end",
+    fetchCols <- unique(c(byId, columns, "tx_cds_seq_start", "tx_cds_seq_end",
                           "seq_name", "seq_strand", "exon_idx", "exon_id", "exon_seq_start",
                           "exon_seq_end"))
-    by.id.full <- unlist(prefixColumns(x, columns=paste0(by, bySuff),
-                                       clean=FALSE), use.names=FALSE)
-    order.by <- paste0(by.id.full , ", case when seq_strand=1 then tx_seq_start when seq_strand=-1 then (tx_seq_end * -1) end")
-    ## get the seqinfo:
-    SI <- seqinfo(x)
     Res <- getWhat(x, columns=fetchCols,
                    filter=filter,
                    order.by=order.by,
@@ -674,17 +678,21 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     Res <- Res[!is.na(Res$tx_cds_seq_start), ]
     ## Remove exons that are not within the cds.
     Res <- Res[Res$exon_seq_end >= Res$tx_cds_seq_start & Res$exon_seq_start <= Res$tx_cds_seq_end,
-               , drop=FALSE]
+             , drop=FALSE]
+    if(nrow(Res)==0){
+        warning("No cds found!")
+        return(NULL)
+    }
+    cdsStarts <- pmax.int(Res$exon_seq_start, Res$tx_cds_seq_start)
+    cdsEnds <- pmin.int(Res$exon_seq_end, Res$tx_cds_seq_end)
+    ## get the seqinfo:
+    SI <- seqinfo(x)
+    SI <- SI[unique(Res$seq_name)]
     ## Rename columns exon_idx to exon_rank, if present
     if(any(colnames(Res) == "exon_idx")){
         colnames(Res)[colnames(Res) == "exon_idx"] <- "exon_rank"
         columns[columns == "exon_idx"] <- "exon_rank"
     }
-    if(nrow(Res)==0)
-        stop("No cds available!")
-    cdsStarts <- pmax.int(Res$exon_seq_start, Res$tx_cds_seq_start)
-    cdsEnds <- pmin.int(Res$exon_seq_end, Res$tx_cds_seq_end)
-    SI <- SI[unique(Res$seq_name)]
     ## Building the result.
     if(length(columns) > 0){
         GR <- GRanges(seqnames=Rle(Res$seq_name),
@@ -734,8 +742,10 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
     ## Remove exons that are within the cds.
     Res <- Res[Res$exon_seq_start < Res$tx_cds_seq_start | Res$exon_seq_end > Res$tx_cds_seq_end,
              , drop=FALSE]
-    if(nrow(Res)==0)
-        stop("No cds available!")
+    if(nrow(Res)==0){
+        warning(paste0("No ", what, "UTR found!"))
+        return(NULL)
+    }
     ## Rename columns exon_idx to exon_rank, if present
     if(any(colnames(Res) == "exon_idx")){
         colnames(Res)[colnames(Res) == "exon_idx"] <- "exon_rank"
@@ -753,8 +763,10 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
         Res <- Res[(Res$seq_strand > 0 & Res$exon_seq_end > Res$tx_cds_seq_end)
                    | (Res$seq_strand < 0 & Res$exon_seq_start < Res$tx_cds_seq_start), , drop=FALSE]
     }
-    if(nrow(Res)==0)
-        stop("No cds available!")
+    if(nrow(Res)==0){
+        warning(paste0("No ", what, "UTR found!"))
+        return(NULL)
+    }
     utrStarts <- rep(0, nrow(Res))
     utrEnds <- utrStarts
     ## Increase the cds end by 1 and decrease the start by 1, thus, avoiding that the UTR
@@ -976,4 +988,130 @@ checkFilter <- function(x){
     }
     return(x)
 }
+
+## Fetch data to add as a GeneTrack.
+## filter ...                 Used to filter the result.
+## chromosome, start, end ... Either all or none has to be specified. If specified, the function
+##                            first retrieves all transcripts that have an exon in the specified
+##                            range and adds them as a TranscriptidFilter to the filters. The
+##                            query to fetch the "real" data is performed after.
+## featureIs ...              Wheter gene_biotype or tx_biotype should be mapped to the column
+##                            feature.
+setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
+                                                         chromosome=NULL,
+                                                         start=NULL,
+                                                         end=NULL,
+                                                         featureIs="gene_biotype"){
+    featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
+    filter <- checkFilter(filter)
+    if(any(!is.null(c(chromosome, start, end)))){
+        if(all(!is.null(c(chromosome, start, end)))){
+            ## Fetch all transcripts in that region:
+            tids <- dbGetQuery(dbconn(x),
+                               paste0("select distinct tx.tx_id from tx join gene on (tx.gene_id=gene.gene_id)",
+                                      " where seq_name='", chromosome, "' and (",
+                                      "(tx_seq_start >= ", start, " and tx_seq_start <= ", end, ") or ",
+                                      "(tx_seq_end >= ", start, " and tx_seq_end <= ", end, ") or ",
+                                      "(tx_seq_start <=", start, " and tx_seq_end >= ", end, ")",
+                                      ")"))[, "tx_id"]
+            if(length(tids) == 0)
+                stop(paste0("Did not find any transcript on chromosome from ", start, " to ",
+                            end, "!"))
+            filter <- c(filter, TxidFilter(tids))
+        }else{
+            stop(paste0("Either all or none of arguments 'chromosome', 'start' and 'end' ",
+                        " have to be specified!"))
+        }
+    }
+    ## Return a data.frame with columns: chromosome, start, end, width, strand, feature,
+    ## gene, exon, transcript and symbol.
+    ## 1) Query the data as we usually would.
+    ## 2) Perform an additional query to get cds and utr, remove all entries from the
+    ##    first result for the same transcripts and rbind the data.frames.
+    needCols <- c("seq_name", "exon_seq_start", "exon_seq_end", "seq_strand",
+                  featureIs, "gene_id", "exon_id",
+                  "exon_idx", "tx_id", "gene_name")
+    ## That's the names to which we map the original columns from the EnsDb.
+    names(needCols) <- c("chromosome", "start", "end", "strand",
+                         "feature", "gene", "exon", "exon_rank", "transcript",
+                         "symbol")
+    txs <- transcripts(x, filter=filter,
+                       columns=needCols, return.type="data.frame")
+    ## Rename columns
+    idx <- match(needCols, colnames(txs))
+    notThere <- is.na(idx)
+    idx <- idx[!notThere]
+    colnames(txs)[idx] <- names(needCols)[!notThere]
+    ## now processing the 5utr
+    fUtr <- fiveUTRsByTranscript(x, filter=filter, columns=needCols)
+    if(length(fUtr) > 0){
+        fUtr <- as(unlist(fUtr, use.names=FALSE), "data.frame")
+        fUtr <- fUtr[, !(colnames(fUtr) %in% c("width", "seq_name", "exon_seq_start",
+                                               "exon_seq_end", "strand"))]
+        colnames(fUtr)[1] <- "chromosome"
+        idx <- match(needCols, colnames(fUtr))
+        notThere <- is.na(idx)
+        idx <- idx[!notThere]
+        colnames(fUtr)[idx] <- names(needCols)[!notThere]
+        ## Force being in the correct ordering:
+        fUtr <- fUtr[, names(needCols)]
+        fUtr$feature <- "utr5"
+        ## Remove transcripts from the txs data.frame
+        txs <- txs[!(txs$transcript %in% fUtr$transcript), , drop=FALSE]
+    }
+    tUtr <- threeUTRsByTranscript(x, filter=filter, columns=needCols)
+    if(length(tUtr) > 0){
+        tUtr <- as(unlist(tUtr, use.names=FALSE), "data.frame")
+        tUtr <- tUtr[, !(colnames(tUtr) %in% c("width", "seq_name", "exon_seq_start",
+                                               "exon_seq_end", "strand"))]
+        colnames(tUtr)[1] <- "chromosome"
+        idx <- match(needCols, colnames(tUtr))
+        notThere <- is.na(idx)
+        idx <- idx[!notThere]
+        colnames(tUtr)[idx] <- names(needCols)[!notThere]
+        ## Force being in the correct ordering:
+        tUtr <- tUtr[, names(needCols)]
+        tUtr$feature <- "utr3"
+        ## Remove transcripts from the txs data.frame
+        if(nrow(txs) > 0){
+            txs <- txs[!(txs$transcript %in% tUtr$transcript), , drop=FALSE]
+        }
+    }
+    cds <- cdsBy(x, filter=filter, columns=needCols)
+    if(length(cds) > 0){
+        cds <- as(unlist(cds, use.names=FALSE), "data.frame")
+        cds <- cds[, !(colnames(cds) %in% c("width", "seq_name", "exon_seq_start",
+                                            "exon_seq_end", "strand"))]
+        colnames(cds)[1] <- "chromosome"
+        idx <- match(needCols, colnames(cds))
+        notThere <- is.na(idx)
+        idx <- idx[!notThere]
+        colnames(cds)[idx] <- names(needCols)[!notThere]
+        ## Force being in the correct ordering:
+        cds <- cds[, names(needCols)]
+        ## Remove transcripts from the txs data.frame
+        if(nrow(txs) > 0){
+            txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
+        }
+    }
+    if(length(fUtr) > 0){
+        txs <- rbind(txs, fUtr)
+    }
+    if(length(tUtr) > 0){
+        txs <- rbind(txs, tUtr)
+    }
+    if(length(cds) > 0){
+        txs <- rbind(txs, cds)
+    }
+    ## Convert into GRanges.
+    SI <- seqinfo(x)
+    SI <- SI[unique(txs$chromosome)]
+    GR <- GRanges(seqnames=Rle(txs$chromosome),
+                  strand=Rle(txs$strand),
+                  ranges=IRanges(start=txs$start, end=txs$end),
+                  seqinfo=SI,
+                  txs[, c("feature", "gene", "exon", "exon_rank",
+                          "transcript", "symbol"), drop=FALSE])
+    return(GR)
+})
 
