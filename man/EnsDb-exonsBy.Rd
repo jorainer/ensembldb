@@ -10,6 +10,7 @@
 \alias{exons,EnsDb-method}
 \alias{exonsBy}
 \alias{exonsBy,EnsDb-method}
+\alias{extractTranscriptSeqs,ANY,EnsDb-method}
 \alias{genes}
 \alias{genes,EnsDb-method}
 \alias{getGenomeFaFile}
@@ -36,7 +37,7 @@
                         return.type="GRanges")
 
 \S4method{exonsBy}{EnsDb}(x, by=c("tx", "gene"),
-                          columns=listColumns(x, "exon"), filter)
+                          columns=listColumns(x, "exon"), filter, use.names=FALSE)
 
 \S4method{transcripts}{EnsDb}(x, columns=listColumns(x, "tx"),
                               filter, order.by, order.type="asc",
@@ -60,6 +61,8 @@
 \S4method{fiveUTRsByTranscript}{EnsDb}(x, columns=NULL, filter)
 
 \S4method{threeUTRsByTranscript}{EnsDb}(x, columns=NULL, filter)
+
+\S4method{extractTranscriptSeqs}{ANY,EnsDb}(x, transcripts, filter)
 
 \S4method{toSAF}{GRangesList}(x, ...)
 
@@ -158,20 +161,29 @@
     columns are added as metadata columns to the GRanges object.
   }
 
+  \item{transcripts}{
+    For \code{extractTranscriptSeqs}: the \code{EnsDb} object from which
+    the transcript definitions should be extracted.
+  }
+
   \item{upstream}{
     For method \code{promoters}: the number of nucleotides upstream of
     the transcription start site that should be included in the promoter region.
   }
 
   \item{use.names}{
-    For \code{cdsBy}: only for \code{by="gene"}: use the names of the
+    For \code{cdsBy} and \code{exonsBy}: only for \code{by="gene"}: use the names of the
     genes instead of their IDs as names of the resulting
     \code{GRangesList}.
   }
 
   \item{x}{
-    For \code{toSAF} a \code{GRangesList} object. For all other
-    methods an \code{EnsDb} instance.
+    For \code{toSAF} a \code{GRangesList} object.
+    For \code{extractTranscriptSeqs}: An object representing a single
+    chromosome or a collection of chromosomes. Refer to the help of the
+    \code{\link[GenomicFeatures]{extractTranscriptSeqs}} method in
+    \code{GenomicFeatures} package for more information.
+    For all other methods an \code{EnsDb} instance.
   }
 
 }
@@ -271,6 +283,14 @@
       \code{GRangesList} that groups features (exons, transcripts) by gene.
     }
 
+    \item{extractTranscriptSeqs}{
+      Extract transcript sequences. This method adapts the
+      \code{\link[GenomicFeatures]{extractTranscriptSeqs}} from the
+      \code{GenomicFeatures} package to allow the usage of filters to
+      specify the transcripts from which the sequence should be
+      extracted.
+    }
+
     \item{getGenomeFaFile}{
       Returns a \code{\link[Rsamtools]{FaFile-class}} (defined in
       \code{Rsamtools}) with the genomic sequence of the genome build
@@ -364,6 +384,10 @@
   \code{GRanges} for each protein coding transcript representing the
   start and end coordinates of full or partial exons that constitute the
   3' untranslated region of the transcript.
+
+  For \code{extractTranscriptSeqs}: A \code{DNAStringSet} object
+  parallel to \code{transcripts} (i.e. the i-th element in it is the
+  sequence of the i-th transcript in \code{transcripts}).
 
   For \code{getGenomeFaFile}: a \code{\link[Rsamtools]{FaFile-class}}
   object with the genomic DNA sequence.
@@ -484,6 +508,16 @@ fUTRs <- fiveUTRsByTranscript(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"))
 ####    the 3' untranslated regions with additional column gene_name.
 tUTRs <- threeUTRsByTranscript(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"),
                                columns="gene_name")
+
+
+\dontrun{
+    ## Extract the transcript sequence for all transcripts encoded on chromosome
+    ## Y.
+    Dna <- getGenomeFaFile(EnsDb.Hsapiens.v75)
+    extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
+
+}
+
 
 }
 \keyword{classes}

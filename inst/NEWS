@@ -1,3 +1,20 @@
+CHANGES IN VERSION 1.3.4
+------------------------
+
+NEW FEATURES
+    o Added extractTranscriptSeqs method for EnsDb objects.
+
+
+SIGNIFICANT USER-VISIBLE CHANGES
+    o Added a section to the vignette describing the use of ensembldb in Gviz.
+    o Fixed the vignette to conform the "Bioconductor style".
+    o Added argument use.names to exonsBy.
+
+BUG FIXES
+    o Fixed bug with getGeneRegionTrackForGviz with only chromosome specified.
+    o Fixed an internal problem subsetting a seqinfo.
+
+
 CHANGES IN VERSION 1.3.3
 ------------------------
 

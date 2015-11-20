@@ -1,49 +1,23 @@
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
-<ul>
-<li><a href="#orgheadline1">1. Introduction</a></li>
-<li><a href="#orgheadline2">2. Using <code>ensembldb</code> annotation packages to retrieve specific annotations</a></li>
-<li><a href="#orgheadline3">3. Extracting gene/transcript/exon models for RNASeq feature counting</a></li>
-<li><a href="#orgheadline4">4. Retrieving sequences for gene/transcript/exon models</a></li>
-<li><a href="#orgheadline5">5. Interactive annotation lookup using the <code>shiny</code> web app</a></li>
-<li><a href="#orgheadline6">6. Important notes</a></li>
-<li><a href="#orgheadline9">7. Building an transcript centric database package based on Ensembl annotation</a>
-<ul>
-<li><a href="#orgheadline7">7.1. Requirements</a></li>
-<li><a href="#orgheadline8">7.2. Building an annotation package</a></li>
-</ul>
-</li>
-<li><a href="#orgheadline10">8. Database layout</a></li>
-</ul>
-</div>
-</div>
-
 ---
-title: "Generating and using Ensembl based annotation packages"
-author: "Johannes Rainer"
-date: "Changed: 2015-10-29"
+title: "Generating an using Ensembl based annotation packages"
 graphics: yes
 output:
-  BiocStyle::html_document:
-    toc_depth: 2
-  BiocStyle::pdf_document:
-    toc_depth: 2
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz}
+  %\VignettePackage{ensembldb}
+  %\VignetteKeywords{annotation,database}
 ---
 
-<!--
-%%\VignetteEngine{knitr::rmarkdown}
-%%\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
-%%\VignetteKeywords{annotation, database}
-%%\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
-%%\VignettePackage{ensembldb}
--->
+**Package**: `r Biocpkg("ensembldb")`<br />
+**Authors**: `r packageDescription("ensembldb")[["Author"]] `<br />
+**Modified**: 20 November, 2015<br />
+**Compiled**: `r date()`
 
-```{r echo=FALSE, results='asis', message=FALSE}
-BiocStyle::markdown()
-```
-
-# Introduction<a id="orgheadline1"></a>
+# Introduction
 
 The `ensembldb` package provides functions to create and use transcript centric
 annotation databases/packages. The annotation for the databases are directly
@@ -56,7 +30,7 @@ region or transcript models of lincRNA genes.  In the databases, along with the
 gene and transcript models and their chromosomal coordinates, additional
 annotations including the gene name (symbol) and NCBI Entrezgene identifiers as
 well as the gene and transcript biotypes are stored too (see Section
-[8](#orgtarget1) for the database layout and an overview of available
+[9](#orgtarget1) for the database layout and an overview of available
 attributes/columns).
 
 Another main goal of this package is to generate *versioned* annotation
@@ -82,7 +56,7 @@ EnsDb.Hsapiens.v75
 organism(EnsDb.Hsapiens.v75)
 ```
 
-# Using `ensembldb` annotation packages to retrieve specific annotations<a id="orgheadline2"></a>
+# Using `ensembldb` annotation packages to retrieve specific annotations
 
 The `ensembldb` package provides a set of filter objects allowing to specify
 which entries should be fetched from the database. The complete list of filters,
@@ -99,13 +73,13 @@ alphabetical order):
 -   `GeneidFilter`: allows to filter based on the Ensembl gene IDs.
 -   `GenenameFilter`: allows to filter based on the names (symbols) of the genes.
 -   `SeqendFilter`: filter based on the chromosomal end coordinate of the exons,
-    transcripts or genes (correspondingly set `feature`"exon"`, =feature`"tx"= or
-    `feature`"gene"=).
+    transcripts or genes (correspondingly set `feature = "exon"`, `feature = "tx"` or
+    `feature = "gene"`).
 -   `SeqnameFilter`: filter by the name of the chromosomes the genes are encoded
     on.
 -   `SeqstartFilter`: filter based on the chromosomal start coordinates of the
-    exons, transcripts or genes (correspondingly set `feature`"exon"`,
-      =feature`"tx"= or `feature`"gene"=).
+    exons, transcripts or genes (correspondingly set `feature = "exon"`,
+    `feature = "tx"` or `feature = "gene"`).
 -   `SeqstrandFilter`: filter for the chromosome strand on which the genes are
     encoded.
 -   `TxbiotypeFilter`: filter on the transcript biotype defined in Ensembl; use
@@ -115,10 +89,10 @@ alphabetical order):
 Each of the filter classes can take a single value or a vector of values (with
 the exception of the `SeqendFilter` and `SeqstartFilter`) for comparison. In
 addition, it is possible to specify the *condition* for the filter,
-e.g. `condition`"`"` to retrieve all entries matching the filter value,
-`condition`"!="= to negate the filter or also `condition`"like"= to allow
+e.g. setting `condition` to = to retrieve all entries matching the filter value,
+to != to negate the filter or setting `condition = "like"` to allow
 partial matching. The `condition` parameter for `SeqendFilter` and
-`SeqendFilter` can take the values `=`, `>`, `>=`, `<` and `<=` (since these
+`SeqendFilter` can take the values = , >, >=, < and <= (since these
 filters base on numeric values).
 
 A simple example would be to get all transcripts for the gene *BCL2L11*. To this
@@ -126,8 +100,8 @@ end we specify a `GenenameFilter` with the value `"BCL2L11"`. As a result we get
 a `GRanges` object with `start`, `end`, `strand` and `seqname` of the `GRanges`
 object being the start coordinate, end coordinate, chromosome name and strand
 for the respective transcripts. All additional annotations are available as
-metadata columns. Alternatively, by setting `return.type`"DataFrame"`, or
-=return.type`"data.frame"= the method would return a `DataFrame` object or
+metadata columns. Alternatively, by setting `return.type = "DataFrame"`, or
+`return.type`"data.frame"= the method would return a `DataFrame` object or
 `data.frame`.
 
 ```{r }
@@ -234,7 +208,7 @@ mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
 Not unexpectedly, transcripts of protein coding genes are longer than those of
 snRNA, snoRNA or rRNA genes.
 
-# Extracting gene/transcript/exon models for RNASeq feature counting<a id="orgheadline3"></a>
+# Extracting gene/transcript/exon models for RNASeq feature counting
 
 For the feature counting step of an RNAseq experiment, the gene or transcript
 models (defined by the chromosomal start and end positions of their exons) have
@@ -303,7 +277,7 @@ DJE <- disjointExons(EnsDb.Hsapiens.v75,
 			  GeneidFilter("ENSG%", "like")))
 ```
 
-# Retrieving sequences for gene/transcript/exon models<a id="orgheadline4"></a>
+# Retrieving sequences for gene/transcript/exon models
 
 The methods to retrieve exons, transcripts and genes (i.e. `exons`,
 `transcripts` and `genes`) return by default `GRanges` objects that can be used
@@ -320,48 +294,106 @@ In the code block below we retrieve first the `FaFile` with the genomic DNA
 sequence, extract the genomic start and end coordinates for all genes defined in
 the package, subset to genes encoded on sequences available in the `FaFile` and
 extract all of their sequences.  Note: these sequences represent the sequence
-between the chromosomal start and end coordinates of the gene.  To retrieve the
-(exonic) sequence of transcripts (i.e. without introns) we first fetch all exons
-grouped by transcripts and then extract and paste the sequence of all of the
-transcripts' exons.
+between the chromosomal start and end coordinates of the gene.
 
 ```{r eval=FALSE}
-## load the AnnotationHub data
 library(EnsDb.Hsapiens.v75)
 library(Rsamtools)
 edb <- EnsDb.Hsapiens.v75
 
-## get the FaFile with the genomic sequence matching the Ensembl version
+## Get the FaFile with the genomic sequence matching the Ensembl version
 ## using the AnnotationHub package.
 Dna <- getGenomeFaFile(edb)
-## get start/end coordinates of all genes
+
+## Get start/end coordinates of all genes.
 genes <- genes(edb)
-## subset to all genes that are encoded on chromosomes for which
+## Subset to all genes that are encoded on chromosomes for which
 ## we do have DNA sequence available.
 genes <- genes[seqnames(genes) %in% seqnames(seqinfo(Dna))]
-## get the gene sequences, i.e. the sequence including the sequence of
-## all of the gene's exons and introns
-geneSeqs <- getSeq(Dna, genes)
 
-## to get the sequence of all transcripts (i.e. only their exonic sequence) we
-## fetch the exons grouped by transcripts.
-## get all exons by transcript for all genes defined by Ensembl. This excludes
-## eventual "LRG" genes, that might be encoded on a sequence for which we don't
-## have a DNA sequence.
-txExons <- exonsBy(edb, "tx", filter=GeneidFilter("ENS%", condition="like"))
-## extract sequence of all of each transcripts' exons and join them into a single
-## sequence; this takes quite some time, so we just run it on the first 100.
-txSeqs <- lapply(txExons[1:100], function(x){unlist(getSeq(Dna, x))})
+## Get the gene sequences, i.e. the sequence including the sequence of
+## all of the gene's exons and introns.
+geneSeqs <- getSeq(Dna, genes)
 ```
 
-# Interactive annotation lookup using the `shiny` web app<a id="orgheadline5"></a>
+To retrieve the (exonic) sequence of transcripts (i.e. without introns) we can
+use directly the `extractTranscriptSeqs` method on the `EnsDb` object,
+eventually using a filter to restrict the query. Alternatively, we could extract
+the `GRanges` representing the exons of each transcript and use the `getSeq`
+method.
+
+```{r eval=FALSE}
+## Extract the transcript sequences of all transcripts defined by Ensembl.
+txSeqs <- extractTranscriptSeqs(Dna, edb)
+
+
+## Alternatively, use filters to restrict the search.
+yTx <- extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
+
+## Or extract first the exons by transcript and use the getSeq method.
+## We're getting all exons by transcript for all genes defined by Ensembl. This
+## excludes eventual "LRG" genes, that might be encoded on a sequence for which
+## we don't have a DNA sequence.
+txExons <- exonsBy(edb, "tx", filter=GeneidFilter("ENS%", condition="like"))
+
+## Extract the sequences of the first 10
+txSeqs <- lapply(txExons[1:10], function(x){unlist(getSeq(Dna, x))})
+```
+
+# Interactive annotation lookup using the `shiny` web app
 
 In addition to the `genes`, `transcripts` and `exons` methods it is possibly to
 search interactively for gene/transcript/exon annotations using the internal,
 `shiny` based, web application. The application can be started with the
 `runEnsDbApp()` function.
 
-# Important notes<a id="orgheadline6"></a>
+# Plotting gene/transcript features using `ensembldb` and `Gviz`
+
+The `Gviz` package provides functions to plot genes and transcripts along with
+other data on a genomic scale. Gene models can be provided either as a
+`data.frame`, `GRanges`, `TxDB` database, can be fetched from biomart and can
+also be retrieved from `ensembldb`.
+
+Below we generate a `GeneRegionTrack` fetching all transcripts from a certain
+region on chromosome Y. Note that we also have to change the
+`ucscChromosomeNames` option from `Gviz`, as the chromosome names from Ensembl
+are named differently from UCSC (i.e. without `chr`).
+
+```{r gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25}
+## Loading the Gviz library
+library(Gviz)
+library(EnsDb.Hsapiens.v75)
+edb <- EnsDb.Hsapiens.v75
+
+## Retrieving a Gviz compatible GRanges object with all genes
+## encoded on chromosome Y.
+gr <- getGeneRegionTrackForGviz(edb, chromosome="Y", start=20400000, end=21400000)
+## Define a genome axis track
+gat <- GenomeAxisTrack()
+
+## To allow use of Ensembl chromosome names we have to change a default option
+## in Gviz:
+options(ucscChromosomeNames=FALSE)
+plotTracks(list(gat, GeneRegionTrack(gr)))
+```
+
+We can also use the filters from the `ensembldb` package to further refine what
+transcripts are fetched, like in the example below, in which we create two
+different gene region tracks, one for protein coding genes and one for lincRNAs.
+
+```{r gviz-separate-tracks, message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25}
+protCod <- getGeneRegionTrackForGviz(edb, chromosome="Y",
+				     start=20400000, end=21400000,
+				     filter=GenebiotypeFilter("protein_coding"))
+lincs <- getGeneRegionTrackForGviz(edb, chromosome="Y",
+				     start=20400000, end=21400000,
+				   filter=GenebiotypeFilter("lincRNA"))
+
+plotTracks(list(gat, GeneRegionTrack(protCod, name="protein coding"),
+		GeneRegionTrack(lincs, name="lincs")), transcriptAnnotation="symbol")
+```
+
+# Important notes
 
 These notes might explain eventually unexpected results (and, more importantly,
 help avoiding them):
@@ -373,7 +405,7 @@ help avoiding them):
 
 -   Results of `exonsBy`, `transcriptsBy` are always ordered by the `by` argument.
 
-# Building an transcript centric database package based on Ensembl annotation<a id="orgheadline9"></a>
+# Building an transcript centric database package based on Ensembl annotation
 
 The code in this section is not supposed to be automatically executed when the
 vignette is built, as this would require a working installation of the Ensembl
@@ -381,7 +413,7 @@ Perl API, which is not expected to be available on each system. Also, fetching
 data from the Ensembl database takes quite some time, thus, in this section only
 the code is displayed, but not executed.
 
-## Requirements<a id="orgheadline7"></a>
+## Requirements
 
 The `fetchTablesFromEnsembl` function of the package uses the Ensembl Perl API
 to retrieve the required annotations from an Ensembl database (e.g. from the
@@ -393,7 +425,7 @@ build EnsDb SQLite files from a `GRanges` object or an Ensembl GTF file and thus
 doesn't depend on the Ensembl Perl API. Such `GRanges` objects could for example
 be retrieved with the `AnnotationHub` package.
 
-## Building an annotation package<a id="orgheadline8"></a>
+## Building an annotation package
 
 The functions below use the Ensembl Perl API to fetch the required data directly
 from the Ensembl core databases. Thus, the path to the Perl API specific for the
@@ -429,8 +461,8 @@ calling `edb <- EnsDb(DBFile)` and work with that annotation object.
 
 To fetch and build annotation packages for plant genomes (e.g. arabidopsis
 thaliana), the *Ensembl genomes* should be specified as a host, i.e. setting
-`host = "mysql-eg-publicsql.ebi.ac.uk"`, `port=4157` and species to
-e.g. `species = "arabidopsis thaliana"`.
+`host` to `"mysql-eg-publicsql.ebi.ac.uk"`, `port` to `4157` and `species` to
+e.g. `"arabidopsis thaliana"`.
 
 In the next example we create an `EnsDb` database using the `AnnotationHub`
 package and load also the corresponding genomic DNA sequence matching the
@@ -513,10 +545,10 @@ makeEnsembldbPackage(ensdb=DB, version="0.99.12",
 		     author="J Rainer")
 ```
 
-# Database layout<a id="orgtarget1"></a><a id="orgheadline10"></a>
+# Database layout<a id="orgtarget1"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [84](#orgparagraph1)):
+shown in Figure [88](#orgparagraph1)):
 
 -   **gene**: all gene specific annotations.
     -   `gene_id`: the Ensembl ID of the gene.
