@@ -387,7 +387,7 @@ setMethod("genes", "EnsDb", function(x,
         GR <- GRanges(seqnames=Rle(Res$seq_name),
                       ranges=IRanges(start=Res$gene_seq_start, end=Res$gene_seq_end),
                       strand=Rle(Res$seq_strand),
-                      seqinfo=SI[ unique(Res$seq_name) ],
+                      seqinfo=SI[as.character(unique(Res$seq_name))],
                       Res[ , metacols, drop=FALSE ]
                     )
         names(GR) <- Res$gene_id
@@ -438,7 +438,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
         GR <- GRanges(seqnames=Rle(Res$seq_name),
                       ranges=IRanges(start=Res$tx_seq_start, end=Res$tx_seq_end),
                       strand=Rle(Res$seq_strand),
-                      seqinfo=SI[ unique(Res$seq_name) ],
+                      seqinfo=SI[as.character(unique(Res$seq_name))],
                       Res[ , metacols, drop=FALSE ]
                     )
         names(GR) <- Res$tx_id
@@ -505,7 +505,7 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
         GR <- GRanges(seqnames=Rle(Res$seq_name),
                       ranges=IRanges(start=Res$exon_seq_start, end=Res$exon_seq_end),
                       strand=Rle(Res$seq_strand),
-                      seqinfo=SI[ unique(Res$seq_name) ],
+                      seqinfo=SI[as.character(unique(Res$seq_name))],
                       Res[ , metacols, drop=FALSE ]
                     )
         names(GR) <- Res$exon_id
@@ -517,8 +517,18 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
 ## should return a GRangesList
 ## still considerably slower than the corresponding call in the GenomicFeatures package.
 setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
-                                       columns=listColumns(x, "exon"), filter){
+                                       columns=listColumns(x, "exon"), filter, use.names=FALSE){
     by <- match.arg(by, c("tx", "gene"))
+    bySuff <- "_id"
+    if(use.names){
+        if(by == "tx"){
+            use.names <- FALSE
+            warning("Argument use.names ignored as no transcript names are available.")
+        }else{
+            columns <- unique(c(columns, "gene_name"))
+            bySuff <- "_name"
+        }
+    }
     ## note: if it's by gene we don't want any columns from the transcript table AND
     ## we don't want the exon_rank! rather we would like to sort by exon_chrom_start * seq_strand
     min.columns <- c(paste0(by, "_id"), "seq_name",
@@ -555,7 +565,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
         filter <- checkFilter(filter)
     }
     Res <- getWhat(x, columns=columns, filter=filter, order.by=order.by, skip.order.check=TRUE)
-    SI <- SI[ unique(Res$seq_name) ]
+    SI <- SI[as.character(unique(Res$seq_name))]
     ## replace exon_idx with exon_rank
     colnames(Res)[ colnames(Res)=="exon_idx" ] <- "exon_rank"
     columns[ columns=="exon_idx" ] <- "exon_rank"
@@ -569,7 +579,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
                 )
     ## now that GR is ordered as we wanted; once we split it it will be ordered by
     ## the value which we used for splitting.
-    return(split(GR, Res[ , paste0(by, "_id") ]))
+    return(split(GR, Res[ , paste0(by, bySuff) ]))
 })
 
 
@@ -605,7 +615,7 @@ setMethod("transcriptsBy", "EnsDb", function(x, by=c("gene", "exon"),
                    filter=filter,
                    order.by=order.by,
                    skip.order.check=TRUE)
-    SI <- SI[ unique(Res$seq_name) ]
+    SI <- SI[as.character(unique(Res$seq_name))]
     columns.metadata <- columns[ !(columns %in% c("seq_name", "seq_strand", "tx_seq_start", "tx_seq_end", paste0(by, "_id"))) ]
     columns.metadata <- match(columns.metadata, colnames(Res))   ## presumably faster...
     GR <- GRanges(seqnames=Rle(Res$seq_name),
@@ -687,7 +697,7 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     cdsEnds <- pmin.int(Res$exon_seq_end, Res$tx_cds_seq_end)
     ## get the seqinfo:
     SI <- seqinfo(x)
-    SI <- SI[unique(Res$seq_name)]
+    SI <- SI[as.character(unique(Res$seq_name))]
     ## Rename columns exon_idx to exon_rank, if present
     if(any(colnames(Res) == "exon_idx")){
         colnames(Res)[colnames(Res) == "exon_idx"] <- "exon_rank"
@@ -781,7 +791,7 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
     bm <- which(Res$exon_seq_end >= Res$tx_cds_seq_end)
     utrStarts[bm] <- pmax.int(Res$exon_seq_start[bm], Res$tx_cds_seq_end[bm])
     utrEnds[bm] <- Res$exon_seq_end[bm]
-    SI <- SI[unique(Res$seq_name)]
+    SI <- SI[as.character(unique(Res$seq_name))]
     GR <- GRanges(seqnames=Rle(Res$seq_name),
                   strand=Rle(Res$seq_strand),
                   ranges=IRanges(start=utrStarts, end=utrEnds),
@@ -1004,15 +1014,28 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
                                                          featureIs="gene_biotype"){
     featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
     filter <- checkFilter(filter)
-    if(any(!is.null(c(chromosome, start, end)))){
-        if(all(!is.null(c(chromosome, start, end)))){
+    if(missing(chromosome))
+        chromosome <- NULL
+    if(missing(start))
+        start <- NULL
+    if(missing(end))
+        end <- NULL
+    ## if only chromosome is specified, create a SeqnameFilter and add it to the filter
+    if(is.null(start) & is.null(end) & !is.null(chromosome)){
+        filter <- c(filter, list(SeqnameFilter(chromosome)))
+        chromosome <- NULL
+    }
+    if(any(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
+        ## Require however that all are defined!!!
+        if(all(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
             ## Fetch all transcripts in that region:
             tids <- dbGetQuery(dbconn(x),
-                               paste0("select distinct tx.tx_id from tx join gene on (tx.gene_id=gene.gene_id)",
+                               paste0("select distinct tx.tx_id from tx join gene on",
+                                      " (tx.gene_id=gene.gene_id)",
                                       " where seq_name='", chromosome, "' and (",
-                                      "(tx_seq_start >= ", start, " and tx_seq_start <= ", end, ") or ",
-                                      "(tx_seq_end >= ", start, " and tx_seq_end <= ", end, ") or ",
-                                      "(tx_seq_start <=", start, " and tx_seq_end >= ", end, ")",
+                                      "(tx_seq_start >=",start," and tx_seq_start <=",end,") or ",
+                                      "(tx_seq_end >=",start," and tx_seq_end <=",end,") or ",
+                                      "(tx_seq_start <=",start," and tx_seq_end >=",end,")",
                                       ")"))[, "tx_id"]
             if(length(tids) == 0)
                 stop(paste0("Did not find any transcript on chromosome from ", start, " to ",
@@ -1105,7 +1128,7 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
     }
     ## Convert into GRanges.
     SI <- seqinfo(x)
-    SI <- SI[unique(txs$chromosome)]
+    SI <- SI[as.character(unique(txs$chromosome))]
     GR <- GRanges(seqnames=Rle(txs$chromosome),
                   strand=Rle(txs$strand),
                   ranges=IRanges(start=txs$start, end=txs$end),
@@ -1114,4 +1137,39 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
                           "transcript", "symbol"), drop=FALSE])
     return(GR)
 })
+
+
+####
+## extractTranscriptSeqs
+##
+## Extending the extractTranscriptSeqs from GenomicFeatures allowing also to
+## use the EnsDb filters.
+## setMethod("extractTranscriptSeqs",
+##           signature(x="ANY", transcripts="EnsDb", filter="missing"),
+##           function(x, transcripts, filter){
+##               return(extractTranscriptSeqs(x, transcripts, filter=list()))
+##           })
+## setMethod("extractTranscriptSeqs",
+##           signature(x="ANY", transcripts="EnsDb", filter="BasicFilter"),
+##           function(x, transcripts, filter){
+##               return(extractTranscriptSeqs(x, transcripts, filter=list(filter)))
+##           })
+setMethod("extractTranscriptSeqs", "ANY",
+          function(x, transcripts, filter=list()){
+              if(is(transcripts, "EnsDb")){
+                  if(missing(filter)){
+                      filter <- list()
+                  }else{
+                      filter <- checkFilter(filter)
+                  }
+                  transcripts <- exonsBy(transcripts, by="tx", use.names=FALSE, filter=filter)
+                  ## Now check that the seqnames fit!
+                  if(is(x, "FaFile")){
+                      SN <- seqnames(seqinfo(x))
+                      transcripts <- transcripts[seqnames(transcripts) %in% SN]
+                  }
+              }
+              Meth <- getMethod("extractTranscriptSeqs", signature="ANY", where="GenomicFeatures")
+              return(Meth(x, transcripts))
+          })
 
