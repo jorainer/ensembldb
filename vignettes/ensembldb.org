@@ -37,7 +37,7 @@ vignette: >
 #+BEGIN_HTML
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")[["Author"]] `<br />
-**Modified**: 20 November, 2015<br />
+**Modified**: 27 November, 2015<br />
 **Compiled**: `r date()`
 #+END_HTML
 
@@ -101,11 +101,13 @@ variable =EnsDb.Hsapiens.v75=.
 #+BEGIN_SRC R :ravel warning=FALSE, message=FALSE
   library(EnsDb.Hsapiens.v75)
 
+  ## Making a "short cut"
+  edb <- EnsDb.Hsapiens.v75
   ## print some informations for this package
-  EnsDb.Hsapiens.v75
+  edb
 
   ## for what organism was the database generated?
-  organism(EnsDb.Hsapiens.v75)
+  organism(edb)
 #+END_SRC
 
 
@@ -125,6 +127,13 @@ alphabetical order):
   biotypes.
 + =GeneidFilter=: allows to filter based on the Ensembl gene IDs.
 + =GenenameFilter=: allows to filter based on the names (symbols) of the genes.
++ =GRangesFilter=: allows to retrieve all features (genes, transcripts or exons)
+  that are either within (setting =condition = "within"=) or partially
+  overlapping (=condition = "overlapping"=) the defined genomic
+  region/range. Note that, depending on the called method (=genes=,
+  =transcripts= or =exons=) the start and end coordinates of either the genes,
+  transcripts or exons are used for the filter. For methods =exonsBy=, =cdsBy=
+  and =txBy= the coordinates of =by= are used.
 + =SeqendFilter=: filter based on the chromosomal end coordinate of the exons,
   transcripts or genes (correspondingly set =feature = "exon"=, =feature = "tx"= or
   =feature = "gene"=).
@@ -148,6 +157,14 @@ partial matching. The =condition= parameter for =SeqendFilter= and
 =SeqendFilter= can take the values = , >, >=, < and <= (since these
 filters base on numeric values).
 
+The =SeqnameFilter= and =GRangesFilter= support both UCSC and Ensembl chromosome
+names (e.g. ="chrX"= for UCSC and ="X"= for Ensembl), internally, UCSC
+chromosome names are mapped to Ensembl names. By default, all functions to
+retrieve data from the database return Ensembl chromosome names, but by setting
+the global option =ucscChromosomeNames= to =TRUE=
+(i.e. =options(ucscChromosomeNames = TRUE)=) chromosome/seqnames are returned in
+UCSC format.
+
 A simple example would be to get all transcripts for the gene /BCL2L11/. To this
 end we specify a =GenenameFilter= with the value ="BCL2L11"=. As a result we get
 a =GRanges= object with =start=, =end=, =strand= and =seqname= of the =GRanges=
@@ -158,7 +175,7 @@ metadata columns. Alternatively, by setting =return.type = "DataFrame"=, or
 =data.frame=.
 
 #+BEGIN_SRC R
-  Tx <- transcripts(EnsDb.Hsapiens.v75, filter=list(GenenameFilter("BCL2L11")))
+  Tx <- transcripts(edb, filter=list(GenenameFilter("BCL2L11")))
 
   Tx
 
@@ -179,10 +196,10 @@ table.
 
 #+BEGIN_SRC R
   ## list all database tables along with their columns
-  listTables(EnsDb.Hsapiens.v75)
+  listTables(edb)
 
   ## list columns from a specific table
-  listColumns(EnsDb.Hsapiens.v75, "tx")
+  listColumns(edb, "tx")
 #+END_SRC
 
 Thus, we could retrieve all transcripts of the biotype /nonsense_mediated_decay/
@@ -193,8 +210,8 @@ the name of the gene for each transcript. Note that we are changing here the
 results instead of the default =GRanges=.
 
 #+BEGIN_SRC R
-  Tx <- transcripts(EnsDb.Hsapiens.v75,
-                    columns=c(listColumns(EnsDb.Hsapiens.v75 , "tx"), "gene_name"),
+  Tx <- transcripts(edb,
+                    columns=c(listColumns(edb , "tx"), "gene_name"),
                     filter=TxbiotypeFilter("nonsense_mediated_decay"),
                     return.type="DataFrame")
   nrow(Tx)
@@ -206,8 +223,48 @@ region. In the example below we extract the CDS for all transcripts encoded on
 chromosome Y.
 
 #+BEGIN_SRC R
-  yCds <- cdsBy(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"))
+  yCds <- cdsBy(edb, filter=SeqnameFilter("Y"))
   yCds
+#+END_SRC
+
+Using a =GRangesFilter= we can retrieve all features from the database that are
+either within or overlapping with the specified genomic region. In the example
+below we query all genes that are partially overlapping with a small region on
+chromosome 11. The filter restricts to all genes for which either an exon or an
+intron is partially overlapping with the region.
+
+#+BEGIN_SRC R
+  ## Define the filter
+  grf <- GRangesFilter(GRanges("11", ranges=IRanges(114000000, 114000050),
+                               strand="+"), condition="overlapping")
+
+  ## Query genes:
+  gn <- genes(edb, filter=grf)
+  gn
+
+  ## Next we retrieve all transcripts for that gene so that we can plot them.
+  txs <- transcripts(edb, filter=GenenameFilter(gn$gene_name))
+#+END_SRC
+
+#+BEGIN_SRC R :ravel tx-for-zbtb16, message=FALSE, fig.align='center', fig.width=7.5, fig.height=5
+  plot(3, 3, pch=NA, xlim=c(start(gn), end(gn)), ylim=c(0, length(txs)), yaxt="n", ylab="")
+  ## Highlight the GRangesFilter region
+  rect(xleft=start(grf), xright=end(grf), ybottom=0, ytop=length(txs), col="red", border="red")
+  for(i in 1:length(txs)){
+      current <- txs[i]
+      rect(xleft=start(current), xright=end(current), ybottom=i-0.975, ytop=i-0.125, border="grey")
+      text(start(current), y=i-0.5,pos=4, cex=0.75, labels=current$tx_id)
+  }
+
+#+END_SRC
+
+As we can see, 4 transcripts of the gene ZBTB16 are also overlapping the
+region. Below we fetch these 4 transcripts. Note, that a call to =exons= will
+not return any features from the database, as no exon is overlapping with the
+region.
+
+#+BEGIN_SRC R
+  transcripts(edb, filter=grf)
 #+END_SRC
 
 To get an overview of allowed/available gene and transcript biotype the
@@ -216,10 +273,10 @@ functions =listGenebiotypes= and =listTxbiotypes= can be used.
 #+BEGIN_SRC R
   ## Get all gene biotypes from the database. The GenebiotypeFilter
   ## allows to filter on these values.
-  listGenebiotypes(EnsDb.Hsapiens.v75)
+  listGenebiotypes(edb)
 
   ## Get all transcript biotypes from the database.
-  listTxbiotypes(EnsDb.Hsapiens.v75)
+  listTxbiotypes(edb)
 #+END_SRC
 
 Data can be fetched in an analogous way using the =exons= and =genes=
@@ -230,7 +287,7 @@ methods. In the example below we retrieve =gene_name=, =entrezid= and the
   ## We're going to fetch all genes which names start with BCL. To this end
   ## we define a GenenameFilter with partial matching, i.e. condition "like"
   ## and a % for any character/string.
-  BCLs <- genes(EnsDb.Hsapiens.v75,
+  BCLs <- genes(edb,
                 columns=c("gene_name", "entrezid", "gene_biotype"),
                 filter=list(GenenameFilter("BCL%", condition="like")),
                 return.type="DataFrame")
@@ -247,13 +304,13 @@ these chromosomes.
 #+BEGIN_SRC R
   ## determine the average length of snRNA, snoRNA and rRNA genes encoded on
   ## chromosomes X and Y.
-  mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
+  mean(lengthOf(edb, of="tx",
                 filter=list(GenebiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
                     SeqnameFilter(c("X", "Y")))))
 
   ## determine the average length of protein coding genes encoded on the same
   ## chromosomes.
-  mean(lengthOf(EnsDb.Hsapiens.v75, of="tx",
+  mean(lengthOf(edb, of="tx",
                 filter=list(GenebiotypeFilter("protein_coding"),
                     SeqnameFilter(c("X", "Y")))))
 #+END_SRC
@@ -279,7 +336,7 @@ A simple use case is to retrieve all genes encoded on chromosomes X and Y from
 the database.
 
 #+BEGIN_SRC R
-  TxByGns <- transcriptsBy(EnsDb.Hsapiens.v75, by="gene",
+  TxByGns <- transcriptsBy(edb, by="gene",
                            filter=list(SeqnameFilter(c("X", "Y")))
                            )
   TxByGns
@@ -298,7 +355,7 @@ Ensembl genes.
 #+BEGIN_SRC R :ravel eval=FALSE
   ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
   ## Note: want to get rid of the "LRG" genes!!!
-  EnsGenes <- exonsBy(EnsDb.Hsapiens.v75, by="gene",
+  EnsGenes <- exonsBy(edb, by="gene",
                       filter=list(SeqnameFilter(c(1:22, "X", "Y")),
                           GeneidFilter("ENSG%", "like")))
 #+END_SRC
@@ -327,7 +384,7 @@ parts which can be used in the =DEXSeq= package.
 
 #+BEGIN_SRC R :ravel eval=FALSE
   ## Create a GRanges of non-overlapping exon parts.
-  DJE <- disjointExons(EnsDb.Hsapiens.v75,
+  DJE <- disjointExons(edb,
                        filter=list(SeqnameFilter(c(1:22, "X", "Y")),
                             GeneidFilter("ENSG%", "like")))
 
@@ -419,9 +476,17 @@ other data on a genomic scale. Gene models can be provided either as a
 also be retrieved from =ensembldb=.
 
 Below we generate a =GeneRegionTrack= fetching all transcripts from a certain
-region on chromosome Y. Note that we also have to change the
-=ucscChromosomeNames= option from =Gviz=, as the chromosome names from Ensembl
-are named differently from UCSC (i.e. without =chr=).
+region on chromosome Y.
+
+Note that if we want in addition to work also with BAM files that were aligned
+against DNA sequences retrieved from Ensembl or FASTA files representing genomic
+DNA sequences from Ensembl we should change the
+=ucscChromosomeNames= option from =Gviz= to =FALSE= (i.e. by calling
+=options(ucscChromosomeNames = FALSE)=).
+This is not necessary if we just want to retrieve gene models from an =EnsDb=
+object, as the =ensembldb= package internally checks the =ucscChromosomeNames=
+option and, depending on that, maps Ensembl chromosome names to UCSC chromosome
+names.
 
 #+BEGIN_SRC R :ravel gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
   ## Loading the Gviz library
@@ -435,10 +500,13 @@ are named differently from UCSC (i.e. without =chr=).
   ## Define a genome axis track
   gat <- GenomeAxisTrack()
 
-  ## To allow use of Ensembl chromosome names we have to change a default option
-  ## in Gviz:
-  options(ucscChromosomeNames=FALSE)
   plotTracks(list(gat, GeneRegionTrack(gr)))
+
+  ## Note: in some cases we might want to change the ucscChromosomeNames to FALSE
+  ## i.e. using options(ucscChromosomeNames=FALSE) to force use of the chromosome names
+  ## "as is", e.g. if we're also using and fetching genomic DNA information from Ensembl
+  ## FASTA files or did align reads against Ensembl chromosome sequences.
+
 #+END_SRC
 
 
@@ -451,7 +519,7 @@ different gene region tracks, one for protein coding genes and one for lincRNAs.
                                        start=20400000, end=21400000,
                                        filter=GenebiotypeFilter("protein_coding"))
   lincs <- getGeneRegionTrackForGviz(edb, chromosome="Y",
-                                       start=20400000, end=21400000,
+                                     start=20400000, end=21400000,
                                      filter=GenebiotypeFilter("lincRNA"))
 
   plotTracks(list(gat, GeneRegionTrack(protCod, name="protein coding"),
@@ -805,8 +873,40 @@ might a =data.frame= do as well?).
      Wait for Florian Hahne to add the changes to Gviz.
 
 
-** TODO Implement a fix that would allow UCSC chromosome names
-
+** DONE Implement a fix that would allow UCSC chromosome names [4/4]
+   CLOSED: [2015-11-30 Mon 09:24]
+   - State "DONE"       from "TODO"       [2015-11-30 Mon 09:24]
 The idea is that, reading =options("ucscChromosomeNames")= a ="chr"= is appended
 to the chromosome names. That way, =EnsDb= databases could directly work with
 =Gviz= (as that package uses the above option).
+
++ If something is queried from the database, the ="chr"= has to be stripped
+  off. Here we have to deal with the filters:
++ [X] =SeqnameFilter=: this now always returns stripped chr names, if =EnsDb= is
+  also submitted.
++ [X] =GRangesFilter=
+  and eventually using their =value= method:
++ If anything is returned from the database, a ="chr"= has to be appended, if
+  the options are =TRUE=.
+  - Looks like the major return path is =getWhat=, so, will include the replace
+    stuff there.
++ [X] Adapt =getWhat=.
++ [X] The query to build the Gviz =GenePanel=.
+
+** DONE Implement a fix to rename additional chromosome names, like =Mt= etc.
+   CLOSED: [2015-11-30 Mon 08:59]
+   - State "DONE"       from "TODO"       [2015-11-30 Mon 08:59]
+** DONE Implement a =GRangesFilter= [2/2]
+   CLOSED: [2015-11-27 Fri 13:59]
+   - State "DONE"       from "TODO"       [2015-11-27 Fri 13:59]
++ [X] Filter should allow to either get all features =within= the GRanges:
+  complete feature has to be within the range.
++ [X] All features overlapping: =overlappingExon=: part of an exon has to
+  overlap the range. =overlappingAll=: exon or intron has to partially overlap
+  the range.
+
++ Filter should use the coordinates of the things to fetch, i.e. gene,
+  transcript or exon regions.
+
++ =within=: _seq_start >= start & _seq_end <= end.
++ =overlapping=: _seq_start <= end & _seq_end >= start.

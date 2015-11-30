@@ -13,6 +13,7 @@
 \alias{SeqstrandFilter-class}
 \alias{SeqstartFilter-class}
 \alias{SeqendFilter-class}
+\alias{GRangesFilter-class}
 \alias{column,EntrezidFilter,missing,missing-method}
 \alias{column,GeneidFilter,missing,missing-method}
 \alias{column,GenenameFilter,missing,missing-method}
@@ -24,6 +25,7 @@
 \alias{column,SeqstrandFilter,missing,missing-method}
 \alias{column,SeqstartFilter,missing,missing-method}
 \alias{column,SeqendFilter,missing,missing-method}
+\alias{column,GRangesFilter,missing,missing-method}
 \alias{where,EntrezidFilter,missing,missing-method}
 \alias{where,GeneidFilter,missing,missing-method}
 \alias{where,GenenameFilter,missing,missing-method}
@@ -35,6 +37,7 @@
 \alias{where,SeqstrandFilter,missing,missing-method}
 \alias{where,SeqstartFilter,missing,missing-method}
 \alias{where,SeqendFilter,missing,missing-method}
+\alias{where,GRangesFilter,missing,missing-method}
 % EnsDb, missing
 \alias{column,EntrezidFilter,EnsDb,missing-method}
 \alias{column,GeneidFilter,EnsDb,missing-method}
@@ -47,6 +50,7 @@
 \alias{column,SeqstrandFilter,EnsDb,missing-method}
 \alias{column,SeqstartFilter,EnsDb,missing-method}
 \alias{column,SeqendFilter,EnsDb,missing-method}
+\alias{column,GRangesFilter,EnsDb,missing-method}
 \alias{where,EntrezidFilter,EnsDb,missing-method}
 \alias{where,GeneidFilter,EnsDb,missing-method}
 \alias{where,GenenameFilter,EnsDb,missing-method}
@@ -58,6 +62,7 @@
 \alias{where,SeqstrandFilter,EnsDb,missing-method}
 \alias{where,SeqstartFilter,EnsDb,missing-method}
 \alias{where,SeqendFilter,EnsDb,missing-method}
+\alias{where,GRangesFilter,EnsDb,missing-method}
 % EnsDb, character
 \alias{column,EntrezidFilter,EnsDb,character-method}
 \alias{column,GeneidFilter,EnsDb,character-method}
@@ -70,6 +75,7 @@
 \alias{column,SeqstrandFilter,EnsDb,character-method}
 \alias{column,SeqstartFilter,EnsDb,character-method}
 \alias{column,SeqendFilter,EnsDb,character-method}
+\alias{column,GRangesFilter,EnsDb,character-method}
 \alias{where,EntrezidFilter,EnsDb,character-method}
 \alias{where,GeneidFilter,EnsDb,character-method}
 \alias{where,GenenameFilter,EnsDb,character-method}
@@ -81,9 +87,12 @@
 \alias{where,SeqstrandFilter,EnsDb,character-method}
 \alias{where,SeqstartFilter,EnsDb,character-method}
 \alias{where,SeqendFilter,EnsDb,character-method}
+\alias{where,GRangesFilter,EnsDb,character-method}
 %
 \alias{condition,BasicFilter-method}
+\alias{condition,GRangesFilter-method}
 \alias{show,BasicFilter-method}
+\alias{show,GRangesFilter-method}
 \alias{print,BasicFilter-method}
 \alias{where,BasicFilter,missing,missing-method}
 \alias{where,BasicFilter,EnsDb,missing-method}
@@ -91,7 +100,13 @@
 \alias{where,list,EnsDb,character-method}
 \alias{where,list,EnsDb,missing-method}
 \alias{where,list,missing,missing-method}
+\alias{value,BasicFilter,missing-method}
+\alias{value,BasicFilter,EnsDb-method}
+\alias{value,GRangesFilter,missing-method}
+\alias{value,GRangesFilter,EnsDb-method}
+\alias{value,SeqnameFilter,EnsDb-method}
 \alias{condition}
+\alias{value}
 \alias{column}
 \alias{where}
 
@@ -105,6 +120,7 @@
   \code{new("GeneidFilter", ...)} users are strongly encouraged to use the
   specific functions: \code{\link{GeneidFilter}}, \code{\link{EntrezidFilter}},
   \code{\link{GenenameFilter}}, \code{\link{GenebiotypeFilter}},
+  \code{\link{GRangesFilter}},
   \code{\link{TxidFilter}}, \code{\link{TxbiotypeFilter}},
   \code{\link{ExonidFilter}}, \code{\link{SeqnameFilter}},
   \code{\link{SeqstrandFilter}}, \code{\link{SeqstartFilter}} and \code{\link{SeqendFilter}}.
@@ -164,6 +180,10 @@
       the value for the \code{condition} slot.
     }
 
+    \item{value}{\code{signature(x="BasicFilter", db="EnsDb")}:
+      returns the value of the \code{value} slot of the filter object.
+    }
+
     \item{where}{\code{signature(object = "GeneidFilter", db="EnsDb",
 	with.tables="character")}:
       returns the where clause for the SQL call. Submitting also the
@@ -215,6 +235,31 @@
       Allows to filter on the gene names (symbols) of the genes.
     }
 
+    \item{\code{GRangesFilter}}{
+      Allows to fetch features within or overlapping a specified genomic
+      region/range. This filter takes a \code{GRanges} object as input
+      and, if \code{condition="within"} (the default) will restrict
+      results to features (genes, transcripts or exons) that are
+      completely within the region. Alternatively, by specifying
+      \code{condition="overlapping"} it will return all features
+      (i.e. genes for a call to \code{\link{genes}}, transcripts for a
+      call to \code{\link{transcripts}} and exons for a call to
+      \code{\link{exons}}) that are partially overlapping with the
+      region, i.e. which start coordinate is smaller than the end
+      coordinate of the region and which end coordinate is larger than
+      the start coordinate of the region. Thus, genes and transcripts
+      that have an intron overlapping the region will also be returned.
+
+      Calls to the methods \code{\link{exonsBy}}, \code{\link{cdsBy}}
+      and \code{\link{transcriptsBy}} use the start and end coordinates of the
+      feature type specified with argument \code{by}
+      (i.e. \code{"gene"}, \code{"transcript"} or \code{"exon"}) for the
+      filtering.
+
+      Chromosome names/seqnames can be provided in UCSC format
+      (e.g. \code{"chrX"}) or Ensembl format (e.g. \code{"X"}).
+    }
+
     \item{\code{SeqendFilter}}{
       Filter based on the chromosomal end coordinate of the exons,
       transcripts or genes.
@@ -222,7 +267,9 @@
 
     \item{\code{SeqnameFilter}}{
       Filter on the sequence name on which the features are encoded
-      (mostly the chromosome names).
+      (mostly the chromosome names). Supports UCSC chromosome names
+      (e.g. \code{"chrX"}) and Ensembl chromosome names
+      (e.g. \code{"X"}).
     }
 
     \item{\code{SeqstartFilter}}{
@@ -278,6 +325,36 @@ Sef <- SeqendFilter(10000, condition=">", "gene")
 Sef
 
 ## for additional examples see the help page of "genes"
+
+
+## Example for GRangesFilter:
+## retrieve all genes overlapping the specified region
+grf <- GRangesFilter(GRanges("11", ranges=IRanges(114000000, 114000050),
+                             strand="+"), condition="overlapping")
+library(EnsDb.Hsapiens.v75)
+edb <- EnsDb.Hsapiens.v75
+genes(edb, filter=grf)
+
+## Get also all transcripts overlapping that region
+transcripts(edb, filter=grf)
+
+## Retrieve all transcripts for the above gene
+gn <- genes(edb, filter=grf)
+txs <- transcripts(edb, filter=GenenameFilter(gn$gene_name))
+## Next we simply plot their start and end coordinates.
+plot(3, 3, pch=NA, xlim=c(start(gn), end(gn)), ylim=c(0, length(txs)), yaxt="n", ylab="")
+## Highlight the GRangesFilter region
+rect(xleft=start(grf), xright=end(grf), ybottom=0, ytop=length(txs), col="red", border="red")
+for(i in 1:length(txs)){
+    current <- txs[i]
+    rect(xleft=start(current), xright=end(current), ybottom=i-0.975, ytop=i-0.125, border="grey")
+    text(start(current), y=i-0.5,pos=4, cex=0.75, labels=current$tx_id)
+}
+## Thus, we can see that only 4 transcripts of that gene are indeed overlapping the region.
+
+
+## No exon is overlapping that region, thus we're not getting anything
+exons(edb, filter=grf)
 
 
 }

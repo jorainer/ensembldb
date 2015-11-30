@@ -10,6 +10,7 @@
 \alias{SeqstrandFilter}
 \alias{SeqstartFilter}
 \alias{SeqendFilter}
+\alias{GRangesFilter}
 \title{
   Constructor functions for filter objects
 }
@@ -19,16 +20,29 @@
 }
 \usage{
 EntrezidFilter(value, condition = "=")
+
 GeneidFilter(value, condition = "=")
+
 GenenameFilter(value, condition = "=")
+
 GenebiotypeFilter(value, condition = "=")
+
+GRangesFilter(value, condition="within", feature="gene")
+
 TxidFilter(value, condition = "=")
+
 TxbiotypeFilter(value, condition = "=")
+
 ExonidFilter(value, condition = "=")
+
 SeqnameFilter(value, condition = "=")
+
 SeqstrandFilter(value, condition = "=")
+
 SeqstartFilter(value, condition = "=", feature = "gene")
+
 SeqendFilter(value, condition = "=", feature = "gene")
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -37,59 +51,87 @@ SeqendFilter(value, condition = "=", feature = "gene")
     for which the data should be retrieved. For character values (all
     filters except \code{SeqstartFilter} and \code{SeqendFilter}) also a
     character vector of values is allowed. Allowed values for
-    \code{SeqstrandFilter} are: \code{"+"}, \code{"-"}, \code{"1"} or \code{"-1"}.
+    \code{SeqstrandFilter} are: \code{"+"}, \code{"-"}, \code{"1"} or
+    \code{"-1"}.
+
+    For \code{GRangeFilter} this has to be a \code{GRanges} object.
   }
   \item{condition}{
     The condition to be used in the comparison. For character values
     \code{"="}, \code{"in"} and \code{"like"} are allowed, for numeric values
     (\code{SeqstartFilter} and \code{SeqendFilter}) \code{"="},
     \code{">"}, \code{">="}, \code{"<"} and \code{"<="}. Note that for
-    \code{"like"} \code{value} should be a SQL pattern (e.g. \code{"ENS\%"}).
+    \code{"like"} \code{value} should be a SQL pattern
+    (e.g. \code{"ENS\%"}).
+
+    For \code{GRangesFilter}, \code{"within"} and \code{"overlapping"}
+    are allowed. See below for details.
   }
   \item{feature}{
     For \code{SeqstartFilter} and \code{SeqendFilter}: the chromosomal
     position of which features should be used in the filter (either
-    \code{"gene"}, \code{"transcript"} or \code{"exon"})?
+    \code{"gene"}, \code{"transcript"} or \code{"exon"}).
+
+    For \code{GRangesFilter}: the submitted value is overwritten
+    internally depending on the called method, i.e. calling \code{genes}
+    will set feature to \code{"gene"}, \code{transcripts} to \code{"tx"}
+    and \code{exons} to \code{"exon"}.
+
   }
 }
 \details{
   \describe{
-    \item{\code{EntrezidFilter}}{
+    \item{EntrezidFilter}{
       Filter results based on the NCBI Entrezgene ID of the genes.
     }
-    \item{\code{GeneidFilter}}{
+    \item{GeneidFilter}{
       Filter results based on Ensembl gene IDs.
     }
-    \item{\code{GenenameFilter}}{
+    \item{GenenameFilter}{
       Filter results based on gene names (gene symbols).
     }
-    \item{\code{GenebiotypeFilter}}{
+    \item{GenebiotypeFilter}{
       Filter results based on the biotype of the genes. For a complete
       list of available gene biotypes use the
       \code{\link{listGenebiotypes}} method.
     }
-    \item{\code{TxidFilter}}{
+    \item{GRangesFilter}{
+      Allows to fetch features within or overlapping a specified genomic
+      region/range. This filter takes a \code{GRanges} object as input
+      and, if \code{condition="within"} (the default) will restrict
+      results to features (genes, transcripts or exons) that are
+      completely within the region. Alternatively, by specifying
+      \code{condition="overlapping"} it will return all features that
+      are partially overlapping with the region, i.e. which start
+      coordinate is smaller than the end coordinate of the region and
+      which end coordinate is larger than the start coordinate of the
+      region. Thus, genes and transcripts that have an intron
+      overlapping the region will also be returned.
+
+      See \code{\linkS4class{GRangesFilter}} for more details.
+    }
+    \item{TxidFilter}{
       Filter results based on the Ensembl transcript IDs.
     }
-    \item{\code{TxbiotypeFilter}}{
+    \item{TxbiotypeFilter}{
       Filter results based on the biotype of the transcripts. For a
       complete list of available transcript biotypes use the
       \code{\link{listTxbiotypes}} method.
     }
-    \item{\code{ExonidFilter}}{
+    \item{ExonidFilter}{
       Filter based on the Ensembl exon ID.
     }
-    \item{\code{SeqnameFilter}}{
+    \item{SeqnameFilter}{
       Filter results based on the name of the sequence the features are encoded.
     }
-    \item{\code{SeqstrandFilter}}{
+    \item{SeqstrandFilter}{
       Filter results based on the strand on which the features are encoded.
     }
-    \item{\code{SeqstartFilter}}{
+    \item{SeqstartFilter}{
       Filter results based on the (chromosomal) start coordinate of the
       features (exons, genes or transcripts).
     }
-    \item{\code{SeqendFilter}}{
+    \item{SeqendFilter}{
       Filter results based on the (chromosomal) end coordinates.
     }
   }
@@ -100,6 +142,7 @@ SeqendFilter(value, condition = "=", feature = "gene")
   \code{\linkS4class{GeneidFilter}},
   \code{\linkS4class{GenenameFilter}},
   \code{\linkS4class{GenebiotypeFilter}},
+  \code{\linkS4class{GRangesFilter}},
   \code{\linkS4class{TxidFilter}},
   \code{\linkS4class{TxbiotypeFilter}},
   \code{\linkS4class{ExonidFilter}},
@@ -116,6 +159,7 @@ SeqendFilter(value, condition = "=", feature = "gene")
   \code{\linkS4class{GeneidFilter}},
   \code{\linkS4class{GenenameFilter}},
   \code{\linkS4class{GenebiotypeFilter}},
+  \code{\linkS4class{GRangesFilter}},
   \code{\linkS4class{TxidFilter}},
   \code{\linkS4class{TxbiotypeFilter}},
   \code{\linkS4class{ExonidFilter}},
@@ -148,6 +192,11 @@ Filter
 
 ## generate the where SQL call for these filters:
 where(Filter)
+
+
+## Create a GRangesFilter
+GRangesFilter(GRanges("X", IRanges(123, 5454)))
+
 
 }
 \keyword{data}
