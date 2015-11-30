@@ -39,12 +39,17 @@ setMethod("initialize", "BasicFilter", function(.Object, ...){
     callNextMethod(.Object, ...)
 })
 
-.where <- function(object){
+.where <- function(object, db=NULL){
+    if(is.null(db)){
+        Vals <- value(object)
+    }else{
+        Vals <- value(object, db)
+    }
     ## if not a number we have to single quote!
     if(object@.valueIsCharacter){
-        Vals <- sQuote(gsub(unique(object@value),pattern="'",replacement="''"))
+        Vals <- sQuote(gsub(unique(Vals),pattern="'",replacement="''"))
     }else{
-        Vals <- unique(object@value)
+        Vals <- unique(Vals)
     }
     ## check, if there are more than one, concatenate in that case on put () aroung
     if(length(Vals) > 1){
@@ -58,14 +63,14 @@ setMethod("where", signature(object="BasicFilter", db="missing", with.tables="mi
 })
 setMethod("where", signature(object="BasicFilter", db="EnsDb", with.tables="missing"),
           function(object, db, with.tables, ...){
-    return(.where(object))
+    return(.where(object, db=db))
 })
 setMethod("where", signature(object="BasicFilter", db="EnsDb", with.tables="character"),
           function(object, db, with.tables, ...){
-    return(.where(object))
+    return(.where(object, db=db))
 })
 setMethod("condition", "BasicFilter", function(x, ...){
-    if(length(unique(x@value)) > 1){
+    if(length(unique(value(x))) > 1){
         if(x@condition=="in" | x@condition=="not in")
             return(x@condition)
         if(x@condition=="!="){
@@ -85,6 +90,14 @@ setMethod("condition", "BasicFilter", function(x, ...){
         return(x@condition)
     }
 })
+setMethod("value", signature(x="BasicFilter", db="missing"),
+          function(x, db, ...){
+              return(x@value)
+          })
+setMethod("value", signature(x="BasicFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(x@value)
+          })
 
 ## setMethod("requireTable", "EnsFilter", function(object, ...){
 ##     return(object@required.table)
@@ -93,8 +106,9 @@ setMethod("print", "BasicFilter", function(x, ...){
     show(x)
 })
 setMethod("show", "BasicFilter", function(object){
+    cat("| ", class(object), "\n")
     cat("| condition: ", object@condition, "\n")
-    cat("| value: ", object@value, "\n")
+    cat("| value: ", value(object), "\n")
 })
 
 ##***********************************************************************
@@ -419,7 +433,12 @@ setMethod("column", signature(object="SeqnameFilter", db="EnsDb", with.tables="c
               return(unlist(prefixColumns(db, column(object), with.tables=with.tables),
                             use.names=FALSE))
           })
-
+## Overwriting the value method allows us to fix chromosome names (e.g. with prefix chr)
+## to be usable for EnsDb and Ensembl based chromosome names (i.e. without chr).
+setMethod("value", signature(x="SeqnameFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(ucscToEns(value(x)))
+          })
 
 
 ##***********************************************************************
@@ -542,4 +561,176 @@ setMethod("column", signature(object="SeqendFilter", db="EnsDb", with.tables="ch
               return(unlist(prefixColumns(db, column(object), with.tables=with.tables),
                             use.names=FALSE))
           })
+
+
+###============================================================
+##    Methods for GRangesFilter
+##    + show
+##    + condition
+##    + value
+##    + where
+##    + column
+##    + start
+##    + end
+##    + seqnames
+##    + strand
+###------------------------------------------------------------
+## Overwrite the validation method.
+setValidity("GRangesFilter", function(object){
+    if(!any(object@location == c("within", "overlapping") )){
+        return(paste0("Argument condition should be either 'within' or 'overlapping'! Got ",
+                      object@location, "!"))
+    }
+    ## GRanges has to have valid values for start, end and seqnames!
+    if(length(start(object)) == 0)
+        return("start coordinate of the range is missing!")
+    if(length(end(object)) == 0)
+        return("end coordinate of the range is missing!")
+    if(length(seqnames(object)) == 0)
+        return("A valid seqname is required from the submitted GRanges!")
+    return(TRUE)
+})
+setMethod("show", "GRangesFilter", function(object){
+    cat("|", class(object), "\n")
+    cat("| region:\n")
+    cat("| + start: ", start(object), "\n")
+    cat("| + end:   ", end(object), "\n")
+    cat("| + seqname: ", seqnames(object), "\n")
+    cat("| + strand: ", strand(object), "\n")
+    cat("| condition: ", condition(object), "\n")
+})
+setMethod("condition", "GRangesFilter", function(x, ...){
+    return(x@location)
+})
+setMethod("value", signature(x="GRangesFilter", db="missing"),
+          function(x, db, ...){
+              return(x@grange)
+          })
+setMethod("value", signature(x="GRangesFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(x@grange)
+          })
+setMethod("start", signature(x="GRangesFilter"),
+          function(x, ...){
+              return(start(value(x)))
+          })
+setMethod("end", signature(x="GRangesFilter"),
+          function(x, ...){
+              return(end(value(x)))
+          })
+setMethod("strand", signature(x="GRangesFilter"),
+          function(x, ...){
+              strnd <- as.character(strand(value(x)))
+              return(strnd)
+          })
+setMethod("seqnames", signature(x="GRangesFilter"),
+          function(x){
+              return(as.character(seqnames(value(x))))
+          })
+## The column method for GRangesFilter returns all columns required for the query, i.e.
+## the _seq_start, _seq_end for the feature, seq_name and seq_strand.
+## Note: this method has to return a named vector!
+setMethod("column", signature(object="GRangesFilter", db="missing", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              ## assuming that we follow the naming convention:
+              ## <feature>_seq_end for the naming of the database columns.
+              feature <- object@feature
+              feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
+              if(object@feature=="transcript")
+                  feature <- "tx"
+              cols <- c(start=paste0(feature, "_seq_start"),
+                        end=paste0(feature, "_seq_end"),
+                        seqname="seq_name",
+                        strand="seq_strand")
+              return(cols)
+          })
+setMethod("column", signature(object="GRangesFilter", db="EnsDb", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              tn <- names(listTables(db))
+              return(column(object, db, with.tables=tn))
+          })
+## Providing also the columns.
+setMethod("column", signature(object="GRangesFilter", db="EnsDb", with.tables="character"),
+          function(object, db, with.tables, ...){
+              cols <- unlist(prefixColumns(db, column(object), with.tables=with.tables),
+                             use.names=FALSE)
+              ## We have to give the vector the required names!
+              names(cols) <- 1:length(cols)
+              names(cols)[grep(cols, pattern="seq_name")] <- "seqname"
+              names(cols)[grep(cols, pattern="seq_strand")] <- "strand"
+              names(cols)[grep(cols, pattern="seq_start")] <- "start"
+              names(cols)[grep(cols, pattern="seq_end")] <- "end"
+              return(cols[c("start", "end", "seqname", "strand")])
+          })
+## Where for GRangesFilter only.
+setMethod("where", signature(object="GRangesFilter", db="missing", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              ## Get the names of the columns we're going to query.
+              cols <- column(object)
+              query <- buildWhereForGRanges(object, cols)
+              return(query)
+          })
+setMethod("where", signature(object="GRangesFilter", db="EnsDb", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              tn <- names(listTables(db))
+              return(where(object, db, with.tables=tn))
+          })
+setMethod("where", signature(object="GRangesFilter", db="EnsDb", with.tables="character"),
+          function(object, db, with.tables, ...){
+              cols <- column(object, db, with.tables)
+              query <- buildWhereForGRanges(object, cols, fixUCSC=TRUE)
+              return(query)
+          })
+
+## grf: GRangesFilter
+buildWhereForGRanges <- function(grf, columns, fixUCSC=FALSE){
+    condition <- condition(grf)
+    if(!any(condition == c("within", "overlapping")))
+        stop(paste0("'condition' for GRangesFilter should either be ",
+                    "'within' or 'overlapping', got ", condition, "."))
+    if(is.null(names(columns))){
+        stop(paste0("The vector with the required column names for the",
+                    " GRangesFilter query has to have names!"))
+    }
+    if(!all(c("start", "end", "seqname", "strand") %in% names(columns)))
+        stop(paste0("'columns' has to be a named vector with names being ",
+                    "'start', 'end', 'seqname', 'strand'!"))
+    ## Build the query to fetch all features that are located within the range
+    seqn <- seqnames(grf)
+    if(fixUCSC)
+        seqn <- ucscToEns(seqn)
+    if(condition == "within"){
+        query <- paste0(columns["start"], " >= ", start(grf), " and ",
+                        columns["end"], " <= ", end(grf), " and ",
+                        columns["seqname"], " == '", seqn, "'")
+    }
+    ## Build the query to fetch all features (partially) overlapping the range. This
+    ## includes also all features (genes or transcripts) that have an intron at that
+    ## position.
+    if(condition == "overlapping"){
+        query <- paste0(columns["start"], " <= ", end(grf), " and ",
+                        columns["end"], " >= ", start(grf), " and ",
+                        columns["seqname"], " = '", seqn, "'")
+    }
+    ## Include the strand, if it's not "*"
+    if(strand(grf) != "*"){
+        query <- paste0(query, " and ", columns["strand"], " = ", strand2num(strand(grf)))
+    }
+    return(query)
+}
+## map chromosome strand...
+strand2num <- function(x){
+    if(x == "+" | x == "-"){
+        return(as.numeric(paste0(x, 1)))
+    }else{
+        stop("Only '+' and '-' supported!")
+    }
+}
+num2strand <- function(x){
+    if(x < 0){
+        return("-")
+    }else{
+        return("+")
+    }
+}
 

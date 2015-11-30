@@ -347,6 +347,17 @@
   Ensembl. Their gene id starts with LRG instead of ENS for Ensembl
   genes, thus, a filter can be applied to specifically select those
   genes or exclude those genes (see examples below).
+
+  Depending on the value of the global option
+  \code{"ucscChromosomeNames"} (use
+  \code{getOption(ucscChromosomeNames, FALSE)} to get its value or
+  \code{option(ucscChromosomeNames=TRUE)} to change its value)
+  the sequence/chromosome names of the returned \code{GRanges} objects
+  or provided in the returned \code{data.frame} or \code{DataFrame}
+  correspond to Ensembl chromosome names (if value is \code{FALSE}) or
+  UCSC chromosome names (if \code{TRUE}). This ensures a better
+  integration with the \code{Gviz} package, in which this option is set
+  by default to \code{TRUE}.
 }
 
 \value{
@@ -354,7 +365,8 @@
   a \code{data.frame}, \code{DataFrame}
   or a \code{GRanges}, depending on the value of the
   \code{return.type} parameter. The result
-  is ordered as specified by the parameter \code{order.by}, NOT by any
+  is ordered as specified by the parameter \code{order.by} or, if not
+  provided, by \code{seq_name} and chromosomal start coordinate, but NOT by any
   ordering of values in eventually submitted filter objects.
 
   For \code{exonsBy}, \code{transcriptsBy}:

@@ -189,7 +189,7 @@ addRequiredTables <- function(x, tab){
         columns <- unique(c(columns, filtercolumns))
     }
     ## 2) get all column names for the order.by:
-    if(order.by!=""){
+    if(order.by != ""){
         ## if we have skip.order.check set we use the order.by as is.
         if(!skip.order.check){
             order.by <- unlist(strsplit(order.by, split=",", fixed=TRUE))
@@ -204,6 +204,8 @@ addRequiredTables <- function(x, tab){
             }
             if(length(order.by)==0){
                 order.by <- ""
+            }else{
+                order.by <- paste(order.by, collapse=", ")
             }
         }
     }else{
@@ -230,6 +232,8 @@ addRequiredTables <- function(x, tab){
     ## c) the order part of the query
     if(order.by!=""){
         if(!skip.order.check){
+            order.by <- unlist(strsplit(order.by, split=",", fixed=TRUE))
+            order.by <- gsub(order.by, pattern=" ", replacement="", fixed=TRUE)
             order.by <- paste(unlist(prefixColumns(x=x, columns=order.by,
                                                    with.tables=need.tables),
                                      use.names=FALSE), collapse=",")
@@ -473,6 +477,50 @@ getGeneTrackDfForGviz <- function(x, filter=list(), chromosome=NULL, start=NULL,
 }
 
 
+###==============================================================
+##  Prefix chromosome names with "chr" if ucscChromosomeNames option
+##  is set, otherwise, use chromosome names "as is".
+##  This function should be used in functions that return results from
+##  EnsDbs.
+###--------------------------------------------------------------
+prefixChromName <- function(x, prefix="chr"){
+    ucsc <- getOption("ucscChromosomeNames", default=FALSE)
+    if(ucsc){
+        ## TODO fix also the mitochondrial chromosome name.
+        mapping <- ucscToEnsMapping()
+        for(i in 1:length(mapping)){
+            x <- sub(x, pattern=names(mapping)[i], replacement=mapping[i],
+                     fixed=TRUE)
+        }
+        ## Replace chr if it's already there
+        x <- gsub(x, pattern="^chr", replacement="", ignore.case=TRUE)
+        x <- paste0(prefix, x)
+    }
+    return(x)
+}
 
-
+###==============================================================
+##  Remove leading "chr" to fit Ensembl based chromosome names.
+##  This function should be called in functions that fetch data from
+##  EnsDbs.
+###--------------------------------------------------------------
+ucscToEns <- function(x){
+    ## TODO rename all additional chromosome names.
+    mapping <- ucscToEnsMapping()
+    for(i in 1:length(mapping)){
+        x <- sub(x, pattern=mapping[i], replacement=names(mapping)[i],
+                 fixed=TRUE)
+    }
+    x <- gsub(x, pattern="^chr", replacement="", ignore.case=TRUE)
+    return(x)
+}
+###============================================================
+##  Returns a character vector, elements representing UCSC chromosome
+##  names with their names corresponding to the respective Ensembl
+##  chromosome names.
+###------------------------------------------------------------
+ucscToEnsMapping <- function(){
+    theMap <- c(MT="chrM")
+    return(theMap)
+}
 

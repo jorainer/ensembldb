@@ -1,99 +1,5 @@
 ##***********************************************************************
 ##
-##     Generic methods
-##
-##***********************************************************************
-if(!isGeneric("column"))
-    setGeneric("column", function(object, db, with.tables, ...)
-        standardGeneric("column"))
-if(!isGeneric("buildQuery"))
-    setGeneric("buildQuery", function(x, ...)
-        standardGeneric("buildQuery"))
-if(!isGeneric("cleanColumns"))
-    setGeneric("cleanColumns", function(x, columns, ...)
-        starndardGeneric("cleanColumns"))
-if(!isGeneric("condition"))
-    setGeneric("condition", function(x, ...)
-        standardGeneric("condition"))
-if(!isGeneric("genes"))
-    setGeneric("genes", function(x, ...)
-        standardGeneric("genes"))
-if(!isGeneric("getWhat"))
-    setGeneric("getWhat", function(x, ...)
-        standardGeneric("getWhat"))
-if(!isGeneric("ensemblVersion"))
-    setGeneric("ensemblVersion", function(x)
-        standardGeneric("ensemblVersion"))
-if(!isGeneric("exons"))
-    setGeneric("exons", function(x, ...)
-        standardGeneric("exons"))
-if(!isGeneric("exonsBy"))
-    setGeneric("exonsBy", function(x, ...)
-        standardGeneric("exonsBy"))
-
-setGeneric("getGeneRegionTrackForGviz", function(x, ...)
-    standardGeneric("getGeneRegionTrackForGviz"))
-
-if(!isGeneric("getGenomeFaFile"))
-    setGeneric("getGenomeFaFile", function(x, ...)
-        standardGeneric("getGenomeFaFile"))
-if(!isGeneric("getMetadataValue"))
-    setGeneric("getMetadataValue", function(x, name)
-        standardGeneric("getMetadataValue"))
-if(!isGeneric("listColumns")){
-    setGeneric("listColumns", function(x, ...)
-        standardGeneric("listColumns"))
-}
-if(!isGeneric("listGenebiotypes")){
-    setGeneric("listGenebiotypes", function(x, ...)
-        standardGeneric("listGenebiotypes"))
-}
-if(!isGeneric("listTxbiotypes")){
-    setGeneric("listTxbiotypes", function(x, ...)
-        standardGeneric("listTxbiotypes"))
-}
-if(!isGeneric("lengthOf"))
-    setGeneric("lengthOf", function(x, ...)
-        standardGeneric("lengthOf"))
-if(!isGeneric("print"))
-    setGeneric("print", function(x, ...)
-        standardGeneric("print"))
-if(!isGeneric("requireTable"))
-    setGeneric("requireTable", function(x, db, ...)
-        standardGeneric("requireTable"))
-if(!isGeneric("seqinfo"))
-    setGeneric("seqinfo", function(x)
-        standardGeneric("seqinfo"))
-if(!isGeneric("show"))
-    setGeneric("show", function(object, ...)
-        standardGeneric("show"))
-if(!isGeneric("toSAF"))
-    setGeneric("toSAF", function(x, ...)
-        standardGeneric("toSAF"))
-if(!isGeneric("listTables")){
-    setGeneric("listTables", function(x, ...)
-        standardGeneric("listTables"))
-}
-if(!isGeneric("tablesByDegree")){
-    setGeneric("tablesByDegree", function(x, ...)
-        standardGeneric("tablesByDegree"))
-}
-if(!isGeneric("tablesForColumns"))
-    setGeneric("tablesForColumns", function(x, attributes, ...)
-        standardGeneric("tablesForColumns"))
-if(!isGeneric("transcripts"))
-    setGeneric("transcripts", function(x, ...)
-        standardGeneric("transcripts"))
-if(!isGeneric("transcriptsBy"))
-    setGeneric("transcriptsBy", function(x, ...)
-        standardGeneric("transcriptsBy"))
-if(!isGeneric("where"))
-    setGeneric("where", function(object, db, with.tables, ...)
-        standardGeneric("where"))
-
-
-##***********************************************************************
-##
 ##     Methods for EnsDb classes
 ##
 ##***********************************************************************
@@ -301,7 +207,7 @@ setMethod("cleanColumns", "EnsDb", function(x,
         removed <- columns[ !bm ]
     }
     if(length(removed) > 0){
-        warning("Columns ", paste(removed, collapse=", "),
+        warning("Columns ", paste(sQuote(removed), collapse=", "),
                 " are not valid and have been removed")
     }
     return(columns[ bm ])
@@ -365,6 +271,17 @@ setMethod("genes", "EnsDb", function(x,
     }else{
         filter <- checkFilter(filter)
     }
+    filter <- setFeatureInGRangesFilter(filter, "gene")
+    ## If we don't have an order.by define one.
+    if(order.by == ""){
+        order.by <- NULL
+        if(any(columns == "gene_seq_start"))
+            order.by <- "gene_seq_start"
+        if(any(columns == "seq_name"))
+            order.by <- paste(c("seq_name", order.by), collapse=", ")
+        if(is.null(order.by))
+            order.by <- ""
+    }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
     if(return.type=="data.frame" | return.type=="DataFrame"){
@@ -415,6 +332,17 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
         filter=list()
     }else{
         filter <- checkFilter(filter)
+    }
+    filter <- setFeatureInGRangesFilter(filter, "tx")
+    ## If we don't have an order.by define one.
+    if(order.by == ""){
+        order.by <- NULL
+        if(any(columns == "tx_seq_start"))
+            order.by <- "tx_seq_start"
+        if(any(columns == "seq_name"))
+            order.by <- paste(c("seq_name", order.by), collapse=", ")
+        if(is.null(order.by))
+            order.by <- ""
     }
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
@@ -483,6 +411,17 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
     }else{
         filter <- checkFilter(filter)
     }
+    ## If we don't have an order.by define one.
+    if(order.by == ""){
+        order.by <- NULL
+        if(any(columns == "exon_seq_start"))
+            order.by <- "exon_seq_start"
+        if(any(columns == "seq_name"))
+            order.by <- paste(c("seq_name", order.by), collapse=", ")
+        if(is.null(order.by))
+            order.by <- ""
+    }
+    filter <- setFeatureInGRangesFilter(filter, "exon")
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type)
     if(return.type=="data.frame" | return.type=="DataFrame"){
@@ -564,6 +503,8 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     }else{
         filter <- checkFilter(filter)
     }
+    ## We're applying eventual GRangesFilter to either gene or tx.
+    filter <- setFeatureInGRangesFilter(filter, by)
     Res <- getWhat(x, columns=columns, filter=filter, order.by=order.by, skip.order.check=TRUE)
     SI <- SI[as.character(unique(Res$seq_name))]
     ## replace exon_idx with exon_rank
@@ -611,6 +552,7 @@ setMethod("transcriptsBy", "EnsDb", function(x, by=c("gene", "exon"),
     }else{
         filter <- checkFilter(filter)
     }
+    filter <- setFeatureInGRangesFilter(filter, by)
     Res <- getWhat(x, columns=columns,
                    filter=filter,
                    order.by=order.by,
@@ -656,6 +598,7 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     }else{
         filter <- checkFilter(filter)
     }
+    filter <- setFeatureInGRangesFilter(filter, by)
     bySuff <- "_id"
     if(by == "tx"){
         ## adding exon_id, exon_idx to the columns.
@@ -732,6 +675,7 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
     }else{
         filter <- checkFilter(filter)
     }
+    filter <- setFeatureInGRangesFilter(filter, "tx")
     columns <- unique(c(columns, "exon_id", "exon_idx"))
     ## what do we need: we need columns tx_cds_seq_start and tx_cds_seq_end and exon_idx
     fetchCols <- unique(c("tx_id", columns, "tx_cds_seq_start", "tx_cds_seq_end",
@@ -914,17 +858,27 @@ setMethod("buildQuery", "EnsDb",
                                  order.type=order.type,
                                  skip.order.check=skip.order.check))
           })
+####
+## Method that wraps the internal .getWhat function to retrieve data from the
+## database. In addition, if present, we're renaming chromosome names depending
+## on the ucscChromosomeNames option.
 setMethod("getWhat", "EnsDb",
           function(x, columns=c("gene_id", "gene_biotype", "gene_name"),
                    filter=list(), order.by="", order.type="asc",
                    group.by=NULL, skip.order.check=FALSE){
-              return(.getWhat(x=x,
+              Res <- .getWhat(x=x,
                               columns=columns,
                               filter=filter,
                               order.by=order.by,
                               order.type=order.type,
                               group.by=group.by,
-                              skip.order.check=skip.order.check))
+                              skip.order.check=skip.order.check)
+              ## Eventually renaming chromosome names depending on the
+              ## value of ucscChromosomeNames.
+              if(any(colnames(Res) == "seq_name")){
+                  Res$seq_name <- prefixChromName(as.character(Res$seq_name))
+              }
+              return(Res)
           })
 
 ## that's basically a copy of the code from the GenomicFeatures package.
@@ -1028,6 +982,8 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
     if(any(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
         ## Require however that all are defined!!!
         if(all(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
+            ## Fix eventually provided UCSC chromosome names:
+            chromosome <- ucscToEns(chromosome)
             ## Fetch all transcripts in that region:
             tids <- dbGetQuery(dbconn(x),
                                paste0("select distinct tx.tx_id from tx join gene on",
@@ -1038,8 +994,8 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
                                       "(tx_seq_start <=",start," and tx_seq_end >=",end,")",
                                       ")"))[, "tx_id"]
             if(length(tids) == 0)
-                stop(paste0("Did not find any transcript on chromosome from ", start, " to ",
-                            end, "!"))
+                stop(paste0("Did not find any transcript on chromosome ", chromosome,
+                            " from ", start, " to ", end, "!"))
             filter <- c(filter, TxidFilter(tids))
         }else{
             stop(paste0("Either all or none of arguments 'chromosome', 'start' and 'end' ",
@@ -1172,4 +1128,14 @@ setMethod("extractTranscriptSeqs", "ANY",
               Meth <- getMethod("extractTranscriptSeqs", signature="ANY", where="GenomicFeatures")
               return(Meth(x, transcripts))
           })
+
+## Simple helper function to set the @feature in GRangesFilter depending on the calling method.
+setFeatureInGRangesFilter <- function(x, feature){
+    for(i in seq(along.with=x)){
+        if(is(x[[i]], "GRangesFilter")){
+            x[[i]]@feature <- feature
+        }
+    }
+    return(x)
+}
 
