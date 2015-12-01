@@ -208,12 +208,15 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     tx <- as.data.frame(x[x$type == "transcript" , reqCols])[ , -c(1, 4, 5)]
     ## process the CDS features to get the cds start and end of the transcript.
     CDS <- as.data.frame(x[x$type == "CDS", "transcript_id"])
-    cdsStarts <- aggregate(CDS[, "start"], by=list(CDS$transcript_id), FUN=min, na.rm=TRUE)
-    cdsEnds <- aggregate(CDS[, "end"], by=list(CDS$transcript_id), FUN=max, na.rm=TRUE)
-    idx <- match(cdsStarts[, 1], tx$transcript_id)
+    ##
+    startByTx <- split(CDS$start, f=CDS$transcript_id)
+    cdsStarts <- unlist(lapply(startByTx, function(z){return(min(z, na.rm=TRUE))}))
+    endByTx <- split(CDS$end, f=CDS$transcript_id)
+    cdsEnds <- unlist(lapply(endByTx, function(z){return(max(z, na.rm=TRUE))}))
+    idx <- match(names(cdsStarts), tx$transcript_id)
     tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)), tx_cds_seq_end=rep(NA, nrow(tx)))
-    tx[idx, "tx_cds_seq_start"] <- cdsStarts[, 2]
-    tx[idx, "tx_cds_seq_end"] <- cdsEnds[, 2]
+    tx[idx, "tx_cds_seq_start"] <- cdsStarts
+    tx[idx, "tx_cds_seq_end"] <- cdsEnds
     colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id", "tx_biotype",
                       "tx_cds_seq_start", "tx_cds_seq_end")
     ## rearranging data.frame:
