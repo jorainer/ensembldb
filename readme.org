@@ -29,11 +29,10 @@
 # badges:
 [[http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html][http://www.bioconductor.org/shields/years-in-bioc/ensembldb.svg]]
 
-Stable version:
-[[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/release/bioc/ensembldb.svg]]
-
-Devel version:
-[[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg]]
+Build reports:
++ [[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/release/bioc/ensembldb.svg]] ... Bioconductor release.
++ [[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg]]
+  ... Bioconductor devel.
 
 * =ensembldb=: build and use Ensembl-based annotation packages
 
