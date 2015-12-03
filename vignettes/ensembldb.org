@@ -37,7 +37,7 @@ vignette: >
 #+BEGIN_HTML
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")[["Author"]] `<br />
-**Modified**: 27 November, 2015<br />
+**Modified**: 3 December, 2015<br />
 **Compiled**: `r date()`
 #+END_HTML
 
@@ -632,7 +632,7 @@ Ensembl version. We thus first query the =AnnotationHub= package for all
 resources available for =Mus musculus= and the Ensembl release 77. Next we load
 the =gtf= file for the transcript definitions and the =dna.toplevel.fa= file for
 the DNA sequence. From the =GRanges= object representing the =gtf= file we can
-build and load an =EnsDb=.  At last we retrieve the sequences of all exons using
+build and load an =EnsDb=. At last we retrieve the sequences of all exons using
 the =getSeq= method.
 
 #+BEGIN_SRC R :ravel eval=FALSE
@@ -672,10 +672,13 @@ information.
   Y
 
   DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
-                         organism="Homo_sapiens")
+			 organism="Homo_sapiens")
 
   edb <- EnsDb(DB)
   edb
+
+  ## As shown in the example below, we could make an EnsDb package on
+  ## this DB object using the makeEnsembldbPackage function.
 
 #+END_SRC
 
