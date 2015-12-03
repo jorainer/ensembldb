@@ -1,4 +1,3 @@
-
 ## x... optional, the database file name.
 ## v... verbosity
 ## function to load the database...
@@ -13,7 +12,8 @@ EnsDb <- function(x){
     ## read the columns for these tables.
     Tables <- vector(length=length(tables), "list")
     for(i in 1:length(Tables)){
-        Tables[[ i ]] <- colnames(dbGetQuery(con, paste0("select * from ", tables[ i ], " limit 1")))
+        Tables[[ i ]] <- colnames(dbGetQuery(con, paste0("select * from ",
+                                                         tables[ i ], " limit 1")))
     }
     names(Tables) <- tables
     EDB <- new("EnsDb", ensdb=con, tables=Tables)
@@ -260,73 +260,74 @@ addRequiredTables <- function(x, tab){
 }
 
 
-
-## the buildQuery function; basically create the SQL query.
-## x... EnsDb
-## columns... the columns to retrieve.
-## filter... list of filters
-.buildQueryOld <- function(x, columns, filter=list(), order.by="", order.type="asc", group.by, skip.order.check=FALSE){
-    resultcolumns <- columns    ## just to remember what we really want to give back
-    if(!missing(filter)){
-        if(class(filter)!="list")
-            stop("parameter filter has to be a list of BasicFilter classes!")
-    }
-    ## first checking the filters and eventually add required columns to the columns:
-    if(length(filter) > 0){
-        ## check filter!
-        ## add the columns needed for the filter
-        filtercolumns <- unlist(lapply(filter, column, x))   ## this returns
-        ## the full named columns!
-        filtercolumns <- sapply(filtercolumns, removePrefix, USE.NAMES=FALSE)
-        columns <- unique(c(columns, filtercolumns))
-        ## next we're building the where query.
-        wherequery <- paste(" where", paste(unlist(lapply(filter, where, x)),
-                                            collapse=" and "))
-    }else{
-        wherequery <- ""
-    }
-    ## should we do an order.by?
-    if(!missing(order.by) & order.by!=""){
-        ## if we have skip.order.check set we use the order.by as is.
-        if(!skip.order.check){
-            order.by <- unlist(strsplit(order.by, split=",", fixed=TRUE))
-            order.by <- gsub(order.by, pattern=" ", replacement="", fixed=TRUE)
-            ## allow only order.by that are also in the columns.
-            order.by.nocolumns <- order.by[ !(order.by %in% columns) ]
-            order.by <- order.by[ order.by %in% columns ]
-            if(length(order.by.nocolumns) > 0){
-                warning("columns provided in order.by (",
-                        paste(order.by.nocolumns, collapse=","),
-                        ") are not in columns and were thus removed." )
-            }
-            if(length(order.by)==0){
-                order.by <- ""
-            }else{
-                ## have to pre-pend the database table name...
-                order.by <- paste(unlist(prefixColumns(x=x, columns=order.by), use.names=FALSE), collapse=",")
-            }
-        }
-    }else{
-        order.by <- ""
-    }
-    ## OK, build that query.
-    if(order.by!=""){
-        orderquery <- paste(" order by", order.by, order.type)
-    }else{
-        orderquery <- ""
-    }
-    ## now build the join query that joins all required tables.
-    joinquery <- joinQueryOnColumns(x, columns=columns)
-    finalquery <- paste0("select distinct ",
-                         paste(unlist(prefixColumns(x, resultcolumns),
-                                      use.names=FALSE), collapse=","),
-                         " from ",
-                         joinquery,
-                         wherequery,
-                         orderquery
-                         )
-    return(finalquery)
-}
+##### REMOVEME!!!
+## ## the buildQuery function; basically create the SQL query.
+## ## x... EnsDb
+## ## columns... the columns to retrieve.
+## ## filter... list of filters
+## .buildQueryOld <- function(x, columns, filter=list(), order.by="", order.type="asc",
+##                            group.by, skip.order.check=FALSE){
+##     resultcolumns <- columns    ## just to remember what we really want to give back
+##     if(!missing(filter)){
+##         if(class(filter)!="list")
+##             stop("parameter filter has to be a list of BasicFilter classes!")
+##     }
+##     ## first checking the filters and eventually add required columns to the columns:
+##     if(length(filter) > 0){
+##         ## check filter!
+##         ## add the columns needed for the filter
+##         filtercolumns <- unlist(lapply(filter, column, x))   ## this returns
+##         ## the full named columns!
+##         filtercolumns <- sapply(filtercolumns, removePrefix, USE.NAMES=FALSE)
+##         columns <- unique(c(columns, filtercolumns))
+##         ## next we're building the where query.
+##         wherequery <- paste(" where", paste(unlist(lapply(filter, where, x)),
+##                                             collapse=" and "))
+##     }else{
+##         wherequery <- ""
+##     }
+##     ## should we do an order.by?
+##     if(!missing(order.by) & order.by!=""){
+##         ## if we have skip.order.check set we use the order.by as is.
+##         if(!skip.order.check){
+##             order.by <- unlist(strsplit(order.by, split=",", fixed=TRUE))
+##             order.by <- gsub(order.by, pattern=" ", replacement="", fixed=TRUE)
+##             ## allow only order.by that are also in the columns.
+##             order.by.nocolumns <- order.by[ !(order.by %in% columns) ]
+##             order.by <- order.by[ order.by %in% columns ]
+##             if(length(order.by.nocolumns) > 0){
+##                 warning("columns provided in order.by (",
+##                         paste(order.by.nocolumns, collapse=","),
+##                         ") are not in columns and were thus removed." )
+##             }
+##             if(length(order.by)==0){
+##                 order.by <- ""
+##             }else{
+##                 ## have to pre-pend the database table name...
+##                 order.by <- paste(unlist(prefixColumns(x=x, columns=order.by), use.names=FALSE), collapse=",")
+##             }
+##         }
+##     }else{
+##         order.by <- ""
+##     }
+##     ## OK, build that query.
+##     if(order.by!=""){
+##         orderquery <- paste(" order by", order.by, order.type)
+##     }else{
+##         orderquery <- ""
+##     }
+##     ## now build the join query that joins all required tables.
+##     joinquery <- joinQueryOnColumns(x, columns=columns)
+##     finalquery <- paste0("select distinct ",
+##                          paste(unlist(prefixColumns(x, resultcolumns),
+##                                       use.names=FALSE), collapse=","),
+##                          " from ",
+##                          joinquery,
+##                          wherequery,
+##                          orderquery
+##                          )
+##     return(finalquery)
+## }
 
 ## remove the prefix again...
 removePrefix <- function(x, split=".", fixed=TRUE){
@@ -363,118 +364,119 @@ removePrefix <- function(x, split=".", fixed=TRUE){
     return(Res)
 }
 
-## Fetch data to add as a GeneTrack.
-## filter ...                 Used to filter the result.
-## chromosome, start, end ... Either all or none has to be specified. If specified, the function
-##                            first retrieves all transcripts that have an exon in the specified
-##                            range and adds them as a TranscriptidFilter to the filters. The
-##                            query to fetch the "real" data is performed after.
-## featureIs ...              Wheter gene_biotype or tx_biotype should be mapped to the column
-##                            feature.
-getGeneTrackDfForGviz <- function(x, filter=list(), chromosome=NULL, start=NULL, end=NULL,
-                                  featureIs="gene_biotype"){
-    featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
-    if(any(!is.null(c(chromosome, start, end)))){
-        if(all(!is.null(c(chromosome, start, end)))){
-            ## Fetch all transcripts in that region:
-            tids <- dbGetQuery(dbconn(x),
-                               paste0("select distinct tx.tx_id from tx join gene on (tx.gene_id=gene.gene_id)",
-                                      " where seq_name='", chromosome, "' and (",
-                                      "(tx_seq_start >= ", start, " and tx_seq_start <= ", end, ") or ",
-                                      "(tx_seq_end >= ", start, " and tx_seq_end <= ", end, ") or ",
-                                      "(tx_seq_start <=", start, " and tx_seq_end >= ", end, ")",
-                                      ")"))[, "tx_id"]
-            if(length(tids) == 0)
-                stop(paste0("Did not find any transcript on chromosome from ", start, " to ",
-                            end, "!"))
-            filter <- c(filter, TxidFilter(tids))
-        }else{
-            stop(paste0("Either all or none of arguments 'chromosome', 'start' and 'end' ",
-                        " have to be specified!"))
-        }
-    }
-    ## Return a data.frame with columns: chromosome, start, end, width, strand, feature,
-    ## gene, exon, transcript and symbol.
-    ## 1) Query the data as we usually would.
-    ## 2) Perform an additional query to get cds and utr, remove all entries from the
-    ##    first result for the same transcripts and rbind the data.frames.
-    needCols <- c("seq_name", "exon_seq_start", "exon_seq_end", "seq_strand",
-                  "featureIs", "gene_id", "exon_id",
-                  "exon_idx", "tx_id", "gene_name")
-    ## That's the names to which we map the original columns from the EnsDb.
-    names(needCols) <- c("chromosome", "start", "end", "strand",
-                         "feature", "gene", "exon", "exon_rank", "transcript",
-                         "symbol")
-    txs <- transcripts(x, filter=filter,
-                       columns=needCols, return.type="data.frame")
-    ## Rename columns
-    idx <- match(needCols, colnames(txs))
-    notThere <- is.na(idx)
-    idx <- idx[!notThere]
-    colnames(txs)[idx] <- names(needCols)[!notThere]
-    ## now processing the 5utr
-    fUtr <- fiveUTRsByTranscript(x, filter=filter, columns=needCols)
-    if(length(fUtr) > 0){
-        fUtr <- as(unlist(fUtr, use.names=FALSE), "data.frame")
-        fUtr <- fUtr[, !(colnames(fUtr) %in% c("width", "seq_name", "exon_seq_start",
-                                               "exon_seq_end", "strand"))]
-        colnames(fUtr)[1] <- "chromosome"
-        idx <- match(needCols, colnames(fUtr))
-        notThere <- is.na(idx)
-        idx <- idx[!notThere]
-        colnames(fUtr)[idx] <- names(needCols)[!notThere]
-        ## Force being in the correct ordering:
-        fUtr <- fUtr[, names(needCols)]
-        fUtr$feature <- "utr5"
-        ## Remove transcripts from the txs data.frame
-        txs <- txs[!(txs$transcript %in% fUtr$transcript), , drop=FALSE]
-    }
-    tUtr <- threeUTRsByTranscript(x, filter=filter, columns=needCols)
-    if(length(tUtr) > 0){
-        tUtr <- as(unlist(tUtr, use.names=FALSE), "data.frame")
-        tUtr <- tUtr[, !(colnames(tUtr) %in% c("width", "seq_name", "exon_seq_start",
-                                               "exon_seq_end", "strand"))]
-        colnames(tUtr)[1] <- "chromosome"
-        idx <- match(needCols, colnames(tUtr))
-        notThere <- is.na(idx)
-        idx <- idx[!notThere]
-        colnames(tUtr)[idx] <- names(needCols)[!notThere]
-        ## Force being in the correct ordering:
-        tUtr <- tUtr[, names(needCols)]
-        tUtr$feature <- "utr3"
-        ## Remove transcripts from the txs data.frame
-        if(nrow(txs) > 0){
-            txs <- txs[!(txs$transcript %in% tUtr$transcript), , drop=FALSE]
-        }
-    }
-    cds <- cdsBy(x, filter=filter, columns=needCols)
-    if(length(cds) > 0){
-        cds <- as(unlist(cds, use.names=FALSE), "data.frame")
-        cds <- cds[, !(colnames(cds) %in% c("width", "seq_name", "exon_seq_start",
-                                            "exon_seq_end", "strand"))]
-        colnames(cds)[1] <- "chromosome"
-        idx <- match(needCols, colnames(cds))
-        notThere <- is.na(idx)
-        idx <- idx[!notThere]
-        colnames(cds)[idx] <- names(needCols)[!notThere]
-        ## Force being in the correct ordering:
-        cds <- cds[, names(needCols)]
-        ## Remove transcripts from the txs data.frame
-        if(nrow(txs) > 0){
-            txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
-        }
-    }
-    if(length(fUtr) > 0){
-        txs <- rbind(txs, fUtr)
-    }
-    if(length(tUtr) > 0){
-        txs <- rbind(txs, tUtr)
-    }
-    if(length(cds) > 0){
-        txs <- rbind(txs, cds)
-    }
-    return(txs)
-}
+###### REMOVEME!!!
+## ## Fetch data to add as a GeneTrack.
+## ## filter ...                 Used to filter the result.
+## ## chromosome, start, end ... Either all or none has to be specified. If specified, the function
+## ##                            first retrieves all transcripts that have an exon in the specified
+## ##                            range and adds them as a TranscriptidFilter to the filters. The
+## ##                            query to fetch the "real" data is performed after.
+## ## featureIs ...              Wheter gene_biotype or tx_biotype should be mapped to the column
+## ##                            feature.
+## getGeneTrackDfForGviz <- function(x, filter=list(), chromosome=NULL, start=NULL, end=NULL,
+##                                   featureIs="gene_biotype"){
+##     featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
+##     if(any(!is.null(c(chromosome, start, end)))){
+##         if(all(!is.null(c(chromosome, start, end)))){
+##             ## Fetch all transcripts in that region:
+##             tids <- dbGetQuery(dbconn(x),
+##                                paste0("select distinct tx.tx_id from tx join gene on (tx.gene_id=gene.gene_id)",
+##                                       " where seq_name='", chromosome, "' and (",
+##                                       "(tx_seq_start >= ", start, " and tx_seq_start <= ", end, ") or ",
+##                                       "(tx_seq_end >= ", start, " and tx_seq_end <= ", end, ") or ",
+##                                       "(tx_seq_start <=", start, " and tx_seq_end >= ", end, ")",
+##                                       ")"))[, "tx_id"]
+##             if(length(tids) == 0)
+##                 stop(paste0("Did not find any transcript on chromosome from ", start, " to ",
+##                             end, "!"))
+##             filter <- c(filter, TxidFilter(tids))
+##         }else{
+##             stop(paste0("Either all or none of arguments 'chromosome', 'start' and 'end' ",
+##                         " have to be specified!"))
+##         }
+##     }
+##     ## Return a data.frame with columns: chromosome, start, end, width, strand, feature,
+##     ## gene, exon, transcript and symbol.
+##     ## 1) Query the data as we usually would.
+##     ## 2) Perform an additional query to get cds and utr, remove all entries from the
+##     ##    first result for the same transcripts and rbind the data.frames.
+##     needCols <- c("seq_name", "exon_seq_start", "exon_seq_end", "seq_strand",
+##                   "featureIs", "gene_id", "exon_id",
+##                   "exon_idx", "tx_id", "gene_name")
+##     ## That's the names to which we map the original columns from the EnsDb.
+##     names(needCols) <- c("chromosome", "start", "end", "strand",
+##                          "feature", "gene", "exon", "exon_rank", "transcript",
+##                          "symbol")
+##     txs <- transcripts(x, filter=filter,
+##                        columns=needCols, return.type="data.frame")
+##     ## Rename columns
+##     idx <- match(needCols, colnames(txs))
+##     notThere <- is.na(idx)
+##     idx <- idx[!notThere]
+##     colnames(txs)[idx] <- names(needCols)[!notThere]
+##     ## now processing the 5utr
+##     fUtr <- fiveUTRsByTranscript(x, filter=filter, columns=needCols)
+##     if(length(fUtr) > 0){
+##         fUtr <- as(unlist(fUtr, use.names=FALSE), "data.frame")
+##         fUtr <- fUtr[, !(colnames(fUtr) %in% c("width", "seq_name", "exon_seq_start",
+##                                                "exon_seq_end", "strand"))]
+##         colnames(fUtr)[1] <- "chromosome"
+##         idx <- match(needCols, colnames(fUtr))
+##         notThere <- is.na(idx)
+##         idx <- idx[!notThere]
+##         colnames(fUtr)[idx] <- names(needCols)[!notThere]
+##         ## Force being in the correct ordering:
+##         fUtr <- fUtr[, names(needCols)]
+##         fUtr$feature <- "utr5"
+##         ## Remove transcripts from the txs data.frame
+##         txs <- txs[!(txs$transcript %in% fUtr$transcript), , drop=FALSE]
+##     }
+##     tUtr <- threeUTRsByTranscript(x, filter=filter, columns=needCols)
+##     if(length(tUtr) > 0){
+##         tUtr <- as(unlist(tUtr, use.names=FALSE), "data.frame")
+##         tUtr <- tUtr[, !(colnames(tUtr) %in% c("width", "seq_name", "exon_seq_start",
+##                                                "exon_seq_end", "strand"))]
+##         colnames(tUtr)[1] <- "chromosome"
+##         idx <- match(needCols, colnames(tUtr))
+##         notThere <- is.na(idx)
+##         idx <- idx[!notThere]
+##         colnames(tUtr)[idx] <- names(needCols)[!notThere]
+##         ## Force being in the correct ordering:
+##         tUtr <- tUtr[, names(needCols)]
+##         tUtr$feature <- "utr3"
+##         ## Remove transcripts from the txs data.frame
+##         if(nrow(txs) > 0){
+##             txs <- txs[!(txs$transcript %in% tUtr$transcript), , drop=FALSE]
+##         }
+##     }
+##     cds <- cdsBy(x, filter=filter, columns=needCols)
+##     if(length(cds) > 0){
+##         cds <- as(unlist(cds, use.names=FALSE), "data.frame")
+##         cds <- cds[, !(colnames(cds) %in% c("width", "seq_name", "exon_seq_start",
+##                                             "exon_seq_end", "strand"))]
+##         colnames(cds)[1] <- "chromosome"
+##         idx <- match(needCols, colnames(cds))
+##         notThere <- is.na(idx)
+##         idx <- idx[!notThere]
+##         colnames(cds)[idx] <- names(needCols)[!notThere]
+##         ## Force being in the correct ordering:
+##         cds <- cds[, names(needCols)]
+##         ## Remove transcripts from the txs data.frame
+##         if(nrow(txs) > 0){
+##             txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
+##         }
+##     }
+##     if(length(fUtr) > 0){
+##         txs <- rbind(txs, fUtr)
+##     }
+##     if(length(tUtr) > 0){
+##         txs <- rbind(txs, tUtr)
+##     }
+##     if(length(cds) > 0){
+##         txs <- rbind(txs, cds)
+##     }
+##     return(txs)
+## }
 
 
 ###==============================================================
