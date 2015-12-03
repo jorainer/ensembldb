@@ -11,11 +11,11 @@
 ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, verbose=FALSE){
     options(useFancyQuotes=FALSE)
     if(verbose)
-        cat("importing gtf file...")
+        cat("Importing gtf file...")
     wanted.features <- c("gene", "transcript", "exon", "CDS")
     GTF <- import(con=gtf, format="gtf", feature.type=wanted.features)
     if(verbose)
-        cat("done\n")
+        cat("OK\n")
     ## check what we've got...
     ## all wanted features?
     if(any(!(wanted.features %in% levels(GTF$type)))){
@@ -38,6 +38,8 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, v
     tmp <- tmp[grep(tmp, pattern="^#")]
     haveHeader <- FALSE
     if(length(tmp) > 0){
+        if(verbose)
+            cat("GTF file has a header.\n")
         tmp <- gsub(tmp, pattern="^#", replacement="")
         tmp <- gsub(tmp, pattern="^!", replacement="")
         Header <- do.call(rbind, strsplit(tmp, split=" ", fixed=TRUE))
@@ -60,27 +62,34 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version, v
     }
     if(is.na(as.numeric(ensemblVersion))){
         if(fromFile){
-            stop("The GTF file name is not as expected: <Organism>.<genome version>.<Ensembl version>.gtf!")
+            stop(paste0("The GTF file name is not as expected: <Organism>.",
+                        "<genome version>.<Ensembl version>.gtf!"))
         }
     }
     if(haveHeader){
         if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"]){
-            stop(paste0("The GTF file name is not as expected: <Organism>.<genome version>.<Ensembl version>.gtf!",
-                        " I've got genome version ", genomeVersion, " but in the header of the GTF file ",
-                        Header[Header[, "name"] == "genome-version", "value"], " is specified!"))
+            stop(paste0("The GTF file name is not as expected: <Organism>.",
+                        "<genome version>.<Ensembl version>.gtf!",
+                        " I've got genome version ", genomeVersion,
+                        " but in the header of the GTF file ",
+                        Header[Header[, "name"] == "genome-version", "value"],
+                        " is specified!"))
         }
     }
 
     ## here on -> call ensDbFromGRanges.
     dbname <- ensDbFromGRanges(GTF, outfile=outfile, path=path, organism=organism,
-                               genomeVersion=genomeVersion, version=ensemblVersion, verbose=verbose)
+                               genomeVersion=genomeVersion, version=ensemblVersion,
+                               verbose=verbose)
 
     gtfFilename <- unlist(strsplit(gtf, split=.Platform$file.sep))
     gtfFilename <- gtfFilename[length(gtfFilename)]
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname )
-    bla <- dbGetQuery(con, paste0("update metadata set value='", gtfFilename,"' where name='source_file';"))
+    bla <- dbGetQuery(con, paste0("update metadata set value='",
+                                  gtfFilename,
+                                  "' where name='source_file';"))
     dbDisconnect(con)
     return(dbname)
 }
@@ -118,7 +127,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
         if(!fetchSeqinfo){
             genomeVersion <- unique(genome(Seqinfo))
             if(is.na(genomeVersion) | length(genomeVersion) > 1){
-                stop("The genome version has to be specified as it can not be extracted from the seqinfo!")
+                stop(paste0("The genome version has to be specified as",
+                            " it can not be extracted from the seqinfo!"))
             }
         }else{
             stop("The genome version has to be specified!")
@@ -151,7 +161,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     ## ----------------------------
     ## metadata table:
     if(verbose){
-        cat("processing metadata...")
+        cat("Processing metadata...")
     }
     Metadata <- buildMetadata(organism, version, host="unknown",
                               sourceFile="GRanges object", genomeVersion=genomeVersion)
@@ -164,13 +174,14 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     ## we're lacking NCBI Entrezids and also the coord system, but these are not
     ## required columns anyway...
     if(verbose){
-        cat("processing genes...")
+        cat("Processing genes...")
     }
     ## want to have: gene_id, gene_name, entrezid, gene_biotype, gene_seq_start,
     ##               gene_seq_end, seq_name, seq_strand, seq_coord_system.
     reqCols <- c("gene_id", "gene_name", "gene_biotype")
     if(!any(reqCols %in% colnames(mcols(x))))
-        stop(paste0("One or more required fields are not defined in the submitted GRanges object! Need ",
+        stop(paste0("One or more required fields are not defined in the",
+                    " submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
                     paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
                     "."))
@@ -196,12 +207,13 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     ##
     ## process transcripts
     if(verbose)
-        cat("processing transcripts...")
+        cat("Processing transcripts...")
     ## want to have: tx_id, tx_biotype, tx_seq_start, tx_seq_end, tx_cds_seq_start,
     ##               tx_cds_seq_end, gene_id
     reqCols <- c("transcript_id", "gene_id", txBiotypeCol)
     if(!any(reqCols %in% colnames(mcols(x))))
-        stop(paste0("One or more required fields are not defined in the submitted GRanges object! Need ",
+        stop(paste0("One or more required fields are not defined in",
+                    " the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
                     paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
                     "."))
@@ -235,10 +247,11 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     ##
     ## process exons
     if(verbose)
-        cat("processing exons...")
+        cat("Processing exons...")
     reqCols <- c("exon_id", "transcript_id", "exon_number")
     if(!any(reqCols %in% colnames(mcols(x))))
-        stop(paste0("One or more required fields are not defined in the submitted GRanges object! Need ",
+        stop(paste0("One or more required fields are not defined in",
+                    " the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
                     paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
                     "."))
@@ -260,7 +273,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     ##
     ## process chromosomes
     if(verbose)
-        cat("processing chromosomes...")
+        cat("Processing chromosomes...")
     if(fetchSeqinfo){
         ## problem is I don't have these available...
         chroms <- data.frame(seq_name=unique(as.character(genes$seq_name)))
@@ -287,7 +300,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version,
     if(verbose)
         cat("OK\n")
     if(verbose)
-        cat("generating index...")
+        cat("Generating index...")
     ## generating all indices...
     dbGetQuery(con, "create index seq_name_idx on chromosome (seq_name);")
     dbGetQuery(con, "create index gene_id_idx on gene (gene_id);")
@@ -344,8 +357,10 @@ checkValidEnsDb <- function(x, verbose=FALSE){
                                    return(any(z != seq(1, length(z))))
                                }))
     if(any(Different)){
-        stop("Provided exon index in transcript does not match with ordering of the exons by chromosomal coordinates for",
-             sum(Different), "of the", length(Different), "transcripts encoded on the + strand!")
+        stop(paste0("Provided exon index in transcript does not match with ordering",
+                    " of the exons by chromosomal coordinates for",
+                    sum(Different), "of the", length(Different),
+                    "transcripts encoded on the + strand!"))
     }
     extmp <- ex[ex$seq_strand==-1, c("exon_idx", "tx_id", "exon_seq_end")]
     extmp <- extmp[order(extmp$exon_seq_end, decreasing=TRUE), ]
@@ -354,8 +369,10 @@ checkValidEnsDb <- function(x, verbose=FALSE){
                                    return(any(z != seq(1, length(z))))
                                }))
     if(any(Different)){
-        stop("Provided exon index in transcript does not match with ordering of the exons by chromosomal coordinates for",
-             sum(Different), "of the", length(Different), "transcripts encoded on the - strand!")
+        stop(paste0("Provided exon index in transcript does not match with ordering",
+                    " of the exons by chromosomal coordinates for",
+                    sum(Different), "of the", length(Different),
+                    "transcripts encoded on the - strand!"))
     }
     if(verbose)
         cat("OK\n")
@@ -368,7 +385,7 @@ tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames, verbose
     Dataset <- paste0(c(tolower(.abbrevOrganismName(organism)), "gene_ensembl"),
                       collapse="_")
     if(verbose)
-        cat("fetch seqlenghts from ensembl, dataset ", Dataset, " version ",
+        cat("Fetch seqlenghts from ensembl, dataset ", Dataset, " version ",
             ensemblVersion, "...")
     ## get it all from the ensemblgenomes.org host???
     tmp <- try(

@@ -6,6 +6,7 @@ library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
 test_check_SeqnameFilter <- function(){
+    Orig <- getOption("ucscChromosomeNames", FALSE)
     options(ucscChromosomeNames=TRUE)
     snf <- SeqnameFilter(c("chrX", "chr3"))
     checkEquals(value(snf), c("chrX", "chr3"))
@@ -34,9 +35,13 @@ test_check_SeqnameFilter <- function(){
     snf <- SeqnameFilter("chrM")
     checkEquals(where(snf, edb), "gene.seq_name = 'MT'")
 
+    options(ucscChromosomeNames=Orig)
 }
 
 test_check_retrieve_data <- function(){
+    Orig <- getOption("ucscChromosomeNames", FALSE)
+
+    options(ucscChromosomeNames=FALSE)
     genes <- genes(edb, filter=SeqnameFilter(c("21", "Y", "X")))
     checkEquals(all(seqlevels(genes) %in% c("21", "X", "Y")), TRUE)
     options(ucscChromosomeNames=TRUE)
@@ -51,6 +56,6 @@ test_check_retrieve_data <- function(){
     exons <- exons(edb, filter=SeqnameFilter("MT"))
     checkEquals(seqlevels(exons), "chrM")
 
-    ## Transcripts.
+    options(ucscChromosomeNames=Orig)
 }
 
