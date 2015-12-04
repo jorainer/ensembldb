@@ -27,14 +27,12 @@
 #+LATEX_HEADER: \makeatother
 
 # badges:
+
 [[http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html][http://www.bioconductor.org/shields/years-in-bioc/ensembldb.svg]]
-
-Build reports:
-+ [[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/release/bioc/ensembldb.svg]] ... Bioconductor release.
-+ [[http://bioconductor.org/checkResults/devel/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg]]
-  ... Bioconductor devel.
-+ [[https://travis-ci.org/jotsetung/ensembldb][https://travis-ci.org/jotsetung/ensembldb.svg?branch=master]] ... Travis CI.
-
+[[http://bioconductor.org/checkResults/release/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/release/bioc/ensembldb.svg]]
+[[http://bioconductor.org/checkResults/devel/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg]]
+[[https://travis-ci.org/jotsetung/ensembldb][https://travis-ci.org/jotsetung/ensembldb.svg?branch=master]]
+[[https://codecov.io/github/jotsetung/ensembldb?branch=master][https://codecov.io/github/jotsetung/ensembldb//coverage.svg?branch=master]]
 
 * =ensembldb=: build and use Ensembl-based annotation packages
 
