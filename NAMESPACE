@@ -3,7 +3,7 @@ import(BiocGenerics)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
 importFrom(Biobase, createPackage)
-importFrom(GenomeInfoDb, Seqinfo, isCircular, genome)
+importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels)
 importMethodsFrom(AnnotationDbi, dbconn)
 importFrom(rtracklayer, import)
 import(RSQLite)
@@ -19,6 +19,9 @@ importClassesFrom(Rsamtools, FaFile, RsamtoolsFile)
 importFrom(Rsamtools, FaFile)
 importMethodsFrom(Rsamtools, getSeq, indexFa, path)
 importFrom(Rsamtools, index)
+
+## biovizBase
+##importMethodsFrom(biovizBase, crunch)
 
 #exportPattern("^[[:alpha:]]+")
 export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
