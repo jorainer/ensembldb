@@ -913,3 +913,8 @@ to the chromosome names. That way, =EnsDb= databases could directly work with
 
 + =within=: _seq_start >= start & _seq_end <= end.
 + =overlapping=: _seq_start <= end & _seq_end >= start.
+** TODO Extend the =getGenomeFaFile= method
+
+Search for the genome release matching the current Ensembl release, if not
+present, search for a (Ensembl) =FaFile= matching the genome version and, if
+more available, select the one with the closest release date or version.
