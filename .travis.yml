@@ -29,5 +29,5 @@ notifications:
 
 env:
   global:
-    - BIOC_USE_DEVEL="TRUE"
+    - BIOC_USE_DEVEL="FALSE"
 
