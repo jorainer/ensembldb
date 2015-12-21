@@ -26,7 +26,9 @@
 	available in any of the locally installed \code{EnsDb} annotation packages.
 }
 \value{
-	Nothing is returned by the function.
+  If the button \emph{Return & close} is clicked, the function returns
+  the results of the present query either as \code{data.frame} or as
+  \code{GRanges} object.
 }
 \seealso{
   \code{\link{EnsDb}}, \code{\link{genes}}

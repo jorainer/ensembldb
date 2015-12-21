@@ -37,7 +37,7 @@ vignette: >
 #+BEGIN_HTML
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")[["Author"]] `<br />
-**Modified**: 3 December, 2015<br />
+**Modified**: 21 December, 2015<br />
 **Compiled**: `r date()`
 #+END_HTML
 
@@ -465,7 +465,8 @@ method.
 In addition to the =genes=, =transcripts= and =exons= methods it is possibly to
 search interactively for gene/transcript/exon annotations using the internal,
 =shiny= based, web application. The application can be started with the
-=runEnsDbApp()= function.
+=runEnsDbApp()= function. The search results from this app can also be returned
+to the R workspace either as a =data.frame= or =GRanges= object.
 
 
 * Plotting gene/transcript features using =ensembldb= and =Gviz=
@@ -918,3 +919,8 @@ to the chromosome names. That way, =EnsDb= databases could directly work with
 Search for the genome release matching the current Ensembl release, if not
 present, search for a (Ensembl) =FaFile= matching the genome version and, if
 more available, select the one with the closest release date or version.
+
+** TODO Interface to the =OrganismDbi= database.
+** DONE Enhance the shiny app to return the search result.
+   CLOSED: [2015-12-21 Mon 14:52]
+   - State "DONE"       from "TODO"       [2015-12-21 Mon 14:52]
