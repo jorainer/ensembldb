@@ -14,7 +14,7 @@ vignette: >
 
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")[["Author"]] `<br />
-**Modified**: 3 December, 2015<br />
+**Modified**: 21 December, 2015<br />
 **Compiled**: `r date()`
 
 # Introduction
@@ -401,7 +401,8 @@ txSeqs <- lapply(txExons[1:10], function(x){unlist(getSeq(Dna, x))})
 In addition to the `genes`, `transcripts` and `exons` methods it is possibly to
 search interactively for gene/transcript/exon annotations using the internal,
 `shiny` based, web application. The application can be started with the
-`runEnsDbApp()` function.
+`runEnsDbApp()` function. The search results from this app can also be returned
+to the R workspace either as a `data.frame` or `GRanges` object.
 
 # Plotting gene/transcript features using `ensembldb` and `Gviz`
 
