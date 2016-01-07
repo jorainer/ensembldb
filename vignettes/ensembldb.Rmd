@@ -30,7 +30,7 @@ region or transcript models of lincRNA genes.  In the databases, along with the
 gene and transcript models and their chromosomal coordinates, additional
 annotations including the gene name (symbol) and NCBI Entrezgene identifiers as
 well as the gene and transcript biotypes are stored too (see Section
-[9](#orgtarget1) for the database layout and an overview of available
+[10](#orgtarget1) for the database layout and an overview of available
 attributes/columns).
 
 Another main goal of this package is to generate *versioned* annotation
@@ -75,20 +75,20 @@ alphabetical order):
 -   `GeneidFilter`: allows to filter based on the Ensembl gene IDs.
 -   `GenenameFilter`: allows to filter based on the names (symbols) of the genes.
 -   `GRangesFilter`: allows to retrieve all features (genes, transcripts or exons)
-    that are either within (setting `condition = "within"`) or partially
-    overlapping (`condition = "overlapping"`) the defined genomic
-    region/range. Note that, depending on the called method (`genes`,
+    that are either within (setting =condition = "within"=) or partially
+    overlapping (`condition = "overlapping"=) the defined genomic
+      region/range. Note that, depending on the called method (=genes`,
     `transcripts` or `exons`) the start and end coordinates of either the genes,
     transcripts or exons are used for the filter. For methods `exonsBy`, `cdsBy`
     and `txBy` the coordinates of `by` are used.
 -   `SeqendFilter`: filter based on the chromosomal end coordinate of the exons,
-    transcripts or genes (correspondingly set `feature = "exon"`, `feature = "tx"` or
-    `feature = "gene"`).
+    transcripts or genes (correspondingly set =feature = "exon"=, =feature = "tx"= or
+    =feature = "gene"=).
 -   `SeqnameFilter`: filter by the name of the chromosomes the genes are encoded
     on.
 -   `SeqstartFilter`: filter based on the chromosomal start coordinates of the
-    exons, transcripts or genes (correspondingly set `feature = "exon"`,
-    `feature = "tx"` or `feature = "gene"`).
+    exons, transcripts or genes (correspondingly set =feature = "exon"=,
+    =feature = "tx"= or =feature = "gene"=).
 -   `SeqstrandFilter`: filter for the chromosome strand on which the genes are
     encoded.
 -   `TxbiotypeFilter`: filter on the transcript biotype defined in Ensembl; use
@@ -99,13 +99,13 @@ Each of the filter classes can take a single value or a vector of values (with
 the exception of the `SeqendFilter` and `SeqstartFilter`) for comparison. In
 addition, it is possible to specify the *condition* for the filter,
 e.g. setting `condition` to = to retrieve all entries matching the filter value,
-to != to negate the filter or setting `condition = "like"` to allow
-partial matching. The `condition` parameter for `SeqendFilter` and
+to != to negate the filter or setting `condition = "like"= to allow
+partial matching. The =condition` parameter for `SeqendFilter` and
 `SeqendFilter` can take the values = , >, >=, < and <= (since these
 filters base on numeric values).
 
 The `SeqnameFilter` and `GRangesFilter` support both UCSC and Ensembl chromosome
-names (e.g. `"chrX"` for UCSC and `"X"` for Ensembl), internally, UCSC
+names (e.g. ="chrX"= for UCSC and ="X"= for Ensembl), internally, UCSC
 chromosome names are mapped to Ensembl names. By default, all functions to
 retrieve data from the database return Ensembl chromosome names, but by setting
 the global option `ucscChromosomeNames` to `TRUE`
@@ -113,12 +113,12 @@ the global option `ucscChromosomeNames` to `TRUE`
 UCSC format.
 
 A simple example would be to get all transcripts for the gene *BCL2L11*. To this
-end we specify a `GenenameFilter` with the value `"BCL2L11"`. As a result we get
-a `GRanges` object with `start`, `end`, `strand` and `seqname` of the `GRanges`
+end we specify a `GenenameFilter` with the value ="BCL2L11"`. As a result we get
+a =GRanges` object with `start`, `end`, `strand` and `seqname` of the `GRanges`
 object being the start coordinate, end coordinate, chromosome name and strand
 for the respective transcripts. All additional annotations are available as
-metadata columns. Alternatively, by setting `return.type = "DataFrame"`, or
-`return.type`"data.frame"= the method would return a `DataFrame` object or
+metadata columns. Alternatively, by setting `return.type = "DataFrame"=, or
+=return.type`"data.frame"= the method would return a `DataFrame` object or
 `data.frame`.
 
 ```{r }
@@ -227,7 +227,7 @@ listTxbiotypes(edb)
 
 Data can be fetched in an analogous way using the `exons` and `genes`
 methods. In the example below we retrieve `gene_name`, `entrezid` and the
-`gene_biotype` of all genes in the database which names start with `"BCL2"`.
+`gene_biotype` of all genes in the database which names start with ="BCL2"=.
 
 ```{r }
 ## We're going to fetch all genes which names start with BCL. To this end
@@ -272,8 +272,8 @@ to be known. To extract these from an Ensembl based annotation package, the
 `exonsBy`, `genesBy` and `transcriptsBy` methods can be used in an analogous way
 as in `TxDb` packages generated by the `GenomicFeatures` package.  However, the
 `transcriptsBy` method does not, in contrast to the method in the
-`GenomicFeatures` package, allow to return transcripts by `"cds"`. While the
-annotation packages built by the `ensembldb` contain the chromosomal start and
+`GenomicFeatures` package, allow to return transcripts by ="cds"`. While the
+annotation packages built by the =ensembldb` contain the chromosomal start and
 end coordinates of the coding region (for protein coding genes) they do not
 assign an ID to each CDS.
 
@@ -460,6 +460,81 @@ plotTracks(list(gat, GeneRegionTrack(protCod, name="protein coding"),
 		GeneRegionTrack(lincs, name="lincs")), transcriptAnnotation="symbol")
 ```
 
+# Using `EnsDb` objects in the `AnnotationDbi` framework
+
+Most of the methods defined for objects extending the basic annotation package
+class `AnnotationDbi` are also defined for `EnsDb` objects (i.e. methods
+`columns`, `keytypes`, `keys`, `mapIds` and `select`). While these methods can
+be used analogously to basic annotation packages, the implementation for `EnsDb`
+objects also support the filtering framework of the `ensembldb` package.
+
+In the example below we first evaluate all the available columns and keytypes in
+the database and extract then the gene names for all genes encoded on chromosome
+X.
+
+```{r }
+library(EnsDb.Hsapiens.v75)
+edb <- EnsDb.Hsapiens.v75
+
+## List all available columns in the database.
+columns(edb)
+
+## Note that these do *not* correspond to the actual column names
+## of the database that can be passed to methods like exons, genes,
+## transcripts etc. These column names can be listed with the listColumns
+## method.
+listColumns(edb)
+
+## List all of the supported key types.
+keytypes(edb)
+
+## Get all gene ids from the database.
+gids <- keys(edb, keytype="GENEID")
+length(gids)
+
+## Get all gene names for genes encoded on chromosome Y.
+gnames <- keys(edb, keytype="GENENAME", filter=SeqnameFilter("Y"))
+head(gnames)
+```
+
+In the next example we retrieve specific information from the database using the
+`select` method. First we fetch all transcripts for the genes *BCL2* and
+*BCL2L11*. In the first call we provide the gene names, while in the second call
+we employ the filtering system to perform a more fine-grained query to fetch
+only the protein coding transcripts for these genes.
+
+```{r warning=FALSE}
+## Use the /standard/ way to fetch data.
+select(edb, keys=c("BCL2", "BCL2L11"), keytype="GENENAME",
+       columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
+
+## Use the filtering system of ensembldb
+select(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
+		      TxbiotypeFilter("protein_coding")),
+       columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
+```
+
+Finally, we use the `mapIds` method to establish a mapping between ids and
+values. In the example below we fetch transcript ids for the two genes from the
+example above.
+
+```{r }
+## Use the default method, which just returns the first value for multi mappings.
+mapIds(edb, keys=c("BCL2", "BCL2L11"), column="TXID", keytype="GENENAME")
+
+## Alternatively, specify multiVals="list" to return all mappings.
+mapIds(edb, keys=c("BCL2", "BCL2L11"), column="TXID", keytype="GENENAME",
+       multiVals="list")
+
+## And, just like before, we can use filters to map only to protein coding transcripts.
+mapIds(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
+		      TxbiotypeFilter("protein_coding")), column="TXID",
+       multiVals="list")
+```
+
+Note that, if the filters are used, the ordering of the result does no longer
+match the ordering of the genes.
+
 # Important notes
 
 These notes might explain eventually unexpected results (and, more importantly,
@@ -528,8 +603,8 @@ calling `edb <- EnsDb(DBFile)` and work with that annotation object.
 
 To fetch and build annotation packages for plant genomes (e.g. arabidopsis
 thaliana), the *Ensembl genomes* should be specified as a host, i.e. setting
-`host` to `"mysql-eg-publicsql.ebi.ac.uk"`, `port` to `4157` and `species` to
-e.g. `"arabidopsis thaliana"`.
+`host` to ="mysql-eg-publicsql.ebi.ac.uk"=, `port` to `4157` and `species` to
+e.g. ="arabidopsis thaliana"=.
 
 In the next example we create an `EnsDb` database using the `AnnotationHub`
 package and load also the corresponding genomic DNA sequence matching the
@@ -618,7 +693,7 @@ makeEnsembldbPackage(ensdb=DB, version="0.99.12",
 # Database layout<a id="orgtarget1"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [93](#orgparagraph1)):
+shown in Figure [98](#orgparagraph1)):
 
 -   **gene**: all gene specific annotations.
     -   `gene_id`: the Ensembl ID of the gene.
