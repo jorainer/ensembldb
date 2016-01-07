@@ -4,7 +4,7 @@ import(S4Vectors)
 importFrom(DBI, dbDriver)
 importFrom(Biobase, createPackage)
 importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels)
-importMethodsFrom(AnnotationDbi, dbconn)
+importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
 importFrom(rtracklayer, import)
 import(RSQLite)
 import(GenomicFeatures)
@@ -30,13 +30,16 @@ exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilte
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
               SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter)
 ## for EnsFilter
-exportMethods(column, print, show, value, where)
+exportMethods(column, print, show, value, where, "condition<-", "value<-")
 ## for class EnsDb:
 exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, genes,
               getGenomeFaFile, lengthOf, listColumns, listGenebiotypes, listTxbiotypes,
               listTables, organism, seqinfo, toSAF, transcripts, transcriptsBy,
               disjointExons, metadata, promoters, cdsBy, fiveUTRsByTranscript,
               threeUTRsByTranscript, getGeneRegionTrackForGviz)
+## Methods for AnnotationDbi
+exportMethods(columns, keytypes, keys, select, mapIds)
+
 ## constructors
 export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
        TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,

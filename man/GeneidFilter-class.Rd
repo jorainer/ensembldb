@@ -90,6 +90,8 @@
 \alias{where,GRangesFilter,EnsDb,character-method}
 %
 \alias{condition,BasicFilter-method}
+\alias{condition<-,BasicFilter-method}
+\alias{condition<-}
 \alias{condition,GRangesFilter-method}
 \alias{show,BasicFilter-method}
 \alias{show,GRangesFilter-method}
@@ -101,6 +103,8 @@
 \alias{where,list,EnsDb,missing-method}
 \alias{where,list,missing,missing-method}
 \alias{value,BasicFilter,missing-method}
+\alias{value<-}
+\alias{value<-,BasicFilter-method}
 \alias{value,BasicFilter,EnsDb-method}
 \alias{value,GRangesFilter,missing-method}
 \alias{value,GRangesFilter,EnsDb-method}
@@ -180,8 +184,16 @@
       the value for the \code{condition} slot.
     }
 
+    \item{condition<-}{
+      setter method for condition.
+    }
+
     \item{value}{\code{signature(x="BasicFilter", db="EnsDb")}:
       returns the value of the \code{value} slot of the filter object.
+    }
+
+    \item{value<-}{
+      setter method for value.
     }
 
     \item{where}{\code{signature(object = "GeneidFilter", db="EnsDb",

@@ -552,6 +552,81 @@ different gene region tracks, one for protein coding genes and one for lincRNAs.
 
 
 
+* Using =EnsDb= objects in the =AnnotationDbi= framework
+
+Most of the methods defined for objects extending the basic annotation package
+class =AnnotationDbi= are also defined for =EnsDb= objects (i.e. methods
+=columns=, =keytypes=, =keys=, =mapIds= and =select=). While these methods can
+be used analogously to basic annotation packages, the implementation for =EnsDb=
+objects also support the filtering framework of the =ensembldb= package.
+
+In the example below we first evaluate all the available columns and keytypes in
+the database and extract then the gene names for all genes encoded on chromosome
+X.
+
+#+BEGIN_SRC R
+  library(EnsDb.Hsapiens.v75)
+  edb <- EnsDb.Hsapiens.v75
+
+  ## List all available columns in the database.
+  columns(edb)
+
+  ## Note that these do *not* correspond to the actual column names
+  ## of the database that can be passed to methods like exons, genes,
+  ## transcripts etc. These column names can be listed with the listColumns
+  ## method.
+  listColumns(edb)
+
+  ## List all of the supported key types.
+  keytypes(edb)
+
+  ## Get all gene ids from the database.
+  gids <- keys(edb, keytype="GENEID")
+  length(gids)
+
+  ## Get all gene names for genes encoded on chromosome Y.
+  gnames <- keys(edb, keytype="GENENAME", filter=SeqnameFilter("Y"))
+  head(gnames)
+#+END_SRC
+
+In the next example we retrieve specific information from the database using the
+=select= method. First we fetch all transcripts for the genes /BCL2/ and
+/BCL2L11/. In the first call we provide the gene names, while in the second call
+we employ the filtering system to perform a more fine-grained query to fetch
+only the protein coding transcripts for these genes.
+
+#+BEGIN_SRC R :ravel warning=FALSE
+  ## Use the /standard/ way to fetch data.
+  select(edb, keys=c("BCL2", "BCL2L11"), keytype="GENENAME",
+         columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
+
+  ## Use the filtering system of ensembldb
+  select(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
+                        TxbiotypeFilter("protein_coding")),
+         columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
+#+END_SRC
+
+Finally, we use the =mapIds= method to establish a mapping between ids and
+values. In the example below we fetch transcript ids for the two genes from the
+example above.
+
+#+BEGIN_SRC R
+  ## Use the default method, which just returns the first value for multi mappings.
+  mapIds(edb, keys=c("BCL2", "BCL2L11"), column="TXID", keytype="GENENAME")
+
+  ## Alternatively, specify multiVals="list" to return all mappings.
+  mapIds(edb, keys=c("BCL2", "BCL2L11"), column="TXID", keytype="GENENAME",
+         multiVals="list")
+
+  ## And, just like before, we can use filters to map only to protein coding transcripts.
+  mapIds(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
+                        TxbiotypeFilter("protein_coding")), column="TXID",
+         multiVals="list")
+#+END_SRC
+
+Note that, if the filters are used, the ordering of the result does no longer
+match the ordering of the genes.
+
 * Important notes
 
 These notes might explain eventually unexpected results (and, more importantly,
@@ -920,7 +995,42 @@ Search for the genome release matching the current Ensembl release, if not
 present, search for a (Ensembl) =FaFile= matching the genome version and, if
 more available, select the one with the closest release date or version.
 
-** TODO Interface to the =OrganismDbi= database.
+** TODO Implement some more =GenomicFeatures= methods [/]
+
++ [ ] =transcriptLenghts=: use the =lengthOf= method.
++ [ ] =transcriptsByOverlaps=.
++ [ ] =exonsByOverlaps=.
++ [ ] =cds=.
++ [ ] =distance=, =nearest=.
+
+** TODO Interface to the =OrganismDbi= database [/].
+
+Basically, implementing the =AnnotationDbi= methods =columns=, =select=, =keys=
+and =keytypes= methods should already be enough, but in addition I could
+implement the two additional methods below... eventually.
+
++ [ ] Implement =selectByRanges(x, ranges, columns, overlaps, ignore.strand)=:
+  supports multiple ranges. This returns a =GRanges= with one or more element(s)
+  per input range or nothing, if nothing overlapped that region. =overlaps= can
+  be =gene, tx, exons, cds, 5utr, introns or 3utr=.
+
++ [ ] Implement =selectRangesById=.
+
+** DONE Interface the =AnnotationDbi= database [6/6]
+   CLOSED: [2015-12-23 Wed 22:29]
+   - State "DONE"       from "TODO"       [2015-12-23 Wed 22:29]
+Implement the following methods:
++ [X] =columns=.
++ [X] =keytypes=.
++ [X] =keys=.
++ [X] =select=: I want to add a little more flexibility here: allow to specify,
+  in addition to the standard usage of keys, keytypes etc, filter object(s) to
+  perform some more fine-grained queries.
++ [X] =mapIds=.
+
++ [X] Add a section to the vignette.
+
+
 ** DONE Enhance the shiny app to return the search result.
    CLOSED: [2015-12-21 Mon 14:52]
    - State "DONE"       from "TODO"       [2015-12-21 Mon 14:52]

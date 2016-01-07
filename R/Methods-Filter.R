@@ -7,12 +7,14 @@ validateConditionFilter <- function(object){
     if(object@.valueIsCharacter){
         ## condition has to be either = or in
         if(!any(c("=", "in", "not in", "like", "!=")==object@condition)){
-            return(paste("only \"=\", \"!=\", \"in\" , \"not in\" and \"like\" allowed for condition, I've got", object@condition))
+            return(paste("only \"=\", \"!=\", \"in\" , \"not in\" and \"like\" allowed for condition",
+                         ", I've got", object@condition))
         }
     }else{
         ## condition has to be = < > >= <=
-        if(!any(c("=", ">", "<", ">=", "<=")==object@condition)){
-            return(paste("only \"=\", \">\", \"<\", \">=\" and \"<=\" are allowed for condition, I've got", object@condition))
+        if(!any(c("=", ">", "<", ">=", "<=", "in", "not in")==object@condition)){
+            return(paste("only \"=\", \">\", \"<\", \">=\", \"<=\" , \"in\" and \"not in\"",
+                         " are allowed for condition, I've got", object@condition))
         }
     }
     if(length(object@value) > 1){
@@ -90,6 +92,32 @@ setMethod("condition", "BasicFilter", function(x, ...){
         return(x@condition)
     }
 })
+setReplaceMethod("condition", "BasicFilter", function(x, value){
+    if(x@.valueIsCharacter){
+        allowed <- c("=", "!=", "in", "not in", "like")
+        if(!any(allowed == value)){
+            stop("Only ", paste(allowed, collapse=", "), " are allowed if the value from",
+                 " the filter is of type character!")
+        }
+        if(value == "=" & length(x@value) > 1)
+            value <- "in"
+        if(value == "!=" & length(x@value) > 1)
+            value <- "not in"
+        if(value == "in" & length(x@value) == 1)
+            value <- "="
+        if(value == "not in" & length(x@value) == 1)
+            value <- "!="
+    }else{
+        allowed <- c("=", ">", "<", ">=", "<=")
+        if(!any(allowed == value)){
+            stop("Only ", paste(allowed, collapse=", "), " are allowed if the value from",
+                 " the filter is numeric!")
+        }
+    }
+    x@condition <- value
+    validObject(x)
+    return(x)
+})
 setMethod("value", signature(x="BasicFilter", db="missing"),
           function(x, db, ...){
               return(x@value)
@@ -98,7 +126,29 @@ setMethod("value", signature(x="BasicFilter", db="EnsDb"),
           function(x, db, ...){
               return(x@value)
           })
-
+setReplaceMethod("value", "BasicFilter", function(x, value){
+    if(is.numeric(value)){
+        x@.valueIsCharacter <- FALSE
+    }else{
+        x@.valueIsCharacter <- TRUE
+    }
+    x@value <- as.character(value)
+    ## Checking if condition matches the value.
+    if(length(value) > 1){
+        if(x@condition == "=")
+            x@condition <- "in"
+        if(x@condition == "!=")
+            x@condition <- "not in"
+    }else{
+        if(x@condition == "in")
+            x@condition <- "="
+        if(x@condition == "not in")
+            x@condition <- "!="
+    }
+    ## Test validity
+    validObject(x)
+    return(x)
+})
 ## setMethod("requireTable", "EnsFilter", function(object, ...){
 ##     return(object@required.table)
 ## })
