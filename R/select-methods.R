@@ -174,6 +174,9 @@ setMethod("select", "EnsDb",
             keyFilter <- filterForKeytype(keytype)
             value(keyFilter) <- keys
             keys <- list(keyFilter)
+            ## Add also the keytype itself to the columns.
+            if(!any(columns == keytype))
+                columns <- c(keytype, columns)
         }
     }
     ## Map the columns to column names we have in the database.
