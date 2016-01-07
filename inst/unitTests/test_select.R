@@ -75,7 +75,7 @@ test_select <- function(){
     checkEquals(unique(Test[, c("GENEID", "GENENAME", "SEQNAME")]), Test3)
     ## Provide keys.
     Test4 <- select(edb, keys="BCL2", keytype="GENENAME")
-    checkEquals(Test, Test4)
+    checkEquals(Test[, colnames(Test4)], Test4)
     txs <- keys(edb, "TXID")
     ## Just get stuff from the tx table; should be faster.
     system.time(
@@ -87,12 +87,12 @@ test_select <- function(){
                    keytype="GENEBIOTYPE")
     Test2 <- select(edb, keys=GenebiotypeFilter("lincRNA"),
                     columns=c("GENEID", "GENEBIOTYPE", "GENENAME"))
-    checkEquals(Test, Test2)
+    checkEquals(Test[, colnames(Test2)], Test2)
     ## All on chromosome 21
     Test <- select(edb, keys="21", columns=c("GENEID", "GENEBIOTYPE", "GENENAME"),
                    keytype="SEQNAME")
     Test2 <- select(edb, keys=SeqnameFilter("21"), columns=c("GENEID", "GENEBIOTYPE", "GENENAME"))
-    checkEquals(Test, Test2)
+    checkEquals(Test[, colnames(Test2)], Test2)
     ## What if we can't find it?
     Test <- select(edb, keys="bla", columns=c("GENEID", "GENENAME"), keytype="GENENAME")
     ## Run the full thing.
@@ -139,7 +139,7 @@ test_mapIds <- function(){
     ## Submit Filter:
     Test <- mapIds(edb, keys=SeqnameFilter("Y"), column="GENEID", multiVals="list")
     TestS <- select(edb, keys=Test[[1]], columns="SEQNAME", keytype="GENEID")
-    checkEquals(unique(TestS), "Y")
+    checkEquals(unique(TestS$SEQNAME), "Y")
     ## Submit 2 filter.
     Test <- mapIds(edb, keys=list(SeqnameFilter("Y"), SeqstrandFilter("-")), multiVals="list",
                    column="GENEID")
