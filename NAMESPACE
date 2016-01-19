@@ -3,11 +3,13 @@ import(BiocGenerics)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
 importFrom(Biobase, createPackage)
-importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels)
+importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels,
+           keepSeqlevels)
 importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
 importFrom(rtracklayer, import)
 import(RSQLite)
 import(GenomicFeatures)
+importMethodsFrom(GenomicFeatures, extractTranscriptSeqs)
 import(GenomicRanges)
 importFrom(IRanges, IRanges)
 ## AnnotationHub
@@ -25,7 +27,7 @@ importFrom(Rsamtools, index)
 
 #exportPattern("^[[:alpha:]]+")
 export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
-       ensDbFromGtf, ensDbFromGRanges, runEnsDbApp)
+       ensDbFromGtf, ensDbFromGff, ensDbFromGRanges, ensDbFromAH, runEnsDbApp)
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
               SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter)
