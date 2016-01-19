@@ -13,8 +13,8 @@ vignette: >
 ---
 
 **Package**: `r Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")[["Author"]] `<br />
-**Modified**: 21 December, 2015<br />
+**Authors**: `r packageDescription("ensembldb")$Author`<br />
+**Modified**: 18 January, 2016<br />
 **Compiled**: `r date()`
 
 # Introduction
@@ -342,14 +342,16 @@ basic workflow is thus identical to the one for `TxDb` packages, however, it is
 not straight forward to identify the BSgenome package with the matching genomic
 sequence. Most BSgenome packages are named according to the genome build
 identifier used in UCSC which does not (always) match the genome build name used
-by Ensembl.  Using the Ensembl version provided by the `EnsDb`, the correct
+by Ensembl. Using the Ensembl version provided by the `EnsDb`, the correct
 genomic sequence can however be retrieved easily from the `AnnotationHub` using
-the `getGenomeFaFile`.
+the `getGenomeFaFile`. If no Fasta file matching the Ensembl version is
+available, the function tries to identify a Fasta file with the correct genome
+build from the *closest* Ensembl release and returns that instead.
 
 In the code block below we retrieve first the `FaFile` with the genomic DNA
 sequence, extract the genomic start and end coordinates for all genes defined in
 the package, subset to genes encoded on sequences available in the `FaFile` and
-extract all of their sequences.  Note: these sequences represent the sequence
+extract all of their sequences. Note: these sequences represent the sequence
 between the chromosomal start and end coordinates of the gene.
 
 ```{r eval=FALSE}
@@ -372,28 +374,34 @@ genes <- genes[seqnames(genes) %in% seqnames(seqinfo(Dna))]
 geneSeqs <- getSeq(Dna, genes)
 ```
 
-To retrieve the (exonic) sequence of transcripts (i.e. without introns) we can
-use directly the `extractTranscriptSeqs` method on the `EnsDb` object,
-eventually using a filter to restrict the query. Alternatively, we could extract
-the `GRanges` representing the exons of each transcript and use the `getSeq`
-method.
+To retrieve the (exonic) sequence of transcripts (i.e. without introns) we first
+fetch all exons by transcript and use the `extractTranscriptSeqs` method from
+the `GenomicRanges` package to extract the sequences from the genomic `FaFile`
+fetched above.
 
 ```{r eval=FALSE}
-## Extract the transcript sequences of all transcripts defined by Ensembl.
-txSeqs <- extractTranscriptSeqs(Dna, edb)
+## get all exons of all transcripts encoded on chromosome Y
+yTx <- exonsBy(edb, filter=SeqnameFilter("Y"))
 
+## Retrieve the sequences for these transcripts from the FaFile.
+library(GenomicFeatures)
+yTxSeqs <- extractTranscriptSeqs(Dna, yTx)
+yTxSeqs
 
-## Alternatively, use filters to restrict the search.
-yTx <- extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
+## ## Extract the transcript sequences of all transcripts defined by Ensembl.
+## txSeqs <- extractTranscriptSeqs(Dna, edb)
 
-## Or extract first the exons by transcript and use the getSeq method.
-## We're getting all exons by transcript for all genes defined by Ensembl. This
-## excludes eventual "LRG" genes, that might be encoded on a sequence for which
-## we don't have a DNA sequence.
-txExons <- exonsBy(edb, "tx", filter=GeneidFilter("ENS%", condition="like"))
+## ## Alternatively, use filters to restrict the search.
+## yTx <- extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
 
-## Extract the sequences of the first 10
-txSeqs <- lapply(txExons[1:10], function(x){unlist(getSeq(Dna, x))})
+## ## Or extract first the exons by transcript and use the getSeq method.
+## ## We're getting all exons by transcript for all genes defined by Ensembl. This
+## ## excludes eventual "LRG" genes, that might be encoded on a sequence for which
+## ## we don't have a DNA sequence.
+## txExons <- exonsBy(edb, "tx", filter=GeneidFilter("ENS%", condition="like"))
+
+## ## Extract the sequences of the first 10
+## txSeqs <- lapply(txExons[1:10], function(x){unlist(getSeq(Dna, x))})
 ```
 
 # Interactive annotation lookup using the `shiny` web app
@@ -547,13 +555,16 @@ help avoiding them):
 
 -   Results of `exonsBy`, `transcriptsBy` are always ordered by the `by` argument.
 
+-   The CDS provided by `EnsDb` objects **always** includes both, the start and the
+    stop codon.
+
 # Building an transcript centric database package based on Ensembl annotation
 
 The code in this section is not supposed to be automatically executed when the
 vignette is built, as this would require a working installation of the Ensembl
-Perl API, which is not expected to be available on each system. Also, fetching
-data from the Ensembl database takes quite some time, thus, in this section only
-the code is displayed, but not executed.
+Perl API, which is not expected to be available on each system. Also, building
+\code{EnsDb} from alternative sources, like GFF or GTF files takes some time and
+thus also these examples are not directly executed when the vignette is build.
 
 ## Requirements
 
@@ -562,10 +573,12 @@ to retrieve the required annotations from an Ensembl database (e.g. from the
 main site *ensembldb.ensembl.org*). Thus, to use the functionality to built
 databases, the Ensembl Perl API needs to be installed (see <sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup> for details).
 
-Alternatively, the `ensDbFromGRanges` and `ensDbFromGtf` functions allow to
-build EnsDb SQLite files from a `GRanges` object or an Ensembl GTF file and thus
-doesn't depend on the Ensembl Perl API. Such `GRanges` objects could for example
-be retrieved with the `AnnotationHub` package.
+Alternatively, the `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
+`ensDbFromGtf` functions allow to build EnsDb SQLite files from a `GRanges`
+object or GFF/GTF files from Ensembl. These functions do not depend on the
+Ensembl Perl API, but require a working internet connection to fetch the
+chromosome lengths from Ensembl as these are not provided within GTF or GFF
+files.
 
 ## Building an annotation package
 
@@ -609,42 +622,46 @@ e.g. ="arabidopsis thaliana"=.
 In the next example we create an `EnsDb` database using the `AnnotationHub`
 package and load also the corresponding genomic DNA sequence matching the
 Ensembl version. We thus first query the `AnnotationHub` package for all
-resources available for `Mus musculus` and the Ensembl release 77. Next we load
-the `gtf` file for the transcript definitions and the `dna.toplevel.fa` file for
-the DNA sequence. From the `GRanges` object representing the `gtf` file we can
-build and load an `EnsDb`. At last we retrieve the sequences of all exons using
-the `getSeq` method.
+resources available for `Mus musculus` and the Ensembl release 77. Next we
+create the `EnsDb` object from the appropriate `AnnotationHub` resource.  We
+then use the `getGenomeFaFile` method on the `EnsDb` to directly look up and
+retrieve the correct or best matching `FaFile` with the genomic DNA sequence. At
+last we retrieve the sequences of all exons using the `getSeq` method.
 
 ```{r eval=FALSE}
-## load the AnnotationHub data
+## Load the AnnotationHub data.
 library(AnnotationHub)
 ah <- AnnotationHub()
 
-## query all available files from Ensembl release 77 for
-## Mus musculus
+## Query all available files for Ensembl release 77 for
+## Mus musculus.
 query(ah, c("Mus musculus", "release-77"))
 
-## get the gtf file
-Gtf <- ah[["AH28822"]]
-## create a EnsDb database file from the Gtf
-DbFile <- ensDbFromGRanges(Gtf, organism="Mus_musculus", version=77)
-## we can either generate a database package, or directly load the data
-Edb <- EnsDb(DbFile)
+## Get the resource for the gtf file with the gene/transcript definitions.
+Gtf <- ah["AH28822"]
+## Create a EnsDb database file from this.
+DbFile <- ensDbFromAH(Gtf)
+## We can either generate a database package, or directly load the data
+edb <- EnsDb(DbFile)
 
-## retrieve the toplevel DNA
-Dna <- ah[["AH22042"]]
 
-## we next retrieve the sequence of all exons
+## Identify and get the FaFile object with the genomic DNA sequence matching
+## the EnsDb annotation.
+Dna <- getGenomeFaFile(edb)
 library(Rsamtools)
-exons <- exons(Edb)
+## We next retrieve the sequence of all exons on chromosome Y.
+exons <- exons(edb, filter=SeqnameFilter("Y"))
 exonSeq <- getSeq(Dna, exons)
+
+## Alternatively, look up and retrieve the toplevel DNA sequence manually.
+Dna <- ah[["AH22042"]]
 ```
 
 In the example below we load a `GRanges` containing gene definitions for genes
 encoded on chromosome Y and generate a EnsDb SQLite database from that
 information.
 
-```{r }
+```{r message=FALSE}
 ## Generate a sqlite database from a GRanges object specifying
 ## genes encoded on chromosome Y
 load(system.file("YGRanges.RData", package="ensembldb"))
@@ -661,8 +678,8 @@ edb
 ```
 
 Alternatively we can build the annotation database using the `ensDbFromGtf`
-function, that extracts most of the required data from a GTF file which can be
-downloaded from Ensembl (e.g. from
+`ensDbFromGff` functions, that extracts most of the required data from a GTF
+respectively Gff file which can be downloaded from Ensembl (e.g. from
 <ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens> for human gene definitions
 from Ensembl version 75; for plant genomes etc files can be retrieved from
 <ftp://ftp.ensemblgenomes.org>). All information except the chromosome lengths and
@@ -678,7 +695,7 @@ library(ensembldb)
 ## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/
 gtffile <- "Homo_sapiens.GRCh37.75.gtf.gz"
 ## generate the SQLite database file
-DB <- ensDbFromGtf(gtf=gtffile, verbose=TRUE)
+DB <- ensDbFromGtf(gtf=gtffile)
 
 ## load the DB file directly
 EDB <- EnsDb(DB)
@@ -693,7 +710,7 @@ makeEnsembldbPackage(ensdb=DB, version="0.99.12",
 # Database layout<a id="orgtarget1"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [98](#orgparagraph1)):
+shown in Figure [99](#orgparagraph1)):
 
 -   **gene**: all gene specific annotations.
     -   `gene_id`: the Ensembl ID of the gene.
