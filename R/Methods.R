@@ -92,24 +92,47 @@ setMethod("seqinfo", "EnsDb", function(x){
 ### getGenomeFaFile
 ## queries the dna.toplevel.fa file from AnnotationHub matching the current
 ## Ensembl version
+## Update: if we can't find a FaFile matching the Ensembl version we suggest ones
+## that might match.
 setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
     ah <- AnnotationHub()
-    queryCol <- "title"  ## the column we want to query
-    eData <- query(ah, c(organism(x), paste0("release-", ensemblVersion(x))))
-    idx <- grep(mcols(eData)[, queryCol], pattern=pattern)
-    if(length(idx) == 0){
-        stop(paste0("No genomic fasta file found in AnnotationHub for organism ",
-                    organism(x), " and Ensembl version ", ensemblVersion(x), "!\n",
-                    "Available resources are:",
-                    paste0(mcols(eData)[, queryCol], collapse="\n"), "\n"))
+    ## Reduce the AnnotationHub to species, provider and genome version.
+    ah <- .reduceAH(ah, organism=organism(x), dataprovider="Ensembl",
+                    genome=unique(genome(x)))
+    if(length(ah) == 0)
+        stop("Can not find any ressources in AnnotationHub for organism: ",
+             organism(x), ", data provider: Ensembl and genome version: ",
+             unique(genome(x)), "!")
+    ## Reduce to all Fasta files with toplevel or primary_assembly.
+    ah <- ah[ah$rdataclass == "FaFile", ]
+    if(length(ah) == 0)
+        stop("No FaFiles available in AnnotationHub for organism: ",
+             organism(x), ", data provider: Ensembl and genome version: ",
+             unique(genome(x)), "! You might also try to use the",
+             " 'getGenomeTwoBitFile' method instead.")
+    ## Reduce to dna.toplevel or dna.primary_assembly.
+    idx <- c(grep(ah$title, pattern="dna.toplevel"),
+             grep(ah$title, pattern="dna.primary_assembly"))
+    if(length(idx) == 0)
+        stop("No genome assembly fasta file available for organism: ",
+             organism(x), ", data provider: Ensembl and genome version: ",
+             unique(genome(x)), "!")
+    ah <- ah[idx, ]
+    ## Get the Ensembl version from the source url.
+    ensVers <- .ensVersionFromSourceUrl(ah$sourceurl)
+    if(any(ensVers == ensemblVersion(x))){
+        ## Got it.
+        itIs <- which(ensVers == ensemblVersion(x))
+    }else{
+        ## Get the "closest" one.
+        diffs <- abs(ensVers - as.numeric(ensemblVersion(x)))
+        itIs <- which(diffs == min(diffs))[1]
+        message("Returning the Fasta file for Ensembl version ", ensVers[itIs],
+                " since no file for Ensembl version ", ensemblVersion(x),
+                " is available.")
     }
-    if(length(idx) > 1){
-        warning(paste0("Found more than one matching file: ",
-                       paste0(mcols(eData)[idx, queryCol], collapse="\n"),
-                       "\nUsing only the first." ))
-        idx <- idx[1]
-    }
-    Dna <- ah[[names(eData)[idx]]]
+    ## Getting the ressource.
+    Dna <- ah[[names(ah)[itIs]]]
     ## generate an index if none is available
     if(is.na(index(Dna))){
         indexFa(Dna)
@@ -117,6 +140,77 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
     }
     return(Dna)
 })
+## Just restricting the Annotation Hub to entries matching the species and the
+## genome; not yet the Ensembl version.
+.reduceAH <- function(ah, organism=NULL, dataprovider="Ensembl",
+                      genome=NULL){
+    if(!is.null(dataprovider))
+        ah <- ah[ah$dataprovider == dataprovider, ]
+    if(!is.null(organism))
+        ah <- ah[ah$species == organism, ]
+    if(!is.null(genome))
+        ah <- ah[ah$genome == genome, ]
+    return(ah)
+}
+.ensVersionFromSourceUrl <- function(url){
+    url <- strsplit(url, split="/", fixed=TRUE)
+    ensVers <- unlist(lapply(url, function(z){
+        idx <- grep(z, pattern="^release")
+        if(length(idx) == 0)
+            return(-1)
+        return(as.numeric(unlist(strsplit(z[idx], split="-"))[2]))
+    }))
+    return(ensVers)
+}
+
+####============================================================
+##  getGenomeTwoBitFile
+##
+##  Search and retrieve a genomic DNA resource through a TwoBitFile
+##  from AnnotationHub.
+####------------------------------------------------------------
+setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
+    ah <- AnnotationHub()
+    ## Reduce the AnnotationHub to species, provider and genome version.
+    ah <- .reduceAH(ah, organism=organism(x), dataprovider="Ensembl",
+                    genome=unique(genome(x)))
+    if(length(ah) == 0)
+        stop("Can not find any ressources in AnnotationHub for organism: ",
+             organism(x), ", data provider: Ensembl and genome version: ",
+             unique(genome(x)), "!")
+    ## Reduce to all Fasta files with toplevel or primary_assembly.
+    ah <- ah[ah$rdataclass == "TwoBitFile", ]
+    if(length(ah) == 0)
+        stop("No TwoBitFile available in AnnotationHub for organism: ",
+             organism(x), ", data provider: Ensembl and genome version: ",
+             unique(genome(x)), "!")
+    ## Reduce to dna.toplevel or dna.primary_assembly.
+    idx <- c(grep(ah$title, pattern="dna.toplevel"),
+             grep(ah$title, pattern="dna.primary_assembly"))
+    if(length(idx) == 0)
+        stop("No genome assembly fasta file available for organism: ",
+             organism(x), ", data provider: Ensembl and genome version: ",
+             unique(genome(x)), "!")
+    ah <- ah[idx, ]
+    ## Get the Ensembl version from the source url.
+    ensVers <- .ensVersionFromSourceUrl(ah$sourceurl)
+    if(any(ensVers == ensemblVersion(x))){
+        ## Got it.
+        itIs <- which(ensVers == ensemblVersion(x))
+    }else{
+        ## Get the "closest" one.
+        diffs <- abs(ensVers - as.numeric(ensemblVersion(x)))
+        itIs <- which(diffs == min(diffs))[1]
+        message("Returning the TwoBit file for Ensembl version ", ensVers[itIs],
+                " since no file for Ensembl version ", ensemblVersion(x),
+                " is available.")
+    }
+    ## Getting the ressource.
+    Dna <- ah[[names(ah)[itIs]]]
+    return(Dna)
+})
+
+
 
 ### listTables
 ## returns a named list with database table columns
@@ -1095,39 +1189,60 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
 })
 
 
-####
-## extractTranscriptSeqs
-##
-## Extending the extractTranscriptSeqs from GenomicFeatures allowing also to
-## use the EnsDb filters.
+## ####
+## ## extractTranscriptSeqs
+## ##
+## ## Extending the extractTranscriptSeqs from GenomicFeatures allowing also to
+## ## use the EnsDb filters.
 ## setMethod("extractTranscriptSeqs",
-##           signature(x="ANY", transcripts="EnsDb", filter="missing"),
+##           signature(x="ANY", transcripts="EnsDb"),
 ##           function(x, transcripts, filter){
 ##               return(extractTranscriptSeqs(x, transcripts, filter=list()))
 ##           })
-## setMethod("extractTranscriptSeqs",
-##           signature(x="ANY", transcripts="EnsDb", filter="BasicFilter"),
-##           function(x, transcripts, filter){
-##               return(extractTranscriptSeqs(x, transcripts, filter=list(filter)))
+## ## setMethod("extractTranscriptSeqs",
+## ##           signature(x="ANY", transcripts="EnsDb", filter="BasicFilter"),
+## ##           function(x, transcripts, filter){
+## ##               return(extractTranscriptSeqs(x, transcripts, filter=list(filter)))
+## ##           })
+## setMethod("extractTranscriptSeqs", signature("ANY", transcripts="EnsDb"),
+##           function(x, transcripts, filter=list()){
+##               if(is(transcripts, "EnsDb")){
+##                   if(missing(filter)){
+##                       filter <- list()
+##                   }else{
+##                       filter <- checkFilter(filter)
+##                   }
+##                   transcripts <- exonsBy(transcripts, by="tx", use.names=FALSE, filter=filter)
+##                   ## Now check that the seqnames fit!
+##                   if(is(x, "FaFile")){
+##                       SN <- seqnames(seqinfo(x))
+##                       transcripts <- transcripts[seqnames(transcripts) %in% SN]
+##                   }
+##               }
+##               return(extractTranscriptSeqs(x, transcripts))
+##               ## Meth <- getMethod("extractTranscriptSeqs", signature="ANY", where="GenomicFeatures")
+##               ## return(Meth(x, transcripts))
 ##           })
-setMethod("extractTranscriptSeqs", "ANY",
-          function(x, transcripts, filter=list()){
-              if(is(transcripts, "EnsDb")){
-                  if(missing(filter)){
-                      filter <- list()
-                  }else{
-                      filter <- checkFilter(filter)
-                  }
-                  transcripts <- exonsBy(transcripts, by="tx", use.names=FALSE, filter=filter)
-                  ## Now check that the seqnames fit!
-                  if(is(x, "FaFile")){
-                      SN <- seqnames(seqinfo(x))
-                      transcripts <- transcripts[seqnames(transcripts) %in% SN]
-                  }
-              }
-              Meth <- getMethod("extractTranscriptSeqs", signature="ANY", where="GenomicFeatures")
-              return(Meth(x, transcripts))
-          })
+
+## setMethod("extractTranscriptSeqs", "ANY",
+##           function(x, transcripts, filter=list()){
+##               if(is(transcripts, "EnsDb")){
+##                   if(missing(filter)){
+##                       filter <- list()
+##                   }else{
+##                       filter <- checkFilter(filter)
+##                   }
+##                   transcripts <- exonsBy(transcripts, by="tx", use.names=FALSE, filter=filter)
+##                   ## Now check that the seqnames fit!
+##                   if(is(x, "FaFile")){
+##                       SN <- seqnames(seqinfo(x))
+##                       transcripts <- transcripts[seqnames(transcripts) %in% SN]
+##                   }
+##               }
+##               ## return(GenomicFeatures::extractTranscriptSeqs(x, transcripts))
+##               ## Meth <- getMethod("extractTranscriptSeqs", signature="ANY", where="GenomicFeatures")
+##               ## return(Meth(x, transcripts))
+##           })
 
 ## Simple helper function to set the @feature in GRangesFilter depending on the calling method.
 setFeatureInGRangesFilter <- function(x, feature){

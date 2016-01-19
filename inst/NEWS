@@ -1,9 +1,28 @@
+CHANGES IN VERSION 1.3.12
+-------------------------
+
+NEW FEATURES
+    o ensDbFromGff and ensDbFromAH functions to build EnsDb objects from GFF3 files
+      or directly from AnnotationHub ressources.
+    o getGenomeFaFile does now also retrieve Fasta files for the "closest" Ensembl
+      release if none is available for the matching version.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+    o Removed argument 'verbose' in ensDbFromGRanges and ensDbFromGtf.
+    o Updated parts of the vignette.
+    o Removed method extractTranscriptSeqs again due to some compatibility problems
+      with GenomicRanges.
+
+BUG FIXES
+    o Avoid wrong CDS start/end position definition for Ensembl gtf files in which the
+      start or end codon is outside the CDS.
+
+
 CHANGES IN VERSION 1.3.11
 -------------------------
 
 BUG FIXES
     o "select" method returns now also the keytype as a column from the database.
-
 
 
 CHANGES IN VERSION 1.3.10
