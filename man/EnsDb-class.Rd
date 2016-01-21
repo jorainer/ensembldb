@@ -11,9 +11,6 @@
 \alias{ensemblVersion,EnsDb-method}
 \alias{listColumns}
 \alias{listColumns,EnsDb-method}
-\alias{lengthOf}
-\alias{lengthOf,GRangesList-method}
-\alias{lengthOf,EnsDb-method}
 \alias{metadata}
 \alias{metadata,EnsDb-method}
 \alias{seqinfo}
@@ -28,6 +25,8 @@
 \alias{listTxbiotypes,EnsDb-method}
 \alias{listTables}
 \alias{listTables,EnsDb-method}
+\alias{updateEnsDb}
+\alias{updateEnsDb,EnsDb-method}
 
 \title{Basic usage of an Ensembl based annotation database}
 \description{
@@ -55,8 +54,6 @@ EnsDb(x)
 
 \S4method{ensemblVersion}{EnsDb}(x)
 
-\S4method{lengthOf}{EnsDb}(x, of="gene", filter=list())
-
 \S4method{listColumns}{EnsDb}(x, table, skip.keys=TRUE, ...)
 
 \S4method{listGenebiotypes}{EnsDb}(x, ...)
@@ -70,6 +67,8 @@ EnsDb(x)
 \S4method{organism}{EnsDb}(object)
 
 \S4method{seqinfo}{EnsDb}(x)
+
+\S4method{updateEnsDb}{EnsDb}(x, ...)
 
 }
 \arguments{
@@ -93,11 +92,6 @@ EnsDb(x)
 
   \item{object}{
     For \code{organism}: an \code{EnsDb} instance.
-  }
-
-  \item{of}{
-    for \code{lengthOf}: whether the length of genes or
-    transcripts should be retrieved from the database.
   }
 
   \item{order.by}{name of one of the columns above on which the
@@ -127,24 +121,25 @@ EnsDb(x)
 
   \item{x}{
     For \code{EnsDb}: the file name of the SQLite database.
-
-    For \code{lengthOf}: either an \code{EnsDb} or a
-    \code{GRangesList} object. For all other methods an \code{EnsDb}
-    instance.
   }
 
 }
 \section{Slots}{
   \describe{
-    \item{\code{ensdb}:}{
+    \item{ensdb}{
       Object of class \code{"DBIConnection"}: the
       connection to the database.
     }
 
-    \item{\code{tables}:}{
-      named list of database table columns with the names being the
+    \item{tables}{
+      Named list of database table columns with the names being the
       database table names. The tables are ordered by their degree,
       i.e. the number of other tables they can be joined with.
+    }
+
+    \item{.properties}{
+      Internal list storing user-defined properties. Should not be
+      directly accessed.
     }
   }
 }
@@ -162,14 +157,6 @@ EnsDb(x)
 
     \item{ensemblVersion}{
       Returns the Ensembl version on which the package was built.
-    }
-
-    \item{lengthOf}{
-      Retrieve the length of genes or transcripts from the
-      database. The length is the sum of the lengths of all exons of a
-      transcript or a gene. In the latter case the exons are first reduced
-      so that the length corresponds to the part of the genomic sequence covered by
-      the exons.
     }
 
     \item{listColumns}{
@@ -206,6 +193,10 @@ EnsDb(x)
 
     \item{show}{
       Displays some informations from the database.
+    }
+
+    \item{updateEnsDb}{
+      Updates the \code{EnsDb} object to the most recent implementation.
     }
 
   }
@@ -257,6 +248,9 @@ EnsDb(x)
       A \code{Seqinfo} class.
     }
 
+    \item{For \code{updateEnsDb}}{
+      A \code{EnsDb} object.
+    }
   }
 }
 \author{
@@ -297,33 +291,14 @@ buildQuery(EnsDb.Hsapiens.v75, columns=c("gene_id", "tx_id"))
 buildQuery(EnsDb.Hsapiens.v75, columns=c("exon_id", "tx_id"),
            filter=list(SeqnameFilter( "Y")))
 
-#####    lengthOf
-##
-## length of a specific gene.
-lengthOf(EnsDb.Hsapiens.v75,
-         filter=list(GeneidFilter("ENSG00000000003")))
-
-## length of a transcript
-lengthOf(EnsDb.Hsapiens.v75, of="tx",
-         filter=list(TxidFilter("ENST00000494424")))
-
-## average length of all protein coding genes encoded on chromosomes X
-## and Y
-mean(lengthOf(EnsDb.Hsapiens.v75, of="gene",
-              filter=list(GenebiotypeFilter("protein_coding"),
-                  SeqnameFilter(c("X", "Y")))))
-
-## average length of all snoRNAs
-mean(lengthOf(EnsDb.Hsapiens.v75, of="gene",
-              filter=list(GenebiotypeFilter("snoRNA"),
-                  SeqnameFilter(c("X", "Y")))))
-
 ## list all available gene biotypes from the database:
 listGenebiotypes(EnsDb.Hsapiens.v75)
 
 ## list all available transcript biotypes:
 listTxbiotypes(EnsDb.Hsapiens.v75)
 
+## Update the EnsDb; this is in most instances not necessary at all.
+updateEnsDb(EnsDb.Hsapiens.v75)
 
 }
 \keyword{classes}
