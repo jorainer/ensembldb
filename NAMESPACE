@@ -38,7 +38,8 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, gen
               getGenomeFaFile, lengthOf, listColumns, listGenebiotypes, listTxbiotypes,
               listTables, organism, seqinfo, toSAF, transcripts, transcriptsBy,
               disjointExons, metadata, promoters, cdsBy, fiveUTRsByTranscript,
-              threeUTRsByTranscript, getGeneRegionTrackForGviz)
+              threeUTRsByTranscript, getGeneRegionTrackForGviz, updateEnsDb,
+              transcriptLengths)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
 

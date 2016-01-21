@@ -1070,8 +1070,42 @@ Implement the following methods:
 We could also import stuff from GFF, not only GTF.
 
 
-** TODO Fix a bug resulting in wrong CDS definitions form GTF files.
-
+** DONE Fix a bug resulting in wrong CDS definitions form GTF files.
+   CLOSED: [2016-01-19 Tue 13:41]
+   - State "DONE"       from "TODO"       [2016-01-19 Tue 13:41]
 I've to evaluate which is the correct way, the GFF info or the GTF, in which
 start or stop codon can be outside of the coding region (which seems odd).
 Check that with the Ensembl web page and eventually contact support!
+** TODO Include functionality from the =GenomeInfoDb= to fix chromosome naming.
+
++ [ ] Implement a =seqlevelsStyle<-= method for =EnsDb=. Should do something
+  similar than the stuff for =Gviz=.
+  Impact of that setter:
+  - Queries support seqnames other than the ones from Ensembl.
+  - Results have seqlevels set accordingly.
+  - Check that the species is supported by =GenomeInfoDb=! Otherwise, return an error!
++ [ ] Implement a =seqlevelsStyle= method for =EnsDb=.
++ [ ] Implement central =mapSlToEns= =mapSlFromEns= methods (basically
+  replacement for =ucscToEns= and =prefixChromName=).
++ [ ] =EnsDb= needs a new slot to store any data (type list).
+Specifically, use =mapSeqlevels=
+
++ Methods/functions that should be affected:
+  - [ ] =getWhat=
+  - [ ] =seqinfo=
+  - [ ] =seqlevel=
+  - [ ] =exons=
+  - [ ] =exonsBy=
+  - [ ] =genes=
+  - [ ] =genesBy=
+  - [ ] =transcripts=
+  - [ ] =transcriptsBy=
+  - [ ] =SeqnameFilter=
+  - [ ] =GRangesFilter=
+  - [ ] =threeUTRsByTranscript=
+  - [ ] =fiveUTRsByTranscript=
+  - [ ] =promoters=
+
+** TODO Allow more generic GTF file names in =ensDbFromGtf=
+
+Somehow I have to fix that it does not work with =chr.gtf.gz=.
