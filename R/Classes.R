@@ -6,8 +6,8 @@
 ##
 ##***********************************************************************
 setClass("EnsDb",
-         representation(ensdb="DBIConnection", tables="list"),
-         prototype=list(ensdb=NULL, tables=list())
+         representation(ensdb="DBIConnection", tables="list", .properties="list"),
+         prototype=list(ensdb=NULL, tables=list(), .properties=list())
         )
 
 

@@ -1,3 +1,17 @@
+CHANGES IN VERSION 1.3.13
+-------------------------
+
+NEW FEATURES
+    o EnsDb: new "hidden" slot to store additional properties and a method updateEnsDb
+      to update objects to the new implementation.
+    o New method "transcriptLengths" for EnsDb that creates a similar data.frame than
+      the same named function in the GenomicFeatures package.
+
+BUG FIXES
+    o fiveUTRsByTranscript and threeUTRsByTranscript returned wrong UTRs for some special
+      cases in which the CDS start and end were in the same exon. This has been fixed.
+
+
 CHANGES IN VERSION 1.3.12
 -------------------------
 
