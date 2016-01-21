@@ -86,12 +86,20 @@ if(!isGeneric("tablesByDegree")){
 if(!isGeneric("tablesForColumns"))
     setGeneric("tablesForColumns", function(x, attributes, ...)
         standardGeneric("tablesForColumns"))
+
+setGeneric("transcriptLengths", function(x, with.cds_len=FALSE,
+                                         with.utr5_len=FALSE,
+                                         with.utr3_len=FALSE, ...)
+    standardGeneric("transcriptLengths"))
+
 if(!isGeneric("transcripts"))
     setGeneric("transcripts", function(x, ...)
         standardGeneric("transcripts"))
 if(!isGeneric("transcriptsBy"))
     setGeneric("transcriptsBy", function(x, ...)
         standardGeneric("transcriptsBy"))
+setGeneric("updateEnsDb", function(x, ...)
+    standardGeneric("updateEnsDb"))
 ##if(!isGeneric("value"))
     setGeneric("value", function(x, db, ...)
         standardGeneric("value"))
@@ -100,3 +108,17 @@ setGeneric("value<-", function(x, value)
 if(!isGeneric("where"))
     setGeneric("where", function(object, db, with.tables, ...)
         standardGeneric("where"))
+
+####============================================================
+##  Private methods
+##
+####------------------------------------------------------------
+setGeneric("properties", function(x, ...)
+    standardGeneric("properties"))
+## setGeneric("properties<-", function(x, name, value, ...)
+##             standardGeneric("properties<-"))
+setGeneric("getProperty", function(x, name=NULL, ...)
+    standardGeneric("getProperty"))
+setGeneric("setProperty", function(x, value=NULL, ...)
+    standardGeneric("setProperty"))
+

@@ -5,6 +5,22 @@
 library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
+test_updateEnsDb <- function(){
+    edb2 <- updateEnsDb(edb)
+    checkEquals(edb2@tables, edb@tables)
+    checkTrue(.hasSlot(edb2, ".properties"))
+}
+
+test_properties <- function(){
+    checkEquals(ensembldb:::getProperty(edb, "foo"), NA)
+
+    checkException(ensembldb:::setProperty(edb, "foo"))
+
+    edb <- ensembldb:::setProperty(edb, foo="bar")
+    checkEquals(ensembldb:::getProperty(edb, "foo"), "bar")
+    checkEquals(length(ensembldb:::properties(edb)), 1)
+}
+
 test_check_SeqnameFilter <- function(){
     Orig <- getOption("ucscChromosomeNames", FALSE)
     options(ucscChromosomeNames=TRUE)
@@ -58,4 +74,14 @@ test_check_retrieve_data <- function(){
 
     options(ucscChromosomeNames=Orig)
 }
+
+## Use the stuff from GenomeInfoDb!
+notrun_test_newstuff <- function(){
+    library(GenomeInfoDb)
+    Map <- mapSeqlevels(seqlevels(edb), style="Ensembl")
+    Map <- mapSeqlevels(seqlevels(edb), style="UCSC")
+    ## just check what's out there
+    genomeStyles()
+}
+
 

@@ -311,3 +311,39 @@ notrun_test_genetrack_df <- function(){
     ## )
 }
 
+####============================================================
+##  length stuff
+##
+####------------------------------------------------------------
+test_lengthOf <- function(){
+    system.time(
+        lenY <- lengthOf(DB, "tx", filter=SeqnameFilter("Y"))
+    )
+    ## Check what would happen if we do it ourselfs...
+    system.time(
+        lenY2 <- sum(width(reduce(exonsBy(DB, "tx", filter=SeqnameFilter("Y")))))
+    )
+    checkEquals(lenY, lenY2)
+    ## Same for genes.
+    system.time(
+        lenY <- lengthOf(DB, "gene", filter=SeqnameFilter("Y"))
+    )
+    ## Check what would happen if we do it ourselfs...
+    system.time(
+        lenY2 <- sum(width(reduce(exonsBy(DB, "gene", filter=SeqnameFilter("Y")))))
+    )
+    checkEquals(lenY, lenY2)
+    ## Just using the transcriptLengths
+
+
+}
+
+notrun_lengthOf <- function(){
+    ## How does TxDb do that?s
+    library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+    txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+    Test <- transcriptLengths(txdb)
+    head(Test)
+}
+
+

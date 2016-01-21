@@ -668,10 +668,11 @@ setMethod("transcriptsBy", "EnsDb", function(x, by=c("gene", "exon"),
 
 ## for GRangesList...
 setMethod("lengthOf", "GRangesList", function(x, ...){
-    return(unlist(lapply(width(reduce(x)), sum)))
+    return(sum(width(reduce(x))))
+##    return(unlist(lapply(width(reduce(x)), sum)))
 })
 
-## return the length of genes
+## return the length of genes or transcripts
 setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
     of <- match.arg(of, c("gene", "tx"))
     ## get the exons by gene or transcript from the database...
@@ -681,6 +682,98 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
     return(lengthOf(GRL))
 })
 
+####============================================================
+##  transcriptLengths
+##
+##  For TxDb: calls just the function (not method!) from the GenomicFeatures
+##            package.
+##  For EnsDb: calls the .transcriptLengths function.
+####------------------------------------------------------------
+setMethod("transcriptLengths", "TxDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
+                                               with.utr3_len=FALSE){
+    return(GenomicFeatures::transcriptLengths(x, with.cds_len=with.cds_len,
+                                              with.utr5_len=with.utr5_len,
+                                              with.utr3_len=with.utr3_len))
+})
+setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
+                                                with.utr3_len=FALSE, filter=list()){
+    return(.transcriptLengths(x, with.cds_len=with.cds_len, with.utr5_len=with.utr3_len,
+                              with.utr3_len=with.utr3_len, filter=filter))
+})
+## implement the method from the GenomicFeatures package
+.transcriptLengths <- function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
+                               with.utr3_len=FALSE, filter=list()){
+    ## First we're going to fetch the exonsBy.
+    ## Or use getWhat???
+    ## Dash, have to make two queries!
+    allTxs <- transcripts(x, filter=filter)
+    exns <- exonsBy(x, filter=filter)
+    ## Match ordering
+    exns <- exns[match(allTxs$tx_id, names(exns))]
+    ## Calculate length of transcripts.
+    txLengths <- sum(width(reduce(exns)))
+    ## Calculate no. of exons.
+    ## build result data frame:
+    Res <- data.frame(tx_id=allTxs$tx_id, gene_id=allTxs$gene_id,
+                      nexon=lengths(exns), tx_len=txLengths,
+                      stringsAsFactors=FALSE)
+    if(!any(c(with.cds_len, with.utr5_len, with.utr3_len))){
+        ## Return what we've got thus far.
+        return(Res)
+    }
+    if(with.cds_len)
+        Res <- cbind(Res, cds_len=rep(NA, nrow(Res)))
+    if(with.utr5_len)
+        Res <- cbind(Res, utr5_len=rep(NA, nrow(Res)))
+    if(with.utr3_len)
+        Res <- cbind(Res, utr3_len=rep(NA, nrow(Res)))
+    ## Otherwise do the remaining stuff...
+    txs <- allTxs[!is.na(allTxs$tx_cds_seq_start)]
+    if(length(txs) > 0){
+        cExns <- exns[txs$tx_id]
+        cReg <- GRanges(seqnames=seqnames(txs),
+                             ranges=IRanges(txs$tx_cds_seq_start,
+                                            txs$tx_cds_seq_end),
+                             strand=strand(txs),
+                             tx_id=txs$tx_id)
+        cReg <- split(cReg, f=cReg$tx_id)
+        ## Match order.
+        cReg <- cReg[match(txs$tx_id, names(cReg))]
+        cdsExns <- pintersect(cReg, cExns)
+        ## cExns: all exons of coding transcripts (includes untranslated
+        ##        and translated region)
+        ## cReg: just the start-end position of the coding region of the tx.
+        ## cdsExns: the coding part of all exons of the tx.
+        if(with.cds_len){
+            ## Calculate CDS length
+            cdsLengths <- sum(width(reduce(cdsExns)))
+            Res[names(cdsLengths), "cds_len"] <- cdsLengths
+        }
+        if(with.utr3_len | with.utr5_len){
+            ## ! UTR is the difference between the exons and the cds-exons
+            ## Note: order of parameters is important!
+            utrReg <- psetdiff(cExns, cdsExns)
+            leftOfCds <- utrReg[end(utrReg) < start(cReg)]
+            rightOfCds <- utrReg[start(utrReg) > end(cReg)]
+            ## Calculate lengths.
+            leftOfLengths <- sum(width(reduce(leftOfCds)))
+            rightOfLengths <- sum(width(reduce(rightOfCds)))
+            minusTx <- which(as.character(strand(txs)) == "-" )
+            if(with.utr3_len){
+                ## Ordering of txs and all other stuff matches.
+                tmp <- rightOfLengths
+                tmp[minusTx] <- leftOfLengths[minusTx]
+                Res[names(tmp), "utr3_len"] <- tmp
+            }
+            if(with.utr5_len){
+                tmp <- leftOfLengths
+                tmp[minusTx] <- rightOfLengths[minusTx]
+                Res[names(tmp), "utr5_len"] <- tmp
+            }
+        }
+    }
+    return(Res)
+}
 
 ## cdsBy... return coding region ranges by tx or by gene.
 setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
@@ -781,6 +874,8 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
                        ", case when seq_strand=1 then tx_seq_start when seq_strand=-1 then (tx_seq_end * -1) end")
     ## get the seqinfo:
     SI <- seqinfo(x)
+    ## Note: doing that with a single query and some coordinate juggling is faster than
+    ## calling exonsBy and GRangesList psetdiff etc.
     Res <- getWhat(x, columns=fetchCols,
                    filter=filter,
                    order.by=order.by,
@@ -815,20 +910,50 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
         warning(paste0("No ", what, "UTR found!"))
         return(NULL)
     }
-    utrStarts <- rep(0, nrow(Res))
-    utrEnds <- utrStarts
     ## Increase the cds end by 1 and decrease the start by 1, thus, avoiding that the UTR
     ## overlaps the cds
-    Res$tx_cds_seq_end <- Res$tx_cds_seq_end+1
-    Res$tx_cds_seq_start <- Res$tx_cds_seq_start-1
-    ## Start of exon is smaller than cds start:
+    Res$tx_cds_seq_end <- Res$tx_cds_seq_end+1L
+    Res$tx_cds_seq_start <- Res$tx_cds_seq_start-1L
+    utrStarts <- rep(0, nrow(Res))
+    utrEnds <- utrStarts
+    ## Distinguish between stuff which is left of and right of the CDS:
+    ## Left of the CDS: can be either 5' for + strand or 3' for - strand.
     bm <- which(Res$exon_seq_start <= Res$tx_cds_seq_start)
-    utrStarts[bm] <- Res$exon_seq_start[bm]
-    utrEnds[bm] <- pmin.int(Res$exon_seq_end[bm], Res$tx_cds_seq_start[bm])
-    ## End of exon is larger than cds end:
+    if(length(bm) > 0){
+        if(what == "five"){
+            ## 5' and left of CDS means we're having 5' CDSs
+            bm <- bm[Res$seq_strand[bm] > 0]
+            if(length(bm) > 0){
+                utrStarts[bm] <- Res$exon_seq_start[bm]
+                utrEnds[bm] <- pmin.int(Res$exon_seq_end[bm], Res$tx_cds_seq_start[bm])
+            }
+        }else{
+            bm <- bm[Res$seq_strand[bm] < 0]
+            if(length(bm) > 0){
+                utrStarts[bm] <- Res$exon_seq_start[bm]
+                utrEnds[bm] <- pmin.int(Res$exon_seq_end[bm], Res$tx_cds_seq_start[bm])
+            }
+        }
+    }
+    ## Right of the CDS: can be either 5' for - strand of 3' for + strand.
     bm <- which(Res$exon_seq_end >= Res$tx_cds_seq_end)
-    utrStarts[bm] <- pmax.int(Res$exon_seq_start[bm], Res$tx_cds_seq_end[bm])
-    utrEnds[bm] <- Res$exon_seq_end[bm]
+    if(length(bm) > 0){
+        if(what == "five"){
+            ## Right of CDS is 5' for - strand.
+            bm <- bm[Res$seq_strand[bm] < 0]
+            if(length(bm) > 0){
+                utrStarts[bm] <- pmax.int(Res$exon_seq_start[bm], Res$tx_cds_seq_end[bm])
+                utrEnds[bm] <- Res$exon_seq_end[bm]
+            }
+        }else{
+            ## Right of CDS is 3' for + strand
+            bm <- bm[Res$seq_strand[bm] > 0]
+            if(length(bm) > 0){
+                utrStarts[bm] <- pmax.int(Res$exon_seq_start[bm], Res$tx_cds_seq_end[bm])
+                utrEnds[bm] <- Res$exon_seq_end[bm]
+            }
+        }
+    }
     SI <- SI[as.character(unique(Res$seq_name))]
     GR <- GRanges(seqnames=Rle(Res$seq_name),
                   strand=Rle(Res$seq_strand),
@@ -1253,4 +1378,77 @@ setFeatureInGRangesFilter <- function(x, feature){
     }
     return(x)
 }
+
+####============================================================
+##  properties
+##
+##  Get access to the "hidden" .properties slot and return it.
+##  This ensures that we're not generating an error for objects that
+##  do not have yet that slot.
+####------------------------------------------------------------
+setMethod("properties", "EnsDb", function(x, ...){
+    if(.hasSlot(x, ".properties")){
+        return(x@.properties)
+    }else{
+        warning("The present EnsDb instance has no .properties slot! ",
+                "Please use 'updateEnsDb' to update the object!")
+        return(list())
+    }
+})
+
+####============================================================
+##  getProperty
+##
+##  Return the value for the property with the specified name or
+##  NA if not present.
+####------------------------------------------------------------
+setMethod("getProperty", "EnsDb", function(x, name){
+    props <- properties(x)
+    if(any(names(props) == name)){
+        return(props[[name]])
+    }else{
+        return(NA)
+    }
+})
+
+####============================================================
+##  setProperty
+##
+##  Sets a property in the object. The value has to be a named vector.
+####------------------------------------------------------------
+setMethod("setProperty", "EnsDb", function(x, ...){
+    dotL <- list(...)
+    if(length(dotL) == 0){
+        stop("No property specified! The property has to be submitted ",
+                "in the format name=value!")
+        return(x)
+    }
+    if(length(dotL) > 1){
+        warning("'setProperty' does only support setting of a single property!",
+                " Using the first submitted one.")
+        dotL <- dotL[1]
+    }
+    if(is.null(names(dotL)) | names(dotL) == "")
+        stop("A name is required! Use name=value!")
+    if(.hasSlot(x, ".properties")){
+        x@.properties[names(dotL)] <- dotL[[1]]
+    }else{
+        warning("The present EnsDb instance has no .properties slot! ",
+                "Please use 'updateEnsDb' to update the object!")
+    }
+    return(x)
+})
+
+####============================================================
+##  updateEnsDb
+##
+##  Update any "old" EnsDb instance to the most recent implementation.
+####------------------------------------------------------------
+setMethod("updateEnsDb", "EnsDb", function(x, ...){
+    newE <- new("EnsDb", ensdb=x@ensdb, tables=x@tables)
+    if(.hasSlot(x, ".properties"))
+        newE@.properties <- x@.properties
+    return(newE)
+})
+
 
