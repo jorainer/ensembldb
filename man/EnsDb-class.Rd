@@ -15,6 +15,8 @@
 \alias{metadata,EnsDb-method}
 \alias{seqinfo}
 \alias{seqinfo,EnsDb-method}
+\alias{seqlevels}
+\alias{seqlevels,EnsDb-method}
 \alias{organism}
 \alias{organism,EnsDb-method}
 \alias{show}
@@ -67,6 +69,8 @@ EnsDb(x)
 \S4method{organism}{EnsDb}(object)
 
 \S4method{seqinfo}{EnsDb}(x)
+
+\S4method{seqlevels}{EnsDb}(x)
 
 \S4method{updateEnsDb}{EnsDb}(x, ...)
 
@@ -191,6 +195,11 @@ EnsDb(x)
       Returns the sequence/chromosome information from the database.
     }
 
+    \item{seqlevels}{
+      Returns the chromosome/sequence names that are available in the
+      database.
+    }
+
     \item{show}{
       Displays some informations from the database.
     }
@@ -266,35 +275,38 @@ EnsDb(x)
 
 library(EnsDb.Hsapiens.v75)
 
-## display some information:
+## Display some information:
 EnsDb.Hsapiens.v75
 
-## show the tables along with its columns
+## Show the tables along with its columns
 listTables(EnsDb.Hsapiens.v75)
 
-## for what species is this database?
+## For what species is this database?
 organism(EnsDb.Hsapiens.v75)
 
-## what Ensembl version if the database based on?
+## What Ensembl version if the database based on?
 ensemblVersion(EnsDb.Hsapiens.v75)
 
-## get some more information from the database
+## Get some more information from the database
 metadata(EnsDb.Hsapiens.v75)
+
+## Get all the sequence names.
+seqlevels(EnsDb.Hsapiens.v75)
 
 ######    buildQuery
 ##
-## join tables gene and transcript and return gene_id and tx_id
+## Join tables gene and transcript and return gene_id and tx_id
 buildQuery(EnsDb.Hsapiens.v75, columns=c("gene_id", "tx_id"))
 
 
-## get all exon_ids and transcript ids of genes encoded on chromosome Y.
+## Get all exon_ids and transcript ids of genes encoded on chromosome Y.
 buildQuery(EnsDb.Hsapiens.v75, columns=c("exon_id", "tx_id"),
            filter=list(SeqnameFilter( "Y")))
 
-## list all available gene biotypes from the database:
+## List all available gene biotypes from the database:
 listGenebiotypes(EnsDb.Hsapiens.v75)
 
-## list all available transcript biotypes:
+## List all available transcript biotypes:
 listTxbiotypes(EnsDb.Hsapiens.v75)
 
 ## Update the EnsDb; this is in most instances not necessary at all.

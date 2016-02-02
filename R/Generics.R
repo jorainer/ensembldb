@@ -17,6 +17,9 @@ if(!isGeneric("condition"))
         standardGeneric("condition"))
 setGeneric("condition<-", function(x, value)
         standardGeneric("condition<-"))
+setGeneric("dbSeqlevelsStyle", function(x, ...)
+    standardGeneric("dbSeqlevelsStyle"))
+
 if(!isGeneric("genes"))
     setGeneric("genes", function(x, ...)
         standardGeneric("genes"))
@@ -66,6 +69,10 @@ if(!isGeneric("print"))
 if(!isGeneric("requireTable"))
     setGeneric("requireTable", function(x, db, ...)
         standardGeneric("requireTable"))
+
+setGeneric("supportedSeqlevelsStyles", function(x)
+           standardGeneric("supportedSeqlevelsStyles"))
+
 if(!isGeneric("seqinfo"))
     setGeneric("seqinfo", function(x)
         standardGeneric("seqinfo"))
@@ -87,10 +94,11 @@ if(!isGeneric("tablesForColumns"))
     setGeneric("tablesForColumns", function(x, attributes, ...)
         standardGeneric("tablesForColumns"))
 
-setGeneric("transcriptLengths", function(x, with.cds_len=FALSE,
-                                         with.utr5_len=FALSE,
-                                         with.utr3_len=FALSE, ...)
-    standardGeneric("transcriptLengths"))
+if(!isGeneric("transcriptLengths"))
+    setGeneric("transcriptLengths", function(x, with.cds_len=FALSE,
+                                             with.utr5_len=FALSE,
+                                             with.utr3_len=FALSE, ...)
+        standardGeneric("transcriptLengths"))
 
 if(!isGeneric("transcripts"))
     setGeneric("transcripts", function(x, ...)
@@ -121,4 +129,7 @@ setGeneric("getProperty", function(x, name=NULL, ...)
     standardGeneric("getProperty"))
 setGeneric("setProperty", function(x, value=NULL, ...)
     standardGeneric("setProperty"))
-
+setGeneric("formatSeqnamesForQuery", function(x, sn, ...)
+    standardGeneric("formatSeqnamesForQuery"))
+setGeneric("formatSeqnamesFromQuery", function(x, sn, ...)
+    standardGeneric("formatSeqnamesFromQuery"))
