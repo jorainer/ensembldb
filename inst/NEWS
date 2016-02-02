@@ -1,3 +1,23 @@
+CHANGES IN VERSION 1.3.14
+-------------------------
+
+NEW FEATURES
+    o seqlevelsStyle getter and setter method to change the enable easier integration
+      of EnsDb objects with UCSC based packages. supportedSeqlevelsStyle method to list
+      possible values. Global option "ensembldb.seqnameNotFound" allows to adapt the
+      behaviour of the mapping functions when a seqname can not be mapped properly.
+    o Added a seqlevels method for EnsDb objects.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+    o Add an example to extract transcript sequences directly from an EnsDb object to
+      the vignette.
+    o Add examples to use EnsDb objects with UCSC chromosome names to the vignette.
+
+BUG FIXES
+    o Seqinfo for genes, transcripts and exons contain now only the seqnames returned
+      in the GRanges, not all that are in the database.
+
+
 CHANGES IN VERSION 1.3.13
 -------------------------
 
