@@ -13,11 +13,12 @@
 
 #+latex: %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
 #+latex: %\VignetteKeywords{annotation, database}
-#+latex: %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75}
+#+latex: %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BSgenome.Hsapiens.UCSC.hg19}
 #+latex: %\VignettePackage{ensembldb}
 #+latex: %\VignetteEngine{knitr::knitr}
 
-#+BEGIN_HTML
+
+#+BEGIN_EXPORT html
 ---
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
@@ -31,15 +32,15 @@ vignette: >
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
-#+END_HTML
+#+END_EXPORT
 
 
-#+BEGIN_HTML
+#+BEGIN_EXPORT html
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 18 January, 2016<br />
+**Modified**: 2 February, 2016<br />
 **Compiled**: `r date()`
-#+END_HTML
+#+END_EXPORT
 
 
 # #+NAME: style
@@ -157,13 +158,13 @@ partial matching. The =condition= parameter for =SeqendFilter= and
 =SeqendFilter= can take the values = , >, >=, < and <= (since these
 filters base on numeric values).
 
-The =SeqnameFilter= and =GRangesFilter= support both UCSC and Ensembl chromosome
-names (e.g. ="chrX"= for UCSC and ="X"= for Ensembl), internally, UCSC
-chromosome names are mapped to Ensembl names. By default, all functions to
-retrieve data from the database return Ensembl chromosome names, but by setting
-the global option =ucscChromosomeNames= to =TRUE=
-(i.e. =options(ucscChromosomeNames = TRUE)=) chromosome/seqnames are returned in
-UCSC format.
+# The =SeqnameFilter= and =GRangesFilter= support both UCSC and Ensembl chromosome
+# names (e.g. ="chrX"= for UCSC and ="X"= for Ensembl), internally, UCSC
+# chromosome names are mapped to Ensembl names. By default, all functions to
+# retrieve data from the database return Ensembl chromosome names, but by setting
+# the global option =ucscChromosomeNames= to =TRUE=
+# (i.e. =options(ucscChromosomeNames = TRUE)=) chromosome/seqnames are returned in
+# UCSC format.
 
 A simple example would be to get all transcripts for the gene /BCL2L11/. To this
 end we specify a =GenenameFilter= with the value ="BCL2L11"=. As a result we get
@@ -435,16 +436,10 @@ between the chromosomal start and end coordinates of the gene.
 
 #+END_SRC
 
-# To retrieve the (exonic) sequence of transcripts (i.e. without introns) we can
-# use directly the =extractTranscriptSeqs= method on the =EnsDb= object,
-# eventually using a filter to restrict the query. Alternatively, we could also
-# extract the =GRanges= representing the exons of each transcript and use the
-# =getSeq= method.
-
-To retrieve the (exonic) sequence of transcripts (i.e. without introns) we first
-fetch all exons by transcript and use the =extractTranscriptSeqs= method from
-the =GenomicRanges= package to extract the sequences from the genomic =FaFile=
-fetched above.
+To retrieve the (exonic) sequence of transcripts (i.e. without introns) we can
+use directly the =extractTranscriptSeqs= method defined in the =GenomicFeatures=
+on the =EnsDb= object, eventually using a filter to restrict the
+query.
 
 #+BEGIN_SRC R :ravel eval=FALSE
   ## get all exons of all transcripts encoded on chromosome Y
@@ -455,23 +450,103 @@ fetched above.
   yTxSeqs <- extractTranscriptSeqs(Dna, yTx)
   yTxSeqs
 
-  ## ## Extract the transcript sequences of all transcripts defined by Ensembl.
-  ## txSeqs <- extractTranscriptSeqs(Dna, edb)
+  ## Extract the sequences of all transcripts encoded on chromosome Y.
+  yTx <- extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
 
-  ## ## Alternatively, use filters to restrict the search.
-  ## yTx <- extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
-
-  ## ## Or extract first the exons by transcript and use the getSeq method.
-  ## ## We're getting all exons by transcript for all genes defined by Ensembl. This
-  ## ## excludes eventual "LRG" genes, that might be encoded on a sequence for which
-  ## ## we don't have a DNA sequence.
-  ## txExons <- exonsBy(edb, "tx", filter=GeneidFilter("ENS%", condition="like"))
-
-  ## ## Extract the sequences of the first 10
-  ## txSeqs <- lapply(txExons[1:10], function(x){unlist(getSeq(Dna, x))})
+  ## Along these lines, we could use the method also to retrieve the coding sequence
+  ## of all transcripts on the Y chromosome.
+  cdsY <- cdsBy(edb, filter=SeqnameFilter("Y"))
+  extractTranscriptSeqs(Dna, cdsY)
 
 #+END_SRC
 
+Note: in the next section we describe how transcript sequences can be retrieved
+from a =BSgenome= package that is based on UCSC, not Ensembl.
+
+* Integrating annotations from Ensembl based  =EnsDb= packages with UCSC based annotations
+
+Sometimes it might be useful to combine (Ensembl based) annotations from =EnsDb=
+packages/objects with annotations from other Bioconductor packages, that might
+base on UCSC annotations. To support such an integration of annotations, the
+=ensembldb= packages implements the =seqlevelsStyle= and =seqlevelsStyle<-= from
+the =GenomeInfoDb= package that allow to change the style of chromosome naming.
+Thus, sequence/chromosome names other than those used by Ensembl can be used in,
+and are returned by, the queries to =EnsDb= objects as long as a mapping for
+them is provided by the =GenomeInfoDb= package (which provides a mapping mostly
+between UCSC, NCBI and Ensembl chromosome names for the /main/ chromosomes).
+
+In the example below we change the seqnames style to UCSC.
+
+#+BEGIN_SRC R :ravel message=FALSE
+  ## Change the seqlevels style form Ensembl (default) to UCSC:
+  seqlevelsStyle(edb) <- "UCSC"
+
+  ## Now we can use UCSC style seqnames in SeqnameFilters or GRangesFilter:
+  genesY <- genes(edb, filter=SeqnameFilter("chrY"))
+  ## The seqlevels of the returned GRanges are also in UCSC style
+  seqlevels(genesY)
+#+END_SRC
+
+Note that in most instances no mapping is available for sequences not
+corresponding to the main chromosomes (i.e. contigs, patched chromosomes
+etc). What is returned in cases in which no mapping is available can be
+specified with the global =ensembldb.seqnameNotFound= option. By default (with
+=ensembldb.seqnameNotFound = "ORIGINAL"=), the original seqnames (i.e. the ones
+from Ensembl) are returned. With =ensembldb.seqnameNotFound = "MISSING"= each
+time a seqname can not be found an error is thrown. For all other cases
+(e.g. =ensembldb.seqnameNotFound = NA=) the value of the option is returned.
+
+#+BEGIN_SRC R
+  seqlevelsStyle(edb) <- "UCSC"
+
+  ## Getting the default option:
+  getOption("ensembldb.seqnameNotFound")
+
+  ## Listing all seqlevels in the database.
+  seqlevels(edb)[1:30]
+
+  ## Setting the option to NA, thus, for each seqname for which no mapping is available,
+  ## NA is returned.
+  options(ensembldb.seqnameNotFound=NA)
+  seqlevels(edb)[1:30]
+
+  ## Resetting the option.
+  options(ensembldb.seqnameNotFound="ORIGINAL")
+
+#+END_SRC
+
+Next we retrieve transcript sequences from genes encoded on chromosome Y using
+the =BSGenome= package for the human genome from UCSC. The specified version
+=hg19= matches the genome build of Ensembl version 75, i.e. =GRCh37=. Note that
+while we changed the style of the seqnames to UCSC we did not change the naming
+of the genome release.
+
+#+BEGIN_SRC R :ravel warning=FALSE, message=FALSE
+  library(BSgenome.Hsapiens.UCSC.hg19)
+  bsg <- BSgenome.Hsapiens.UCSC.hg19
+
+  ## Get the genome version
+  unique(genome(bsg))
+  unique(genome(edb))
+  ## Although differently named, both represent genome build GRCh37.
+
+  ## Extract the full transcript sequences.
+  yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx", filter=SeqnameFilter("chrY")))
+
+  yTxSeqs
+
+  ## Extract just the CDS
+  Test <- cdsBy(edb, "tx", filter=SeqnameFilter("chrY"))
+  yTxCds <- extractTranscriptSeqs(bsg, cdsBy(edb, "tx", filter=SeqnameFilter("chrY")))
+  yTxCds
+
+#+END_SRC
+
+At last changing the seqname style to the default value ="Ensembl"=.
+
+#+BEGIN_SRC R
+  seqlevelsStyle(edb) <- "Ensembl"
+#+END_SRC
 
 * Interactive annotation lookup using the =shiny= web app
 
@@ -514,30 +589,51 @@ names.
   ## Define a genome axis track
   gat <- GenomeAxisTrack()
 
+  ## We have to change the ucscChromosomeNames option to FALSE to enable Gviz usage
+  ## with non-UCSC chromosome names.
+  options(ucscChromosomeNames=FALSE)
+
   plotTracks(list(gat, GeneRegionTrack(gr)))
 
-  ## Note: in some cases we might want to change the ucscChromosomeNames to FALSE
-  ## i.e. using options(ucscChromosomeNames=FALSE) to force use of the chromosome names
-  ## "as is", e.g. if we're also using and fetching genomic DNA information from Ensembl
-  ## FASTA files or did align reads against Ensembl chromosome sequences.
+  options(ucscChromosomeNames=TRUE)
 
 #+END_SRC
 
+Above we had to change the option =ucscChromosomeNames= to =FALSE= in order to
+use it with non-UCSC chromosome names. Alternatively, we could however also
+change the =seqnamesStyle= of the =EnsDb= object to =UCSC=. Note that we have to
+use now also chromosome names in the /UCSC style/ in the =SeqnameFilter=
+(i.e. ="chrY"= instead of =Y=).
+
+#+BEGIN_SRC R :ravel message=FALSE
+  seqlevelsStyle(edb) <- "UCSC"
+  ## Retrieving the GRanges objects with seqnames corresponding to UCSC chromosome names.
+  gr <- getGeneRegionTrackForGviz(edb, chromosome="chrY", start=20400000, end=21400000)
+  seqnames(gr)
+  ## Define a genome axis track
+  gat <- GenomeAxisTrack()
+  plotTracks(list(gat, GeneRegionTrack(gr)))
+
+#+END_SRC
 
 We can also use the filters from the =ensembldb= package to further refine what
 transcripts are fetched, like in the example below, in which we create two
 different gene region tracks, one for protein coding genes and one for lincRNAs.
 
 #+BEGIN_SRC R :ravel gviz-separate-tracks, message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
-  protCod <- getGeneRegionTrackForGviz(edb, chromosome="Y",
+  protCod <- getGeneRegionTrackForGviz(edb, chromosome="chrY",
                                        start=20400000, end=21400000,
                                        filter=GenebiotypeFilter("protein_coding"))
-  lincs <- getGeneRegionTrackForGviz(edb, chromosome="Y",
+  lincs <- getGeneRegionTrackForGviz(edb, chromosome="chrY",
                                      start=20400000, end=21400000,
                                      filter=GenebiotypeFilter("lincRNA"))
 
   plotTracks(list(gat, GeneRegionTrack(protCod, name="protein coding"),
-                  GeneRegionTrack(lincs, name="lincs")), transcriptAnnotation="symbol")
+                  GeneRegionTrack(lincs, name="lincRNAs")), transcriptAnnotation="symbol")
+
+  ## At last we change the seqlevels style again to Ensembl
+  seqlevelsStyle <- "Ensembl"
+
 #+END_SRC
 
 # Instead of using the =getGeneRegionTrackForGviz= we could also directly pass the
@@ -561,7 +657,6 @@ different gene region tracks, one for protein coding genes and one for lincRNAs.
 #   plotTracks(list(gat, protGrt, lincGrt, otherGrt), transcriptAnnotation="symbol")
 
 # #+END_SRC
-
 
 
 
@@ -654,6 +749,13 @@ help avoiding them):
 
 + The CDS provided by =EnsDb= objects *always* includes both, the start and the
   stop codon.
+
++ Transcripts with multiple CDS are at present not supported by =EnsDb=.
+
++ At present, =EnsDb= support only genes/transcripts for which all of their
+  exons are encoded on the same chromosome and the same strand.
+
+
 
 * Building an transcript centric database package based on Ensembl annotation
 
@@ -782,7 +884,7 @@ information.
 
 Alternatively we can build the annotation database using the =ensDbFromGtf=
 =ensDbFromGff= functions, that extracts most of the required data from a GTF
-respectively Gff file which can be downloaded from Ensembl (e.g. from
+respectively GFF (version 3) file which can be downloaded from Ensembl (e.g. from
 ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens for human gene definitions
 from Ensembl version 75; for plant genomes etc files can be retrieved from
 ftp://ftp.ensemblgenomes.org). All information except the chromosome lengths and
@@ -1024,12 +1126,12 @@ The advantage over =getGenomeFaFile=? Eventually more =TwoBit= files might
 become available in future.
 Problem now is that the =seqinfo= for these guys seems a little problematic.
 
-** TODO Implement some more =GenomicFeatures= methods [/]
+** TODO Implement some more =GenomicFeatures= methods [1/5]
 
-+ [ ] =transcriptLenghts=: use the =lengthOf= method.
++ [X] =transcriptLenghts=: use the =lengthOf= method.
 + [ ] =transcriptsByOverlaps=.
 + [ ] =exonsByOverlaps=.
-+ [ ] =cds=.
+(+ [ ] =cds=.) CANCELED. A cds without a transcript makes no sense...
 + [ ] =distance=, =nearest=.
 
 ** TODO Interface to the =OrganismDbi= database [/].
@@ -1076,36 +1178,59 @@ We could also import stuff from GFF, not only GTF.
 I've to evaluate which is the correct way, the GFF info or the GTF, in which
 start or stop codon can be outside of the coding region (which seems odd).
 Check that with the Ensembl web page and eventually contact support!
-** TODO Include functionality from the =GenomeInfoDb= to fix chromosome naming.
+** DONE Include functionality from the =GenomeInfoDb= to fix chromosome naming.
+   CLOSED: [2016-02-02 Tue 07:21]
 
-+ [ ] Implement a =seqlevelsStyle<-= method for =EnsDb=. Should do something
-  similar than the stuff for =Gviz=.
+   - State "DONE"       from "TODO"       [2016-02-02 Tue 07:21]
++ [X] Implement a =seqlevelsStyle<-= method for =EnsDb=. Should do something
+  similar than the stuff for =Gviz=. If =seqlevelStyle= is /Ensembl/ keep all as
+  it is.
   Impact of that setter:
   - Queries support seqnames other than the ones from Ensembl.
   - Results have seqlevels set accordingly.
   - Check that the species is supported by =GenomeInfoDb=! Otherwise, return an error!
-+ [ ] Implement a =seqlevelsStyle= method for =EnsDb=.
-+ [ ] Implement central =mapSlToEns= =mapSlFromEns= methods (basically
++ [X] Implement a =seqlevelsStyle= method for =EnsDb=.
++ [X] Implement central =formatSeqnamesForQuery= =formatSeqnamesFromQuery= methods (basically
   replacement for =ucscToEns= and =prefixChromName=).
-+ [ ] =EnsDb= needs a new slot to store any data (type list).
++ [X] =EnsDb= needs a new slot to store any data (type list).
 Specifically, use =mapSeqlevels=
 
++ *Note*: the global option =ensembldb.seqnameNotFound= allows to specify how
+  the package handles missing mappings. Allowed are: =NA=, any value and special
+  cases ="MISSING"= (causes an error) and ="ORIGINAL"= (returns the original
+  names).
+
 + Methods/functions that should be affected:
-  - [ ] =getWhat=
-  - [ ] =seqinfo=
-  - [ ] =seqlevel=
-  - [ ] =exons=
-  - [ ] =exonsBy=
-  - [ ] =genes=
-  - [ ] =genesBy=
-  - [ ] =transcripts=
-  - [ ] =transcriptsBy=
-  - [ ] =SeqnameFilter=
-  - [ ] =GRangesFilter=
-  - [ ] =threeUTRsByTranscript=
-  - [ ] =fiveUTRsByTranscript=
-  - [ ] =promoters=
+  - [X] =getWhat=: always calling =formatSeqnamesFromQuery=.
+  - [X] =seqinfo=: always calling =formatSeqnamesFromQuery=.
+  - [X] =seqlevels=: always calling =formatSeqnamesFromQuery=.
+  - [X] =exons=: uses =getWhat= and =seqinfo= (restricting to used seqnames).
+  - [X] =exonsBy= uses =getWhat= and =seqinfo= (restricting to used seqnames).
+  - [X] =genes= uses =getWhat= and =seqinfo= (restricting to used seqnames).
+  - [X] =transcripts= uses =getWhat= and =seqinfo= (restricting to used seqnames).
+  - [X] =transcriptsBy= uses =getWhat= and =seqinfo= (restricting to used seqnames).
+  - [X] =SeqnameFilter=: always calling =formatSeqnamesForQuery=, does *not*
+    allow =NA= values, thus doesn't work if the seqname can not be changed to
+    Ensembl style.
+  - [X] =GRangesFilter=: always calls =formatSeqnamesForQuery=.
+  - [X] =threeUTRsByTranscript=
+  - [X] =fiveUTRsByTranscript=
+  - [X] =cdsBy= uses =getWhat= and =seqinfo= (restricting to used seqnames).
+  - [X] =promoters=: uses =transcripts=.
 
-** TODO Allow more generic GTF file names in =ensDbFromGtf=
++ [X] At last to verification: I could use the BSGenome package to retrieve
+  sequence info from UCSC and cross check that sequence info with the two fasta
+  files that are included in ensembldb.
 
++ [X] Add examples to the Vignette.
+
++ [X] Add help.
+
+** DONE Allow more generic GTF file names in =ensDbFromGtf=
+   CLOSED: [2016-01-21 Thu 17:15]
+   - State "DONE"       from "TODO"       [2016-01-21 Thu 17:15]
 Somehow I have to fix that it does not work with =chr.gtf.gz=.
+
+** DONE For all queries, restrict the seqinfo to the chromosome names in the =GRanges=.
+   CLOSED: [2016-02-01 Mon 08:53]
+   - State "DONE"       from "TODO"       [2016-02-01 Mon 08:53]

@@ -4,7 +4,7 @@ import(S4Vectors)
 importFrom(DBI, dbDriver)
 importFrom(Biobase, createPackage)
 importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels,
-           keepSeqlevels)
+           keepSeqlevels, seqlevelsStyle, "seqlevelsStyle<-", genomeStyles)
 importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
 importFrom(rtracklayer, import)
 import(RSQLite)
@@ -42,6 +42,9 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, gen
               transcriptLengths)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
+## Methods for GenomeInfoDb and related stuff
+exportMethods("seqlevelsStyle", "seqlevelsStyle<-", "supportedSeqlevelsStyles",
+              seqlevels)
 
 ## constructors
 export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
