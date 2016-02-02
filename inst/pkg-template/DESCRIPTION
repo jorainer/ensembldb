@@ -5,7 +5,6 @@ Version: @PKGVERSION@
 Author: @AUTHOR@
 Maintainer: @MAINTAINER@
 Depends: ensembldb
-Imports: GenomicFeatures
 License: @LIC@
 organism: @ORGANISM@
 species: @SPECIES@

@@ -1,3 +1,40 @@
+notrun_test_builds <- function(){
+    input <- "/Users/jo/Projects/EnsDbs/83/Homo_sapiens.GRCh38.83.gtf.gz"
+    fromGtf <- ensDbFromGtf(input, outfile=tempfile())
+    ## provide wrong ensembl version
+    fromGtf <- ensDbFromGtf(input, outfile=tempfile(), version="75")
+    ## provide wrong genome version
+    fromGtf <- ensDbFromGtf(input, outfile=tempfile(), genomeVersion="75")
+    EnsDb(fromGtf)
+    ## provide wrong organism
+    fromGtf <- ensDbFromGtf(input, outfile=tempfile(), organism="blalba")
+    EnsDb(fromGtf)
+    ## GFF
+    input <- "/Users/jo/Projects/EnsDbs/83/Homo_sapiens.GRCh38.83.chr.gff3.gz"
+    fromGff <- ensDbFromGff(input, outfile=tempfile())
+    EnsDb(fromGff)
+    fromGff <- ensDbFromGff(input, outfile=tempfile(), version="75")
+    EnsDb(fromGff)
+    fromGff <- ensDbFromGff(input, outfile=tempfile(), genomeVersion="bla")
+    EnsDb(fromGff)
+    fromGff <- ensDbFromGff(input, outfile=tempfile(), organism="blabla")
+    EnsDb(fromGff)
+
+    ## AH
+    library(AnnotationHub)
+    ah <- AnnotationHub()
+    fromAh <- ensDbFromAH(ah["AH47963"], outfile=tempfile())
+    EnsDb(fromAH)
+    fromAh <- ensDbFromAH(ah["AH47963"], outfile=tempfile(), version="75")
+    EnsDb(fromAH)
+    fromAh <- ensDbFromAH(ah["AH47963"], outfile=tempfile(), genomeVersion="bla")
+    EnsDb(fromAH)
+    fromAh <- ensDbFromAH(ah["AH47963"], outfile=tempfile(), organism="blabla")
+    EnsDb(fromAH)
+}
+
+
+
 notrun_test_ensdbFromGFF <- function(){
     library(ensembldb)
     ##library(rtracklayer)
@@ -111,7 +148,7 @@ notrun_test_ensdbFromGFF <- function(){
     fromGff <- ensDbFromGff(gff, outfile=tempfile())
     ## That works.
 
-    ## Try with a file from AnnotationHub.
+    ## Try with a file from AnnotationHub: Gorilla gorilla.
     library(AnnotationHub)
     ah <- AnnotationHub()
     ah <- ah["AH47962"]

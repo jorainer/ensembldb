@@ -487,7 +487,12 @@ setMethod("column", signature(object="SeqnameFilter", db="EnsDb", with.tables="c
 ## to be usable for EnsDb and Ensembl based chromosome names (i.e. without chr).
 setMethod("value", signature(x="SeqnameFilter", db="EnsDb"),
           function(x, db, ...){
-              return(ucscToEns(value(x)))
+              val <- formatSeqnamesForQuery(db, value(x))
+              if(any(is.na(val))){
+                  stop("A value of <NA> is not allowed for a SeqnameFilter!")
+              }
+              return(val)
+              ##return(ucscToEns(value(x)))
           })
 
 
@@ -728,12 +733,12 @@ setMethod("where", signature(object="GRangesFilter", db="EnsDb", with.tables="mi
 setMethod("where", signature(object="GRangesFilter", db="EnsDb", with.tables="character"),
           function(object, db, with.tables, ...){
               cols <- column(object, db, with.tables)
-              query <- buildWhereForGRanges(object, cols, fixUCSC=TRUE)
+              query <- buildWhereForGRanges(object, cols, db=db)
               return(query)
           })
 
 ## grf: GRangesFilter
-buildWhereForGRanges <- function(grf, columns, fixUCSC=FALSE){
+buildWhereForGRanges <- function(grf, columns, db=NULL){
     condition <- condition(grf)
     if(!any(condition == c("within", "overlapping")))
         stop(paste0("'condition' for GRangesFilter should either be ",
@@ -746,9 +751,13 @@ buildWhereForGRanges <- function(grf, columns, fixUCSC=FALSE){
         stop(paste0("'columns' has to be a named vector with names being ",
                     "'start', 'end', 'seqname', 'strand'!"))
     ## Build the query to fetch all features that are located within the range
-    seqn <- seqnames(grf)
-    if(fixUCSC)
-        seqn <- ucscToEns(seqn)
+    if(!is.null(db)){
+        seqn <- formatSeqnamesForQuery(db, seqnames(grf))
+    }else{
+        seqn <- seqnames(grf)
+    }
+    ## if(fixUCSC)
+    ##     seqn <- ucscToEns(seqn)
     if(condition == "within"){
         query <- paste0(columns["start"], " >= ", start(grf), " and ",
                         columns["end"], " <= ", end(grf), " and ",
