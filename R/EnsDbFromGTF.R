@@ -44,26 +44,12 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version){
         colnames(Header) <- c("name", "value")
         haveHeader <- TRUE
     }
-    ## getting the species name and the ensembl version from the GTF file name
-    fromFile <- FALSE
-    if(missing(organism) | missing(version) | missing(genomeVersion))
-        fromFile <- TRUE
-    if(missing(organism))
-        organism <- .organismName(organismFromGtfFileName(gtf))
-    if(missing(version)){
-        ensemblVersion <- ensemblVersionFromGtfFileName(gtf)
-    }else{
-        ensemblVersion <- version
-    }
-    if(missing(genomeVersion)){
-        genomeVersion <- genomeVersionFromGtfFileName(gtf)
-    }
-    if(is.na(as.numeric(ensemblVersion))){
-        if(fromFile){
-            stop(paste0("The GTF file name is not as expected: <Organism>.",
-                        "<genome version>.<Ensembl version>.gtf!"))
-        }
-    }
+    ## Check parameters
+    Parms <- .checkExtractVersions(gtf, organism, genomeVersion, version)
+    ensemblVersion <- Parms["version"]
+    organism <- Parms["organism"]
+    genomeVersion <- Parms["genomeVersion"]
+
     if(haveHeader){
         if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"]){
             stop(paste0("The GTF file name is not as expected: <Organism>.",
@@ -125,32 +111,12 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
         stop("Can only process GTF files provided by Ensembl!")
     if(tolower(ah$sourcetype) != "gtf")
         stop("Resource is not a GTF file!")
-    ensFromAH <- ensemblVersionFromGtfFileName(ah$title)
-    orgFromAH <- organismFromGtfFileName(ah$title)
-    genFromAH <- genomeVersionFromGtfFileName(ah$title)
+    ## Check parameters
+    Parms <- .checkExtractVersions(ah$title, organism, genomeVersion, version)
+    ensFromAH <- Parms["version"]
+    orgFromAH <- Parms["organism"]
+    genFromAH <- Parms["genomeVersion"]
     gtfFilename <- ah$title
-    ## Do some more testing with versions provided from the user.
-    if(!missing(organism)){
-        if(organism != orgFromAH){
-            warning("User specified organism (", organism, ") is different to the one extracted",
-                    " from the file name (", orgFromAH, ")! Using the one defined by the user.")
-            orgFromAH <- organism
-        }
-    }
-    if(!missing(genomeVersion)){
-        if(genomeVersion != genFromAH){
-            warning("User specified genome version (", genomeVersion, ") is different to the one extracted",
-                    " from the file name (", genFromAH, ")! Using the one defined by the user.")
-            genFromAH <- genomeVersion
-        }
-    }
-    if(!missing(version)){
-        if(version != ensFromAH){
-            warning("User specified Ensembl version (", version, ") is different to the one extracted",
-                    " from the file name (", ensFromAH, ")! Using the one defined by the user.")
-            ensFromAH <- version
-        }
-    }
     message("Fetching data ...", appendLF=FALSE)
     suppressMessages(
         gff <- ah[[1]]
@@ -173,6 +139,55 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     return(dbname)
 }
 
+.checkExtractVersions <- function(filename, organism, genomeVersion, version){
+    if(isEnsemblFileName(filename)){
+        ensFromFile <- ensemblVersionFromGtfFileName(filename)
+        orgFromFile <- organismFromGtfFileName(filename)
+        genFromFile <- genomeVersionFromGtfFileName(filename)
+    }else{
+        ensFromFile <- NA
+        orgFromFile <- NA
+        genFromFile <- NA
+        if(missing(organism) | missing(genomeVersion) | missing(version))
+            stop("The file name does not match the expected naming scheme of Ensembl",
+                 " files hence I cannot extract any information from it! Parameters",
+                 " 'organism', 'genomeVersion' and 'version' are thus required!")
+    }
+    ## Do some more testing with versions provided from the user.
+    if(!missing(organism)){
+        if(!is.na(orgFromFile)){
+            if(organism != orgFromFile){
+                warning("User specified organism (", organism, ") is different to the one extracted",
+                        " from the file name (", orgFromFile, ")! Using the one defined by the user.")
+            }
+        }
+        orgFromFile <- organism
+    }
+    if(!missing(genomeVersion)){
+        if(!is.na(genFromFile)){
+            if(genomeVersion != genFromFile){
+                warning("User specified genome version (", genomeVersion, ") is different to the one extracted",
+                        " from the file name (", genFromFile, ")! Using the one defined by the user.")
+            }
+        }
+        genFromFile <- genomeVersion
+    }
+    if(!missing(version)){
+        if(!is.na(ensFromFile)){
+            if(version != ensFromFile){
+            warning("User specified Ensembl version (", version, ") is different to the one extracted",
+                    " from the file name (", ensFromFile, ")! Using the one defined by the user.")
+            }
+        }
+        ensFromFile <- version
+    }
+    res <- c(orgFromFile, genFromFile, ensFromFile)
+    names(res) <- c("organism", "genomeVersion", "version")
+    return(res)
+}
+
+
+
 ####============================================================
 ##
 ##  ensDbFromGff
@@ -181,12 +196,11 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
 ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     options(useFancyQuotes=FALSE)
 
-    ## Get organism, Ensembl version and genome version from file name:
-    ## Ensembl gff files have the naming convention:
-    ## <species>.<assembly>.<_version>.gff.gz
-    orgFromFile <- organismFromGtfFileName(gff)
-    ensFromFile <- ensemblVersionFromGtfFileName(gsub(gff, pattern="gff", replacement="gtf"))
-    genFromFile <- genomeVersionFromGtfFileName(gsub(gff, pattern="gff", replacement="gtf"))
+    ## Check parameters
+    Parms <- .checkExtractVersions(gff, organism, genomeVersion, version)
+    ensFromFile <- Parms["version"]
+    orgFromFile <- Parms["organism"]
+    genFromFile <- Parms["genomeVersion"]
     ## Reading some info from the header.
     tmp <- readLines(gff, n=500)
     if(length(grep(tmp[1], pattern="##gff-version")) == 0)
@@ -205,31 +219,9 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
             if(genFromHeader != genFromFile){
                 warning("Genome version extracted from file name (", genFromFile,
                         ") does not match the genome version specified inside the file (",
-                        genFromHeader, "). Will consider the one defined insider the file.")
+                        genFromHeader, "). Will consider the one defined inside the file.")
                 genFromFile <- genFromHeader
             }
-        }
-    }
-    ## Do some more testing with versions provided from the user.
-    if(!missing(organism)){
-        if(organism != orgFromFile){
-            warning("User specified organism (", organism, ") is different to the one extracted",
-                    " from the file name (", orgFromFile, ")! Using the one defined by the user.")
-            orgFromFile <- organism
-        }
-    }
-    if(!missing(genomeVersion)){
-        if(genomeVersion != genFromFile){
-            warning("User specified genome version (", genomeVersion, ") is different to the one extracted",
-                    " from the file name (", genFromFile, ")! Using the one defined by the user.")
-            genFromFile <- genomeVersion
-        }
-    }
-    if(!missing(version)){
-        if(version != ensFromFile){
-            warning("User specified Ensembl version (", version, ") is different to the one extracted",
-                    " from the file name (", ensFromFile, ")! Using the one defined by the user.")
-            ensFromFile <- version
         }
     }
 
@@ -951,13 +943,78 @@ compareExons <- function(x, y){
     return(Ret)
 }
 
-
-
+####============================================================
+##  isEnsemblFileName
+##
+##  evaluate whether the file name is "most likely" corresponding
+##  to a file name from Ensembl, i.e. following the convention
+##  <organism>.<genome version>.<ensembl version>.[chr].gff/gtf.gz
+##  The problem is that the genome version can also be . separated.
+####------------------------------------------------------------
+isEnsemblFileName <- function(x){
+    x <- file.name(x)
+    ## If we split by ., do we get at least 4 elements?
+    els <- unlist(strsplit(x, split=".", fixed=TRUE))
+    if(length(els) < 4)
+        return(FALSE)
+    ## Can we get an Ensembl version?
+    ensVer <- ensemblVersionFromGtfFileName(x)
+    if(is.na(ensVer))
+        return(FALSE)
+    ## If we got one, do we still have enough fields left of the version?
+    idx <- which(els == ensVer)
+    idx <- idx[length(idx)]
+    if(idx < 3){
+        ## No way, we're missing the organism and the genome build field!
+        return(FALSE)
+    }
+    ## Well, can not think of any other torture... let's assume it's OK.
+    return(TRUE)
+}
 organismFromGtfFileName <- function(x){
     return(elementFromEnsemblFilename(x, 1))
 }
-
+####============================================================
+##  ensemblVersionFromGtfFileName
+##
+##  Tries to extract the Ensembl version from the file name. If it
+##  finds a numeric value it returns it, otherwise it returns NA.
+####------------------------------------------------------------
 ensemblVersionFromGtfFileName <- function(x){
+    x <- file.name(x)
+    els <- unlist(strsplit(x, split=".", fixed=TRUE))
+    ## Ensembl version is the last numeric value in the file name.
+    for(elm in rev(els)){
+        suppressWarnings(
+            if(!is.na(as.numeric(elm))){
+                return(elm)
+            }
+        )
+    }
+    return(NA)
+}
+####============================================================
+##  genomeVersionFromGtfFileName
+##
+## the genome build can also contain .! thus, I return everything which is not
+## the first element (i.e. organism), or the ensembl version, that is one left of
+## the gtf.
+genomeVersionFromGtfFileName <- function(x){
+    x <- file.name(x)
+    els <- unlist(strsplit(x, split=".", fixed=TRUE))
+    ensVer <- ensemblVersionFromGtfFileName(x)
+    if(is.na(ensVer)){
+        stop("Can not extract the genome version from the file name!",
+             " The file name does not follow the expected naming convention from Ensembl!")
+    }
+    idx <- which(els == ensVer)
+    idx <- idx[length(idx)]
+    if(idx < 3)
+        stop("Can not extract the genome version from the file name!",
+             " The file name does not follow the expected naming convention from Ensembl!")
+    return(paste(els[2:(idx-1)], collapse="."))
+}
+old_ensemblVersionFromGtfFileName <- function(x){
     tmp <- unlist(strsplit(x, split=.Platform$file.sep, fixed=TRUE))
     splitty <- unlist(strsplit(tmp[length(tmp)], split=".", fixed=TRUE))
     return(splitty[(grep(splitty, pattern="gtf")-1)])
@@ -966,7 +1023,7 @@ ensemblVersionFromGtfFileName <- function(x){
 ## the genome build can also contain .! thus, I return everything which is not
 ## the first element (i.e. organism), or the ensembl version, that is one left of
 ## the gtf.
-genomeVersionFromGtfFileName <- function(x){
+old_genomeVersionFromGtfFileName <- function(x){
     tmp <- unlist(strsplit(x, split=.Platform$file.sep, fixed=TRUE))
     splitty <- unlist(strsplit(tmp[length(tmp)], split=".", fixed=TRUE))
     gvparts <- splitty[2:(grep(splitty, pattern="gtf")-2)]
@@ -984,3 +1041,8 @@ elementFromEnsemblFilename <- function(x, which=1){
     return(splitty[which])
 }
 
+file.name <- function(x){
+    fn <- unlist(strsplit(x, split=.Platform$file.sep, fixed=TRUE))
+    fn <- fn[length(fn)]
+    return(fn)
+}

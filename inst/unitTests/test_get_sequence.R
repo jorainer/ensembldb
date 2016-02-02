@@ -1,15 +1,135 @@
 library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
-notrun_test_extractTranscriptSeqs <- function(){
-    ## That's how we want to test the transcript seqs.
-    ZBTB <- extractTranscriptSeqs(getGenomeFaFile(edb), edb, filter=GenenameFilter("ZBTB16"))
-
-    library(TxDb.Hsapiens.UCSC.hg19.knownGene)
-    txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+## That's now using the BSGenome package...
+test_extractTranscriptSeqs_with_BSGenome <- function(){
     library(BSgenome.Hsapiens.UCSC.hg19)
-    genome <- BSgenome.Hsapiens.UCSC.hg19
-    All <- extractTranscriptSeqs(genome, txdb)
+    bsg <- BSgenome.Hsapiens.UCSC.hg19
+
+    ## Changing the seqlevels tyle to UCSC
+    seqlevelsStyle(edb) <- "UCSC"
+    ZBTB <- extractTranscriptSeqs(bsg, edb, filter=GenenameFilter("ZBTB16"))
+    ## Load the sequences for one ZBTB16 transcript from FA.
+    faf <- system.file("txt/ENST00000335953.fa.gz", package="ensembldb")
+    Seqs <- readDNAStringSet(faf)
+    tx <- "ENST00000335953"
+    ## cDNA
+    checkEquals(unname(as.character(ZBTB[tx])),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    ## CDS
+    cBy <- cdsBy(edb, "tx", filter=TxidFilter(tx))
+    CDS <- extractTranscriptSeqs(bsg, cBy)
+    checkEquals(unname(as.character(CDS)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cds")])))
+    ## 5' UTR
+    fBy <- fiveUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(bsg, fBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr5")])))
+    ## 3' UTR
+    tBy <- threeUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(bsg, tBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr3")])))
+
+
+    ## Another gene on the reverse strand:
+    faf <- system.file("txt/ENST00000200135.fa.gz", package="ensembldb")
+    Seqs <- readDNAStringSet(faf)
+    tx <- "ENST00000200135"
+    ## cDNA
+    cDNA <- extractTranscriptSeqs(bsg, edb, filter=TxidFilter(tx))
+    checkEquals(unname(as.character(cDNA)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    ## do the same, but from other strand
+    exns <- exonsBy(edb, "tx", filter=TxidFilter(tx))
+    cDNA <- extractTranscriptSeqs(bsg, exns)
+    checkEquals(unname(as.character(cDNA)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    strand(exns) <- "+"
+    cDNA <- extractTranscriptSeqs(bsg, exns)
+    checkTrue(unname(as.character(cDNA)) !=
+              unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    ## CDS
+    cBy <- cdsBy(edb, "tx", filter=TxidFilter(tx))
+    CDS <- extractTranscriptSeqs(bsg, cBy)
+    checkEquals(unname(as.character(CDS)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cds")])))
+    ## 5' UTR
+    fBy <- fiveUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(bsg, fBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr5")])))
+    ## 3' UTR
+    tBy <- threeUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(bsg, tBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr3")])))
+}
+
+
+notrun_test_extractTranscriptSeqs <- function(){
+    ## Note: we can't run that by default as we can not assume everybody has
+    ## AnnotationHub and the required ressource installed.
+    ## That's how we want to test the transcript seqs.
+    genome <- getGenomeFaFile(edb)
+    ZBTB <- extractTranscriptSeqs(genome, edb, filter=GenenameFilter("ZBTB16"))
+    ## Load the sequences for one ZBTB16 transcript from FA.
+    faf <- system.file("txt/ENST00000335953.fa.gz", package="ensembldb")
+    Seqs <- readDNAStringSet(faf)
+    tx <- "ENST00000335953"
+    ## cDNA
+    checkEquals(unname(as.character(ZBTB[tx])),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    ## CDS
+    cBy <- cdsBy(edb, "tx", filter=TxidFilter(tx))
+    CDS <- extractTranscriptSeqs(genome, cBy)
+    checkEquals(unname(as.character(CDS)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cds")])))
+    ## 5' UTR
+    fBy <- fiveUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(genome, fBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr5")])))
+    ## 3' UTR
+    tBy <- threeUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(genome, tBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr3")])))
+
+
+    ## Another gene on the reverse strand:
+    faf <- system.file("txt/ENST00000200135.fa.gz", package="ensembldb")
+    Seqs <- readDNAStringSet(faf)
+    tx <- "ENST00000200135"
+    ## cDNA
+    cDNA <- extractTranscriptSeqs(genome, edb, filter=TxidFilter(tx))
+    checkEquals(unname(as.character(cDNA)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    ## do the same, but from other strand
+    exns <- exonsBy(edb, "tx", filter=TxidFilter(tx))
+    cDNA <- extractTranscriptSeqs(genome, exns)
+    checkEquals(unname(as.character(cDNA)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    strand(exns) <- "+"
+    cDNA <- extractTranscriptSeqs(genome, exns)
+    checkTrue(unname(as.character(cDNA)) !=
+              unname(as.character(Seqs[grep(names(Seqs), pattern="cdna")])))
+    ## CDS
+    cBy <- cdsBy(edb, "tx", filter=TxidFilter(tx))
+    CDS <- extractTranscriptSeqs(genome, cBy)
+    checkEquals(unname(as.character(CDS)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="cds")])))
+    ## 5' UTR
+    fBy <- fiveUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(genome, fBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr5")])))
+    ## 3' UTR
+    tBy <- threeUTRsByTranscript(edb, filter=TxidFilter(tx))
+    UTR <- extractTranscriptSeqs(genome, tBy)
+    checkEquals(unname(as.character(UTR)),
+                unname(as.character(Seqs[grep(names(Seqs), pattern="utr3")])))
 }
 
 notrun_test_getCdsSequence <- function(){

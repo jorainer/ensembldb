@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use an Ensembl based annotation database
-Version: 1.3.13
+Version: 1.3.14
 Author: Johannes Rainer <johannes.rainer@eurac.edu>,
 	Tim Triche <tim.triche@usc.edu>
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
@@ -10,9 +10,9 @@ BugReports: https://github.com/jotsetung/ensembldb/issues
 Imports: methods, RSQLite, DBI, Biobase, GenomeInfoDb,
          AnnotationDbi (>= 1.31.19), rtracklayer, S4Vectors,
          AnnotationHub, Rsamtools, IRanges
-Depends: BiocGenerics (>= 0.15.10), GenomicRanges, GenomicFeatures
+Depends: BiocGenerics (>= 0.15.10), GenomicRanges, GenomicFeatures (>= 1.23.18)
 Suggests: BiocStyle, knitr, rmarkdown, EnsDb.Hsapiens.v75 (>= 0.99.7),
-	  RUnit, shiny, Gviz
+	  RUnit, shiny, Gviz, BSgenome.Hsapiens.UCSC.hg19
 VignetteBuilder: knitr
 Description: The package provides functions to create and use
         transcript centric annotation databases/packages. The
@@ -25,6 +25,7 @@ Description: The package provides functions to create and use
         specific entries like genes encoded on a chromosome region or
         transcript models of lincRNA genes.
 Collate: Classes.R Generics.R dbhelpers.R Methods.R Methods-Filter.R loadEnsDb.R
-        makeEnsemblDbPackage.R EnsDbFromGTF.R runEnsDbApp.R select-methods.R zzz.R
+        makeEnsemblDbPackage.R EnsDbFromGTF.R runEnsDbApp.R select-methods.R
+	seqname-utils.R zzz.R
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL
