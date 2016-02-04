@@ -91,5 +91,12 @@ test_GRangesFilterQuery <- function(){
         ## OK, that' OK.
     }
 
+    ## OK, now for a GRangesFilter with more than one GRanges.
+    ir2 <- IRanges(start=c(2654890, 2709520, 28111770),
+                   end=c(2654900, 2709550, 28111790))
+    grf2 <- GRangesFilter(GRanges(rep("Y", length(ir2)), ir2), condition="overlapping")
+    Test <- transcripts(edb, filter=grf2)
+    checkEquals(names(Test), c("ENST00000383070", "ENST00000250784", "ENST00000598545"))
+
 }
 

@@ -96,8 +96,8 @@ SeqendFilter(value, condition = "=", feature = "gene")
       \code{\link{listGenebiotypes}} method.
     }
     \item{GRangesFilter}{
-      Allows to fetch features within or overlapping a specified genomic
-      region/range. This filter takes a \code{GRanges} object as input
+      Allows to fetch features within or overlapping the specified genomic
+      region(s)/range(s). This filter takes a \code{GRanges} object as input
       and, if \code{condition="within"} (the default) will restrict
       results to features (genes, transcripts or exons) that are
       completely within the region. Alternatively, by specifying
@@ -107,6 +107,10 @@ SeqendFilter(value, condition = "=", feature = "gene")
       which end coordinate is larger than the start coordinate of the
       region. Thus, genes and transcripts that have an intron
       overlapping the region will also be returned.
+
+      Note: if the specified \code{GRanges} object defines multiple
+      region, all features within (or overlapping) any of these regions
+      are returned.
 
       See \code{\linkS4class{GRangesFilter}} for more details.
     }
@@ -197,6 +201,16 @@ where(Filter)
 ## Create a GRangesFilter
 GRangesFilter(GRanges("X", IRanges(123, 5454)))
 
+## Create a GRangesFilter with multiple ranges
+grf <- GRangesFilter(GRanges(c("X", "Y"),
+                             IRanges(start=c(123, 900),
+                                     end=c(5454, 910))))
+## Evaluate the "where" SQL clause that would be applied.
+where(grf)
+## Change the "condition" of the filter and evaluate the
+## where clause again.
+condition(grf) <- "overlapping"
+where(grf)
 
 }
 \keyword{data}
