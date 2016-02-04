@@ -7,7 +7,8 @@ validateConditionFilter <- function(object){
     if(object@.valueIsCharacter){
         ## condition has to be either = or in
         if(!any(c("=", "in", "not in", "like", "!=")==object@condition)){
-            return(paste("only \"=\", \"!=\", \"in\" , \"not in\" and \"like\" allowed for condition",
+            return(paste("only \"=\", \"!=\", \"in\" , \"not in\" and \"like\"",
+                         "allowed for condition",
                          ", I've got", object@condition))
         }
     }else{
@@ -19,7 +20,8 @@ validateConditionFilter <- function(object){
     }
     if(length(object@value) > 1){
         if(any(!object@condition %in% c("in", "not in")))
-            return(paste("only \"in\" and \"not in\" are allowed if value is a vector with more than one value!"))
+            return(paste("only \"in\" and \"not in\" are allowed if value",
+                         "is a vector with more than one value!"))
     }
     if(!object@.valueIsCharacter){
         ## value has to be numeric!!!
@@ -648,14 +650,20 @@ setValidity("GRangesFilter", function(object){
 setMethod("show", "GRangesFilter", function(object){
     cat("|", class(object), "\n")
     cat("| region:\n")
-    cat("| + start: ", start(object), "\n")
-    cat("| + end:   ", end(object), "\n")
-    cat("| + seqname: ", seqnames(object), "\n")
-    cat("| + strand: ", strand(object), "\n")
+    cat("| + start: ", paste0(start(object), collapse=", "), "\n")
+    cat("| + end:   ", paste0(end(object), collapse=", "), "\n")
+    cat("| + seqname: ", paste0(seqnames(object), collapse=", "), "\n")
+    cat("| + strand: ", paste0(strand(object), collapse=", "), "\n")
     cat("| condition: ", condition(object), "\n")
 })
 setMethod("condition", "GRangesFilter", function(x, ...){
     return(x@location)
+})
+setReplaceMethod("condition", "GRangesFilter", function(x, value){
+    value <- match.arg(value, c("within", "overlapping"))
+    x@location <- value
+    validObject(x)
+    return(x)
 })
 setMethod("value", signature(x="GRangesFilter", db="missing"),
           function(x, db, ...){
@@ -681,6 +689,10 @@ setMethod("strand", signature(x="GRangesFilter"),
 setMethod("seqnames", signature(x="GRangesFilter"),
           function(x){
               return(as.character(seqnames(value(x))))
+          })
+setMethod("seqlevels", signature(x="GRangesFilter"),
+          function(x){
+              return(seqlevels(value(x)))
           })
 ## The column method for GRangesFilter returns all columns required for the query, i.e.
 ## the _seq_start, _seq_end for the feature, seq_name and seq_strand.
@@ -737,6 +749,7 @@ setMethod("where", signature(object="GRangesFilter", db="EnsDb", with.tables="ch
               return(query)
           })
 
+
 ## grf: GRangesFilter
 buildWhereForGRanges <- function(grf, columns, db=NULL){
     condition <- condition(grf)
@@ -751,32 +764,41 @@ buildWhereForGRanges <- function(grf, columns, db=NULL){
         stop(paste0("'columns' has to be a named vector with names being ",
                     "'start', 'end', 'seqname', 'strand'!"))
     ## Build the query to fetch all features that are located within the range
-    if(!is.null(db)){
-        seqn <- formatSeqnamesForQuery(db, seqnames(grf))
-    }else{
-        seqn <- seqnames(grf)
-    }
-    ## if(fixUCSC)
-    ##     seqn <- ucscToEns(seqn)
-    if(condition == "within"){
-        query <- paste0(columns["start"], " >= ", start(grf), " and ",
-                        columns["end"], " <= ", end(grf), " and ",
-                        columns["seqname"], " == '", seqn, "'")
-    }
-    ## Build the query to fetch all features (partially) overlapping the range. This
-    ## includes also all features (genes or transcripts) that have an intron at that
-    ## position.
-    if(condition == "overlapping"){
-        query <- paste0(columns["start"], " <= ", end(grf), " and ",
-                        columns["end"], " >= ", start(grf), " and ",
-                        columns["seqname"], " = '", seqn, "'")
-    }
-    ## Include the strand, if it's not "*"
-    if(strand(grf) != "*"){
-        query <- paste0(query, " and ", columns["strand"], " = ", strand2num(strand(grf)))
-    }
+    quers <- sapply(value(grf), function(z){
+        if(!is.null(db)){
+            seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
+        }else{
+            seqn <- as.character(seqnames(z))
+        }
+        if(condition == "within"){
+            query <- paste0(columns["start"], " >= ", start(z), " and ",
+                            columns["end"], " <= ", end(z), " and ",
+                            columns["seqname"], " == '", seqn, "'")
+        }
+        ## Build the query to fetch all features (partially) overlapping the range. This
+        ## includes also all features (genes or transcripts) that have an intron at that
+        ## position.
+        if(condition == "overlapping"){
+            query <- paste0(columns["start"], " <= ", end(z), " and ",
+                            columns["end"], " >= ", start(z), " and ",
+                            columns["seqname"], " = '", seqn, "'")
+        }
+        ## Include the strand, if it's not "*"
+        if(as.character(strand(z)) != "*"){
+            query <- paste0(query, " and ", columns["strand"], " = ",
+                            strand2num(as.character(strand(z))))
+        }
+        return(query)
+    })
+    if(length(quers) > 1)
+        quers <- paste0("(", quers, ")")
+    query <- paste0(quers, collapse=" or ")
+    ## Collapse now the queries.
     return(query)
 }
+
+
+
 ## map chromosome strand...
 strand2num <- function(x){
     if(x == "+" | x == "-"){

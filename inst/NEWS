@@ -1,3 +1,12 @@
+CHANGES IN VERSION 1.3.15
+-------------------------
+
+NEW FEATURES
+    o GRangesFilter now supports GRanges of length > 1.
+    o seqlevels method for GRangesFilter.
+    o New methods exonsByOverlaps and transcriptsByOverlaps.
+
+
 CHANGES IN VERSION 1.3.14
 -------------------------
 
