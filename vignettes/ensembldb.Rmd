@@ -14,7 +14,7 @@ vignette: >
 
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 2 February, 2016<br />
+**Modified**: 4 February, 2016<br />
 **Compiled**: `r date()`
 
 # Introduction
@@ -167,7 +167,7 @@ yCds
 ```
 
 Using a `GRangesFilter` we can retrieve all features from the database that are
-either within or overlapping with the specified genomic region. In the example
+either within or overlapping the specified genomic region. In the example
 below we query all genes that are partially overlapping with a small region on
 chromosome 11. The filter restricts to all genes for which either an exon or an
 intron is partially overlapping with the region.
@@ -204,6 +204,14 @@ region.
 ```{r }
 transcripts(edb, filter=grf)
 ```
+
+The `GRangesFilter` supports also `GRanges` defining multiple regions and a
+query will return all features overlapping any of these regions. Besides using
+the `GRangesFilter` it is also possible to search for transcripts or exons
+overlapping genomic regions using the `exonsByOverlaps` or
+`transcriptsByOverlaps` known from the `GenomicFeatures` package. Note that the
+implementation of these methods for `EnsDb` objects supports also to use filters
+to further fine-tune the query.
 
 To get an overview of allowed/available gene and transcript biotype the
 functions `listGenebiotypes` and `listTxbiotypes` can be used.
@@ -806,7 +814,7 @@ makeEnsembldbPackage(ensdb=DB, version="0.99.12",
 # Database layout<a id="orgtarget1"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [107](#orgparagraph1)):
+shown in Figure [108](#orgparagraph1)):
 
 -   **gene**: all gene specific annotations.
     -   `gene_id`: the Ensembl ID of the gene.
