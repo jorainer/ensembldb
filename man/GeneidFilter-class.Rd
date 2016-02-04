@@ -93,6 +93,7 @@
 \alias{condition<-,BasicFilter-method}
 \alias{condition<-}
 \alias{condition,GRangesFilter-method}
+\alias{condition<-,GRangesFilter-method}
 \alias{show,BasicFilter-method}
 \alias{show,GRangesFilter-method}
 \alias{print,BasicFilter-method}
@@ -113,6 +114,13 @@
 \alias{value}
 \alias{column}
 \alias{where}
+% Additional GRangesFilter stuff
+\alias{end,GRangesFilter-method}
+\alias{seqlevels,GRangesFilter-method}
+\alias{seqnames,GRangesFilter-method}
+\alias{start,GRangesFilter-method}
+\alias{strand,GRangesFilter-method}
+
 
 \title{Filter results fetched from the Ensembl database}
 \description{
@@ -151,7 +159,7 @@
 \section{Extends}{
   Class \code{\linkS4class{BasicFilter}}, directly.
 }
-\section{Methods}{
+\section{Methods for all \code{BasicFilter} objects}{
   \describe{
     Note: these methods are applicable to all classes extending the
     \code{BasicFilter} class.
@@ -221,6 +229,18 @@
     }
   }
 }
+\section{Methods for \code{GRangesFilter} objects}{
+  \describe{
+    \item{start, end, strand}{
+      Get the start and end coordinate and the strand from the
+	\code{GRanges} within the filter.
+    }
+
+    \item{seqlevels, seqnames}{
+      Get the names of the sequences from the \code{GRanges} of the filter.
+    }
+  }
+}
 \details{
   \describe{
     \item{\code{ExonidFilter}}{
@@ -236,7 +256,6 @@
     \item{\code{GenebiotypeFilter}}{
       Filter results based on the gene biotype as defined in the Ensembl
       database.
-
     }
 
     \item{\code{GeneidFilter}}{
@@ -248,8 +267,8 @@
     }
 
     \item{\code{GRangesFilter}}{
-      Allows to fetch features within or overlapping a specified genomic
-      region/range. This filter takes a \code{GRanges} object as input
+      Allows to fetch features within or overlapping specified genomic
+      region(s)/range(s). This filter takes a \code{GRanges} object as input
       and, if \code{condition="within"} (the default) will restrict
       results to features (genes, transcripts or exons) that are
       completely within the region. Alternatively, by specifying
@@ -268,8 +287,13 @@
       (i.e. \code{"gene"}, \code{"transcript"} or \code{"exon"}) for the
       filtering.
 
+      Note: if the specified \code{GRanges} object defines multiple
+      region, all features within (or overlapping) any of these regions
+      are returned.
+
       Chromosome names/seqnames can be provided in UCSC format
-      (e.g. \code{"chrX"}) or Ensembl format (e.g. \code{"X"}).
+      (e.g. \code{"chrX"}) or Ensembl format (e.g. \code{"X"}); see
+      \code{\link{seqlevelsStyle}} for more information.
     }
 
     \item{\code{SeqendFilter}}{

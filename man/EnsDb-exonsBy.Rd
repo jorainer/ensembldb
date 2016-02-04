@@ -10,6 +10,7 @@
 \alias{exons,EnsDb-method}
 \alias{exonsBy}
 \alias{exonsBy,EnsDb-method}
+\alias{exonsByOverlaps,EnsDb-method}
 \alias{genes}
 \alias{genes,EnsDb-method}
 \alias{toSAF}
@@ -18,6 +19,7 @@
 \alias{transcripts,EnsDb-method}
 \alias{transcriptsBy}
 \alias{transcriptsBy,EnsDb-method}
+\alias{transcriptsByOverlaps,EnsDb-method}
 \alias{promoters}
 \alias{promoters,EnsDb-method}
 
@@ -36,12 +38,22 @@
 \S4method{exonsBy}{EnsDb}(x, by=c("tx", "gene"),
                           columns=listColumns(x, "exon"), filter, use.names=FALSE)
 
+\S4method{exonsByOverlaps}{EnsDb}(x, ranges, maxgap=0L, minoverlap=1L,
+                                  type=c("any", "start", "end"),
+                                  columns=listColumns(x, "exon"),
+                                  filter)
+
 \S4method{transcripts}{EnsDb}(x, columns=listColumns(x, "tx"),
                               filter, order.by, order.type="asc",
                               return.type="GRanges")
 
 \S4method{transcriptsBy}{EnsDb}(x, by=c("gene", "exon"),
                                 columns=listColumns(x, "tx"), filter)
+
+\S4method{transcriptsByOverlaps}{EnsDb}(x, ranges, maxgap=0L, minoverlap=1L,
+                                        type=c("any", "start", "end"),
+                                        columns=listColumns(x, "tx"),
+                                        filter)
 
 \S4method{promoters}{EnsDb}(x, upstream=2000, downstream=200, ...)
 
@@ -129,6 +141,18 @@
     IDs.
   }
 
+  \item{maxgap}{
+    For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: see
+    \code{\link[GenomicFeatures]{exonsByOverlaps}} help page in the
+    \code{GenomicFeatures} package.
+  }
+
+  \item{minoverlap}{
+    For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: see
+    \code{\link[GenomicFeatures]{exonsByOverlaps}} help page in the
+    \code{GenomicFeatures} package.
+  }
+
   \item{order.by}{
     Name of one of the columns above on which the
     results should be sorted.
@@ -139,6 +163,11 @@
     (\code{asc}, default) or descending (\code{desc}).
   }
 
+  \item{ranges}{
+    For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: a
+    \code{GRanges} object specifying the genomic regions.
+  }
+
   \item{return.type}{
     Type of the returned object. Can be either
     \code{"data.frame"}, \code{"DataFrame"} or \code{"GRanges"}. In the latter case the return
@@ -147,6 +176,12 @@
     transcript or exon, depending whether \code{genes},
     \code{transcripts} or \code{exons} was called). All additional
     columns are added as metadata columns to the GRanges object.
+  }
+
+  \item{type}{
+    For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: see
+    \code{\link[GenomicFeatures]{exonsByOverlaps}} help page in the
+    \code{GenomicFeatures} package.
   }
 
   \item{upstream}{
@@ -191,6 +226,15 @@
       the name of the gene or transcript.
     }
 
+    \item{exonsByOverlaps}{
+      Retrieve exons overlapping specified genomic ranges. For
+      more information see
+      \code{\link[GenomicFeatures]{exonsByOverlaps}} method in the
+      \code{GenomicFeatures} package. The functionality is to some
+      extent similar and redundant to the \code{exons} method in
+      combination with \code{\link{GRangesFilter}} filter.
+    }
+
     \item{transcripts}{
       Retrieve transcript information from the database. Additional
       columns from genes or exons associated with the transcripts can be specified
@@ -210,6 +254,15 @@
       position of the transcript for genes encoded on the - strand.
       The \code{GRanges} in the \code{GRangesList} will be ordered by
       the name of the gene or exon.
+    }
+
+    \item{transcriptsByOverlaps}{
+      Retrieve transcripts overlapping specified genomic ranges. For
+      more information see
+      \code{\link[GenomicFeatures]{transcriptsByOverlaps}} method in the
+      \code{GenomicFeatures} package. The functionality is to some
+      extent similar and redundant to the \code{transcripts} method in
+      combination with \code{\link{GRangesFilter}} filter.
     }
 
     \item{promoters}{
@@ -338,6 +391,10 @@
   \code{return.type} parameter. The results are ordered by the value of the
   \code{by} parameter.
 
+  For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: a
+  \code{GRanges} with the exons or transcripts overlapping the specified
+  regions.
+
   For \code{toSAF}: a \code{data.frame} with column names
   \code{"GeneID"} (the group name from the \code{GRangesList}, i.e. the
   ID by which the \code{GRanges} are split), \code{"Chr"} (the seqnames
@@ -372,15 +429,16 @@
 \examples{
 
 library(EnsDb.Hsapiens.v75)
+edb <- EnsDb.Hsapiens.v75
 
 ######   genes
 ##
 ## get all genes endcoded on chromosome Y
-AllY <- genes(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"))
+AllY <- genes(edb, filter=SeqnameFilter("Y"))
 AllY
 
 ## return result as DataFrame.
-AllY.granges <- genes(EnsDb.Hsapiens.v75,
+AllY.granges <- genes(edb,
                       filter=SeqnameFilter("Y"),
                       return.type="DataFrame")
 AllY.granges
@@ -388,7 +446,7 @@ AllY.granges
 ## include all transcripts of the gene and their chromosomal
 ## coordinates, sort by chrom start of transcripts and return as
 ## GRanges.
-AllY.granges.tx <- genes(EnsDb.Hsapiens.v75,
+AllY.granges.tx <- genes(edb,
                          filter=SeqnameFilter("Y"),
                          columns=c("gene_id", "seq_name",
                              "seq_strand", "tx_id", "tx_biotype",
@@ -401,14 +459,14 @@ AllY.granges.tx
 ######   transcripts
 ##
 ## get all transcripts of a gene
-Tx <- transcripts(EnsDb.Hsapiens.v75,
+Tx <- transcripts(edb,
                   filter=GeneidFilter("ENSG00000184895"),
                   order.by="tx_seq_start")
 Tx
 
 ## get all transcripts of two genes along with some information on the
 ## gene and transcript
-Tx <- transcripts(EnsDb.Hsapiens.v75,
+Tx <- transcripts(edb,
                   filter=GeneidFilter(c("ENSG00000184895",
                       "ENSG00000092377")),
                       columns=c("gene_id", "gene_seq_start",
@@ -418,13 +476,13 @@ Tx
 ######   promoters
 ##
 ## get the bona-fide promoters (2k up- to 200nt downstream of TSS)
-promoters(EnsDb.Hsapiens.v75, filter=GeneidFilter(c("ENSG00000184895",
-                                                    "ENSG00000092377")))
+promoters(edb, filter=GeneidFilter(c("ENSG00000184895",
+                                     "ENSG00000092377")))
 
 ######   exons
 ##
 ## get all exons of the provided genes
-Exon <- exons(EnsDb.Hsapiens.v75,
+Exon <- exons(edb,
               filter=GeneidFilter(c("ENSG00000184895",
                   "ENSG00000092377")),
               order.by="exon_seq_start",
@@ -437,12 +495,12 @@ Exon
 #####    exonsBy
 ##
 ## get all exons for transcripts encoded on chromosomes X and Y.
-ETx <- exonsBy(EnsDb.Hsapiens.v75, by="tx",
+ETx <- exonsBy(edb, by="tx",
                filter=SeqnameFilter(c("X", "Y")))
 ETx
 ## get all exons for genes encoded on chromosome 1 to 22, X and Y and
 ## include additional annotation columns in the result
-EGenes <- exonsBy(EnsDb.Hsapiens.v75, by="gene",
+EGenes <- exonsBy(edb, by="gene",
                   filter=SeqnameFilter(c("X", "Y")),
                   columns=c("gene_biotype", "gene_name"))
 EGenes
@@ -456,7 +514,7 @@ length(grep(names(EGenes), pattern="LRG"))
 
 #####    transcriptsBy
 ##
-TGenes <- transcriptsBy(EnsDb.Hsapiens.v75, by="gene",
+TGenes <- transcriptsBy(edb, by="gene",
                         filter=SeqnameFilter(c("X", "Y")))
 TGenes
 
@@ -465,18 +523,34 @@ TGenes
 head(toSAF(TGenes))
 
 
+#####   transcriptsByOverlaps
+##
+ir <- IRanges(start=c(2654890, 2709520, 28111770),
+              end=c(2654900, 2709550, 28111790))
+gr <- GRanges(rep("Y", length(ir)), ir)
+
+## Retrieve all transcripts overlapping any of the regions.
+txs <- transcriptsByOverlaps(edb, gr)
+txs
+
+## Alternatively, use a GRangesFilter
+grf <- GRangesFilter(gr, condition="overlapping")
+txs <- transcripts(edb, filter=grf)
+txs
+
+
 ####    cdsBy
 ## Get the coding region for all transcripts on chromosome Y.
 ## Specifying also additional annotation columns (in addition to the default
 ## exon_id and exon_rank).
-cds <- cdsBy(EnsDb.Hsapiens.v75, by="tx", filter=SeqnameFilter("Y"),
+cds <- cdsBy(edb, by="tx", filter=SeqnameFilter("Y"),
              columns=c("tx_biotype", "gene_name"))
 
 ####    the 5' untranslated regions:
-fUTRs <- fiveUTRsByTranscript(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"))
+fUTRs <- fiveUTRsByTranscript(edb, filter=SeqnameFilter("Y"))
 
 ####    the 3' untranslated regions with additional column gene_name.
-tUTRs <- threeUTRsByTranscript(EnsDb.Hsapiens.v75, filter=SeqnameFilter("Y"),
+tUTRs <- threeUTRsByTranscript(edb, filter=SeqnameFilter("Y"),
                                columns="gene_name")
 
 

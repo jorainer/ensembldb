@@ -222,6 +222,7 @@ test_exonsBy_seqnames <- function(){
     options(ensembldb.seqnameNotFound=orig)
 }
 
+
 test_cdsBy_seqnames <- function(){
     orig <- getOption("ensembldb.seqnameNotFound")
     edb <- EnsDb.Hsapiens.v75

@@ -38,7 +38,7 @@ vignette: >
 #+BEGIN_EXPORT html
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 2 February, 2016<br />
+**Modified**: 4 February, 2016<br />
 **Compiled**: `r date()`
 #+END_EXPORT
 
@@ -229,7 +229,7 @@ chromosome Y.
 #+END_SRC
 
 Using a =GRangesFilter= we can retrieve all features from the database that are
-either within or overlapping with the specified genomic region. In the example
+either within or overlapping the specified genomic region. In the example
 below we query all genes that are partially overlapping with a small region on
 chromosome 11. The filter restricts to all genes for which either an exon or an
 intron is partially overlapping with the region.
@@ -267,6 +267,14 @@ region.
 #+BEGIN_SRC R
   transcripts(edb, filter=grf)
 #+END_SRC
+
+The =GRangesFilter= supports also =GRanges= defining multiple regions and a
+query will return all features overlapping any of these regions. Besides using
+the =GRangesFilter= it is also possible to search for transcripts or exons
+overlapping genomic regions using the =exonsByOverlaps= or
+=transcriptsByOverlaps= known from the =GenomicFeatures= package. Note that the
+implementation of these methods for =EnsDb= objects supports also to use filters
+to further fine-tune the query.
 
 To get an overview of allowed/available gene and transcript biotype the
 functions =listGenebiotypes= and =listTxbiotypes= can be used.
@@ -1126,13 +1134,18 @@ The advantage over =getGenomeFaFile=? Eventually more =TwoBit= files might
 become available in future.
 Problem now is that the =seqinfo= for these guys seems a little problematic.
 
-** TODO Implement some more =GenomicFeatures= methods [1/5]
+** TODO Implement some more =GenomicFeatures= methods [4/6]
 
 + [X] =transcriptLenghts=: use the =lengthOf= method.
-+ [ ] =transcriptsByOverlaps=.
-+ [ ] =exonsByOverlaps=.
++ [X] =transcriptsByOverlaps=: use the same code as in =GenomicFeatures=, but
+  allow faster queries by first running the query to fetch only the specified
+  chromosomes.
++ [X] =exonsByOverlaps=.
++ [X] Compare the two above methods with the /standard/ query and multi-region
+  =GRangesFilter=.
 (+ [ ] =cds=.) CANCELED. A cds without a transcript makes no sense...
 + [ ] =distance=, =nearest=.
++ [ ] =intronsByTranscript=.
 
 ** TODO Interface to the =OrganismDbi= database [/].
 
@@ -1234,3 +1247,9 @@ Somehow I have to fix that it does not work with =chr.gtf.gz=.
 ** DONE For all queries, restrict the seqinfo to the chromosome names in the =GRanges=.
    CLOSED: [2016-02-01 Mon 08:53]
    - State "DONE"       from "TODO"       [2016-02-01 Mon 08:53]
+** DONE =GRangesFilter= for multiple regions in =GRanges=
+   CLOSED: [2016-02-04 Thu 08:02]
+
+   - State "DONE"       from "TODO"       [2016-02-04 Thu 08:02]
+Support multiple regions for a =GRangesFilter=.
+
