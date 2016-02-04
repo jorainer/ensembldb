@@ -1181,17 +1181,17 @@ setMethod("disjointExons", "EnsDb",
 ## checkFilter:
 ## checks the filter argument and ensures that a list of Filter object is returned
 checkFilter <- function(x){
-    if(class(x)=="list"){
+    if(is(x, "list")){
         if(length(x)==0)
             return(x)
         ## check if all elements are Filter classes.
         IsAFilter <- unlist(lapply(x, function(z){
-                                        return(inherits(z, what="BasicFilter"))
+                                        return(is(z, "BasicFilter"))
                                     }))
         if(any(!IsAFilter))
             stop("One of more elements in filter are not filter objects!")
     }else{
-        if(inherits(x, what="BasicFilter")){
+        if(is(x, "BasicFilter")){
             x <- list(x)
         }else{
             stop("filter has to be a filter object or a list of filter objects!")
@@ -1425,5 +1425,51 @@ setMethod("updateEnsDb", "EnsDb", function(x, ...){
         newE@.properties <- x@.properties
     return(newE)
 })
+
+
+####============================================================
+##  transcriptsByOverlaps
+##
+##  Just "re-implementing" the transcriptsByOverlaps methods from the
+##  GenomicFeature package, finetuning and adapting it for EnsDbs
+####------------------------------------------------------------
+setMethod("transcriptsByOverlaps", "EnsDb", function(x, ranges, maxgap=0L, minoverlap=1L,
+                                                     type=c("any", "start", "end"),
+                                                     columns=listColumns(x, "tx"),
+                                                     filter){
+    if(missing(ranges))
+        stop("Parameter 'ranges' is missing!")
+    if(missing(filter)){
+        filter <- list()
+    }else{
+        filter <- checkFilter(filter)
+    }
+    SLs <- unique(as.character(seqnames(ranges)))
+    filter <- c(filter, SeqnameFilter(SLs))
+    return(subsetByOverlaps(transcripts(x, columns=columns, filter=filter),
+           ranges, maxgap=maxgap, minoverlap=minoverlap, type=match.arg(type)))
+})
+
+####============================================================
+##  exonsByOverlaps
+##
+####------------------------------------------------------------
+setMethod("exonsByOverlaps", "EnsDb", function(x, ranges, maxgap=0L, minoverlap=1L,
+                                                type=c("any", "start", "end"),
+                                               columns=listColumns(x, "exon"),
+                                               filter){
+    if(missing(ranges))
+        stop("Parameter 'ranges' is missing!")
+    if(missing(filter)){
+        filter <- list()
+    }else{
+        filter <- checkFilter(filter)
+    }
+    SLs <- unique(as.character(seqnames(ranges)))
+    filter <- c(filter, SeqnameFilter(SLs))
+    return(subsetByOverlaps(exons(x, columns=columns, filter=filter),
+           ranges, maxgap=maxgap, minoverlap=minoverlap, type=match.arg(type)))
+})
+
 
 

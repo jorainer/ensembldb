@@ -326,11 +326,11 @@ GRangesFilter <- function(value, condition="within", feature="gene"){
         stop("'value' has to be a GRanges object!")
     if(length(value) == 0)
         stop("No value provided for the filter!")
-    if(length(value) > 1){
-        warning(paste0("GRanges in 'value' has length ", length(value),
-                       "! Using only the first element!"))
-        value <- value[1]
-    }
+    ## if(length(value) > 1){
+    ##     warning(paste0("GRanges in 'value' has length ", length(value),
+    ##                    "! Using only the first element!"))
+    ##     value <- value[1]
+    ## }
     grf <- new("GRangesFilter", grange=value, location=condition,
                feature=feature)
     ##validObject(grf)
