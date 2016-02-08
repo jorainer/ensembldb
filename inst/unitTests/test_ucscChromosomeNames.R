@@ -55,6 +55,7 @@ test_getWhat_seqnames <- function(){
 
 test_SeqnameFilter_seqnames <- function(){
     orig <- getOption("ensembldb.seqnameNotFound")
+    options(ensembldb.seqnameNotFound="MISSING")
     edb <- EnsDb.Hsapiens.v75
     seqlevelsStyle(edb) <- "Ensembl"
     snf <- SeqnameFilter("chrX")
