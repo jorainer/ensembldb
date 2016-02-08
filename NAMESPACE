@@ -1,4 +1,5 @@
 import(methods)
+importFrom("utils", "read.table", "str")
 import(BiocGenerics)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
