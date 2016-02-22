@@ -760,7 +760,7 @@ setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr
         cReg <- split(cReg, f=cReg$tx_id)
         ## Match order.
         cReg <- cReg[match(txs$tx_id, names(cReg))]
-        cdsExns <- pintersect(cReg, cExns)
+        cdsExns <- intersect(cReg, cExns)
         ## cExns: all exons of coding transcripts (includes untranslated
         ##        and translated region)
         ## cReg: just the start-end position of the coding region of the tx.
@@ -773,7 +773,7 @@ setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr
         if(with.utr3_len | with.utr5_len){
             ## ! UTR is the difference between the exons and the cds-exons
             ## Note: order of parameters is important!
-            utrReg <- psetdiff(cExns, cdsExns)
+            utrReg <- setdiff(cExns, cdsExns)
             leftOfCds <- utrReg[end(utrReg) < start(cReg)]
             rightOfCds <- utrReg[start(utrReg) > end(cReg)]
             ## Calculate lengths.
@@ -900,7 +900,7 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
         SI <- seqinfo(x)
     )
     ## Note: doing that with a single query and some coordinate juggling is faster than
-    ## calling exonsBy and GRangesList psetdiff etc.
+    ## calling exonsBy and GRangesList setdiff etc.
     Res <- getWhat(x, columns=fetchCols,
                    filter=filter,
                    order.by=order.by,
