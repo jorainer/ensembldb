@@ -199,6 +199,31 @@ ExonidFilter <- function(value, condition="="){
     return(new("ExonidFilter", condition=condition, value=as.character(value)))
 }
 
+## Table tx2exon
+## filter for exon_idx
+setClass("ExonrankFilter", contains="BasicFilter",
+         prototype=list(
+             condition="=",
+             value="",
+             .valueIsCharacter=FALSE
+            )
+        )
+ExonrankFilter <- function(value, condition="="){
+    if(missing(value)){
+        stop("A filter without a value makes no sense!")
+    }
+    if(any(is.na(as.numeric(value))))
+        stop("Argument 'value' has to be numeric!")
+    if(length(value) > 1){
+        if(condition=="=")
+            condition="in"
+        if(condition=="!=")
+            condition="not in"
+    }
+    return(new("ExonrankFilter", condition=condition, value=as.character(value)))
+}
+
+
 ## chromosome positions
 ## basic chromosome/seqname filter.
 setClass("SeqnameFilter", contains="BasicFilter",

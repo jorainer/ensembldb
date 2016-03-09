@@ -6,6 +6,7 @@
 \alias{TxidFilter}
 \alias{TxbiotypeFilter}
 \alias{ExonidFilter}
+\alias{ExonrankFilter}
 \alias{SeqnameFilter}
 \alias{SeqstrandFilter}
 \alias{SeqstartFilter}
@@ -34,6 +35,8 @@ TxidFilter(value, condition = "=")
 TxbiotypeFilter(value, condition = "=")
 
 ExonidFilter(value, condition = "=")
+
+ExonrankFilter(value, condition = "=")
 
 SeqnameFilter(value, condition = "=")
 
@@ -125,8 +128,13 @@ SeqendFilter(value, condition = "=", feature = "gene")
     \item{ExonidFilter}{
       Filter based on the Ensembl exon ID.
     }
+    \item{ExonrankFilter}{
+      Filter results based on exon ranks (indices) of exons within
+      transcripts.
+    }
     \item{SeqnameFilter}{
-      Filter results based on the name of the sequence the features are encoded.
+      Filter results based on the name of the sequence the features are
+      encoded.
     }
     \item{SeqstrandFilter}{
       Filter results based on the strand on which the features are encoded.
@@ -150,6 +158,7 @@ SeqendFilter(value, condition = "=", feature = "gene")
   \code{\linkS4class{TxidFilter}},
   \code{\linkS4class{TxbiotypeFilter}},
   \code{\linkS4class{ExonidFilter}},
+  \code{\linkS4class{ExonrankFilter}},
   \code{\linkS4class{SeqnameFilter}},
   \code{\linkS4class{SeqstrandFilter}},
   \code{\linkS4class{SeqstartFilter}},
@@ -167,6 +176,7 @@ SeqendFilter(value, condition = "=", feature = "gene")
   \code{\linkS4class{TxidFilter}},
   \code{\linkS4class{TxbiotypeFilter}},
   \code{\linkS4class{ExonidFilter}},
+  \code{\linkS4class{ExonrankFilter}},
   \code{\linkS4class{SeqnameFilter}},
   \code{\linkS4class{SeqstrandFilter}},
   \code{\linkS4class{SeqstartFilter}},

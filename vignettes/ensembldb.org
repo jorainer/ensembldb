@@ -18,7 +18,7 @@
 #+latex: %\VignetteEngine{knitr::knitr}
 
 
-#+BEGIN_EXPORT html
+#+BEGIN_html
 ---
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
@@ -32,15 +32,16 @@ vignette: >
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
-#+END_EXPORT
+#+END_html
 
+# #+BEGIN_EXPORT html
 
-#+BEGIN_EXPORT html
+#+BEGIN_html
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
 **Modified**: 4 February, 2016<br />
 **Compiled**: `r date()`
-#+END_EXPORT
+#+END_html
 
 
 # #+NAME: style
@@ -121,6 +122,10 @@ alphabetical order):
 
 + =ExonidFilter=: allows to filter the result based on the (Ensembl) exon
   identifiers.
++ =ExonrankFilter=: filter results on the rank (index) of an exon within the
+  transcript model. Exons are always numbered from 5' to 3' end of the
+  transcript, thus, also on the reverse strand, the exon 1 is the most 5' exon
+  of the transcript.
 + =EntrezidFilter=: allows to filter results based on NCBI Entrezgene
   identifiers of the genes.
 + =GenebiotypeFilter=: allows to filter for the gene biotypes defined in the
@@ -327,6 +332,16 @@ these chromosomes.
 Not unexpectedly, transcripts of protein coding genes are longer than those of
 snRNA, snoRNA or rRNA genes.
 
+At last we extract the first two exons of each transcript model from the
+database.
+
+#+BEGIN_SRC R
+  ## Extract all exons 1 and (if present) 2 for all genes encoded on the
+  ## Y chromosome
+  exons(edb, columns=c("tx_id", "exon_idx"),
+        filter=list(SeqnameFilter("Y"),
+                    ExonrankFilter(3, condition="<")))
+#+END_SRC
 
 * Extracting gene/transcript/exon models for RNASeq feature counting
 
