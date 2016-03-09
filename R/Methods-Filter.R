@@ -450,6 +450,48 @@ setMethod("column", signature(object="ExonidFilter", db="EnsDb", with.tables="ch
           })
 
 
+##***********************************************************************
+##
+##     Methods for ExonrankFilter classes.
+##
+##***********************************************************************
+setMethod("where", signature(object="ExonrankFilter", db="missing", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              suff <- callNextMethod()
+              return(paste(column(object), suff))
+          })
+setMethod("column", signature(object="ExonrankFilter", db="missing", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              return("exon_idx")
+          })
+setMethod("where", signature(object="ExonrankFilter", db="EnsDb", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              tn <- names(listTables(db))
+              return(where(object, db, with.tables=tn))
+          })
+setMethod("column", signature(object="ExonrankFilter", db="EnsDb", with.tables="missing"),
+          function(object, db, with.tables, ...){
+              tn <- names(listTables(db))
+              return(column(object, db, with.tables=tn))
+          })
+setMethod("where", signature(object="ExonrankFilter", db="EnsDb", with.tables="character"),
+          function(object, db, with.tables, ...){
+              suff <- callNextMethod()
+              return(paste(column(object, db, with.tables=with.tables), suff))
+          })
+setMethod("column", signature(object="ExonrankFilter", db="EnsDb", with.tables="character"),
+          function(object, db, with.tables, ...){
+              return(unlist(prefixColumns(db, column(object), with.tables=with.tables),
+                            use.names=FALSE))
+          })
+setReplaceMethod("value", "ExonrankFilter", function(x, value){
+    if(any(is.na(as.numeric(value))))
+        stop("Argument 'value' has to be numeric!")
+    x@value <- value
+    validObject(x)
+    return(x)
+})
+
 
 ##***********************************************************************
 ##
