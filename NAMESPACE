@@ -32,7 +32,7 @@ export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage
        ensDbFromGtf, ensDbFromGff, ensDbFromGRanges, ensDbFromAH, runEnsDbApp)
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
-              SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter)
+              SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter, ExonrankFilter)
 ## for EnsFilter
 exportMethods(column, print, show, value, where, "condition<-", "value<-",
               seqnames, start, end, strand, seqlevels)
@@ -52,7 +52,7 @@ exportMethods("seqlevelsStyle", "seqlevelsStyle<-", "supportedSeqlevelsStyles",
 ## constructors
 export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
        TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,
-       SeqendFilter, EnsDb, GRangesFilter)
+       SeqendFilter, EnsDb, GRangesFilter, ExonrankFilter)
 
 
 

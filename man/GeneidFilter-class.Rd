@@ -14,6 +14,7 @@
 \alias{SeqstartFilter-class}
 \alias{SeqendFilter-class}
 \alias{GRangesFilter-class}
+\alias{ExonrankFilter-class}
 \alias{column,EntrezidFilter,missing,missing-method}
 \alias{column,GeneidFilter,missing,missing-method}
 \alias{column,GenenameFilter,missing,missing-method}
@@ -21,6 +22,7 @@
 \alias{column,TxidFilter,missing,missing-method}
 \alias{column,TxbiotypeFilter,missing,missing-method}
 \alias{column,ExonidFilter,missing,missing-method}
+\alias{column,ExonrankFilter,missing,missing-method}
 \alias{column,SeqnameFilter,missing,missing-method}
 \alias{column,SeqstrandFilter,missing,missing-method}
 \alias{column,SeqstartFilter,missing,missing-method}
@@ -33,6 +35,7 @@
 \alias{where,TxidFilter,missing,missing-method}
 \alias{where,TxbiotypeFilter,missing,missing-method}
 \alias{where,ExonidFilter,missing,missing-method}
+\alias{where,ExonrankFilter,missing,missing-method}
 \alias{where,SeqnameFilter,missing,missing-method}
 \alias{where,SeqstrandFilter,missing,missing-method}
 \alias{where,SeqstartFilter,missing,missing-method}
@@ -46,6 +49,7 @@
 \alias{column,TxidFilter,EnsDb,missing-method}
 \alias{column,TxbiotypeFilter,EnsDb,missing-method}
 \alias{column,ExonidFilter,EnsDb,missing-method}
+\alias{column,ExonrankFilter,EnsDb,missing-method}
 \alias{column,SeqnameFilter,EnsDb,missing-method}
 \alias{column,SeqstrandFilter,EnsDb,missing-method}
 \alias{column,SeqstartFilter,EnsDb,missing-method}
@@ -58,6 +62,7 @@
 \alias{where,TxidFilter,EnsDb,missing-method}
 \alias{where,TxbiotypeFilter,EnsDb,missing-method}
 \alias{where,ExonidFilter,EnsDb,missing-method}
+\alias{where,ExonrankFilter,EnsDb,missing-method}
 \alias{where,SeqnameFilter,EnsDb,missing-method}
 \alias{where,SeqstrandFilter,EnsDb,missing-method}
 \alias{where,SeqstartFilter,EnsDb,missing-method}
@@ -71,6 +76,7 @@
 \alias{column,TxidFilter,EnsDb,character-method}
 \alias{column,TxbiotypeFilter,EnsDb,character-method}
 \alias{column,ExonidFilter,EnsDb,character-method}
+\alias{column,ExonrankFilter,EnsDb,character-method}
 \alias{column,SeqnameFilter,EnsDb,character-method}
 \alias{column,SeqstrandFilter,EnsDb,character-method}
 \alias{column,SeqstartFilter,EnsDb,character-method}
@@ -83,6 +89,7 @@
 \alias{where,TxidFilter,EnsDb,character-method}
 \alias{where,TxbiotypeFilter,EnsDb,character-method}
 \alias{where,ExonidFilter,EnsDb,character-method}
+\alias{where,ExonrankFilter,EnsDb,character-method}
 \alias{where,SeqnameFilter,EnsDb,character-method}
 \alias{where,SeqstrandFilter,EnsDb,character-method}
 \alias{where,SeqstartFilter,EnsDb,character-method}
@@ -106,6 +113,7 @@
 \alias{value,BasicFilter,missing-method}
 \alias{value<-}
 \alias{value<-,BasicFilter-method}
+\alias{value<-,ExonrankFilter-method}
 \alias{value,BasicFilter,EnsDb-method}
 \alias{value,GRangesFilter,missing-method}
 \alias{value,GRangesFilter,EnsDb-method}
@@ -134,8 +142,10 @@
   \code{\link{GenenameFilter}}, \code{\link{GenebiotypeFilter}},
   \code{\link{GRangesFilter}},
   \code{\link{TxidFilter}}, \code{\link{TxbiotypeFilter}},
-  \code{\link{ExonidFilter}}, \code{\link{SeqnameFilter}},
-  \code{\link{SeqstrandFilter}}, \code{\link{SeqstartFilter}} and \code{\link{SeqendFilter}}.
+  \code{\link{ExonidFilter}}, \code{\link{ExonrankFilter}},
+  \code{\link{SeqnameFilter}}, \code{\link{SeqstrandFilter}},
+  \code{\link{SeqstartFilter}} and \code{\link{SeqendFilter}}.
+
   See examples below for usage.
 }
 \section{Slots}{
@@ -245,6 +255,13 @@
   \describe{
     \item{\code{ExonidFilter}}{
       Allows to filter based on the (Ensembl) exon identifier.
+    }
+
+    \item{\code{ExonrankFilter}}{
+      Allows to filter based on the rank (index) of the exon within the
+      transcript model. Exons are always numbered 5' to 3' end of the
+      transcript, thus, also on the reverse strand, the exon 1 is the
+      most 5' exon of the transcript.
     }
 
     \item{\code{EntrezidFilter}}{
@@ -391,6 +408,14 @@ for(i in 1:length(txs)){
 
 ## No exon is overlapping that region, thus we're not getting anything
 exons(edb, filter=grf)
+
+
+## Example for ExonrankFilter
+## Extract all exons 1 and (if present) 2 for all genes encoded on the
+## Y chromosome
+exons(edb, columns=c("tx_id", "exon_idx"),
+      filter=list(SeqnameFilter("Y"),
+                  ExonrankFilter(3, condition="<")))
 
 
 }
