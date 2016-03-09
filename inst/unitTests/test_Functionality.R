@@ -338,6 +338,31 @@ test_lengthOf <- function(){
 
 }
 
+####============================================================
+##  ExonrankFilter
+##
+####------------------------------------------------------------
+test_ExonrankFilter <- function(){
+    txs <- transcripts(DB, columns=c("exon_id", "exon_idx"),
+                       filter=SeqnameFilter(c("Y")))
+    txs <- txs[order(names(txs))]
+
+    txs2 <- transcripts(DB, columns=c("exon_id"),
+                        filter=list(SeqnameFilter(c("Y")),
+                                    ExonrankFilter(3)))
+    txs2 <- txs[order(names(txs2))]
+    ## hm, that's weird somehow.
+    exns <- exons(DB, columns=c("tx_id", "exon_idx"),
+                  filter=list(SeqnameFilter("Y"),
+                              ExonrankFilter(3)))
+    checkTrue(all(exns$exon_idx == 3))
+    exns <- exons(DB, columns=c("tx_id", "exon_idx"),
+                  filter=list(SeqnameFilter("Y"),
+                              ExonrankFilter(3, condition="<")))
+    checkTrue(all(exns$exon_idx < 3))
+}
+
+
 notrun_lengthOf <- function(){
     ## How does TxDb do that?s
     library(TxDb.Hsapiens.UCSC.hg19.knownGene)
@@ -345,5 +370,7 @@ notrun_lengthOf <- function(){
     Test <- transcriptLengths(txdb)
     head(Test)
 }
+
+
 
 

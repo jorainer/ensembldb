@@ -1,3 +1,17 @@
+CHANGES IN VERSION 1.3.18
+-------------------------
+
+NEW FEATURES
+    o New ExonrankFilter to filter based on exon index/rank.
+
+
+CHANGES IN VERSION 1.3.17
+-------------------------
+
+BUG FIXES
+    o Use setdiff/intersect instead of psetdiff/pintersect.
+
+
 CHANGES IN VERSION 1.3.16
 -------------------------
 
