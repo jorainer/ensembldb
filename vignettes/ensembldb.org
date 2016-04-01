@@ -1268,3 +1268,59 @@ Somehow I have to fix that it does not work with =chr.gtf.gz=.
    - State "DONE"       from "TODO"       [2016-02-04 Thu 08:02]
 Support multiple regions for a =GRangesFilter=.
 
+** TODO Implement a method to convert variant information within =tx= to genomic coordinates
+
+#+BEGIN_SRC R :eval never
+  ## Get the genomic sequence
+  fa <- getGenomeFaFile(edb)
+
+  ## Convert variant coordinates to genomic coordinates
+  tx <- "ENST00000070846"
+  ## Get the cds
+  txCds <- cdsBy(edb, by="tx", filter=TxidFilter(tx))
+
+  ## ENST00000070846:c.1643delG
+  varPos <- 1643
+  exWidths <- width(txCds[[tx]])
+  ## Define the exon ends in the tx.
+  exEnds <- cumsum(exWidths)
+  ## Get the first negative index.
+  exDiffs <- varPos - exEnds
+  exVar <- min(which((exDiffs) < 0))
+  ## Now we would like to know the position within that exon:
+  posInExon <- exWidths[exVar] + exDiffs[exVar]
+  ## Next the genomic coordinate:
+  ## Note: here we have to consider the strand!
+  ## fw: exon_start + (pos in exon -1)
+  ## rv: exon_end - (pos in exon -1)
+  if(as.character(strand(txCds[[tx]][1])) == "-"){
+      chromPos <- end(txCds[[tx]][exVar]) - (posInExon - 1)
+  }else{
+      chromPos <- start(txCds[[tx]][exVar]) + (posInExon -1)
+  }
+
+  ## Validation.
+  ## OK, now we get the sequence for that exon.
+  ## Check if the estimated position is a G.
+  exSeq <- getSeq(fa, txCds[[tx]][exVar])
+  substring(exSeq, first=posInExon-2, last=posInExon+2)
+  ## Hm, hard to tell... it's two Gs there!
+  substring(exSeq, first=posInExon, last=posInExon) == "G"
+  ## Get the full CDS
+  cdsSeq <- unlist(getSeq(fa, txCds[[tx]]))
+  substring(cdsSeq, first=varPos - 2, last=1643 + 2)
+  ## The same.
+  getSeq(fa, GRanges(seqnames=seqlevels(txCds[[tx]]),
+                     IRanges(chromPos, chromPos), strand="-")) == "G"
+
+
+  ## Next one is c.1881DelC:
+  varPos <- 1881
+  exDiffs <- varPos - exEnds
+  exVar <- min(which(exDiffs < 0))
+  posInExon <- exWidths[exVar] + exDiffs[exVar]
+  exSeq <- getSeq(fa, txCds[[1]][exVar])
+  substring(exSeq, first=posInExon - 2, last=posInExon + 2)
+  ## Hm, again, we're right, but there are other 2 Cs there!
+
+#+END_SRC
