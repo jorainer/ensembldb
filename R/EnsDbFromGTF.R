@@ -11,7 +11,8 @@
 ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version){
     options(useFancyQuotes=FALSE)
     message("Importing GTF file...", appendLF=FALSE)
-    wanted.features <- c("gene", "transcript", "exon", "CDS")
+    ## wanted.features <- c("gene", "transcript", "exon", "CDS")
+    wanted.features <- c("exon")
     ## GTF <- import(con=gtf, format="gtf", feature.type=wanted.features)
     GTF <- import(con=gtf, format="gtf")
     message("OK")
@@ -103,7 +104,7 @@ fixCDStypeInEnsemblGTF <- function(x){
 ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     options(useFancyQuotes=FALSE)
     ## Input checking...
-    if(class(ah) != "AnnotationHub")
+    if(!is(ah, "AnnotationHub"))
         stop("Argument 'ah' has to be a (single) AnnotationHub object.")
     if(length(ah) != 1)
         stop("Argument 'ah' has to be a single AnnotationHub resource!")
@@ -342,7 +343,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
 ##    provided.
 ##
 ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version){
-    if(class(x)!="GRanges")
+    if(!is(x, "GRanges"))
         stop("This method can only be called on GRanges objects!")
     ## check for missing parameters
     if(missing(organism)){
@@ -402,26 +403,67 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
                               sourceFile="GRanges object", genomeVersion=genomeVersion)
     dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE, row.names=FALSE)
     message("OK")
+    ## Check if we've got column "type"
+    if(!any(colnames(mcols(x)) == "type"))
+        stop("The GRanges object lacks the required column 'type', sorry.")
+    gotTypes <- as.character(unique(x$type))
+    gotColumns <- colnames(mcols(x))
     ## ----------------------------
     ##
     ## process genes
     ## we're lacking NCBI Entrezids and also the coord system, but these are not
     ## required columns anyway...
-    message("Processing genes...", appendLF=FALSE)
+    message("Processing genes...")
     ## want to have: gene_id, gene_name, entrezid, gene_biotype, gene_seq_start,
     ##               gene_seq_end, seq_name, seq_strand, seq_coord_system.
-    reqCols <- c("gene_id", "gene_name", "gene_biotype")
-    if(!any(reqCols %in% colnames(mcols(x))))
+    wouldBeNice <- c("gene_id", "gene_name", "entrezid", "gene_biotype")
+    dontHave <- wouldBeNice[!(wouldBeNice %in% gotColumns)]
+    haveGot <- wouldBeNice[wouldBeNice %in% gotColumns]
+    ## Just really require the gene_id...
+    reqCols <- c("gene_id")
+    if(length(dontHave) > 0){
+        mess <- paste0(" I'm missing column(s): ", paste0(sQuote(dontHave), collapse=","),
+                       ".")
+        warning(mess, " The corresponding database column(s) will be empty!")
+    }
+    message(" Attribute availability:", appendLF=TRUE)
+    for(i in 1:length(wouldBeNice)){
+        message("  o ", wouldBeNice[i], "...",
+                ifelse(any(gotColumns == wouldBeNice[i]), yes=" OK", no=" Nope"))
+    }
+    if(!any(reqCols %in% haveGot))
         stop(paste0("One or more required fields are not defined in the",
                     " submitted GRanges object! Need ",
-                    paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
+                    paste(sQuote(reqCols), collapse=","), " but got only ",
+                    paste(reqCols[reqCols %in% gotColumns], collapse=","),
                     "."))
-    genes <- as.data.frame(x[x$type == "gene", reqCols])
-    genes <- cbind(genes, entrezid=rep(NA, nrow(genes)),
-                   seq_coord_system=rep(NA, nrow(genes)))
-    colnames(genes)[1:5] <- c("seq_name", "gene_seq_start", "gene_seq_end", "width",
-                              "seq_strand")
+    ## Now gets tricky; special case Ensembl < 75: we've got NO gene type.
+    if(any(gotTypes == "gene")){
+        ## All is fine.
+        genes <- as.data.frame(x[x$type == "gene", haveGot])
+    }else{
+        ## Well, have to split by gene_id and process...
+        genes <- split(x[ , haveGot], x$gene_id)
+        gnRanges <- unlist(range(genes))
+        gnMcol <- as.data.frame(unique(mcols(unlist(genes))))
+        genes <- as.data.frame(gnRanges)
+        ## Adding mcols again.
+        genes <- cbind(genes, gnMcol[match(rownames(genes), gnMcol$gene_id), ])
+        rm(gnRanges)
+        rm(gnMcol)
+    }
+    colnames(genes) <- c("seq_name", "gene_seq_start", "gene_seq_end", "width",
+                         "seq_strand", haveGot)
+    ## Add missing cols...
+    if(length(dontHave) > 0){
+        cn <- colnames(genes)
+        for(i in 1:length(dontHave)){
+            genes <- cbind(genes, rep(NA, nrow(genes)))
+        }
+        colnames(genes) <- c(cn, dontHave)
+    }
+    genes <- cbind(genes, seq_coord_system=rep(NA, nrow(genes)))
+
     ## transforming seq_strand from +/- to +1, -1.
     strand <- rep(0L, nrow(genes))
     strand[as.character(genes$seq_strand) == "+"] <- 1L
@@ -432,36 +474,80 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
                         "gene_seq_start", "gene_seq_end", "seq_name",
                         "seq_strand", "seq_coord_system")]
     dbWriteTable(con, name="gene", genes, overwrite=TRUE, row.names=FALSE)
+    ## Done.
+
     message("OK")
     ## ----------------------------
     ##
     ## process transcripts
-    message("Processing transcripts...", appendLF=FALSE)
+    message("Processing transcripts...", appendLF=TRUE)
     ## want to have: tx_id, tx_biotype, tx_seq_start, tx_seq_end, tx_cds_seq_start,
     ##               tx_cds_seq_end, gene_id
-    reqCols <- c("transcript_id", "gene_id", txBiotypeCol)
-    if(!any(reqCols %in% colnames(mcols(x))))
+    wouldBeNice <- c("transcript_id", "gene_id", txBiotypeCol)
+    dontHave <- wouldBeNice[!(wouldBeNice %in% gotColumns)]
+    if(length(dontHave) > 0){
+        mess <- paste0("I'm missing column(s): ", paste0(sQuote(dontHave), collapse=","),
+                       ".")
+        warning(mess, " The corresponding database columns will be empty!")
+    }
+    haveGot <- wouldBeNice[wouldBeNice %in% gotColumns]
+    message(" Attribute availability:", appendLF=TRUE)
+    for(i in 1:length(wouldBeNice)){
+        message("  o ", wouldBeNice[i], "...",
+                ifelse(any(gotColumns == wouldBeNice[i]), yes=" OK", no=" Nope"))
+    }
+    reqCols <- c("transcript_id", "gene_id")
+    if(!any(reqCols %in% gotColumns))
         stop(paste0("One or more required fields are not defined in",
                     " the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
+                    paste(reqCols[reqCols %in% gotColumns], collapse=","),
                     "."))
-    tx <- as.data.frame(x[x$type == "transcript" , reqCols])[ , -c(1, 4, 5)]
-    ## process the CDS features to get the cds start and end of the transcript.
-    CDS <- as.data.frame(x[x$type == "CDS", "transcript_id"])
-    ##
-    startByTx <- split(CDS$start, f=CDS$transcript_id)
-    cdsStarts <- unlist(lapply(startByTx, function(z){return(min(z, na.rm=TRUE))}))
-    endByTx <- split(CDS$end, f=CDS$transcript_id)
-    cdsEnds <- unlist(lapply(endByTx, function(z){return(max(z, na.rm=TRUE))}))
-    idx <- match(names(cdsStarts), tx$transcript_id)
-    areNas <- is.na(idx)
-    idx <- idx[!areNas]
-    cdsStarts <- cdsStarts[!areNas]
-    cdsEnds <- cdsEnds[!areNas]
+    if(any(gotTypes == "transcript")){
+        tx <- as.data.frame(x[x$type == "transcript" , haveGot])
+    }else{
+        tx <- split(x[, haveGot], x$transcript_id)
+        txRanges <- unlist(range(tx))
+        txMcol <- as.data.frame(unique(mcols(unlist(tx))))
+        tx <- as.data.frame(txRanges)
+        tx <- cbind(tx, txMcol[match(rownames(tx), txMcol$transcript_id), ])
+        rm(txRanges)
+        rm(txMcol)
+    }
+    ## Drop columns seqnames, width and strand
+    tx <- tx[, -c(1, 4, 5)]
+    ## Add empty columns, eventually
+    if(length(dontHave) > 0){
+        cn <- colnames(tx)
+        for(i in 1:length(dontHave)){
+            tx <- cbind(tx, rep(NA, nrow(tx)))
+        }
+        colnames(tx) <- c(cn, dontHave)
+    }
+    ## Add columns for UTR
     tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)), tx_cds_seq_end=rep(NA, nrow(tx)))
-    tx[idx, "tx_cds_seq_start"] <- cdsStarts
-    tx[idx, "tx_cds_seq_end"] <- cdsEnds
+    ## Process CDS...
+    if(any(gotTypes == "CDS")){
+        ## Only do that if we've got type == "CDS"!
+        ## process the CDS features to get the cds start and end of the transcript.
+        CDS <- as.data.frame(x[x$type == "CDS", "transcript_id"])
+        ##
+        startByTx <- split(CDS$start, f=CDS$transcript_id)
+        cdsStarts <- unlist(lapply(startByTx, function(z){return(min(z, na.rm=TRUE))}))
+        endByTx <- split(CDS$end, f=CDS$transcript_id)
+        cdsEnds <- unlist(lapply(endByTx, function(z){return(max(z, na.rm=TRUE))}))
+        idx <- match(names(cdsStarts), tx$transcript_id)
+        areNas <- is.na(idx)
+        idx <- idx[!areNas]
+        cdsStarts <- cdsStarts[!areNas]
+        cdsEnds <- cdsEnds[!areNas]
+        tx[idx, "tx_cds_seq_start"] <- cdsStarts
+        tx[idx, "tx_cds_seq_end"] <- cdsEnds
+    }else{
+        mess <- " I can't find type=='CDS'! The resulting database will lack CDS information!"
+        message(mess, appendLF = TRUE)
+        warning(mess)
+    }
     colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id", "tx_biotype",
                       "tx_cds_seq_start", "tx_cds_seq_end")
     ## rearranging data.frame:
@@ -479,17 +565,18 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## process exons
     message("Processing exons...", appendLF=FALSE)
     reqCols <- c("exon_id", "transcript_id", "exon_number")
-    if(!any(reqCols %in% colnames(mcols(x))))
+    if(!any(reqCols %in% gotColumns))
         stop(paste0("One or more required fields are not defined in",
                     " the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% colnames(mcols(x))], collapse=","),
+                    paste(reqCols[reqCols %in% gotColumns], collapse=","),
                     "."))
     exons <- as.data.frame(x[x$type == "exon", reqCols])[, -c(1, 4, 5)]
     ## for table tx2exon we want to have:
     ##    tx_id, exon_id, exon_idx
     t2e <- unique(exons[ , c("transcript_id", "exon_id", "exon_number")])
     colnames(t2e) <- c("tx_id", "exon_id", "exon_idx")
+    ## Cross-check that we've got the corresponding tx_ids in the tx table!
     ## for table exons we want to have:
     ##    exon_id, exon_seq_start, exon_seq_end
     exons <- unique(exons[ , c("exon_id", "start", "end")])
@@ -497,7 +584,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## writing the tables.
     dbWriteTable(con, name="exon", exons, overwrite=TRUE, row.names=FALSE)
     dbWriteTable(con, name="tx2exon", t2e, overwrite=TRUE, row.names=FALSE)
-        message("OK")
+    message("OK")
     ## ----------------------------
     ##
     ## process chromosomes

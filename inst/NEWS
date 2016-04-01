@@ -1,6 +1,14 @@
 CHANGES IN VERSION 1.3.18
 -------------------------
 
+BUG FIXES
+    o ensDbFromGRanges (and thus ensDbFromGtf, ensDbFromGff and ensDbFromAH) support now
+      Ensembl GTF file formats from version 74 and before.
+
+
+CHANGES IN VERSION 1.3.18
+-------------------------
+
 NEW FEATURES
     o New ExonrankFilter to filter based on exon index/rank.
 
