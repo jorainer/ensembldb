@@ -463,6 +463,11 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
         return(Res)
     }
     if(return.type=="GRanges"){
+        notThere <- !(columns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        columns <- columns[!notThere]
         metacols <- columns[ !(columns %in% c("seq_name",
                                               "seq_strand",
                                               "tx_seq_start",
@@ -544,6 +549,11 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
         return(Res)
     }
     if(return.type=="GRanges"){
+        notThere <- !(columns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        columns <- columns[!notThere]
         metacols <- columns[ !(columns %in% c("seq_name",
                                               "seq_strand",
                                               "exon_seq_start",
@@ -623,6 +633,11 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     ## replace exon_idx with exon_rank
     colnames(Res)[ colnames(Res)=="exon_idx" ] <- "exon_rank"
     columns[ columns=="exon_idx" ] <- "exon_rank"
+    notThere <- !(columns %in% colnames(Res))
+    if(any(notThere))
+        warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
+                       " not present in the result data.frame!"))
+    columns <- columns[!notThere]
     columns.metadata <- columns[ !(columns %in% c("seq_name", "seq_strand", "exon_seq_start", "exon_seq_end", paste0(by, "_id"))) ]
     columns.metadata <- match(columns.metadata, colnames(Res))   ## presumably faster...
     GR <- GRanges(seqnames=Rle(Res$seq_name),
@@ -673,6 +688,11 @@ setMethod("transcriptsBy", "EnsDb", function(x, by=c("gene", "exon"),
                    order.by=order.by,
                    skip.order.check=TRUE)
     SI <- SI[as.character(unique(Res$seq_name))]
+    notThere <- !(columns %in% colnames(Res))
+    if(any(notThere))
+        warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
+                       " not present in the result data.frame!"))
+    columns <- columns[!notThere]
     columns.metadata <- columns[ !(columns %in% c("seq_name", "seq_strand", "tx_seq_start", "tx_seq_end", paste0(by, "_id"))) ]
     columns.metadata <- match(columns.metadata, colnames(Res))   ## presumably faster...
     GR <- GRanges(seqnames=Rle(Res$seq_name),
@@ -710,17 +730,17 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
 ##            package.
 ##  For EnsDb: calls the .transcriptLengths function.
 ####------------------------------------------------------------
-setMethod("transcriptLengths", "TxDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-                                               with.utr3_len=FALSE){
-    return(GenomicFeatures::transcriptLengths(x, with.cds_len=with.cds_len,
-                                              with.utr5_len=with.utr5_len,
-                                              with.utr3_len=with.utr3_len))
-})
-setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-                                                with.utr3_len=FALSE, filter=list()){
-    return(.transcriptLengths(x, with.cds_len=with.cds_len, with.utr5_len=with.utr3_len,
-                              with.utr3_len=with.utr3_len, filter=filter))
-})
+## setMethod("transcriptLengths", "TxDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
+##                                                with.utr3_len=FALSE){
+##     return(GenomicFeatures::transcriptLengths(x, with.cds_len=with.cds_len,
+##                                               with.utr5_len=with.utr5_len,
+##                                               with.utr3_len=with.utr3_len))
+## })
+## setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
+##                                                 with.utr3_len=FALSE, filter=list()){
+##     return(.transcriptLengths(x, with.cds_len=with.cds_len, with.utr5_len=with.utr3_len,
+##                               with.utr3_len=with.utr3_len, filter=filter))
+## })
 ## implement the method from the GenomicFeatures package
 .transcriptLengths <- function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
                                with.utr3_len=FALSE, filter=list()){
@@ -858,6 +878,11 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     }
     ## Building the result.
     if(length(columns) > 0){
+        notThere <- !(columns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        columns <- columns[!notThere]
         GR <- GRanges(seqnames=Rle(Res$seq_name),
                       strand=Rle(Res$seq_strand),
                       ranges=IRanges(start=cdsStarts, end=cdsEnds),
@@ -979,6 +1004,11 @@ getUTRsByTranscript <- function(x, what, columns=NULL, filter){
             }
         }
     }
+    notThere <- !(columns %in% colnames(Res))
+    if(any(notThere))
+        warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
+                       " not present in the result data.frame!"))
+    columns <- columns[!notThere]
     SI <- SI[as.character(unique(Res$seq_name))]
     GR <- GRanges(seqnames=Rle(Res$seq_name),
                   strand=Rle(Res$seq_strand),

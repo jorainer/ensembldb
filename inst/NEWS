@@ -1,4 +1,14 @@
-CHANGES IN VERSION 1.3.18
+CHANGES IN VERSION 1.3.20
+-------------------------
+
+BUG FIXES
+    o methods transcripts, genes etc don't result in an error when columns are specified which
+      are not present in the database and the return.type is GRanges.
+    o Removed the transcriptLengths method implemented in ensembldb in favor of using the one
+      from GenomicFeatures.
+
+
+CHANGES IN VERSION 1.3.19
 -------------------------
 
 BUG FIXES
