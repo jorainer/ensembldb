@@ -7,7 +7,8 @@
 library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
-test_transcriptLengths <- function(){
+## Just run that after Herve has added the mods to the transcriptLengths function.
+notyetrun_transcriptLengths <- function(){
 
     ## With filter.
     daFilt <- SeqnameFilter("Y")
@@ -90,6 +91,50 @@ notrun_compare_to_genfeat <- function(){
         Len2 <- transcriptLengths(txdb, with.cds_len=TRUE)
     )
     ## 4 sec.
+
+    ## Calling the transcriptLengths of GenomicFeatures on the EnsDb.
+    system.time(
+        Def <- GenomicFeatures::transcriptLengths(edb)
+    ) ## 26.5 sec
+
+    system.time(
+        WithCds <- GenomicFeatures::transcriptLengths(edb, with.cds_len=TRUE)
+    ) ## 55 sec
+
+    system.time(
+        WithAll <- GenomicFeatures::transcriptLengths(edb, with.cds_len=TRUE,
+                                                      with.utr5_len=TRUE,
+                                                      with.utr3_len=TRUE)
+    ) ## 99 secs
+
+    ## Get my versions...
+    system.time(
+        MyDef <- ensembldb:::.transcriptLengths(edb)
+    ) ## 31 sec
+    system.time(
+        MyWithCds <- ensembldb:::.transcriptLengths(edb, with.cds_len=TRUE)
+    ) ## 44 sec
+    system.time(
+        MyWithAll <- ensembldb:::.transcriptLengths(edb, with.cds_len=TRUE,
+                                                    with.utr5_len=TRUE,
+                                                    with.utr3_len=TRUE)
+    ) ## 63 sec
+
+    ## Should be all the same!!!
+    rownames(MyDef) <- NULL
+    checkEquals(Def, MyDef)
+    ##
+    rownames(MyWithCds) <- NULL
+    MyWithCds[is.na(MyWithCds$cds_len), "cds_len"] <- 0
+    checkEquals(WithCds, MyWithCds)
+    ##
+    rownames(MyWithAll) <- NULL
+    MyWithAll[is.na(MyWithAll$cds_len), "cds_len"] <- 0
+    MyWithAll[is.na(MyWithAll$utr3_len), "utr3_len"] <- 0
+    MyWithAll[is.na(MyWithAll$utr5_len), "utr5_len"] <- 0
+    checkEquals(WithAll, MyWithAll)
 }
+
+
 
 
