@@ -97,7 +97,9 @@
     \item{keys}{
       Retrieves all keys from the column name specified with
       \code{keytype}. By default (if \code{keytype} is not provided) it
-      returns all gene IDs.
+      returns all gene IDs. Note that \code{keytype="TXNAME"} will
+      return transcript ids, since no transcript names are available in
+      the database.
 
       Returns a character vector of IDs.
     }
@@ -133,6 +135,11 @@
       \code{\linkS4class{BasicFilter}} or a list of such objects. For
       the latter, the argument \code{keytype} does not have to be
       specified.
+
+      Note that values from a column \code{"TXNAME"} will be the same
+      than for a column \code{"TXID"}, since internally no database
+      column \code{"tx_name"} is present and the column is thus mapped
+      to \code{"tx_id"}.
 
       Returns a \code{data.frame} with the column names corresponding to
       the argument \code{columns} and rows with all data matching the

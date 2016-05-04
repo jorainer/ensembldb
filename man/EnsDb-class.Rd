@@ -262,6 +262,14 @@ EnsDb(x)
     }
   }
 }
+\note{
+  While a column named \code{"tx_name"} is listed by the
+  \code{listTables} and \code{listColumns} method, no such column is
+  present in the database. Transcript names returned by the methods are
+  actually the transcript IDs. This \emph{virtual} column was only
+  introduced to be compliant with \code{TxDb} objects (which provide
+  transcript names).
+}
 \author{
   Johannes Rainer
 }
