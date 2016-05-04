@@ -5,13 +5,20 @@ DB <- EnsDb.Hsapiens.v75
 
 ## testing genes method.
 test_genes <- function(){
-    Gns <- genes(DB)
+    Gns <- genes(DB, filter=SeqnameFilter("X"))
+    Gns <- genes(DB, filter=SeqnameFilter("X"), return.type="DataFrame")
+    checkEquals(sort(colnames(Gns)), sort(listColumns(DB, "gene")))
+    Gns <- genes(DB, filter=SeqnameFilter("X"), return.type="DataFrame", columns=c("gene_id", "tx_name"))
+    checkEquals(sort(colnames(Gns)), c("gene_id", "tx_name"))
     ## checkEquals(class(genes(DB, return.type="DataFrame",
     ##                         filter=list(SeqnameFilter("Y")))), "DataFrame" )
 }
 
 test_transcripts <- function(){
-    Tns <- transcripts(DB)
+    Tns <- transcripts(DB, filter=SeqnameFilter("X"), return.type="DataFrame")
+    checkEquals(sort(colnames(Tns)), sort(listColumns(DB, "tx")))
+    Tns <- transcripts(DB, columns=c("tx_id", "tx_name"), filter=SeqnameFilter("X"))
+    checkEquals(sort(colnames(mcols(Tns))), sort(c("tx_id", "tx_name")))
 }
 
 test_transcriptsBy <- function(){
@@ -19,12 +26,14 @@ test_transcriptsBy <- function(){
 }
 
 test_exons <- function(){
-    Exns <- exons(DB, filter=SeqnameFilter("X"))
-    Exns <- exons(DB, filter=list(SeqnameFilter("X")))
+    Exns <- exons(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
+    checkEquals(sort(colnames(Exns)), sort(listColumns(DB, "exon")))
 }
 
 test_exonsBy <- function(){
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx")
+    ##ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx")
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("tx_name"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_name")))
 }
 
 test_dbfunctionality <- function(){
@@ -80,6 +89,10 @@ test_return_columns_exon <- function(){
 }
 
 test_cdsBy <- function(){
+    ## Just checking if we get also tx_name
+    cs <- cdsBy(DB, filter=SeqnameFilter("Y"), column="tx_name")
+    checkTrue(any(colnames(mcols(cs[[1]])) == "tx_name"))
+
     do.plot <- FALSE
     ## By tx
     cs <- cdsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
@@ -147,6 +160,10 @@ test_cdsByGene <- function(){
 }
 
 test_UTRs <- function(){
+    ## check presence of tx_name
+    fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")), column="tx_name")
+    checkTrue(any(colnames(mcols(fUTRs[[1]])) == "tx_name"))
+
     do.plot <- FALSE
     fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
     tUTRs <- threeUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))

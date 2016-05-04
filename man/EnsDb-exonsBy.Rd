@@ -419,6 +419,11 @@
   3' untranslated region of the transcript.
 
 }
+\note{
+  While it is possible to request values from a column \code{"tx_name"}
+  (with the \code{columns} argument), no such column is present in the
+  database. The returned values correspond to the ID of the transcripts.
+}
 \author{
   Johannes Rainer, Tim Triche
 }

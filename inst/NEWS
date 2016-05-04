@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.3.21
+-------------------------
+
+NEW FEATURES:
+    o Added support for column tx_name in all methods and in the keys and select methods.
+      Values in the returned tx_name columns correspond to the tx_id.
+
+
 CHANGES IN VERSION 1.3.20
 -------------------------
 
