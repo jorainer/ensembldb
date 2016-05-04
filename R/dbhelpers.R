@@ -273,8 +273,14 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 ## just to add another layer; basically just calls buildQuery and executes the query
 .getWhat <- function(x, columns, filter=list(), order.by="",
                      order.type="asc", group.by=NULL, skip.order.check=FALSE){
+    ## That's nasty stuff; for now we support the column tx_name, which we however don't have in the
+    ## database. Thus, we are querying everything except that column and filling it later with the
+    ## values from tx_id.
+    fetchColumns <- columns
+    if(any(columns == "tx_name"))
+        fetchColumns <- unique(c("tx_id", columns[columns != "tx_name"]))
     ## build the query
-    Q <- .buildQuery(x=x, columns=columns, filter=filter,
+    Q <- .buildQuery(x=x, columns=fetchColumns, filter=filter,
                      order.by=order.by, order.type=order.type, group.by=group.by,
                      skip.order.check=skip.order.check)
     ## get the data
@@ -292,6 +298,11 @@ removePrefix <- function(x, split=".", fixed=TRUE){
             ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
             Res[ , "tx_cds_seq_end" ] <- as.numeric(Res[ , "tx_cds_seq_end" ])
         )
+    }
+    ## Now adding the "virtual" tx_name column if it was requested...
+    if(any(columns == "tx_name")){
+        Res <- data.frame(Res, tx_name=Res$tx_id, stringsAsFactors=FALSE)
+        Res <- Res[, columns, drop=FALSE]
     }
     return(Res)
 }
