@@ -37,6 +37,9 @@ test_keys <- function(){
     system.time(
         ids <- keys(edb, "TXID")
     )
+    ## Get the TXNAME...
+    nms <- keys(edb, "TXNAME")
+    checkEquals(nms, ids)
     checkEquals(length(ids), length(unique(ids)))
     ## get all gene names
     system.time(
@@ -101,6 +104,12 @@ test_select <- function(){
     ## )
     ## Test <- select(edb, keys=txs, keytype="TXID")
     ## checkEquals(Test, All)
+    Test <- select(edb, keys="ENST00000000233", columns=c("GENEID", "GENENAME"), keytype="TXNAME")
+    checkEquals(Test$TXNAME, "ENST00000000233")
+    ## Check what happens if we just add TXNAME and also TXID.
+    Test2 <- select(edb, keys=list(gf, TxbiotypeFilter("protein_coding")), columns=c("TXID", "TXNAME",
+                                                                                     "GENENAME", "GENEID"))
+
 }
 
 test_mapIds <- function(){

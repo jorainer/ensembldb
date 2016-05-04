@@ -237,7 +237,9 @@ setMethod("listTables", "EnsDb", function(x, ...){
         x@tables <- Tables
     }
     Tab <- x@tables
-    Tab <- Tab[ tablesByDegree(x, tab=names(Tab)) ]
+    Tab <- Tab[tablesByDegree(x, tab=names(Tab))]
+    ## Manually add tx_name as a "virtual" column; getWhat will insert the tx_id into that.
+    Tab$tx <- unique(c(Tab$tx, "tx_name"))
     return(Tab)
 })
 
@@ -259,10 +261,13 @@ setMethod("listColumns", "EnsDb", function(x,
         names(Tables) <- tables
         x@tables <- Tables
     }
+    Tab <- x@tables
+    ## Manually add tx_name as a "virtual" column; getWhat will insert the tx_id into that.
+    Tab$tx <- unique(c(Tab$tx, "tx_name"))
     if(!missing(table)){
-        columns <- x@tables[[ table ]]
+        columns <- Tab[[ table ]]
     }else{
-        columns <- unlist(x@tables, use.names=FALSE)
+        columns <- unlist(Tab, use.names=FALSE)
     }
     if(skip.keys){
         ## remove everything that has a _pk or _fk...

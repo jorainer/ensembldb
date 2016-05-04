@@ -36,6 +36,8 @@ ensDbColumnForColumn <- function(x, column){
                 " db: ", paste(column[is.na(cols)], collapse=", "))
         cols <- cols[!is.na(cols)]
     }
+    ## Fixing tx_name; tx_name should be mapped to tx_id in the database!
+    ##cols[cols == "tx_name"] <- "tx_id"
     return(cols)
 }
 
@@ -77,9 +79,9 @@ setMethod("keytypes", "EnsDb",
 .keytype2FilterMapping <- function(){
     filters <- c("EntrezidFilter", "GeneidFilter", "GenebiotypeFilter", "GenenameFilter",
                  "TxidFilter", "TxbiotypeFilter", "ExonidFilter", "SeqnameFilter",
-                 "SeqstrandFilter")
+                 "SeqstrandFilter", "TxidFilter")
     names(filters) <- c("ENTREZID", "GENEID", "GENEBIOTYPE", "GENENAME", "TXID",
-                        "TXBIOTYPE", "EXONID", "SEQNAME", "SEQSTRAND")
+                        "TXBIOTYPE", "EXONID", "SEQNAME", "SEQSTRAND", "TXNAME")
     return(filters)
 }
 filterForKeytype <- function(keytype){
@@ -185,6 +187,10 @@ setMethod("select", "EnsDb",
     res <- getWhat(x, columns=ensCols, filter=keys)
     colMap <- .getColMappings(x)
     colnames(res) <- colMap[colnames(res)]
+    ## ## Now, if we've got a "TXNAME" in columns, we have to replace at least one of the "TXID"s
+    ## ## in the colnames...
+    ## if(any(columns == "TXNAME"))
+    ##     colnames(res)[match("TXID", colnames(res))] <- "TXNAME"
     return(res[, columns])
 }
 

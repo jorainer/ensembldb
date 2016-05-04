@@ -14,7 +14,7 @@ vignette: >
 
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 4 February, 2016<br />
+**Modified**: 4 May, 2016<br />
 **Compiled**: `r date()`
 
 # Introduction
@@ -677,7 +677,7 @@ help avoiding them):
 -   At present, `EnsDb` support only genes/transcripts for which all of their
     exons are encoded on the same chromosome and the same strand.
 
-# Building an transcript centric database package based on Ensembl annotation
+# Building an transcript-centric database package based on Ensembl annotation
 
 The code in this section is not supposed to be automatically executed when the
 vignette is built, as this would require a working installation of the Ensembl
@@ -845,7 +845,10 @@ shown in Figure [110](#orgparagraph1)):
     -   `seq_strand`: the strand on which the gene is encoded.
     -   `seq_coord_system`: the coordinate system of the sequence.
 
--   **tx**: all transcript related annotations.
+-   **tx**: all transcript related annotations. Note that while no `tx_name` column
+    is available in this database column, all methods to retrieve data from the
+    database support also this column. The returned values are however the ID of
+    the transcripts.
     -   `tx_id`: the Ensembl transcript ID.
     -   `tx_biotype`: the biotype of the transcript.
     -   `tx_seq_start`: the start coordinate of the transcript.
