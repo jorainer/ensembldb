@@ -576,6 +576,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ##    tx_id, exon_id, exon_idx
     t2e <- unique(exons[ , c("transcript_id", "exon_id", "exon_number")])
     colnames(t2e) <- c("tx_id", "exon_id", "exon_idx")
+    ## Force exon_idx to be an integer!
+    t2e[, "exon_idx"] <- as.integer(t2e[, "exon_idx"])
     ## Cross-check that we've got the corresponding tx_ids in the tx table!
     ## for table exons we want to have:
     ##    exon_id, exon_seq_start, exon_seq_end
