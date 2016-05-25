@@ -594,6 +594,8 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
             bySuff <- "_name"
         }
     }
+    ## Quick fix; rename any exon_rank to exon_idx.
+    columns[columns == "exon_rank"] <- "exon_idx"
     ## note: if it's by gene we don't want any columns from the transcript table AND
     ## we don't want the exon_rank! rather we would like to sort by exon_chrom_start * seq_strand
     min.columns <- c(paste0(by, "_id"), "seq_name",
@@ -608,12 +610,13 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
         txcolumns <- txcolumns[ txcolumns != "gene_id" ]
         torem <- columns %in% txcolumns
         if(any(torem))
-            warning(paste0("Columns ",
-                           paste(columns[ torem ], collapse=","),
-                           " have been removed as they are not allowed if exons are fetched by gene."))
+            warning("Columns ",
+                    paste(columns[ torem ], collapse=","),
+                    " have been removed as they are not allowed if exons are fetched by gene.")
         columns <- columns[ !torem ]
         ##order.by <- paste0(by.id.full, ", case when seq_strand=1 then exon_seq_start when seq_strand=-1 then (exon_seq_end * -1) end")
-        order.by <- paste0("case when seq_strand=1 then exon_seq_start when seq_strand=-1 then (exon_seq_end * -1) end")
+        order.by <- paste0("case when seq_strand=1 then exon_seq_start",
+                           " when seq_strand=-1 then (exon_seq_end * -1) end")
     }else{
         min.columns <- c(min.columns, "exon_idx")
         ##order.by <- paste0(by.id.full, ",exon_idx")
@@ -625,7 +628,6 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     suppressWarnings(
         SI <- seqinfo(x)
     )
-    ##Res <- getWhat(dbconn(x), columns=columns, filter=filter, order.by=paste0("seq_name,gene_seq_start,",by ,"_id,exon_idx"))
     if(missing(filter)){
         filter=list()
     }else{
@@ -643,7 +645,8 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
         warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
                        " not present in the result data.frame!"))
     columns <- columns[!notThere]
-    columns.metadata <- columns[ !(columns %in% c("seq_name", "seq_strand", "exon_seq_start", "exon_seq_end", paste0(by, "_id"))) ]
+    columns.metadata <- columns[ !(columns %in% c("seq_name", "seq_strand",
+                                                  "exon_seq_start", "exon_seq_end")) ]
     columns.metadata <- match(columns.metadata, colnames(Res))   ## presumably faster...
     GR <- GRanges(seqnames=Rle(Res$seq_name),
                   strand=Rle(Res$seq_strand),
