@@ -596,6 +596,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     }
     ## Quick fix; rename any exon_rank to exon_idx.
     columns[columns == "exon_rank"] <- "exon_idx"
+    retColumns <- unique(c("exon_id", columns))  ## These are the columns we want to return as metadata columns!
     ## note: if it's by gene we don't want any columns from the transcript table AND
     ## we don't want the exon_rank! rather we would like to sort by exon_chrom_start * seq_strand
     min.columns <- c(paste0(by, "_id"), "seq_name",
@@ -619,6 +620,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
                            " when seq_strand=-1 then (exon_seq_end * -1) end")
     }else{
         min.columns <- c(min.columns, "exon_idx")
+        retColumns <- unique(c(retColumns, "exon_idx"))
         ##order.by <- paste0(by.id.full, ",exon_idx")
         order.by <- paste0("exon_idx")
     }
@@ -640,6 +642,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     ## replace exon_idx with exon_rank
     colnames(Res)[ colnames(Res)=="exon_idx" ] <- "exon_rank"
     columns[ columns=="exon_idx" ] <- "exon_rank"
+    retColumns[retColumns == "exon_idx"] <- "exon_rank"
     notThere <- !(columns %in% colnames(Res))
     if(any(notThere))
         warning(paste0("Columns ", paste(columns[notThere], collapse=", "),
@@ -652,7 +655,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
                   strand=Rle(Res$seq_strand),
                   ranges=IRanges(start=Res$exon_seq_start, end=Res$exon_seq_end),
                   seqinfo=SI,
-                  Res[ , columns.metadata, drop=FALSE ]
+                  Res[ , retColumns, drop=FALSE ]
                 )
     ## now that GR is ordered as we wanted; once we split it it will be ordered by
     ## the value which we used for splitting.

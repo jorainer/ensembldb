@@ -34,6 +34,13 @@ test_exonsBy <- function(){
     ##ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx")
     ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("tx_name"))
     checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_name")))
+
+    ## Check what happens if we specify tx_id.
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("tx_id"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_id")))
+
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("exon_rank"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank")))
 }
 
 test_dbfunctionality <- function(){
