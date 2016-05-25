@@ -1,10 +1,19 @@
-CHANGES IN VERSION 1.4.2
+CHANGES IN VERSION 1.5.2
 -------------------------
 
 BUG FIXES
     o tx_id was removed from metadata columns in txBy.
     o Fixed a bug that caused exon_idx column to be character if database created
       from a GTF.
+
+
+CHANGES IN VERSION 1.5.1
+-------------------------
+
+NEW FEATURES:
+    o Added support for column tx_name in all methods and in the keys and select methods.
+      Values in the returned tx_name columns correspond to the tx_id.
+    o Update documentation.
 
 
 CHANGES IN VERSION 1.3.20
