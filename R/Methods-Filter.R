@@ -24,13 +24,17 @@ validateConditionFilter <- function(object){
                          "is a vector with more than one value!"))
     }
     if(!object@.valueIsCharacter){
-        ## value has to be numeric!!!
-        if(object@value!=""){
-            suppressWarnings(
-                if(any(is.na(is.numeric(object@value))))
-                    return(paste("value has to be numeric!!!"))
-               )
+        vals <- object@value
+        if(length(vals) == 1){
+            if(vals == ""){
+                vals <- "0"
+            }
         }
+        ## value has to be numeric!!!
+        suppressWarnings(
+            if(any(is.na(is.numeric(vals))))
+                return(paste("value has to be numeric!!!"))
+        )
     }
     return(TRUE)
 }
