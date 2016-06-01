@@ -188,7 +188,7 @@ SeqendFilter(value, condition = "=", feature = "gene")
 ## the respective gene.
 Gif <- GeneidFilter("ENSG00000012817")
 Gif
-## returns the where clause of the SQL querys
+## returns the where condition of the SQL querys
 where(Gif)
 
 ## create a filter for a chromosomal end position of a gene
@@ -215,10 +215,10 @@ GRangesFilter(GRanges("X", IRanges(123, 5454)))
 grf <- GRangesFilter(GRanges(c("X", "Y"),
                              IRanges(start=c(123, 900),
                                      end=c(5454, 910))))
-## Evaluate the "where" SQL clause that would be applied.
+## Evaluate the 'where' SQL condition that would be applied.
 where(grf)
 ## Change the "condition" of the filter and evaluate the
-## where clause again.
+## 'where' condition again.
 condition(grf) <- "overlapping"
 where(grf)
 
