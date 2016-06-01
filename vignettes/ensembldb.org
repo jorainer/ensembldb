@@ -514,8 +514,8 @@ Note that in most instances no mapping is available for sequences not
 corresponding to the main chromosomes (i.e. contigs, patched chromosomes
 etc). What is returned in cases in which no mapping is available can be
 specified with the global =ensembldb.seqnameNotFound= option. By default (with
-=ensembldb.seqnameNotFound = "ORIGINAL"=), the original seqnames (i.e. the ones
-from Ensembl) are returned. With =ensembldb.seqnameNotFound = "MISSING"= each
+=ensembldb.seqnameNotFound= set to "ORIGINAL"), the original seqnames (i.e. the ones
+from Ensembl) are returned. With =ensembldb.seqnameNotFound= "MISSING" each
 time a seqname can not be found an error is thrown. For all other cases
 (e.g. =ensembldb.seqnameNotFound = NA=) the value of the option is returned.
 

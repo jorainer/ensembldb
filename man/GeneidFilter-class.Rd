@@ -129,7 +129,6 @@
 \alias{start,GRangesFilter-method}
 \alias{strand,GRangesFilter-method}
 
-
 \title{Filter results fetched from the Ensembl database}
 \description{
   These classes allow to specify which entries (i.e. genes, transcripts
@@ -216,7 +215,7 @@
 
     \item{where}{\code{signature(object = "GeneidFilter", db="EnsDb",
 	with.tables="character")}:
-      returns the where clause for the SQL call. Submitting also the
+      returns the where condition for the SQL call. Submitting also the
       \code{db} parameter ensures that
       the columns are valid in the corresponding database schema. The
       optional argument \code{with.tables} allows to specify which in
@@ -228,14 +227,14 @@
     \item{where}{\code{signature(object = "GeneidFilter", db="EnsDb",
 	with.tables="missing")}:
       returns the
-      where clause for the SQL call. Submitting also the \code{db}
+      where condition for the SQL call. Submitting also the \code{db}
       parameter ensures that
       the columns are valid in the corresponding database schema.
     }
 
     \item{where}{\code{signature(object = "GeneidFilter", db="missing",
 	with.tables="missing")}:
-      returns the where clause for the SQL call.
+      returns the where condition for the SQL call.
     }
   }
 }
@@ -370,7 +369,7 @@
 ## the respective gene.
 Gif <- GeneidFilter("ENSG00000012817")
 Gif
-## returns the where clause of the SQL querys
+## returns the where condition of the SQL querys
 where(Gif)
 
 ## create a filter for a chromosomal end position of a gene
