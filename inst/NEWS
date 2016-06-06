@@ -1,9 +1,16 @@
+CHANGES IN VERSION 1.5.8
+-------------------------
+
+BUG FIXES
+    o Fix problem with white space separated species name in ensDbFromGRanges.
+
+
 CHANGES IN VERSION 1.5.7
 -------------------------
 
 OTHER CHANGES
     o Fixed typos in documentation
-    
+
 
 CHANGES IN VERSION 1.5.6
 -------------------------
