@@ -691,6 +691,8 @@ checkValidEnsDb <- function(x){
 ## organism is expected to be e.g. Homo_sapiens, so the full organism name, with
 ## _ as a separator
 tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames){
+    ## Quick fix if organism contains whitespace instead of _:
+    organism <- gsub(organism, pattern=" ", replacement="_", fixed=TRUE)
     Dataset <- paste0(c(tolower(.abbrevOrganismName(organism)), "gene_ensembl"),
                       collapse="_")
     message("Fetch seqlengths from ensembl, dataset ", Dataset, " version ",
