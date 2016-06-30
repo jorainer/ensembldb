@@ -120,5 +120,120 @@ test_ExonrankFilter <- function(){
     where(Filt, edb)
 }
 
+## SymbolFilter
+test_SymbolFilter <- function(){
+    edb <- EnsDb.Hsapiens.v75
+    sf <- SymbolFilter("SKA2")
 
+    ## Check the column method.
+    checkEquals(column(sf), "symbol")
+    ## For EnsDb we want it to link to gene_name
+    checkEquals(column(sf, edb), "gene.gene_name")
+    checkException(column(sf, edb, with.tables = c("tx", "exon")))
+
+    ## Check the where method.
+    checkEquals(where(sf), "symbol = 'SKA2'")
+    condition(sf) <- "!="
+    checkEquals(where(sf, edb), "gene.gene_name != 'SKA2'")
+
+    ## Test if we can use it:
+    condition(sf) <- "="
+    Res <- genes(edb, filter = sf, return.type = "data.frame")
+    checkEquals(Res$gene_id, "ENSG00000182628")
+    ## We need now also a column "symbol"!
+    checkEquals(Res$symbol, Res$gene_name)
+    ## Asking explicitely for symbol
+    Res <- genes(edb, filter = sf, return.type = "data.frame",
+                 columns = c("symbol", "gene_id"))
+    checkEquals(colnames(Res), c("symbol", "gene_id"))
+    ## Some more stuff, also shuffling the order.
+    Res <- genes(edb, filter = sf, return.type = "data.frame",
+                 columns = c("gene_name", "symbol", "gene_id"))
+    checkEquals(colnames(Res), c("gene_name", "symbol", "gene_id"))
+    Res <- genes(edb, filter = sf, return.type = "data.frame",
+                 columns = c("gene_id", "gene_name", "symbol"))
+    checkEquals(colnames(Res), c("gene_id", "gene_name", "symbol"))
+    ## And with GRanges as return type.
+    Res <- genes(edb, filter = sf, return.type = "GRanges",
+                 columns = c("gene_id", "gene_name", "symbol"))
+    checkEquals(colnames(mcols(Res)), c("gene_id", "gene_name", "symbol"))
+
+    ## Combine tx_name and symbol
+    Res <- genes(edb, filter = sf, columns = c("tx_name", "symbol"),
+                 return.type = "data.frame")
+    checkEquals(colnames(Res), c("tx_name", "symbol"))
+    checkTrue(all(Res$symbol == "SKA2"))
+
+    ## Test for transcripts
+    Res <- transcripts(edb, filter=sf, return.type="data.frame")
+    checkTrue(all(Res$symbol == "SKA2"))
+    Res <- transcripts(edb, filter = sf, return.type = "data.frame",
+                       columns = c("symbol", "tx_id", "gene_name"))
+    checkTrue(all(Res$symbol == "SKA2"))
+    checkEquals(Res$symbol, Res$gene_name)
+    checkEquals(colnames(Res), c("symbol", "tx_id", "gene_name"))
+
+    ## Test for exons
+    Res <- exons(edb, filter=sf, return.type="data.frame")
+    checkTrue(all(Res$symbol == "SKA2"))
+    Res <- exons(edb, filter = c(sf, TxbiotypeFilter("nonsense_mediated_decay")),
+                 return.type = "data.frame",
+                 columns = c("symbol", "tx_id", "gene_name"))
+    checkTrue(all(Res$symbol == "SKA2"))
+    checkEquals(Res$symbol, Res$gene_name)
+    checkEquals(colnames(Res), c("symbol", "tx_id", "gene_name"))
+
+    ## Test for exonsBy
+    Res <- exonsBy(edb, filter=sf)
+    checkTrue(all(unlist(Res)$symbol == "SKA2"))
+    Res <- exonsBy(edb, filter = c(sf, TxbiotypeFilter("nonsense_mediated_decay")),
+                 columns = c("symbol", "tx_id", "gene_name"))
+    checkTrue(all(unlist(Res)$symbol == "SKA2"))
+
+    checkEquals(unlist(Res)$symbol, unlist(Res)$gene_name)
+
+    ## Test for transcriptsBy too
+}
+
+
+## Here we want to test if we get always also the filter columns back.
+test_multiFilterReturnCols <- function() {
+    cols <- ensembldb:::addSymlinkFilterCols(cols=c("exon_id"), filter = SymbolFilter("SKA2"))
+    checkEquals(cols, c("exon_id", "symbol"))
+    ## Two filter
+    cols <- ensembldb:::addSymlinkFilterCols(cols=c("exon_id"),
+                                             filter = list(SymbolFilter("SKA2"),
+                                                           GenenameFilter("SKA2")))
+    checkEquals(cols, c("exon_id", "symbol", "gene_name"))
+    cols <- ensembldb:::addSymlinkFilterCols(cols=c("exon_id"),
+                                             filter = list(SymbolFilter("SKA2"),
+                                                           GenenameFilter("SKA2"),
+                                                           GRangesFilter(GRanges("3",
+                                                                                 IRanges(3, 5)
+                                                                                 ))))
+    checkEquals(cols, c("exon_id", "symbol", "gene_name", "gene_seq_start",
+                        "gene_seq_end", "seq_name", "seq_strand"))
+    cols <- ensembldb:::addSymlinkFilterCols(cols=c("exon_id"),
+                                             filter = list(SymbolFilter("SKA2"),
+                                                           GenenameFilter("SKA2"),
+                                                           GRangesFilter(GRanges("3",
+                                                                                 IRanges(3, 5)
+                                                                                 ))),
+                                             feature = "exon")
+    checkEquals(cols, c("exon_id", "symbol", "gene_name", "exon_seq_start",
+                        "exon_seq_end", "seq_name", "seq_strand"))
+    ## SeqstartFilter and GRangesFilter
+    ssf <- SeqstartFilter(123, feature="tx")
+    cols <- ensembldb:::addSymlinkFilterCols(cols=c("exon_id"),
+                                             filter = list(SymbolFilter("SKA2"),
+                                                           GenenameFilter("SKA2"),
+                                                           GRangesFilter(GRanges("3",
+                                                                                 IRanges(3, 5)
+                                                                                 )),
+                                                           ssf),
+                                             feature = "exon")
+    checkEquals(cols, c("exon_id", "symbol", "gene_name", "exon_seq_start",
+                        "exon_seq_end", "seq_name", "seq_strand", "tx_seq_start"))
+
+}
 
