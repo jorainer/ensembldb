@@ -18,6 +18,8 @@ EnsDb <- function(x){
     names(Tables) <- tables
     EDB <- new("EnsDb", ensdb=con, tables=Tables)
     EDB <- setProperty(EDB, dbSeqlevelsStyle="Ensembl")
+    ## Setting the default for the returnFilterColumns
+    returnFilterColumns(EDB) <- TRUE
     return(EDB)
 }
 
@@ -271,25 +273,35 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 
 
 ## just to add another layer; basically just calls buildQuery and executes the query
-.getWhat <- function(x, columns, filter=list(), order.by="",
-                     order.type="asc", group.by=NULL, skip.order.check=FALSE){
-    ## That's nasty stuff; for now we support the column tx_name, which we however don't have in the
-    ## database. Thus, we are querying everything except that column and filling it later with the
-    ## values from tx_id.
+.getWhat <- function(x, columns, filter = list(), order.by = "",
+                     order.type = "asc", group.by = NULL, skip.order.check = FALSE) {
+    ## That's nasty stuff; for now we support the column tx_name, which we however
+    ## don't have in the database. Thus, we are querying everything except that
+    ## column and filling it later with the values from tx_id.
     fetchColumns <- columns
     if(any(columns == "tx_name"))
-        fetchColumns <- unique(c("tx_id", columns[columns != "tx_name"]))
+        fetchColumns <- unique(c("tx_id", fetchColumns[fetchColumns != "tx_name"]))
+    ## If any of the filter is a SymbolFilter, add "symbol" to the return columns.
+    if(length(filter) > 0) {
+        if(any(unlist(lapply(filter, function(z) {
+            return(is(z, "SymbolFilter"))
+        }))))
+            columns <- unique(c(columns, "symbol"))  ## append a filter column.
+    }
+    ## Catch also a "symbol" in columns
+    if(any(columns == "symbol"))
+        fetchColumns <- unique(c(fetchColumns[fetchColumns != "symbol"], "gene_name"))
     ## build the query
-    Q <- .buildQuery(x=x, columns=fetchColumns, filter=filter,
-                     order.by=order.by, order.type=order.type, group.by=group.by,
-                     skip.order.check=skip.order.check)
+    Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
+                     order.by = order.by, order.type = order.type, group.by = group.by,
+                     skip.order.check = skip.order.check)
     ## get the data
     Res <- dbGetQuery(dbconn(x), Q)
-    if(any(columns=="tx_cds_seq_start")){
+    if(any(columns == "tx_cds_seq_start")) {
         suppressWarnings(
             ## column contains "NULL" if not defined and coordinates are characters
             ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
-            Res[ , "tx_cds_seq_start" ] <- as.numeric(Res[ , "tx_cds_seq_start" ])
+            Res[ , "tx_cds_seq_start"] <- as.numeric(Res[ , "tx_cds_seq_start"])
         )
     }
     if(any(columns=="tx_cds_seq_end")){
@@ -299,11 +311,45 @@ removePrefix <- function(x, split=".", fixed=TRUE){
             Res[ , "tx_cds_seq_end" ] <- as.numeric(Res[ , "tx_cds_seq_end" ])
         )
     }
-    ## Now adding the "virtual" tx_name column if it was requested...
-    if(any(columns == "tx_name")){
-        Res <- data.frame(Res, tx_name=Res$tx_id, stringsAsFactors=FALSE)
-        Res <- Res[, columns, drop=FALSE]
+    ## Resolving the "symlinks" again.
+    if(any(columns == "tx_name")) {
+        Res <- data.frame(Res, tx_name = Res$tx_id, stringsAsFactors = FALSE)
     }
+    if(any(columns == "symbol")) {
+        Res <- data.frame(Res, symbol = Res$gene_name, stringsAsFactors = FALSE)
+    }
+    ## Ensure that the ordering is as requested.
+    Res <- Res[, columns, drop=FALSE]
+    ## Same for the "symbol" column.
     return(Res)
 }
 
+############################################################
+## addFilterColumns
+##
+## This function checks the filter objects and adds, depending on the
+## returnFilterColumns setting of the EnsDb, also columns for each of the
+## filters, ensuring that:
+## a) "Symlink" filters are added correctly (the column returned by the
+##    column call without db are added).
+## b) GRangesFilter: the feature is set based on the specified feature parameter
+## Args:
+addFilterColumns <- function(cols, filter = list(), edb) {
+    gimmeAll <- returnFilterColumns(edb)
+    if (!missing(filter)) {
+        if(!is.list(filter))
+            filter <- list(filter)
+    } else {
+        return(cols)
+    }
+    if (!gimmeAll)
+        return(cols)
+    ## Or alternatively process the filters and add columns.
+    symFilts <- c("SymbolFilter")
+    addC <- unlist(lapply(filter, function(z) {
+        if(class(z) %in% symFilts)
+            return(column(z))
+        return(column(z))
+    }))
+    return(unique(c(cols, addC)))
+}
