@@ -79,9 +79,10 @@ setMethod("keytypes", "EnsDb",
 .keytype2FilterMapping <- function(){
     filters <- c("EntrezidFilter", "GeneidFilter", "GenebiotypeFilter", "GenenameFilter",
                  "TxidFilter", "TxbiotypeFilter", "ExonidFilter", "SeqnameFilter",
-                 "SeqstrandFilter", "TxidFilter")
+                 "SeqstrandFilter", "TxidFilter", "SymbolFilter")
     names(filters) <- c("ENTREZID", "GENEID", "GENEBIOTYPE", "GENENAME", "TXID",
-                        "TXBIOTYPE", "EXONID", "SEQNAME", "SEQSTRAND", "TXNAME")
+                        "TXBIOTYPE", "EXONID", "SEQNAME", "SEQSTRAND", "TXNAME",
+                        "SYMBOL")
     return(filters)
 }
 filterForKeytype <- function(keytype){
@@ -126,50 +127,51 @@ setMethod("keys", "EnsDb",
 ##
 ####------------------------------------------------------------
 setMethod("select", "EnsDb",
-          function(x, keys, columns, keytype, ...){
-              if(missing(keys))
+          function(x, keys, columns, keytype, ...) {
+              if (missing(keys))
                   keys <- NULL
-              if(missing(columns))
+              if (missing(columns))
                   columns <- NULL
-              if(missing(keytype))
+              if (missing(keytype))
                   keytype <- NULL
-              return(.select(x=x, keys=keys, columns=columns, keytype=keytype, ...))
+              return(.select(x = x, keys = keys, columns = columns,
+                             keytype = keytype, ...))
           })
-.select <- function(x, keys=NULL, columns=NULL, keytype=NULL, ...){
+.select <- function(x, keys = NULL, columns = NULL, keytype = NULL, ...) {
     extraArgs <- list(...)
     ## Perform argument checking:
     ## columns:
-    if(missing(columns) | is.null(columns))
+    if (missing(columns) | is.null(columns))
         columns <- columns(x)
     notAvailable <- !(columns %in% columns(x))
-    if(all(notAvailable))
+    if (all(notAvailable))
         stop("None of the specified columns are avaliable in the database!")
-    if(any(notAvailable)){
+    if (any(notAvailable)){
         warning("The following columns are not available in the database and have",
-                " thus been removed: ", paste(columns[notAvailable], collapse=", "))
+                " thus been removed: ", paste(columns[notAvailable], collapse = ", "))
         columns <- columns[!notAvailable]
     }
     ## keys:
-    if(is.null(keys) | missing(keys)){
+    if (is.null(keys) | missing(keys)) {
         ## Get everything from the database...
         keys <- list()
-    }else{
-        if(!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
+    } else {
+        if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
             stop("Argument keys should be a character vector, an object extending BasicFilter ",
                  "or a list of objects extending BasicFilter.")
-        if(is(keys, "list")){
-            if(!all(vapply(keys, is, logical(1L), "BasicFilter")))
+        if (is(keys, "list")) {
+            if (!all(vapply(keys, is, logical(1L), "BasicFilter")))
                 stop("If keys is a list it should be a list of objects extending BasicFilter!")
         }
-        if(is(keys, "BasicFilter")){
+        if (is(keys, "BasicFilter")) {
             keys <- list(keys)
         }
-        if(is(keys, "character")){
-            if(is.null(keytype)){
+        if (is(keys, "character")) {
+            if (is.null(keytype)) {
                 stop("Argument keytype is mandatory if keys is a character vector!")
             }
             ## Check also keytype:
-            if(!(keytype %in% keytypes(x)))
+            if (!(keytype %in% keytypes(x)))
                 stop("keytype ", keytype, " not available in the database.",
                      " Use keytypes method to list all available keytypes.")
             ## Generate a filter object for the filters.
@@ -177,16 +179,40 @@ setMethod("select", "EnsDb",
             value(keyFilter) <- keys
             keys <- list(keyFilter)
             ## Add also the keytype itself to the columns.
-            if(!any(columns == keytype))
+            if (!any(columns == keytype))
                 columns <- c(keytype, columns)
         }
     }
-    ## Map the columns to column names we have in the database.
-    ensCols <- ensDbColumnForColumn(x, columns)
+    ## Map the columns to column names we have in the database and add filter columns too.
+    ensCols <- unique(c(ensDbColumnForColumn(x, columns),
+                        addFilterColumns(character(), filter = keys, x)))
     ## OK, now perform the query given the filters we've got.
-    res <- getWhat(x, columns=ensCols, filter=keys)
+    res <- getWhat(x, columns = ensCols, filter = keys)
+    ## Order results if length of filters is 1.
+    if (length(keys) == 1) {
+        ## Define the filters on which we could sort.
+        sortFilts <- c("GenenameFilter", "GeneidFilter", "EntrezidFilter", "GenebiotypeFilter",
+                       "SymbolFilter", "TxidFilter", "TxbiotypeFilter", "ExonidFilter",
+                       "ExonrankFilter", "SeqnameFilter")
+        if (class(keys[[1]]) %in% sortFilts) {
+            keyvals <- value(keys[[1]])
+            ## Handle symlink Filter differently:
+            if (is(keys[[1]], "SymbolFilter")) {
+                sortCol <- column(keys[[1]])
+            } else {
+                sortCol <- removePrefix(column(keys[[1]], x))
+            }
+            res <- res[order(match(res[, sortCol], keyvals)), ]
+        }
+    } else {
+        ## Show a mild warning message
+        message("Note: ordering of the results might not match ordering of keys!")
+    }
     colMap <- .getColMappings(x)
     colnames(res) <- colMap[colnames(res)]
+    rownames(res) <- NULL
+    if (returnFilterColumns(x))
+        return(res)
     ## ## Now, if we've got a "TXNAME" in columns, we have to replace at least one of the "TXID"s
     ## ## in the colnames...
     ## if(any(columns == "TXNAME"))

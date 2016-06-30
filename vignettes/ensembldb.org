@@ -39,7 +39,7 @@ vignette: >
 #+BEGIN_html
 **Package**: `r Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 4 May, 2016<br />
+**Modified**: 29 June, 2016<br />
 **Compiled**: `r date()`
 #+END_html
 
@@ -192,13 +192,20 @@ metadata columns. Alternatively, by setting =return.type = "DataFrame"=, or
   head(Tx$tx_biotype)
 #+END_SRC
 
-The parameter =columns= of the =exons=, =genes= and =transcripts= method allow
-to specify which database attributes (columns) should be retrieved. Note that
-these are not restricted to columns of the corresponding database table
-(e.g. columns of database table /gene/ for =genes=). To get an overview of
-database tables and available columns the function =listTables= can be used. The
-method =listColumns= on the other hand lists columns for the specified database
-table.
+The parameter =columns= of the =exons=, =genes= and =transcripts= method allows
+to specify which database attributes (columns) should be retrieved. The =exons=
+method returns by default all exon-related columns, the =transcripts= all columns
+from the transcript database table and the =genes= all from the gene table. Note
+however that in the example above we got also a column =gene_name= although this
+column is not present in the transcript database table. By default the methods
+return also all columns that are used by any of the filters submitted with the
+=filter= argument (thus, because a =GenenameFilter= was used, the column =gene_name=
+is also returned). Setting =returnFilterColumns(edb) <- FALSE= disables this
+option and only the columns specified by the =columns= parameter are retrieved.
+
+To get an overview of database tables and available columns the function
+=listTables= can be used. The method =listColumns= on the other hand lists columns
+for the specified database table.
 
 #+BEGIN_SRC R
   ## list all database tables along with their columns
@@ -1327,3 +1334,17 @@ Support multiple regions for a =GRangesFilter=.
   ## Hm, again, we're right, but there are other 2 Cs there!
 
 #+END_SRC
+
+** TODO Implement a =SymbolFilter= and support a =symbol= column
+
+** TODO What about using pipe and /formula-like/ filters?
+
+** TODO Fix the =select= method such that it always returns the values in the same order than the keys were
+
+This should be done if only a single filter was provided; for multiple filters
+this will not work; could do it with a simple =match=.
+
+** TODO *Always* return the attribute of the filter!
+
+I have to check that; eventually do that based on an user option, or even better
+on an internal property, which can be set by =returnFilterCols(edb) <- TRUE/FALSE=.

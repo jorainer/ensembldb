@@ -364,3 +364,26 @@ GRangesFilter <- function(value, condition="within", feature="gene"){
 ###------------------------------------------------------------
 
 
+###============================================================
+##  SymbolFilter
+###------------------------------------------------------------
+setClass("SymbolFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             value = "",
+             .valueIsCharacter = TRUE
+         )
+         )
+SymbolFilter <- function(value, condition = "=") {
+    if(missing(value)){
+        stop("A filter without a value makes no sense!")
+    }
+    if(length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("SymbolFilter", condition = condition,
+               value = as.character(value)))
+}
