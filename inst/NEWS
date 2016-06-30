@@ -1,3 +1,15 @@
+CHANGES IN VERSION 1.5.9
+-------------------------
+
+NEW FEATURES:
+    o New SymbolFilter.
+    o returnFilterColumns method to enable/disable that filter columns are also
+      returned by the methods (which is the default).
+    o select method support for SYMBOL keys, columns and filter.
+    o Select method does ensure result ordering matches the input keys if a
+      single filter or only keys are provided.
+
+
 CHANGES IN VERSION 1.5.8
 -------------------------
 

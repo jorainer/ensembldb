@@ -157,3 +157,54 @@ test_mapIds <- function(){
     checkTrue(all(TestS$SEQSTRAND == -1))
 }
 
+## Test if the results are properly sorted if we submit a single filter or just keys.
+test_select_sorted <- function() {
+    ks <- c("ZBTB16", "BCL2", "SKA2", "BCL2L11")
+    ## gene_name
+    res <- select(edb, keys = ks, keytype = "GENENAME")
+    checkEquals(unique(res$GENENAME), ks)
+    res <- select(edb, keys = GenenameFilter(ks))
+    checkEquals(unique(res$GENENAME), ks)
+
+    ## Using two filters;
+    res <- select(edb, keys = list(GenenameFilter(ks),
+                                   TxbiotypeFilter("nonsense_mediated_decay")))
+    ## We don't expect same sorting here!
+    checkTrue(!all(unique(res$GENENAME) == ks[ks %in% unique(res$GENENAME)]))
+
+    ## symbol
+    res <- select(edb, keys = ks, keytype = "SYMBOL",
+                  columns = c("GENENAME", "SYMBOL", "SEQNAME"))
+
+    ## tx_biotype
+    ks <- c("retained_intron", "nonsense_mediated_decay")
+    res <- select(edb, keys = ks, keytype = "TXBIOTYPE",
+                  columns = c("GENENAME", "TXBIOTYPE"))
+    checkEquals(unique(res$TXBIOTYPE), ks)
+    res <- select(edb, keys = TxbiotypeFilter(ks),
+                  keytype = "TXBIOTYPE", columns = c("GENENAME", "TXBIOTYPE"))
+    checkEquals(unique(res$TXBIOTYPE), ks)
+}
+
+test_select_symbol <- function() {
+    ## Can I use SYMBOL as keytype?
+    ks <- c("ZBTB16", "BCL2", "SKA2", "BCL2L11")
+    res <- select(edb, keys = ks, keytype = "GENENAME")
+    res2 <- select(edb, keys = ks, keytype = "SYMBOL")
+    checkEquals(res, res2)
+
+    ## Can I use the SymbolFilter?
+    res <- select(edb, keys = GenenameFilter(ks),
+                  columns = c("TXNAME", "SYMBOL", "GENEID"))
+    checkEquals(colnames(res), c("TXNAME", "SYMBOL", "GENEID", "GENENAME"))
+
+    res <- select(edb, keys = SymbolFilter(ks), columns=c("GENEID"))
+    checkEquals(colnames(res), c("GENEID", "SYMBOL"))
+    checkEquals(res$SYMBOL, ks)
+
+    ## Can I ask for SYMBOL?
+    res <- select(edb, keys = list(SeqnameFilter("Y"),
+                                   GenebiotypeFilter("lincRNA")),
+                  columns = c("GENEID", "SYMBOL"))
+    checkEquals(colnames(res), c("GENEID", "SYMBOL", "SEQNAME", "GENEBIOTYPE"))
+}

@@ -86,6 +86,12 @@ if(!isGeneric("listTables")){
     setGeneric("listTables", function(x, ...)
         standardGeneric("listTables"))
 }
+
+setGeneric("returnFilterColumns", function(x, ...)
+    standardGeneric("returnFilterColumns"))
+setGeneric("returnFilterColumns<-", function(x, value)
+    standardGeneric("returnFilterColumns<-"))
+
 if(!isGeneric("tablesByDegree")){
     setGeneric("tablesByDegree", function(x, ...)
         standardGeneric("tablesByDegree"))
