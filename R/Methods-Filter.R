@@ -162,9 +162,9 @@ setMethod("print", "BasicFilter", function(x, ...){
     show(x)
 })
 setMethod("show", "BasicFilter", function(object){
-    cat("| ", class(object), "\n")
-    cat("| condition: ", object@condition, "\n")
-    cat("| value: ", value(object), "\n")
+    cat("| Object of class:", class(object), "\n")
+    cat("| condition:", object@condition, "\n")
+    cat("| value:", value(object), "\n")
 })
 
 ##***********************************************************************
@@ -694,13 +694,13 @@ setValidity("GRangesFilter", function(object){
     return(TRUE)
 })
 setMethod("show", "GRangesFilter", function(object){
-    cat("|", class(object), "\n")
+    cat("| Object of class:" , class(object), "\n")
     cat("| region:\n")
-    cat("| + start: ", paste0(start(object), collapse=", "), "\n")
-    cat("| + end:   ", paste0(end(object), collapse=", "), "\n")
-    cat("| + seqname: ", paste0(seqnames(object), collapse=", "), "\n")
+    cat("| + start:", paste0(start(object), collapse=", "), "\n")
+    cat("| + end:  ", paste0(end(object), collapse=", "), "\n")
+    cat("| + seqname:", paste0(seqnames(object), collapse=", "), "\n")
     cat("| + strand: ", paste0(strand(object), collapse=", "), "\n")
-    cat("| condition: ", condition(object), "\n")
+    cat("| condition:", condition(object), "\n")
 })
 setMethod("condition", "GRangesFilter", function(x, ...){
     return(x@location)
@@ -861,3 +861,44 @@ num2strand <- function(x){
     }
 }
 
+##***********************************************************************
+##
+##     Methods for SymbolFilter classes.
+##
+##***********************************************************************
+setMethod("where", signature(object = "SymbolFilter", db = "missing",
+                             with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+    suff <- callNextMethod()
+    return(paste(column(object), suff))
+})
+setMethod("column", signature(object = "SymbolFilter", db = "missing",
+                              with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+    return("symbol")
+})
+setMethod("where", signature(object = "SymbolFilter", db = "EnsDb",
+                             with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+    tn <- names(listTables(db))
+    return(where(object, db, with.tables = tn))
+})
+setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
+                              with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+    tn <- names(listTables(db))
+    return(column(object, db, with.tables = tn))
+})
+setMethod("where", signature(object = "SymbolFilter", db = "EnsDb",
+                             with.tables="character"),
+          function(object, db, with.tables = "character", ...) {
+    suff <- callNextMethod()
+    return(paste(column(object, db, with.tables = with.tables), suff))
+})
+setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
+                              with.tables = "character"),
+          function(object, db, with.tables, ...) {
+    return(unlist(prefixColumns(db, "gene_name",
+                                with.tables = with.tables),
+                  use.names = FALSE))
+})

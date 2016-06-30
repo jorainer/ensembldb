@@ -1,0 +1,156 @@
+#+TODO: OPEN | CLOSED
+#+TITLE: ensembldb issues
+#+STARTUP: overview
+
+* Introduction
+
+These issues are synced with the issues in github.
+
+* Issues of ensembldb
+:PROPERTIES:
+:LOGGING:  nil
+:since:
+:url:      https://api.github.com/repos/jotsetung/ensembldb
+:END:
+** OPEN Support for columns TXNAME and SYMBOL in select?
+:PROPERTIES:
+:id:       9
+:date-modification: 2016-06-30T10:51:50+0200
+:date-creation: 2016-06-30T10:51:50+0200
+:author:   "jotsetung"
+:END:
+: Are TXNAME and SYMBOL supported for select?
+: Are they supported for genes etc?
+** OPEN Implement a `getGenomeTwoBitFile`
+:PROPERTIES:
+:tags:     ("enhancement")
+:sync:     conflict-local
+:id:       2
+:date-modification: 2016-06-29T11:06:53+0200
+:date-creation: 2016-06-29T10:42:07+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: Get a `TwoBit` matching the genome release for the `EnsDb` object.
+** OPEN Parameter to specify whether filter columns should be returned
+:PROPERTIES:
+:sync:     conflict-local
+:id:       6
+:date-modification: 2016-06-29T10:53:28+0200
+:date-creation: 2016-06-29T10:53:28+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: As of now only columns specified with the `columns` argument are returned by the methods. It might however be useful to return the columns queried by the provided filters too.
+: Add a `returnFilterColumns` setting that allows to control whether filter-columns should be returned too.
+** OPEN Add suport for `SYMBOL`
+:PROPERTIES:
+:sync:     conflict-local
+:id:       5
+:date-modification: 2016-06-29T10:51:35+0200
+:date-creation: 2016-06-29T10:51:35+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: Allow `SYMBOL` to be queried by the `select` method.
+** OPEN Implement a `SymbolFilter`
+:PROPERTIES:
+:tags:     ("enhancement")
+:sync:     conflict-local
+:id:       4
+:date-modification: 2016-06-29T10:51:01+0200
+:date-creation: 2016-06-29T10:51:01+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: Based on Vince's suggestion; this should symlink to `GenenameFilter`.
+** OPEN Convert within tx variant information to genomic coordinates
+:PROPERTIES:
+:tags:     ("enhancement")
+:sync:     conflict-local
+:id:       3
+:date-modification: 2016-06-29T10:50:04+0200
+:date-creation: 2016-06-29T10:50:04+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: Functionality to map variant information within tx to genomic coordinates and vice versa. Example code below:
+:
+: ```{r}
+:   fa <- getGenomeFaFile(edb)
+:
+:   ## Convert variant coordinates to genomic coordinates
+:   tx <- "ENST00000070846"
+:   ## Get the cds
+:   txCds <- cdsBy(edb, by="tx", filter=TxidFilter(tx))
+:
+:   ## ENST00000070846:c.1643delG
+:   varPos <- 1643
+:   exWidths <- width(txCds[[tx]])
+:   ## Define the exon ends in the tx.
+:   exEnds <- cumsum(exWidths)
+:   ## Get the first negative index.
+:   exDiffs <- varPos - exEnds
+:   exVar <- min(which((exDiffs) < 0))
+:   ## Now we would like to know the position within that exon:
+:   posInExon <- exWidths[exVar] + exDiffs[exVar]
+:   ## Next the genomic coordinate:
+:   ## Note: here we have to consider the strand!
+:   ## fw: exon_start + (pos in exon -1)
+:   ## rv: exon_end - (pos in exon -1)
+:   if(as.character(strand(txCds[[tx]][1])) == "-"){
+:       chromPos <- end(txCds[[tx]][exVar]) - (posInExon - 1)
+:   }else{
+:       chromPos <- start(txCds[[tx]][exVar]) + (posInExon -1)
+:   }
+:
+:   ## Validation.
+:   ## OK, now we get the sequence for that exon.
+:   ## Check if the estimated position is a G.
+:   exSeq <- getSeq(fa, txCds[[tx]][exVar])
+:   substring(exSeq, first=posInExon-2, last=posInExon+2)
+:   ## Hm, hard to tell... it's two Gs there!
+:   substring(exSeq, first=posInExon, last=posInExon) == "G"
+:   ## Get the full CDS
+:   cdsSeq <- unlist(getSeq(fa, txCds[[tx]]))
+:   substring(cdsSeq, first=varPos - 2, last=1643 + 2)
+:   ## The same.
+:   getSeq(fa, GRanges(seqnames=seqlevels(txCds[[tx]]),
+:                      IRanges(chromPos, chromPos), strand="-")) == "G"
+:
+:
+:   ## Next one is c.1881DelC:
+:   varPos <- 1881
+:   exDiffs <- varPos - exEnds
+:   exVar <- min(which(exDiffs < 0))
+:   posInExon <- exWidths[exVar] + exDiffs[exVar]
+:   exSeq <- getSeq(fa, txCds[[1]][exVar])
+:   substring(exSeq, first=posInExon - 2, last=posInExon + 2)
+:   ## Hm, again, we're right, but there are other 2 Cs there!
+: ```
+** OPEN Ensure result ordering for `select`
+:PROPERTIES:
+:tags:     ("bug")
+:id:       1
+:date-modification: 2016-06-29T10:40:06+0200
+:date-creation: 2016-06-29T10:39:37+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: If a single filter or if `keys` are provided, the ordering of the result has to match the ordering of the input.
+: For multiple filters this would not work;
+** CLOSED Ensure `setFeatureInGRangesFilter` is always called before `addFilterColumns`
+:PROPERTIES:
+:id:       7
+:date-modification: 2016-06-29T16:20:34+0200
+:date-creation: 2016-06-29T15:24:02+0200
+:author:   "jotsetung"
+:END:
+** CLOSED Ensure `setFeatureInGRangesFilter` is always called before `addFilterColumns`
+:PROPERTIES:
+:sync:     conflict-local
+:id:       8
+:date-modification: 2016-06-29T15:59:07+0200
+:date-creation: 2016-06-29T15:59:07+0200
+:author:   "jotsetung"
+:END:

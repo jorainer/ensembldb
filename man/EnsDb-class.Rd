@@ -29,6 +29,11 @@
 \alias{listTables,EnsDb-method}
 \alias{updateEnsDb}
 \alias{updateEnsDb,EnsDb-method}
+\alias{returnFilterColumns}
+\alias{returnFilterColumns,EnsDb-method}
+\alias{returnFilterColumns<-}
+\alias{returnFilterColumns,EnsDb-method}
+
 
 \title{Basic usage of an Ensembl based annotation database}
 \description{
@@ -67,6 +72,12 @@ EnsDb(x)
 \S4method{metadata}{EnsDb}(x, ...)
 
 \S4method{organism}{EnsDb}(object)
+
+\S4method{returnFilterColumns}{EnsDb}(x)
+
+\S4method{returnFilterColumns}{EnsDb}(x)
+
+\S4method{returnFilterColumns}{EnsDb}(x) <- value
 
 \S4method{seqinfo}{EnsDb}(x)
 
@@ -121,6 +132,12 @@ EnsDb(x)
   \item{table}{
     For \code{listColumns}: optionally specify the table name for
     which the columns should be returned.
+  }
+
+  \item{value}{
+    For \code{returnFilterColumns}: a logical of length one specifying
+    whether columns that are used for eventual filters should also be
+    returned.
   }
 
   \item{x}{
@@ -191,6 +208,12 @@ EnsDb(x)
       Returns the organism name (e.g. \code{"homo_sapiens"}).
     }
 
+    \item{returnFilterColumns, returnFilterColumns<-}{
+      Get or set the option which results in columns that are used for
+      eventually specified filters to be added as result columns. The
+      default value is \code{TRUE} (i.e. filter columns are returned).
+    }
+
     \item{seqinfo}{
       Returns the sequence/chromosome information from the database.
     }
@@ -251,6 +274,10 @@ EnsDb(x)
 
     \item{For \code{organism}}{
       A character string.
+    }
+
+    \item{For \code{returnFilterColumns}}{
+      A logical of length 1.
     }
 
     \item{For \code{seqinfo}}{
@@ -319,6 +346,24 @@ listTxbiotypes(EnsDb.Hsapiens.v75)
 
 ## Update the EnsDb; this is in most instances not necessary at all.
 updateEnsDb(EnsDb.Hsapiens.v75)
+
+######    returnFilterColumns
+returnFilterColumns(EnsDb.Hsapiens.v75)
+
+## Get protein coding genes on chromosome X, specifying to return
+## only columns gene_name as additional column.
+genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("X"),
+                                      GenebiotypeFilter("protein_coding")),
+      columns=c("gene_name"))
+## By default we get also the gene_biotype column as the data was filtered
+## on this column.
+
+## This can be changed using the returnFilterColumns option
+returnFilterColumns(EnsDb.Hsapiens.v75) <- FALSE
+genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("X"),
+                                      GenebiotypeFilter("protein_coding")),
+      columns=c("gene_name"))
+
 
 }
 \keyword{classes}
