@@ -5,19 +5,27 @@ DB <- EnsDb.Hsapiens.v75
 
 ## testing genes method.
 test_genes <- function(){
-    Gns <- genes(DB, filter=SeqnameFilter("X"))
-    Gns <- genes(DB, filter=SeqnameFilter("X"), return.type="DataFrame")
+    Gns <- genes(DB, filter=SeqnameFilter("Y"))
+    Gns <- genes(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
     checkEquals(sort(colnames(Gns)), sort(listColumns(DB, "gene")))
-    Gns <- genes(DB, filter=SeqnameFilter("X"), return.type="DataFrame", columns=c("gene_id", "tx_name"))
-    checkEquals(sort(colnames(Gns)), c("gene_id", "tx_name"))
+    Gns <- genes(DB, filter=SeqnameFilter("Y"), return.type="DataFrame",
+                 columns=c("gene_id", "tx_name"))
+    checkEquals(colnames(Gns), c("gene_id", "tx_name", "seq_name"))
+
+    Gns <- genes(DB, filter=SeqnameFilter("Y"), columns=c("gene_id", "gene_name"))
+    ## Here we don't need the seqnames in mcols!
+    checkEquals(colnames(mcols(Gns)), c("gene_id", "gene_name"))
+
+
     ## checkEquals(class(genes(DB, return.type="DataFrame",
     ##                         filter=list(SeqnameFilter("Y")))), "DataFrame" )
 }
 
 test_transcripts <- function(){
-    Tns <- transcripts(DB, filter=SeqnameFilter("X"), return.type="DataFrame")
-    checkEquals(sort(colnames(Tns)), sort(listColumns(DB, "tx")))
-    Tns <- transcripts(DB, columns=c("tx_id", "tx_name"), filter=SeqnameFilter("X"))
+    Tns <- transcripts(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
+    checkEquals(sort(colnames(Tns)), sort(c(listColumns(DB, "tx"), "seq_name")))
+
+    Tns <- transcripts(DB, columns=c("tx_id", "tx_name"), filter=SeqnameFilter("Y"))
     checkEquals(sort(colnames(mcols(Tns))), sort(c("tx_id", "tx_name")))
 }
 
@@ -27,20 +35,23 @@ test_transcriptsBy <- function(){
 
 test_exons <- function(){
     Exns <- exons(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
-    checkEquals(sort(colnames(Exns)), sort(listColumns(DB, "exon")))
+    checkEquals(sort(colnames(Exns)), sort(c(listColumns(DB, "exon"), "seq_name")))
 }
 
 test_exonsBy <- function(){
     ##ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx")
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("tx_name"))
-    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_name")))
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("tx_name"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_name",
+                                                           "seq_name")))
 
     ## Check what happens if we specify tx_id.
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("tx_id"))
-    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_id")))
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("tx_id"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_id",
+                                                           "seq_name")))
 
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx", columns=c("exon_rank"))
-    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank")))
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("exon_rank"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank",
+                                                           "seq_name")))
 }
 
 test_dbfunctionality <- function(){
@@ -74,25 +85,38 @@ test_promoters <- function(){
 }
 
 test_return_columns_gene <- function(){
-    cols <- c("gene_name", "seq_name", "tx_id")
+    cols <- c("gene_name", "tx_id")
     Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
-    checkEquals(cols, colnames(Resu))
+    checkEquals(sort(c(cols, "seq_name", "gene_id")), sort(colnames(Resu)))
+
     Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
-    checkEquals(cols, colnames(Resu))
+    checkEquals(sort(c(cols, "seq_name", "gene_id")), sort(colnames(Resu)))
+
+    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols)
+    checkEquals(sort(c(cols, "gene_id")), sort(colnames(mcols(Resu))))
 }
+
 test_return_columns_tx <- function(){
     cols <- c("tx_id", "exon_id", "tx_biotype")
     Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
-    checkEquals(cols, colnames(Resu))
+    checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
+
     Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
-    checkEquals(cols, colnames(Resu))
+    checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
+
+    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols)
+    checkEquals(sort(cols), sort(colnames(mcols(Resu))))
 }
 test_return_columns_exon <- function(){
-    cols <- c("tx_id", "exon_id", "tx_biotype", "seq_name")
+    cols <- c("tx_id", "exon_id", "tx_biotype")
     Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
-    checkEquals(cols, colnames(Resu))
+    checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
+
     Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
-    checkEquals(cols, colnames(Resu))
+    checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
+
+    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols)
+    checkEquals(sort(cols), sort(colnames(mcols(Resu))))
 }
 
 test_cdsBy <- function(){

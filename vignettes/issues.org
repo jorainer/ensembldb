@@ -12,15 +12,6 @@ These issues are synced with the issues in github.
 :since:
 :url:      https://api.github.com/repos/jotsetung/ensembldb
 :END:
-** OPEN Support for columns TXNAME and SYMBOL in select?
-:PROPERTIES:
-:id:       9
-:date-modification: 2016-06-30T10:51:50+0200
-:date-creation: 2016-06-30T10:51:50+0200
-:author:   "jotsetung"
-:END:
-: Are TXNAME and SYMBOL supported for select?
-: Are they supported for genes etc?
 ** OPEN Implement a `getGenomeTwoBitFile`
 :PROPERTIES:
 :tags:     ("enhancement")
@@ -32,38 +23,6 @@ These issues are synced with the issues in github.
 :assignee: "jotsetung"
 :END:
 : Get a `TwoBit` matching the genome release for the `EnsDb` object.
-** OPEN Parameter to specify whether filter columns should be returned
-:PROPERTIES:
-:sync:     conflict-local
-:id:       6
-:date-modification: 2016-06-29T10:53:28+0200
-:date-creation: 2016-06-29T10:53:28+0200
-:author:   "jotsetung"
-:assignee: "jotsetung"
-:END:
-: As of now only columns specified with the `columns` argument are returned by the methods. It might however be useful to return the columns queried by the provided filters too.
-: Add a `returnFilterColumns` setting that allows to control whether filter-columns should be returned too.
-** OPEN Add suport for `SYMBOL`
-:PROPERTIES:
-:sync:     conflict-local
-:id:       5
-:date-modification: 2016-06-29T10:51:35+0200
-:date-creation: 2016-06-29T10:51:35+0200
-:author:   "jotsetung"
-:assignee: "jotsetung"
-:END:
-: Allow `SYMBOL` to be queried by the `select` method.
-** OPEN Implement a `SymbolFilter`
-:PROPERTIES:
-:tags:     ("enhancement")
-:sync:     conflict-local
-:id:       4
-:date-modification: 2016-06-29T10:51:01+0200
-:date-creation: 2016-06-29T10:51:01+0200
-:author:   "jotsetung"
-:assignee: "jotsetung"
-:END:
-: Based on Vince's suggestion; this should symlink to `GenenameFilter`.
 ** OPEN Convert within tx variant information to genomic coordinates
 :PROPERTIES:
 :tags:     ("enhancement")
@@ -128,19 +87,27 @@ These issues are synced with the issues in github.
 :   substring(exSeq, first=posInExon - 2, last=posInExon + 2)
 :   ## Hm, again, we're right, but there are other 2 Cs there!
 : ```
-** OPEN Ensure result ordering for `select`
+** CLOSED Bug in test
 :PROPERTIES:
-:tags:     ("bug")
-:id:       1
-:date-modification: 2016-06-29T10:40:06+0200
-:date-creation: 2016-06-29T10:39:37+0200
+:id:       10
+:date-modification: 2016-06-30T16:10:00+0200
+:date-creation: 2016-06-30T16:10:00+0200
 :author:   "jotsetung"
-:assignee: "jotsetung"
 :END:
-: If a single filter or if `keys` are provided, the ordering of the result has to match the ordering of the input.
-: For multiple filters this would not work;
+: In test_properties function.
+** CLOSED Support for columns TXNAME and SYMBOL in select?
+:PROPERTIES:
+:sync:     conflict-local
+:id:       9
+:date-modification: 2016-06-30T10:51:50+0200
+:date-creation: 2016-06-30T10:51:50+0200
+:author:   "jotsetung"
+:END:
+: Are TXNAME and SYMBOL supported for select?
+: Are they supported for genes etc?
 ** CLOSED Ensure `setFeatureInGRangesFilter` is always called before `addFilterColumns`
 :PROPERTIES:
+:sync:     conflict-local
 :id:       7
 :date-modification: 2016-06-29T16:20:34+0200
 :date-creation: 2016-06-29T15:24:02+0200
@@ -154,3 +121,47 @@ These issues are synced with the issues in github.
 :date-creation: 2016-06-29T15:59:07+0200
 :author:   "jotsetung"
 :END:
+** CLOSED Parameter to specify whether filter columns should be returned
+:PROPERTIES:
+:sync:     conflict-local
+:id:       6
+:date-modification: 2016-06-29T10:53:28+0200
+:date-creation: 2016-06-29T10:53:28+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: As of now only columns specified with the `columns` argument are returned by the methods. It might however be useful to return the columns queried by the provided filters too.
+: Add a `returnFilterColumns` setting that allows to control whether filter-columns should be returned too.
+** CLOSED Add suport for `SYMBOL`
+:PROPERTIES:
+:sync:     conflict-local
+:id:       5
+:date-modification: 2016-06-29T10:51:35+0200
+:date-creation: 2016-06-29T10:51:35+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: Allow `SYMBOL` to be queried by the `select` method.
+** CLOSED Implement a `SymbolFilter`
+:PROPERTIES:
+:tags:     ("enhancement")
+:sync:     conflict-local
+:id:       4
+:date-modification: 2016-06-29T10:51:01+0200
+:date-creation: 2016-06-29T10:51:01+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: Based on Vince's suggestion; this should symlink to `GenenameFilter`.
+** CLOSED Ensure result ordering for `select`
+:PROPERTIES:
+:tags:     ("bug")
+:sync:     conflict-local
+:id:       1
+:date-modification: 2016-06-29T10:40:06+0200
+:date-creation: 2016-06-29T10:39:37+0200
+:author:   "jotsetung"
+:assignee: "jotsetung"
+:END:
+: If a single filter or if `keys` are provided, the ordering of the result has to match the ordering of the input.
+: For multiple filters this would not work;

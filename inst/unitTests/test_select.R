@@ -117,14 +117,12 @@ test_mapIds <- function(){
     allgenes <- keys(edb, keytype="GENEID")
     randordergenes <- allgenes[sample(1:length(allgenes), 100)]
     system.time(
-        mi <- mapIds(edb, keys=allgenes, keytype="GENEID")
+        mi <- mapIds(edb, keys=allgenes, keytype="GENEID", column = "GENENAME")
     )
-    checkEquals(unname(mi), keys(edb, keytype="GENEID"))
-    checkEquals(names(mi), unname(mi))
+    checkEquals(allgenes, names(mi))
     ## What happens if the ordering is different:
-    mi <- mapIds(edb, keys=randordergenes, keytype="GENEID")
-    checkEquals(unname(mi), randordergenes)
-    checkEquals(names(mi), unname(mi))
+    mi <- mapIds(edb, keys=randordergenes, keytype="GENEID", column = "GENENAME")
+    checkEquals(randordergenes, names(mi))
 
     ## Now check the different options:
     ## Handle multi mappings.
@@ -207,4 +205,25 @@ test_select_symbol <- function() {
                                    GenebiotypeFilter("lincRNA")),
                   columns = c("GENEID", "SYMBOL"))
     checkEquals(colnames(res), c("GENEID", "SYMBOL", "SEQNAME", "GENEBIOTYPE"))
+}
+
+test_select_symbol_n_txname <- function() {
+    ks <- c("ZBTB16", "BCL2", "SKA2")
+    ## Symbol allowed in keytype
+    res <- select(edb, keys = ks, keytype = "SYMBOL", columns = "GENENAME")
+    checkEquals(colnames(res), c("SYMBOL", "GENENAME"))
+    checkEquals(res$SYMBOL, ks)
+
+    ## Symbol using SymbolFilter
+    res <- select(edb, keys = SymbolFilter(ks), columns = "GENENAME")
+    checkEquals(colnames(res), c("GENENAME", "SYMBOL"))
+    checkEquals(res$SYMBOL, ks)
+
+    ## Symbol as a column.
+    res <- select(edb, keys = ks, keytype = "GENENAME", columns = "SYMBOL")
+    checkEquals(colnames(res), c("GENENAME", "SYMBOL"))
+
+    ## TXNAME as a column
+    res <- select(edb, keys = ks, keytype = "GENENAME", columns = c("TXNAME"))
+    checkEquals(colnames(res), c("GENENAME", "TXNAME"))
 }

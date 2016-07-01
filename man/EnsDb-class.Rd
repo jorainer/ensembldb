@@ -32,7 +32,7 @@
 \alias{returnFilterColumns}
 \alias{returnFilterColumns,EnsDb-method}
 \alias{returnFilterColumns<-}
-\alias{returnFilterColumns,EnsDb-method}
+\alias{returnFilterColumns<-,EnsDb-method}
 
 
 \title{Basic usage of an Ensembl based annotation database}
