@@ -87,7 +87,7 @@ if(!isGeneric("listTables")){
         standardGeneric("listTables"))
 }
 
-setGeneric("returnFilterColumns", function(x, ...)
+setGeneric("returnFilterColumns", function(x)
     standardGeneric("returnFilterColumns"))
 setGeneric("returnFilterColumns<-", function(x, value)
     standardGeneric("returnFilterColumns<-"))

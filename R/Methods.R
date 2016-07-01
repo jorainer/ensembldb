@@ -373,7 +373,7 @@ setMethod("genes", "EnsDb", function(x,
                                      order.type="asc",
                                      return.type="GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
-    columns <- unique(c("gene_id", columns))
+    columns <- unique(c(columns, "gene_id"))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
     ## and gene_seq_end and seq_strand
     if(return.type=="GRanges"){
@@ -438,7 +438,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                                            filter, order.by="", order.type="asc",
                                            return.type="GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
-    columns <- unique(c("tx_id", columns))
+    columns <- unique(c(columns, "tx_id"))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
     ## and gene_seq_end and seq_strand
     if(return.type=="GRanges"){
@@ -524,9 +524,9 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
     if(!any(columns %in% c(listColumns(x, "exon"), "exon_idx"))){
         ## have to have at least one column from the gene table...
-        columns <- c("exon_id", columns)
+        columns <- c(columns, "exon_id")
     }
-    columns <- unique(c("exon_id", columns))
+    columns <- unique(c(columns, "exon_id"))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
     ## and gene_seq_end and seq_strand
     if(return.type=="GRanges"){
@@ -618,7 +618,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
     ## Quick fix; rename any exon_rank to exon_idx.
     columns[columns == "exon_rank"] <- "exon_idx"
     ## Eventually add columns for the filters:
-    columns <- unique(c("exon_id", columns))
+    columns <- unique(c(columns, "exon_id"))
     columns <- addFilterColumns(columns, filter, x)
     retColumns <- columns
 
@@ -881,7 +881,8 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     byId <- paste0(by, bySuff)
     byIdFull <- unlist(prefixColumns(x, columns=byId,
                                      clean=FALSE), use.names=FALSE)
-    order.by <- paste0(byIdFull , ", case when seq_strand=1 then tx_seq_start when seq_strand=-1 then (tx_seq_end * -1) end")
+    order.by <- paste0(byIdFull , ", case when seq_strand=1 then tx_seq_start",
+                       " when seq_strand=-1 then (tx_seq_end * -1) end")
     ## Query the data
     ## what do we need: we need columns tx_cds_seq_start and tx_cds_seq_end and exon_idx
     fetchCols <- unique(c(byId, columns, "tx_cds_seq_start", "tx_cds_seq_end",
@@ -1548,7 +1549,7 @@ setMethod("exonsByOverlaps", "EnsDb", function(x, ranges, maxgap=0L, minoverlap=
 ##
 ## Method to set the option whether or not the filter columns should be
 ## returned too.
-setMethod("returnFilterColumns", "EnsDb", function(x, ...) {
+setMethod("returnFilterColumns", "EnsDb", function(x) {
     return(getProperty(x, "returnFilterColumns"))
 })
 setReplaceMethod("returnFilterColumns", "EnsDb", function(x, value) {

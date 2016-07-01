@@ -12,6 +12,7 @@
 \alias{SeqstartFilter}
 \alias{SeqendFilter}
 \alias{GRangesFilter}
+\alias{SymbolFilter}
 \title{
   Constructor functions for filter objects
 }
@@ -45,6 +46,8 @@ SeqstrandFilter(value, condition = "=")
 SeqstartFilter(value, condition = "=", feature = "gene")
 
 SeqendFilter(value, condition = "=", feature = "gene")
+
+SymbolFilter(value, condition = "=")
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -146,6 +149,12 @@ SeqendFilter(value, condition = "=", feature = "gene")
     \item{SeqendFilter}{
       Filter results based on the (chromosomal) end coordinates.
     }
+    \item{SymbolFilter}{
+      Filter results based on the gene names. The database does not
+      provide an explicit \emph{symbol} column, thus this filter uses the
+      gene name instead (which in many cases corresponds to the official
+      gene name).
+    }
   }
 }
 \value{
@@ -162,7 +171,8 @@ SeqendFilter(value, condition = "=", feature = "gene")
   \code{\linkS4class{SeqnameFilter}},
   \code{\linkS4class{SeqstrandFilter}},
   \code{\linkS4class{SeqstartFilter}},
-  \code{\linkS4class{SeqendFilter}}
+  \code{\linkS4class{SeqendFilter}},
+  \code{\linkS4class{SymbolFilter}}
 }
 \author{
   Johannes Rainer
@@ -180,7 +190,8 @@ SeqendFilter(value, condition = "=", feature = "gene")
   \code{\linkS4class{SeqnameFilter}},
   \code{\linkS4class{SeqstrandFilter}},
   \code{\linkS4class{SeqstartFilter}},
-  \code{\linkS4class{SeqendFilter}}
+  \code{\linkS4class{SeqendFilter}},
+  \code{\linkS4class{SymbolFilter}}
 }
 \examples{
 
