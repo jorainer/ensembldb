@@ -128,6 +128,15 @@
 \alias{seqnames,GRangesFilter-method}
 \alias{start,GRangesFilter-method}
 \alias{strand,GRangesFilter-method}
+% SymbolFilter
+\alias{SymbolFilter-class}
+\alias{column,SymbolFilter,missing,missing-method}
+\alias{column,SymbolFilter,EnsDb,missing-method}
+\alias{column,SymbolFilter,EnsDb,character-method}
+\alias{where,SymbolFilter,missing,missing-method}
+\alias{where,SymbolFilter,EnsDb,missing-method}
+\alias{where,SymbolFilter,EnsDb,character-method}
+
 
 \title{Filter results fetched from the Ensembl database}
 \description{
@@ -139,7 +148,7 @@
   \code{new("GeneidFilter", ...)} users are strongly encouraged to use the
   specific functions: \code{\link{GeneidFilter}}, \code{\link{EntrezidFilter}},
   \code{\link{GenenameFilter}}, \code{\link{GenebiotypeFilter}},
-  \code{\link{GRangesFilter}},
+  \code{\link{GRangesFilter}}, \code{\link{SymbolFilter}},
   \code{\link{TxidFilter}}, \code{\link{TxbiotypeFilter}},
   \code{\link{ExonidFilter}}, \code{\link{ExonrankFilter}},
   \code{\link{SeqnameFilter}}, \code{\link{SeqstrandFilter}},
@@ -173,8 +182,8 @@
     Note: these methods are applicable to all classes extending the
     \code{BasicFilter} class.
 
-    \item{column}{\code{signature(object = "GeneidFilter", db="EnsDb",
-	with.tables="character")}:
+    \item{column}{\code{signature(object = "GeneidFilter", db = "EnsDb",
+	with.tables = "character")}:
       returns the column (attribute name) to be used for the
       filtering. Submitting the \code{db} parameter ensures that
       returned column is valid in the corresponding database schema. The
@@ -184,20 +193,20 @@
       database tables.
     }
 
-    \item{column}{\code{signature(object = "GeneidFilter", db="EnsDb",
-	with.tables="missing")}:
+    \item{column}{\code{signature(object = "GeneidFilter", db = "EnsDb",
+	with.tables = "missing")}:
       returns the column (attribute name) to be used for the
       filtering. Submitting the \code{db} parameter ensures that
       returned column is valid in the corresponding database schema.
     }
 
-    \item{column}{\code{signature(object = "GeneidFilter", db="missing",
-	with.tables="missing")}:
+    \item{column}{\code{signature(object = "GeneidFilter", db = "missing",
+	with.tables = "missing")}:
       returns the column (table column name) to be used for the
       filtering.
     }
 
-    \item{condition}{\code{signature(x="BasicFilter")}: returns
+    \item{condition}{\code{signature(x = "BasicFilter")}: returns
       the value for the \code{condition} slot.
     }
 
@@ -205,7 +214,7 @@
       setter method for condition.
     }
 
-    \item{value}{\code{signature(x="BasicFilter", db="EnsDb")}:
+    \item{value}{\code{signature(x = "BasicFilter", db = "EnsDb")}:
       returns the value of the \code{value} slot of the filter object.
     }
 
@@ -213,8 +222,8 @@
       setter method for value.
     }
 
-    \item{where}{\code{signature(object = "GeneidFilter", db="EnsDb",
-	with.tables="character")}:
+    \item{where}{\code{signature(object = "GeneidFilter", db = "EnsDb",
+	with.tables = "character")}:
       returns the where condition for the SQL call. Submitting also the
       \code{db} parameter ensures that
       the columns are valid in the corresponding database schema. The
@@ -224,16 +233,16 @@
       database tables.
     }
 
-    \item{where}{\code{signature(object = "GeneidFilter", db="EnsDb",
-	with.tables="missing")}:
+    \item{where}{\code{signature(object = "GeneidFilter", db = "EnsDb",
+	with.tables = "missing")}:
       returns the
       where condition for the SQL call. Submitting also the \code{db}
       parameter ensures that
       the columns are valid in the corresponding database schema.
     }
 
-    \item{where}{\code{signature(object = "GeneidFilter", db="missing",
-	with.tables="missing")}:
+    \item{where}{\code{signature(object = "GeneidFilter", db = "missing",
+	with.tables = "missing")}:
       returns the where condition for the SQL call.
     }
   }
@@ -280,6 +289,13 @@
 
     \item{\code{GenenameFilter}}{
       Allows to filter on the gene names (symbols) of the genes.
+    }
+
+    \item{\code{SymbolFilter}}{
+      Filter on gene symbols. Note that since no such database column is
+      available in an \code{EnsDb} database the gene names are used to
+      filter. These do however correspond all to the official gene
+      symbols.
     }
 
     \item{\code{GRangesFilter}}{
@@ -354,7 +370,9 @@
   Note that the database column \code{"entrezid"} queried for
   \code{EntrezidFilter} classes can contain multiple, \code{";"}
   separated, Entrezgene IDs, thus, using this filter at present might
-  not return all entries from the database.
+  not return all entries from the database. Also, the database does not
+  provide a column with the official gene symbols and a
+  \code{SymbolFilter} queries the gene names instead.
 }
 \author{
   Johannes Rainer
@@ -415,6 +433,13 @@ exons(edb, filter=grf)
 exons(edb, columns=c("tx_id", "exon_idx"),
       filter=list(SeqnameFilter("Y"),
                   ExonrankFilter(3, condition="<")))
+
+
+## Get all transcripts for the gene SKA2
+transcripts(edb, filter=GenenameFilter("SKA2"))
+
+## Which is the same as using a SymbolFilter
+transcripts(edb, filter=SymbolFilter("SKA2"))
 
 
 }
