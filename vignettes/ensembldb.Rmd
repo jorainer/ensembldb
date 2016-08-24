@@ -2,7 +2,7 @@
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
 output:
-  BiocStyle::html_document
+  BiocStyle::html_document2
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}

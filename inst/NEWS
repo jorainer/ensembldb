@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.5.10
+-------------------------
+
+USER VISIBLE CHANGES:
+     o Using html_document2 style for the vignette.
+
 CHANGES IN VERSION 1.5.9
 -------------------------
 
