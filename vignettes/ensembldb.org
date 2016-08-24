@@ -23,7 +23,7 @@
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
 output:
-  BiocStyle::html_document
+  BiocStyle::html_document2
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
@@ -1005,6 +1005,31 @@ shown in Figure [[fig.database.layout]]):
 [fn:4] http://www.ncbi.nlm.nih.gov/pubmed/23950696
 
 [fn:5] http://www.ncbi.nlm.nih.gov/pubmed/24227677
+
+
+* Installing the Ensembl database locally and building new packages :noexport:
+:PROPERTIES:
+:eval: never
+:END:
+
+This section covers the local installation of a new Ensembl database on my
+system. Some of the perl scripts used here are available at
+https://github.com/jotsetung/Ensembl-Exon-probemapping.
+
+First of all we have to get the MySQL server up on my system. The MySQL server
+was installed using =homebrew= and was configured to keep the databases on an
+external disk.
+
+Start the server using =mysql.server start=.
+
+#+BEGIN_SRC shell
+  ## Change to the directory with the perl script
+  cd ~/Projects/git/Ensembl-Exon-probemapping/bin/
+
+  ## Download and install the Ensembl core database
+  perl installEnsembldb.pl -e 85 -d homo_sapiens_core_85_38
+#+END_SRC
+
 
 
 * TODOs								   :noexport:
