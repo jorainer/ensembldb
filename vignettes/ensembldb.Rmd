@@ -7,14 +7,14 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz,BiocStyle}
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
 
-**Package**: `r Biocpkg("ensembldb")`<br />
+**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 01 July, 2016<br />
+**Modified**: 12 September, 2016<br />
 **Compiled**: `r date()`
 
 # Introduction
