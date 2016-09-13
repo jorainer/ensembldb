@@ -98,6 +98,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     ## process chromosome
     tmp <- read.table(paste0(path, .Platform$file.sep ,"ens_chromosome.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    tmp[, "seq_name"] <- as.character(tmp[, "seq_name"])
     dbWriteTable(con, name="chromosome", tmp, row.names=FALSE)
     rm(tmp)
     ## make index
@@ -105,7 +106,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     ## process genes: some gene names might have fancy names...
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"), sep="\t", as.is=TRUE, header=TRUE,
-                     quote="", comment.char="" )
+                      quote="", comment.char="" )
+    OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="gene", tmp, row.names=FALSE)
     rm(tmp)
     ## make index
@@ -113,6 +115,14 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     ## process transcripts:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    ## Fix the tx_cds_seq_start and tx_cds_seq_end columns: these should be integer!
+    suppressWarnings(
+        tmp[, "tx_cds_seq_start"] <- as.integer(tmp[, "tx_cds_seq_start"])
+    )
+    suppressWarnings(
+        tmp[, "tx_cds_seq_end"] <- as.integer(tmp[, "tx_cds_seq_end"])
+    )
+    OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
     ## make index
@@ -120,11 +130,13 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     ## process exons:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_exon.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="exon", tmp, row.names=FALSE)
     rm(tmp)
     ## make index
     dbGetQuery(con, "create index exon_id_idx on exon (exon_id);")
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx2exon.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="tx2exon", tmp, row.names=FALSE)
     rm(tmp)
     ## make index
@@ -135,7 +147,22 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     return(dbname)
 }
 
-
+############################################################
+## Simply checking that some columns are integer
+.checkIntegerCols <- function(x, columns = c("gene_seq_start", "gene_seq_end",
+                                             "tx_seq_start", "tx_seq_start",
+                                             "exon_seq_start", "exon_seq_end",
+                                             "exon_idx", "tx_cds_seq_start",
+                                             "tx_cds_seq_end")) {
+    cols <- columns[columns %in% colnames(x)]
+    if(length(cols) > 0) {
+        sapply(cols, function(z) {
+            if(!is.integer(x[, z]))
+                stop("Column '", z,"' is not of type integer!")
+        })
+    }
+    return(TRUE)
+}
 
 
 ####

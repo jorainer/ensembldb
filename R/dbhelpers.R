@@ -298,18 +298,22 @@ removePrefix <- function(x, split=".", fixed=TRUE){
     ## get the data
     Res <- dbGetQuery(dbconn(x), Q)
     if(any(columns == "tx_cds_seq_start")) {
-        suppressWarnings(
-            ## column contains "NULL" if not defined and coordinates are characters
-            ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
-            Res[ , "tx_cds_seq_start"] <- as.numeric(Res[ , "tx_cds_seq_start"])
-        )
+        if (!is.integer(Res[, "tx_cds_seq_start"])) {
+            suppressWarnings(
+                ## column contains "NULL" if not defined and coordinates are characters
+                ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
+                Res[ , "tx_cds_seq_start"] <- as.numeric(Res[ , "tx_cds_seq_start"])
+            )
+        }
     }
     if(any(columns=="tx_cds_seq_end")){
-        suppressWarnings(
-            ## column contains "NULL" if not defined and coordinates are characters
-            ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
-            Res[ , "tx_cds_seq_end" ] <- as.numeric(Res[ , "tx_cds_seq_end" ])
-        )
+        if (!is.integer(Res[, "tx_cds_seq_end"])) {
+            suppressWarnings(
+                ## column contains "NULL" if not defined and coordinates are characters
+                ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
+                Res[ , "tx_cds_seq_end" ] <- as.numeric(Res[ , "tx_cds_seq_end" ])
+            )
+        }
     }
     ## Resolving the "symlinks" again.
     if(any(columns == "tx_name")) {
