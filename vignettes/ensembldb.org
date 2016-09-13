@@ -15,7 +15,7 @@
 #+latex: %\VignetteKeywords{annotation, database}
 #+latex: %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BSgenome.Hsapiens.UCSC.hg19}
 #+latex: %\VignettePackage{ensembldb}
-#+latex: %\VignetteEngine{knitr::knitr}
+#+latex: %\VignetteEngine{knitr::rmarkdown}
 
 
 #+BEGIN_html
@@ -28,7 +28,7 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz,BiocStyle}
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
@@ -37,17 +37,12 @@ vignette: >
 # #+BEGIN_EXPORT html
 
 #+BEGIN_html
-**Package**: `r Biocpkg("ensembldb")`<br />
+**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 01 July, 2016<br />
+**Modified**: 12 September, 2016<br />
 **Compiled**: `r date()`
 #+END_html
 
-
-# #+NAME: style
-# #+BEGIN_SRC R :ravel results='asis', echo=FALSE, eval=TRUE
-# BiocStyle::latex()
-# #+END_SRC
 
 
 * How to export this to a =Rnw= vignette			   :noexport:
