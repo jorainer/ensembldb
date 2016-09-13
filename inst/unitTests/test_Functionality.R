@@ -192,32 +192,79 @@ test_cdsByGene <- function(){
 
 test_UTRs <- function(){
     ## check presence of tx_name
-    fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")), column="tx_name")
+    fUTRs <- fiveUTRsByTranscript(DB, filter = list(SeqnameFilter("Y"),
+                                                    SeqstrandFilter("+")),
+                                  column = "tx_name")
     checkTrue(any(colnames(mcols(fUTRs[[1]])) == "tx_name"))
 
     do.plot <- FALSE
-    fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
-    tUTRs <- threeUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
-    cds <- cdsBy(DB, "tx", filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")))
+    fUTRs <- fiveUTRsByTranscript(DB, filter = list(SeqnameFilter("Y"),
+                                                    SeqstrandFilter("+")))
+    tUTRs <- threeUTRsByTranscript(DB, filter = list(SeqnameFilter("Y"),
+                                                     SeqstrandFilter("+")))
+    cds <- cdsBy(DB, "tx", filter = list(SeqnameFilter("Y"),
+                                         SeqstrandFilter("+")))
     ## Check a TX:
     tx <- names(fUTRs)[1]
-    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
+                  do.plot = do.plot)
     tx <- names(fUTRs)[2]
-    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
+                  do.plot = do.plot)
     tx <- names(fUTRs)[3]
-    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
+                  do.plot = do.plot)
 
     ## Reverse strand
-    fUTRs <- fiveUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
-    tUTRs <- threeUTRsByTranscript(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
-    cds <- cdsBy(DB, "tx", filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")))
+    fUTRs <- fiveUTRsByTranscript(DB, filter = list(SeqnameFilter("Y"),
+                                                    SeqstrandFilter("-")))
+    tUTRs <- threeUTRsByTranscript(DB, filter = list(SeqnameFilter("Y"),
+                                                     SeqstrandFilter("-")))
+    cds <- cdsBy(DB, "tx", filter = list(SeqnameFilter("Y"),
+                                         SeqstrandFilter("-")))
     ## Check a TX:
     tx <- names(fUTRs)[1]
-    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
+                  do.plot = do.plot)
     tx <- names(fUTRs)[2]
-    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
+                  do.plot = do.plot)
     tx <- names(fUTRs)[3]
-    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx=tx, do.plot=do.plot)
+    checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
+                  do.plot = do.plot)
+}
+
+## The "test_UTRs" has a very poor performance with the RSQLite 1.0.9011
+## release candidate. Here we want to evaluate the performance.
+dontrun_test_UTRs_performance <- function() {
+    system.time(fUTRs <- fiveUTRsByTranscript(DB,
+                                              filter = list(SeqnameFilter("Y"),
+                                                            SeqstrandFilter("+")),
+                                              column = "tx_name")
+                )
+    ## 6.4 secs.
+    system.time(fUTRs <- fiveUTRsByTranscript(DB,
+                                              filter = list(SeqnameFilter("Y"),
+                                                            SeqstrandFilter("+"))))
+    ## 6.4 secs.
+    system.time(tUTRs <- threeUTRsByTranscript(DB,
+                                               filter = list(SeqnameFilter("Y"),
+                                                             SeqstrandFilter("+"))))
+    ## 6.3 secs.
+    system.time(cds <- cdsBy(DB, "tx", filter = list(SeqnameFilter("Y"),
+                                                     SeqstrandFilter("+"))))
+    ## 6.3 secs.
+    system.time(fUTRs <- fiveUTRsByTranscript(DB,
+                                              filter = list(SeqnameFilter("Y"),
+                                                            SeqstrandFilter("-"))))
+    ## 6.4 secs.
+    system.time(tUTRs <- threeUTRsByTranscript(DB,
+                                               filter = list(SeqnameFilter("Y"),
+                                                             SeqstrandFilter("-"))))
+    ## 6.6 secs.
+    system.time(cds <- cdsBy(DB, "tx", filter = list(SeqnameFilter("Y"),
+                                                     SeqstrandFilter("-"))))
+    ## 6.3 secs.
 }
 
 checkGeneUTRs <- function(f, t, c, tx, do.plot=FALSE){

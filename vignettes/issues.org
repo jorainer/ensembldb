@@ -6,12 +6,27 @@
 
 These issues are synced with the issues in github.
 
+* How to sync them with github                                     :noexport:
+
+Call =M-x org-sync=.
+
 * Issues of ensembldb
 :PROPERTIES:
 :LOGGING:  nil
 :since:
 :url:      https://api.github.com/repos/jotsetung/ensembldb
 :END:
+** OPEN Long build times of ensembldb with newer RSQLite packages
+:PROPERTIES:
+:id:       11
+:date-modification: 2016-09-12T09:19:20+0200
+:date-creation: 2016-09-12T09:19:20+0200
+:author:   "jotsetung"
+:END:
+: Build times differ considerably between `RSQLite` version 1.0.0 and release candidate.
+: + [ ] Check unit tests.
+: + [ ] Check examples.
+: + [ ] Check vignette.
 ** OPEN Implement a `getGenomeTwoBitFile`
 :PROPERTIES:
 :tags:     ("enhancement")
@@ -89,6 +104,7 @@ These issues are synced with the issues in github.
 : ```
 ** CLOSED Bug in test
 :PROPERTIES:
+:sync:     conflict-local
 :id:       10
 :date-modification: 2016-06-30T16:10:00+0200
 :date-creation: 2016-06-30T16:10:00+0200

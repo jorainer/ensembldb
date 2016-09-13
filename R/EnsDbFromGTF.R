@@ -473,6 +473,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     genes <- genes[ , c("gene_id", "gene_name", "entrezid", "gene_biotype",
                         "gene_seq_start", "gene_seq_end", "seq_name",
                         "seq_strand", "seq_coord_system")]
+    OK <- .checkIntegerCols(genes)
     dbWriteTable(con, name="gene", genes, overwrite=TRUE, row.names=FALSE)
     ## Done.
 
@@ -554,6 +555,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     tx <- tx[ , c("tx_id", "tx_biotype", "tx_seq_start", "tx_seq_end",
                   "tx_cds_seq_start", "tx_cds_seq_end", "gene_id")]
     ## write the table.
+    OK <- .checkIntegerCols(tx)
     dbWriteTable(con, name="tx", tx, overwrite=TRUE, row.names=FALSE)
     rm(tx)
     rm(CDS)
@@ -584,6 +586,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     exons <- unique(exons[ , c("exon_id", "start", "end")])
     colnames(exons) <- c("exon_id", "exon_seq_start", "exon_seq_end")
     ## writing the tables.
+    .checkIntegerCols(exons)
+    .checkIntegerCols(t2e)
     dbWriteTable(con, name="exon", exons, overwrite=TRUE, row.names=FALSE)
     dbWriteTable(con, name="tx2exon", t2e, overwrite=TRUE, row.names=FALSE)
     message("OK")
