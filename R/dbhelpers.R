@@ -20,6 +20,8 @@ EnsDb <- function(x){
     EDB <- setProperty(EDB, dbSeqlevelsStyle="Ensembl")
     ## Setting the default for the returnFilterColumns
     returnFilterColumns(EDB) <- TRUE
+    ## Defining the default for the ordering
+    orderResultsInR(EDB) <- FALSE
     return(EDB)
 }
 
@@ -40,24 +42,24 @@ EnsDb <- function(x){
 ## named: <table name>.<column name>
 ## clean: whether a cleanColumns should be called on the submitted columns.
 ## with.tables: force the prefix to be specifically on the submitted tables.
-prefixColumns <- function(x, columns, clean=TRUE, with.tables){
-    if(missing(columns))
+prefixColumns <- function(x, columns, clean = TRUE, with.tables){
+    if (missing(columns))
         stop("columns is empty! No columns provided!")
     ## first get to the tables that contain these columns
     Tab <- listTables(x)   ## returns the tables by degree!
-    if(!missing(with.tables)){
+    if (!missing(with.tables)) {
         with.tables <- with.tables[ with.tables %in% names(Tab) ]
-        if(length(with.tables) > 0){
+        if (length(with.tables) > 0) {
             Tab <- Tab[ with.tables ]
-        }else{
+        } else {
             warning("The submitted table names are not valid in the database and were thus dropped.")
         }
-        if(length(Tab)==0)
+        if (length(Tab) == 0)
             stop("None of the tables submitted with with.tables is present in the database!")
     }
-    if(clean)
+    if (clean)
         columns <- cleanColumns(x, columns)
-    if(length(columns)==0){
+    if (length(columns) == 0) {
         return(NULL)
     }
     ## group the columns by table.
@@ -99,7 +101,20 @@ prefixColumns <- function(x, columns, clean=TRUE, with.tables){
     return(columns.bytable)
 }
 
-
+############################################################
+## call the prefixColumns function and return just the column
+## names, but in the same order than the provided columns.
+prefixColumnsKeepOrder <- function(x, columns, clean = TRUE, with.tables) {
+    res <- unlist(prefixColumns(x, columns, clean, with.tables),
+                  use.names = FALSE)
+    res_order <- sapply(columns, function(z) {
+        idx <- grep(res, pattern = paste0("\\.", z, "$"))
+        if (length(idx) == 0)
+            return(NULL)
+        return(res[idx[1]])
+    })
+    return(res_order[!is.null(res_order)])
+}
 
 
 
@@ -177,39 +192,32 @@ addRequiredTables <- function(x, tab){
 }
 
 
-.buildQuery <- function(x, columns, filter=list(), order.by="", order.type="asc",
-                        group.by, skip.order.check=FALSE, return.all.columns=TRUE){
+############################################################
+## .buildQuery
+##
+## The "backbone" function that builds the SQL query based on the specified
+## columns, the provided filters etc.
+## x an EnsDb object
+.buildQuery <- function(x, columns, filter = list(), order.by = "",
+                        order.type = "asc", group.by, skip.order.check=FALSE,
+                        return.all.columns = TRUE) {
     resultcolumns <- columns    ## just to remember what we really want to give back
     ## 1) get all column names from the filters also removing the prefix.
-    if(class(filter)!="list")
+    if (class(filter)!="list")
         stop("parameter filter has to be a list of BasicFilter classes!")
-    if(length(filter) > 0){
+    if (length(filter) > 0) {
         ## check filter!
         ## add the columns needed for the filter
         filtercolumns <- unlist(lapply(filter, column, x))
         ## remove the prefix (column name for these)
-        filtercolumns <- sapply(filtercolumns, removePrefix, USE.NAMES=FALSE)
+        filtercolumns <- sapply(filtercolumns, removePrefix, USE.NAMES = FALSE)
         columns <- unique(c(columns, filtercolumns))
     }
     ## 2) get all column names for the order.by:
-    if(order.by != ""){
+    if (any(order.by != "")) {
         ## if we have skip.order.check set we use the order.by as is.
-        if(!skip.order.check){
-            order.by <- unlist(strsplit(order.by, split=",", fixed=TRUE))
-            order.by <- gsub(order.by, pattern=" ", replacement="", fixed=TRUE)
-            ## allow only order.by that are also in the columns.
-            order.by.nocolumns <- order.by[ !(order.by %in% columns) ]
-            order.by <- order.by[ order.by %in% columns ]
-            if(length(order.by.nocolumns) > 0){
-                warning("columns provided in order.by (",
-                        paste(order.by.nocolumns, collapse=","),
-                        ") are not in columns and were thus removed.")
-            }
-            if(length(order.by)==0){
-                order.by <- ""
-            }else{
-                order.by <- paste(order.by, collapse=", ")
-            }
+        if (!skip.order.check) {
+            order.by <- checkOrderBy(orderBy = order.by, supported = columns)
         }
     }else{
         order.by <- ""
@@ -224,22 +232,23 @@ addRequiredTables <- function(x, tab){
     ## a) the query part that joins all required tables.
     joinquery <- joinQueryOnColumns(x, columns=columns)
     ## b) the filter part of the query
-    if(length(filter) > 0){
+    if (length(filter) > 0) {
         filterquery <- paste(" where",
                              paste(unlist(lapply(filter, where, x,
-                                                 with.tables=need.tables)),
+                                                 with.tables = need.tables)),
                                    collapse=" and "))
-    }else{
+    } else {
         filterquery <- ""
     }
     ## c) the order part of the query
-    if(order.by!=""){
-        if(!skip.order.check){
-            order.by <- unlist(strsplit(order.by, split=",", fixed=TRUE))
-            order.by <- gsub(order.by, pattern=" ", replacement="", fixed=TRUE)
-            order.by <- paste(unlist(prefixColumns(x=x, columns=order.by,
-                                                   with.tables=need.tables),
-                                     use.names=FALSE), collapse=",")
+    if (any(order.by != "")) {
+        if (!skip.order.check) {
+            ## order.by <- paste(unlist(prefixColumns(x=x, columns=order.by,
+            ##                                        with.tables=need.tables),
+            ##                          use.names=FALSE), collapse=",")
+            order.by <- paste(prefixColumnsKeepOrder(x = x, columns = order.by,
+                                                     with.tables = need.tables),
+                              collapse=",")
         }
         orderquery <- paste(" order by", order.by, order.type)
     }else{
@@ -250,10 +259,14 @@ addRequiredTables <- function(x, tab){
         resultcolumns <- columns
     }
     finalquery <- paste0("select distinct ",
-                         paste(unlist(prefixColumns(x,
-                                                    resultcolumns,
-                                                    with.tables=need.tables),
-                                      use.names=FALSE), collapse=","),
+                         ## paste(unlist(prefixColumns(x,
+                         ##                            resultcolumns,
+                         ##                            with.tables=need.tables),
+                         ##              use.names=FALSE), collapse=","),
+                         paste(prefixColumnsKeepOrder(x,
+                                                      resultcolumns,
+                                                      with.tables = need.tables),
+                               collapse=","),
                          " from ",
                          joinquery,
                          filterquery,
@@ -274,44 +287,67 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 
 ## just to add another layer; basically just calls buildQuery and executes the query
 .getWhat <- function(x, columns, filter = list(), order.by = "",
-                     order.type = "asc", group.by = NULL, skip.order.check = FALSE) {
+                     order.type = "asc", group.by = NULL,
+                     skip.order.check = FALSE) {
     ## That's nasty stuff; for now we support the column tx_name, which we however
     ## don't have in the database. Thus, we are querying everything except that
     ## column and filling it later with the values from tx_id.
     fetchColumns <- columns
     if(any(columns == "tx_name"))
         fetchColumns <- unique(c("tx_id", fetchColumns[fetchColumns != "tx_name"]))
+    if (class(filter) != "list")
+        stop("parameter filter has to be a list of BasicFilter classes!")
     ## If any of the filter is a SymbolFilter, add "symbol" to the return columns.
-    if(length(filter) > 0) {
-        if(any(unlist(lapply(filter, function(z) {
+    if (length(filter) > 0) {
+        if (any(unlist(lapply(filter, function(z) {
             return(is(z, "SymbolFilter"))
         }))))
             columns <- unique(c(columns, "symbol"))  ## append a filter column.
     }
     ## Catch also a "symbol" in columns
     if(any(columns == "symbol"))
-        fetchColumns <- unique(c(fetchColumns[fetchColumns != "symbol"], "gene_name"))
-    ## build the query
-    Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
-                     order.by = order.by, order.type = order.type, group.by = group.by,
-                     skip.order.check = skip.order.check)
-    ## get the data
-    Res <- dbGetQuery(dbconn(x), Q)
+        fetchColumns <- unique(c(fetchColumns[fetchColumns != "symbol"],
+                                 "gene_name"))
+    ## Shall we do the ordering in R or in SQL?
+    if (orderResultsInR(x) & !skip.order.check) {
+        ## Build the query
+        Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
+                         order.by = "", order.type = order.type,
+                         group.by = group.by,
+                         skip.order.check = skip.order.check)
+        ## Get the data
+        Res <- dbGetQuery(dbconn(x), Q)
+        ## Note: we can only order by the columns that we did get back from the
+        ## database; that might be different for the SQL sorting!
+        Res <- orderDataFrameBy(Res, by = checkOrderBy(order.by, fetchColumns),
+                                decreasing = order.type != "asc")
+    } else {
+        ## Build the query
+        Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
+                         order.by = order.by, order.type = order.type,
+                         group.by = group.by,
+                         skip.order.check = skip.order.check)
+        ## Get the data
+        Res <- dbGetQuery(dbconn(x), Q)
+    }
+    cat("Query:\n", Q, "\n")
     if(any(columns == "tx_cds_seq_start")) {
         if (!is.integer(Res[, "tx_cds_seq_start"])) {
             suppressWarnings(
-                ## column contains "NULL" if not defined and coordinates are characters
-                ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
-                Res[ , "tx_cds_seq_start"] <- as.numeric(Res[ , "tx_cds_seq_start"])
+                ## column contains "NULL" if not defined and coordinates are
+                ## characters as.numeric transforms "NULL" into NA, and ensures
+                ## coords are numeric.
+                Res[ , "tx_cds_seq_start"] <- as.integer(Res[ , "tx_cds_seq_start"])
             )
         }
     }
     if(any(columns=="tx_cds_seq_end")){
         if (!is.integer(Res[, "tx_cds_seq_end"])) {
             suppressWarnings(
-                ## column contains "NULL" if not defined and coordinates are characters
-                ## as.numeric transforms "NULL" into NA, and ensures coords are numeric.
-                Res[ , "tx_cds_seq_end" ] <- as.numeric(Res[ , "tx_cds_seq_end" ])
+                ## column contains "NULL" if not defined and coordinates are
+                ## characters as.numeric transforms "NULL" into NA, and ensures
+                ## coords are numeric.
+                Res[ , "tx_cds_seq_end" ] <- as.integer(Res[ , "tx_cds_seq_end" ])
             )
         }
     }
@@ -324,7 +360,6 @@ removePrefix <- function(x, split=".", fixed=TRUE){
     }
     ## Ensure that the ordering is as requested.
     Res <- Res[, columns, drop=FALSE]
-    ## Same for the "symbol" column.
     return(Res)
 }
 

@@ -27,6 +27,12 @@ test_transcripts <- function(){
 
     Tns <- transcripts(DB, columns=c("tx_id", "tx_name"), filter=SeqnameFilter("Y"))
     checkEquals(sort(colnames(mcols(Tns))), sort(c("tx_id", "tx_name")))
+
+    ## Check the default ordering.
+    Tns <- transcripts(DB, filter = TxbiotypeFilter("protein_coding"),
+                       return.type = "data.frame",
+                       columns = c("seq_name", listColumns(DB, "tx")))
+    checkEquals(order(Tns$seq_name, method = "radix"), 1:nrow(Tns))
 }
 
 test_transcriptsBy <- function(){
@@ -36,13 +42,18 @@ test_transcriptsBy <- function(){
 test_exons <- function(){
     Exns <- exons(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
     checkEquals(sort(colnames(Exns)), sort(c(listColumns(DB, "exon"), "seq_name")))
+
+    ## Check correct ordering.
+    Exns <- exons(DB, return.type = "data.frame", filter = SeqnameFilter(20:23))
+    checkEquals(order(Exns$seq_name, method = "radix"), 1:nrow(Exns))
 }
 
-test_exonsBy <- function(){
+test_exonsBy <- function() {
     ##ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("X")), by="tx")
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("tx_name"))
-    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_name",
-                                                           "seq_name")))
+    ExnsBy <- exonsBy(DB, filter = list(SeqnameFilter("Y")), by = "tx",
+                      columns = c("tx_name"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))),
+                sort(c("exon_id", "exon_rank", "tx_name", "seq_name")))
 
     ## Check what happens if we specify tx_id.
     ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("tx_id"))

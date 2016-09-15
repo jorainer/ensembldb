@@ -154,8 +154,9 @@
   }
 
   \item{order.by}{
-    Name of one of the columns above on which the
-    results should be sorted.
+    Character vector specifying the column(s) by which the result should
+    be ordered. This can be either in the form of
+    \code{"gene_id, seq_name"} or \code{c("gene_id", "seq_name")}.
   }
 
   \item{order.type}{
@@ -383,8 +384,8 @@
   or a \code{GRanges}, depending on the value of the
   \code{return.type} parameter. The result
   is ordered as specified by the parameter \code{order.by} or, if not
-  provided, by \code{seq_name} and chromosomal start coordinate, but NOT by any
-  ordering of values in eventually submitted filter objects.
+  provided, by \code{seq_name} and chromosomal start coordinate, but NOT
+  by any ordering of values in eventually submitted filter objects.
 
   For \code{exonsBy}, \code{transcriptsBy}:
   a \code{GRangesList}, depending on the value of the
