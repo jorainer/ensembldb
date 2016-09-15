@@ -316,7 +316,7 @@ test_properties <- function(){
 
     edb <- ensembldb:::setProperty(edb, foo="bar")
     checkEquals(ensembldb:::getProperty(edb, "foo"), "bar")
-    checkEquals(length(ensembldb:::properties(edb)), 3)
+    checkEquals(length(ensembldb:::properties(edb)), 4)
 }
 
 test_set_get_seqlevelsStyle <- function(){

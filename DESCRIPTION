@@ -25,8 +25,8 @@ Description: The package provides functions to create and use
         also a filter framework allowing to retrieve annotations for
         specific entries like genes encoded on a chromosome region or
         transcript models of lincRNA genes.
-Collate: Classes.R Generics.R dbhelpers.R Methods.R Methods-Filter.R loadEnsDb.R
-        makeEnsemblDbPackage.R EnsDbFromGTF.R runEnsDbApp.R select-methods.R
-	seqname-utils.R zzz.R
+Collate: Classes.R Generics.R functions-utils.R dbhelpers.R Methods.R Methods-Filter.R
+	 loadEnsDb.R makeEnsemblDbPackage.R EnsDbFromGTF.R runEnsDbApp.R
+	 select-methods.R seqname-utils.R zzz.R
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL
