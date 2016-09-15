@@ -145,9 +145,9 @@ test_with_exonsBy <- function(x) {
     returnFilterColumns(edb) <- TRUE
     res <- exonsBy(edb, by = "gene", filter = grf, columns = cols)
     res <- unlist(res)
-    ## Now I expect also the gene coords.
-    checkEquals(colnames(mcols(res)), c(cols, "gene_seq_start", "gene_seq_end", "seq_name",
-                                        "seq_strand"))
+    ## Now I expect also the gene coords, but not the seq_name and seq_strand, as these
+    ## are redundant with data which is in the GRanges!
+    checkEquals(colnames(mcols(res)), c(cols, "gene_seq_start", "gene_seq_end"))
 
     ## Use a gene biotype filter
     gbt <- GenebiotypeFilter("protein_coding")
@@ -155,8 +155,7 @@ test_with_exonsBy <- function(x) {
     returnFilterColumns(edb) <- TRUE
     res <- unlist(exonsBy(edb, by = "gene", filter = list(gbt, grf), columns = cols))
     checkEquals(unique(res$gene_name), c("SKA2"))
-    checkEquals(colnames(mcols(res)), c(cols, "gene_biotype", "gene_seq_start", "gene_seq_end",
-                                        "seq_name", "seq_strand"))
+    checkEquals(colnames(mcols(res)), c(cols, "gene_biotype", "gene_seq_start", "gene_seq_end"))
     returnFilterColumns(edb) <- FALSE
     res <- unlist(exonsBy(edb, by = "gene", filter = list(gbt, grf), columns = cols))
     checkEquals(colnames(mcols(res)), cols)
@@ -174,7 +173,7 @@ test_with_exonsBy <- function(x) {
     res <- unlist(res)
     ## Now I expect also the gene coords.
     checkEquals(colnames(mcols(res)), c(cols, "tx_seq_start", "tx_seq_end",
-                                        "seq_name", "seq_strand", "exon_rank"))
+                                        "exon_rank"))
 
     ## Use a gene biotype filter
     gbt <- GenebiotypeFilter("protein_coding")
@@ -183,7 +182,7 @@ test_with_exonsBy <- function(x) {
     res <- unlist(exonsBy(edb, by = "tx", filter = list(gbt, grf), columns = cols))
     checkEquals(unique(res$gene_name), c("SKA2"))
     checkEquals(colnames(mcols(res)), c(cols, "gene_biotype", "tx_seq_start", "tx_seq_end",
-                                        "seq_name", "seq_strand", "exon_rank"))
+                                        "exon_rank"))
     returnFilterColumns(edb) <- FALSE
     res <- unlist(exonsBy(edb, by = "tx", filter = list(gbt, grf), columns = cols))
     checkEquals(colnames(mcols(res)), c(cols, "exon_rank"))
