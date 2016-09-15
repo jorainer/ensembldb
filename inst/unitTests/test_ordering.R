@@ -157,7 +157,6 @@ dontrun_query_tune <- function() {
 
     Q6 <- "select distinct tx2exon.exon_id,exon.exon_seq_start,exon.exon_seq_end,gene.seq_name,tx2exon.tx_id,gene.seq_strand,tx2exon.exon_idx from gene inner join tx on (gene.gene_id=tx.gene_id) inner join tx2exon on (tx.tx_id=tx2exon.tx_id) inner join exon on (tx2exon.exon_id=exon.exon_id) where gene.seq_name = 'Y' order by tx.tx_id asc"
     system.time(dbGetQuery(con, Q6))
-
 }
 
 
