@@ -330,7 +330,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
         ## Get the data
         Res <- dbGetQuery(dbconn(x), Q)
     }
-    cat("Query:\n", Q, "\n")
+    ## cat("Query:\n", Q, "\n")
     if(any(columns == "tx_cds_seq_start")) {
         if (!is.integer(Res[, "tx_cds_seq_start"])) {
             suppressWarnings(
