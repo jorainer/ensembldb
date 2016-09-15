@@ -36,7 +36,18 @@ test_transcripts <- function(){
 }
 
 test_transcriptsBy <- function(){
-    TnsBy <- transcriptsBy(DB, filter=list(SeqnameFilter("Y")), by="gene")
+    ## Expect results on the forward strand to be ordered by tx_seq_start
+    res <- transcriptsBy(DB, filter = list(SeqnameFilter("Y"),
+                                           SeqstrandFilter("+")),
+                         by = "gene")
+    fw <- res[[3]]
+    checkEquals(order(start(fw)), 1:length(fw))
+    ## Expect results on the reverse strand to be ordered by -tx_seq_end
+    res <- transcriptsBy(DB, filter = list(SeqnameFilter("Y"),
+                                           SeqstrandFilter("-")),
+                         by = "gene")
+    rv <- res[[3]]
+    checkEquals(order(start(rv), decreasing = TRUE), 1:length(rv))
 }
 
 test_exons <- function(){
@@ -53,16 +64,30 @@ test_exonsBy <- function() {
     ExnsBy <- exonsBy(DB, filter = list(SeqnameFilter("Y")), by = "tx",
                       columns = c("tx_name"))
     checkEquals(sort(colnames(mcols(ExnsBy[[1]]))),
-                sort(c("exon_id", "exon_rank", "tx_name", "seq_name")))
+                sort(c("exon_id", "exon_rank", "tx_name")))
 
     ## Check what happens if we specify tx_id.
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("tx_id"))
-    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank", "tx_id",
-                                                           "seq_name")))
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx",
+                      columns=c("tx_id"))
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))),
+                sort(c("exon_id", "exon_rank", "tx_id")))
 
-    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx", columns=c("exon_rank"))
-    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))), sort(c("exon_id", "exon_rank",
-                                                           "seq_name")))
+    ## ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx",
+    ##                   columns=c("exon_rank"))
+    ## checkEquals(sort(colnames(mcols(ExnsBy[[1]]))),
+    ##             sort(c("exon_id", "exon_rank")))
+
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("+")),
+                      by="gene")
+    ## Check that ordering is on start on the forward strand.
+    fw <- ExnsBy[[3]]
+    checkEquals(order(start(fw)), 1:length(fw))
+    ##
+    ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y"), SeqstrandFilter("-")),
+                      by="gene")
+    ## Check that ordering is on start on the forward strand.
+    rv <- ExnsBy[[3]]
+    checkEquals(order(end(rv), decreasing = TRUE), 1:length(rv))
 }
 
 test_dbfunctionality <- function(){
@@ -201,10 +226,10 @@ test_cdsByGene <- function(){
                 by="gene", use.names=TRUE)
 }
 
-test_UTRs <- function(){
+test_UTRs <- function() {
     ## check presence of tx_name
-    fUTRs <- fiveUTRsByTranscript(DB, filter = list(SeqnameFilter("Y"),
-                                                    SeqstrandFilter("+")),
+    fUTRs <- fiveUTRsByTranscript(DB,
+                                  filter = TxidFilter("ENST00000155093"),
                                   column = "tx_name")
     checkTrue(any(colnames(mcols(fUTRs[[1]])) == "tx_name"))
 
