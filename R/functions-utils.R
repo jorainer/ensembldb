@@ -43,3 +43,41 @@ checkOrderBy <- function(orderBy, supported = character()) {
     return(orderBy)
 }
 
+############################################################
+## addFilterColumns
+##
+## This function checks the filter objects and adds, depending on the
+## returnFilterColumns setting of the EnsDb, also columns for each of the
+## filters, ensuring that:
+## a) "Symlink" filters are added correctly (the column returned by the
+##    column call without db are added).
+## b) GRangesFilter: the feature is set based on the specified feature parameter
+## Args:
+addFilterColumns <- function(cols, filter = list(), edb) {
+    gimmeAll <- returnFilterColumns(edb)
+    if (!missing(filter)) {
+        if(!is.list(filter))
+            filter <- list(filter)
+    } else {
+        return(cols)
+    }
+    if (!gimmeAll)
+        return(cols)
+    ## Or alternatively process the filters and add columns.
+    symFilts <- c("SymbolFilter")
+    addC <- unlist(lapply(filter, function(z) {
+        if(class(z) %in% symFilts)
+            return(column(z))
+        return(column(z))
+    }))
+    return(unique(c(cols, addC)))
+}
+
+############################################################
+## SQLiteName2MySQL
+##
+## Convert the SQLite database name (file name) to the corresponding
+## MySQL database name.
+SQLiteName2MySQL <- function(x) {
+    return(tolower(gsub(x, pattern = ".", replacement = "_", fixed = TRUE)))
+}

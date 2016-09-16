@@ -351,6 +351,16 @@ removePrefix <- function(x, split=".", fixed=TRUE){
             )
         }
     }
+    ## Fix for MySQL returning 'numeric' instead of 'integer'.
+    ## THIS SHOULD BE REMOVED ONCE THE PROBLEM IS FIXED IN RMySQL!!!
+    int_cols <- c("exon_seq_start", "exon_seq_end", "exon_idx", "tx_seq_start",
+                  "tx_seq_end", "tx_cds_seq_start", "tx_cds_seq_end",
+                  "gene_seq_start", "gene_seq_end", "seq_strand")
+    for (the_col in int_cols) {
+        if (any(colnames(Res) == the_col))
+            if (!is.integer(Res[, the_col]))
+                Res[, the_col] <- as.integer(Res[, the_col])
+    }
     ## Resolving the "symlinks" again.
     if(any(columns == "tx_name")) {
         Res <- data.frame(Res, tx_name = Res$tx_id, stringsAsFactors = FALSE)
@@ -364,31 +374,106 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 }
 
 ############################################################
-## addFilterColumns
-##
-## This function checks the filter objects and adds, depending on the
-## returnFilterColumns setting of the EnsDb, also columns for each of the
-## filters, ensuring that:
-## a) "Symlink" filters are added correctly (the column returned by the
-##    column call without db are added).
-## b) GRangesFilter: the feature is set based on the specified feature parameter
-## Args:
-addFilterColumns <- function(cols, filter = list(), edb) {
-    gimmeAll <- returnFilterColumns(edb)
-    if (!missing(filter)) {
-        if(!is.list(filter))
-            filter <- list(filter)
-    } else {
-        return(cols)
+## Check database validity.
+.ENSDB_TABLES <- list(gene = c("gene_id", "gene_name", "entrezid",
+                               "gene_biotype", "gene_seq_start",
+                               "gene_seq_end", "seq_name", "seq_strand",
+                               "seq_coord_system"),
+                      tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                             "tx_seq_end", "tx_cds_seq_start",
+                             "tx_cds_seq_end", "gene_id"),
+                      tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                      exon = c("exon_id", "exon_seq_start", "exon_seq_end"),
+                      chromosome = c("seq_name", "seq_length", "is_circular"),
+                      metadata = c("name", "value"))
+dbHasRequiredTables <- function(con, returnError = TRUE) {
+    tabs <- dbListTables(con)
+    if (length(tabs) == 0) {
+        if (returnError)
+            return("Database does not have any tables!")
+        return(FALSE)
     }
-    if (!gimmeAll)
-        return(cols)
-    ## Or alternatively process the filters and add columns.
-    symFilts <- c("SymbolFilter")
-    addC <- unlist(lapply(filter, function(z) {
-        if(class(z) %in% symFilts)
-            return(column(z))
-        return(column(z))
-    }))
-    return(unique(c(cols, addC)))
+    not_there <- names(.ENSDB_TABLES)[!(names(.ENSDB_TABLES) %in% tabs)]
+    if (length(not_there) > 0) {
+        if (returnError)
+            return(paste0("Required tables ", paste(not_there, collapse = ", "),
+                          " are not present in the database!"))
+        return(FALSE)
+    }
+    return(TRUE)
+}
+dbHasValidTables <- function(con, returnError = TRUE) {
+    for (tab in names(.ENSDB_TABLES)) {
+        cols <- .ENSDB_TABLES[[tab]]
+        from_db <- colnames(dbGetQuery(con, paste0("select * from ", tab,
+                                                   " limit 1")))
+        not_there <- cols[!(cols %in% from_db)]
+        if (length(not_there) > 0) {
+            if (returnError)
+                return(paste0("Table ", tab, " is missing required columns ",
+                              paste(not_there, collapse = ", "), "!"))
+            return(FALSE)
+        }
+    }
+    return(TRUE)
+}
+
+############################################################
+## feedEnsDb2MySQL
+##
+##
+feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
+    if (!inherits(mysql, "MySQLConnection"))
+        stop("'mysql' is supposed to be a connection to a MySQL database.")
+    ## Fetch the tables and feed them to MySQL.
+    sqlite_con <- dbconn(x)
+    tabs <- dbListTables(sqlite_con)
+    for (the_table in tabs) {
+        if (verbose)
+            message("Fetch table ", the_table, "...", appendLF = FALSE)
+        tmp <- dbGetQuery(sqlite_con, paste0("select * from ", the_table, ";"))
+        if (verbose)
+            message("OK\nStoring the table in MySQL...", appendLF = FALSE)
+        ## Fix tx_cds_seq_start being a character in old databases
+        if (any(colnames(tmp) == "tx_cds_seq_start")) {
+            suppressWarnings(
+                tmp[, "tx_cds_seq_start"] <- as.integer(tmp[, "tx_cds_seq_start"])
+            )
+            suppressWarnings(
+                tmp[, "tx_cds_seq_end"] <- as.integer(tmp[, "tx_cds_seq_end"])
+            )
+        }
+        dbWriteTable(mysql, tmp, name = the_table, row.names = FALSE)
+        if (verbose)
+            message("OK")
+    }
+    ## Create the indices.
+    if (verbose)
+        message("Creating indices...", appendLF = FALSE)
+    .createEnsDbIndices(mysql, indexLength = "(20)")
+    if (verbose)
+        message("OK")
+    return(TRUE)
+}
+## Small helper function to cfeate all the indices.
+.createEnsDbIndices <- function(con, indexLength = "") {
+    dbGetQuery(con, paste0("create index seq_name_idx on chromosome (seq_name",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index gene_gene_id_idx on gene (gene_id",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index gene_gene_name_idx on gene (gene_name",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index gene_seq_name_idx on gene (seq_name",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index tx_tx_id_idx on tx (tx_id",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index tx_gene_id_idx on tx (gene_id",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index exon_exon_id_idx on exon (exon_id",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index t2e_tx_id_idx on tx2exon (tx_id",
+                           indexLength, ");"))
+    dbGetQuery(con, paste0("create index t2e_exon_id_idx on tx2exon (exon_id",
+                           indexLength, ");"))
+    dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
 }
