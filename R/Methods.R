@@ -1,14 +1,3 @@
-## LLL:
-## genes OK
-## transcripts OK
-## exons OK
-## exonsBy OK
-## transcriptsBy OK
-## cdsBy eventually OK.
-## 3utr OK
-## 5utr OK
-## promoters
-
 ##***********************************************************************
 ##
 ##     Methods for EnsDb classes
@@ -53,14 +42,12 @@ setMethod("metadata", "EnsDb", function(x, ...){
 validateEnsDb <- function(object){
     ## check if the database contains all required tables...
     if(!is.null(object@ensdb)){
-        have <- dbListTables(object@ensdb)
-        need <- c("chromosome", "exon", "gene", "metadata", "tx",
-                  "tx2exon")
-        notthere <- need[ !(need %in% have) ]
-        if(length(notthere) > 0){
-            return(paste("Required tables", notthere,
-                         "not found in the database!"))
-        }
+        OK <- dbHasRequiredTables(object@ensdb)
+        if (is.character(OK))
+            return(OK)
+        OK <- dbHasValidTables(object@ensdb)
+        if (is.character(OK))
+            return(OK)
     }
     return(TRUE)
 }
