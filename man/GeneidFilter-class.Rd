@@ -55,6 +55,7 @@
 \alias{column,SeqstartFilter,EnsDb,missing-method}
 \alias{column,SeqendFilter,EnsDb,missing-method}
 \alias{column,GRangesFilter,EnsDb,missing-method}
+\alias{column,OnlyCodingTx,EnsDb,missing-method}
 \alias{where,EntrezidFilter,EnsDb,missing-method}
 \alias{where,GeneidFilter,EnsDb,missing-method}
 \alias{where,GenenameFilter,EnsDb,missing-method}
@@ -68,6 +69,7 @@
 \alias{where,SeqstartFilter,EnsDb,missing-method}
 \alias{where,SeqendFilter,EnsDb,missing-method}
 \alias{where,GRangesFilter,EnsDb,missing-method}
+\alias{where,OnlyCodingTx,EnsDb,missing-method}
 % EnsDb, character
 \alias{column,EntrezidFilter,EnsDb,character-method}
 \alias{column,GeneidFilter,EnsDb,character-method}
@@ -82,6 +84,7 @@
 \alias{column,SeqstartFilter,EnsDb,character-method}
 \alias{column,SeqendFilter,EnsDb,character-method}
 \alias{column,GRangesFilter,EnsDb,character-method}
+\alias{column,OnlyCodingTx,EnsDb,character-method}
 \alias{where,EntrezidFilter,EnsDb,character-method}
 \alias{where,GeneidFilter,EnsDb,character-method}
 \alias{where,GenenameFilter,EnsDb,character-method}
@@ -95,6 +98,7 @@
 \alias{where,SeqstartFilter,EnsDb,character-method}
 \alias{where,SeqendFilter,EnsDb,character-method}
 \alias{where,GRangesFilter,EnsDb,character-method}
+\alias{where,OnlyCodingTx,EnsDb,character-method}
 %
 \alias{condition,BasicFilter-method}
 \alias{condition<-,BasicFilter-method}
