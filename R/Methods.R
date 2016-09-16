@@ -14,13 +14,17 @@
 ##     Methods for EnsDb classes
 ##
 ##***********************************************************************
-setMethod("show", "EnsDb", function(object){
-    if(is.null(object@ensdb)){
+setMethod("show", "EnsDb", function(object) {
+    if (is.null(object@ensdb)) {
         cat("Dash it! Got an empty thing!\n")
-    }else{
+    } else {
         info <- dbGetQuery(object@ensdb, "select * from metadata")
         cat("EnsDb for Ensembl:\n")
-        for(i in 1:nrow(info)){
+        if (inherits(object@ensdb, "SQLiteConnection"))
+            cat(paste0("|Backend: SQLite\n"))
+        if (inherits(object@ensdb, "MySQLConnection"))
+            cat(paste0("|Backend: MySQL\n"))
+        for (i in 1:nrow(info)) {
             cat(paste0("|", info[ i, "name" ], ": ",
                        info[ i, "value" ], "\n"))
         }
@@ -53,14 +57,9 @@ setMethod("metadata", "EnsDb", function(x, ...){
 validateEnsDb <- function(object){
     ## check if the database contains all required tables...
     if(!is.null(object@ensdb)){
-        have <- dbListTables(object@ensdb)
-        need <- c("chromosome", "exon", "gene", "metadata", "tx",
-                  "tx2exon")
-        notthere <- need[ !(need %in% have) ]
-        if(length(notthere) > 0){
-            return(paste("Required tables", notthere,
-                         "not found in the database!"))
-        }
+        OK <- dbHasRequiredTables(object@ensdb)
+        if (is.character(OK))
+            return(OK)
     }
     return(TRUE)
 }
@@ -1661,4 +1660,90 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
         stop("'value' has to be a logical of length 1!")
     x <- setProperty(x, orderResultsInR = value)
     return(x)
+})
+
+############################################################
+## useMySQL
+##
+## Switch from RSQlite backend to a MySQL backend.
+##' @title Use a MySQL backend
+##' @aliases useMySQL
+##'
+##' @description Change the SQL backend from \emph{SQLite} to \emph{MySQL}.
+##' When first called on an \code{\linkS4class{EnsDb}} object, the function
+##' tries to create and save all of the data into a MySQL database. All
+##' subsequent calls will connect to the already existing MySQL database.
+##'
+##' @details This functionality requires that the \code{RMySQL} package is
+##' installed and that the user has (write) access to a running MySQL server.
+##' If the corresponding database does already exist users without write access
+##' can use this functionality.
+##'
+##' @note At present the function does not evaluate whether the versions
+##' between the SQLite and MySQL database differ.
+##'
+##' @param x The \code{\linkS4class{EnsDb}} object.
+##' @param host Character vector specifying the host on which the MySQL
+##' server runs.
+##' @param port The port on which the MySQL server can be accessed.
+##' @param user The user name for the MySQL server.
+##' @param pass The password for the MySQL server.
+##' @return A \code{\linkS4class{EnsDb}} object providing access to the
+##' data stored in the MySQL backend.
+##' @author Johannes Rainer
+##' @examples
+##' ## Load the EnsDb database (SQLite backend).
+##' library(EnsDb.Hsapiens.v75)
+##' edb <- EnsDb.Hsapiens.v75
+##' ## Now change the backend to MySQL; my_user and my_pass should
+##' ## be the user name and password to access the MySQL server.
+##' \dontrun{
+##' edb_mysql <- useMySQL(edb, user = my_user, pass = my_pass)
+##' }
+setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
+                                        port = 3306, user, pass) {
+    if (missing(user))
+        stop("'user' has to be specified.")
+    if (missing(pass))
+        stop("'pass' has to be specified.")
+    ## Check if RMySQL package is available.
+    if(requireNamespace("RMySQL", quietly = TRUE)) {
+        ## Check if we can connect to MySQL.
+        driva <- dbDriver("MySQL")
+        con <- dbConnect(driva, host = host, user = user, pass = pass,
+                         port = port)
+        ## Check if database is available.
+        dbs <- dbGetQuery(con, "show databases;")
+        sqliteName <- sub(basename(dbfile(dbconn(x))),
+                          pattern = ".sqlite", replacement = "",
+                          fixed = TRUE)
+        mysqlName <- SQLiteName2MySQL(sqliteName)
+        if (nrow(dbs) == 0 | !any(dbs$Database == mysqlName)) {
+            message("Database not available, trying to create it...",
+                    appendLF = FALSE)
+            dbGetQuery(con, paste0("create database ", mysqlName))
+            message("OK")
+        }
+        dbDisconnect(con)
+        ## Connect to the database and check if we've got all tables.
+        con <- dbConnect(driva, host = host, user = user, pass = pass,
+                         dbname = mysqlName)
+        ## If we've got no tables we try to feed the SQLite database
+        if (length(dbListTables(con)) == 0)
+            feedEnsDb2MySQL(x, mysql = con)
+        ## Check if we've got all required tables.
+        OK <- dbHasRequiredTables(con)
+        if (is.character(OK))
+            stop(OK)
+        OK <- dbHasValidTables(con)
+        if (is.character(OK))
+            stop(OK)
+        ## Now store the connection into the @ensdb slot
+        ## dbDisconnect(x@ensdb)
+        ## x@ensdb <- NULL
+        x@ensdb <- con
+        return(x)
+    } else {
+        stop("Package 'RMySQL' not available.")
+    }
 })
