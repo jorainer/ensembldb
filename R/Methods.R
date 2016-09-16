@@ -1,14 +1,3 @@
-## LLL:
-## genes OK
-## transcripts OK
-## exons OK
-## exonsBy OK
-## transcriptsBy OK
-## cdsBy eventually OK.
-## 3utr OK
-## 5utr OK
-## promoters
-
 ##***********************************************************************
 ##
 ##     Methods for EnsDb classes
@@ -58,6 +47,9 @@ validateEnsDb <- function(object){
     ## check if the database contains all required tables...
     if(!is.null(object@ensdb)){
         OK <- dbHasRequiredTables(object@ensdb)
+        if (is.character(OK))
+            return(OK)
+        OK <- dbHasValidTables(object@ensdb)
         if (is.character(OK))
             return(OK)
     }
