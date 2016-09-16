@@ -290,13 +290,31 @@ removePrefix <- function(x, split=".", fixed=TRUE){
     }
     ## Catch also a "symbol" in columns
     if(any(columns == "symbol"))
-        fetchColumns <- unique(c(fetchColumns[fetchColumns != "symbol"], "gene_name"))
-    ## build the query
-    Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
-                     order.by = order.by, order.type = order.type, group.by = group.by,
-                     skip.order.check = skip.order.check)
-    ## get the data
-    Res <- dbGetQuery(dbconn(x), Q)
+        fetchColumns <- unique(c(fetchColumns[fetchColumns != "symbol"],
+                                 "gene_name"))
+    ## Shall we do the ordering in R or in SQL?
+    if (orderResultsInR(x) & !skip.order.check) {
+        ## Build the query
+        Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
+                         order.by = "", order.type = order.type,
+                         group.by = group.by,
+                         skip.order.check = skip.order.check)
+        ## Get the data
+        Res <- dbGetQuery(dbconn(x), Q)
+        ## Note: we can only order by the columns that we did get back from the
+        ## database; that might be different for the SQL sorting!
+        Res <- orderDataFrameBy(Res, by = checkOrderBy(order.by, fetchColumns),
+                                decreasing = order.type != "asc")
+    } else {
+        ## Build the query
+        Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
+                         order.by = order.by, order.type = order.type,
+                         group.by = group.by,
+                         skip.order.check = skip.order.check)
+        ## Get the data
+        Res <- dbGetQuery(dbconn(x), Q)
+    }
+    ## cat("Query:\n", Q, "\n")
     if(any(columns == "tx_cds_seq_start")) {
         if (!is.integer(Res[, "tx_cds_seq_start"])) {
             suppressWarnings(

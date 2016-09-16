@@ -387,3 +387,18 @@ SymbolFilter <- function(value, condition = "=") {
     return(new("SymbolFilter", condition = condition,
                value = as.character(value)))
 }
+
+############################################################
+## OnlyCodingTx
+##
+## That's a special case filter that just returns transcripts
+## that have tx_cds_seq_start defined (i.e. not NULL).
+setClass("OnlyCodingTx", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             value = "",
+             .valueIsCharacter = TRUE
+         ))
+OnlyCodingTx <- function() {
+    return(new("OnlyCodingTx"))
+}
