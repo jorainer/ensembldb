@@ -44,7 +44,7 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, gen
               disjointExons, metadata, promoters, cdsBy, fiveUTRsByTranscript,
               threeUTRsByTranscript, getGeneRegionTrackForGviz, updateEnsDb,
               transcriptsByOverlaps, exonsByOverlaps, returnFilterColumns,
-              "returnFilterColumns<-")
+              "returnFilterColumns<-", useMySQL)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
 ## Methods for GenomeInfoDb and related stuff
