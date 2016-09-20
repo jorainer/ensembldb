@@ -101,8 +101,6 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     tmp[, "seq_name"] <- as.character(tmp[, "seq_name"])
     dbWriteTable(con, name="chromosome", tmp, row.names=FALSE)
     rm(tmp)
-    ## make index
-    dbGetQuery(con, "create index seq_name_idx on chromosome (seq_name);")
 
     ## process genes: some gene names might have fancy names...
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"), sep="\t", as.is=TRUE, header=TRUE,
@@ -110,10 +108,6 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="gene", tmp, row.names=FALSE)
     rm(tmp)
-    ## make index
-    dbGetQuery(con, "create index gene_gene_id_idx on gene (gene_id);")
-    dbGetQuery(con, "create index gene_gene_name_idx on gene (gene_name);")
-    dbGetQuery(con, "create index gene_seq_name_idx on gene (seq_name);")
 
     ## process transcripts:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"), sep="\t", as.is=TRUE, header=TRUE)
@@ -127,25 +121,18 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
-    ## make index
-    dbGetQuery(con, "create index tx_tx_id_idx on tx (tx_id);")
-    dbGetQuery(con, "create index tx_gene_id_idx on tx (gene_id);")
 
     ## process exons:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_exon.txt"), sep="\t", as.is=TRUE, header=TRUE)
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="exon", tmp, row.names=FALSE)
     rm(tmp)
-    ## make index
-    dbGetQuery(con, "create index exon_exon_id_idx on exon (exon_id);")
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx2exon.txt"), sep="\t", as.is=TRUE, header=TRUE)
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="tx2exon", tmp, row.names=FALSE)
     rm(tmp)
-    ## make index
-    dbGetQuery(con, "create index t2e_tx_id_idx on tx2exon (tx_id);")
-    dbGetQuery(con, "create index t2e_exon_id_idx on tx2exon (exon_id);")
-    dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
+    ## Create indices
+    .createEnsDbIndices(con)
     dbDisconnect(con)
     ## done.
     return(dbname)

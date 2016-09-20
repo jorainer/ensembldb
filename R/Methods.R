@@ -3,13 +3,17 @@
 ##     Methods for EnsDb classes
 ##
 ##***********************************************************************
-setMethod("show", "EnsDb", function(object){
-    if(is.null(object@ensdb)){
+setMethod("show", "EnsDb", function(object) {
+    if (is.null(object@ensdb)) {
         cat("Dash it! Got an empty thing!\n")
-    }else{
+    } else {
         info <- dbGetQuery(object@ensdb, "select * from metadata")
         cat("EnsDb for Ensembl:\n")
-        for(i in 1:nrow(info)){
+        if (inherits(object@ensdb, "SQLiteConnection"))
+            cat(paste0("|Backend: SQLite\n"))
+        if (inherits(object@ensdb, "MySQLConnection"))
+            cat(paste0("|Backend: MySQL\n"))
+        for (i in 1:nrow(info)) {
             cat(paste0("|", info[ i, "name" ], ": ",
                        info[ i, "value" ], "\n"))
         }
@@ -388,12 +392,12 @@ setMethod("genes", "EnsDb", function(x,
     columns <- addFilterColumns(columns, filter, x)
     retColumns <- columns
     ## If we don't have an order.by define one.
-    if(order.by == ""){
+    if(all(order.by == "")){
         order.by <- NULL
-        if(any(columns == "gene_seq_start"))
-            order.by <- "gene_seq_start"
-        if(any(columns == "seq_name"))
-            order.by <- paste(c("seq_name", order.by), collapse=", ")
+        if (any(columns == "seq_name"))
+            order.by <- c(order.by, "seq_name")
+        if( any(columns == "gene_seq_start"))
+            order.by <- c(order.by, "gene_seq_start")
         if(is.null(order.by))
             order.by <- ""
     }
@@ -455,12 +459,12 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
     columns <- addFilterColumns(columns, filter, x)
     retColumns <- columns
     ## If we don't have an order.by define one.
-    if(order.by == ""){
+    if(all(order.by == "")){
         order.by <- NULL
-        if(any(columns == "tx_seq_start"))
-            order.by <- "tx_seq_start"
         if(any(columns == "seq_name"))
-            order.by <- paste(c("seq_name", order.by), collapse=", ")
+            order.by <- c(order.by, "seq_name")
+        if(any(columns == "tx_seq_start"))
+            order.by <- c(order.by, "tx_seq_start")
         if(is.null(order.by))
             order.by <- ""
     }
@@ -543,12 +547,12 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
     columns <- addFilterColumns(columns, filter, x)
     retColumns <- columns
     ## If we don't have an order.by define one.
-    if(order.by == ""){
+    if (order.by == "") {
         order.by <- NULL
-        if(any(columns == "exon_seq_start"))
-            order.by <- "exon_seq_start"
-        if(any(columns == "seq_name"))
-            order.by <- paste(c("seq_name", order.by), collapse=", ")
+        if (any(columns == "seq_name"))
+            order.by <- c(order.by, "seq_name")
+        if (any(columns == "exon_seq_start"))
+            order.by <- c(order.by, "exon_seq_start")
         if(is.null(order.by))
             order.by <- ""
     }
@@ -593,22 +597,23 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
 
 ## should return a GRangesList
 ## still considerably slower than the corresponding call in the GenomicFeatures package.
-setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
-                                       columns=listColumns(x, "exon"), filter, use.names=FALSE){
+setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
+                                       columns = listColumns(x, "exon"),
+                                       filter, use.names = FALSE) {
     by <- match.arg(by, c("tx", "gene"))
     bySuff <- "_id"
-    if(use.names){
-        if(by == "tx"){
+    if (use.names) {
+        if (by == "tx") {
             use.names <- FALSE
             warning("Argument use.names ignored as no transcript names are available.")
-        }else{
+        } else {
             columns <- unique(c(columns, "gene_name"))
             bySuff <- "_name"
         }
     }
-    if(missing(filter)){
-        filter=list()
-    }else{
+    if (missing(filter)) {
+        filter <- list()
+    } else {
         filter <- checkFilter(filter)
     }
     ## We're applying eventual GRangesFilter to either gene or tx.
@@ -631,7 +636,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
         txcolumns <- c(listColumns(x, "tx"), "exon_idx")
         txcolumns <- txcolumns[txcolumns != "gene_id"]
         torem <- columns %in% txcolumns
-        if(any(torem))
+        if (any(torem))
             warning("Columns ",
                     paste(columns[ torem ], collapse = ","),
                     " have been removed as they are not allowed if exons",
@@ -698,9 +703,7 @@ setMethod("exonsBy", "EnsDb", function(x, by=c("tx", "gene"),
                   seqinfo = SI,
                   Res[, columns.metadata, drop=FALSE]
                 )
-    ## now that GR is ordered as we wanted; once we split it it will be ordered by
-    ## the value which we used for splitting.
-    return(split(GR, Res[ , paste0(by, bySuff) ]))
+    return(split(GR, Res[, paste0(by, bySuff)]))
 })
 
 
@@ -893,13 +896,13 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
 }
 
 ## cdsBy... return coding region ranges by tx or by gene.
-setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
-                                     columns=NULL, filter,
-                                     use.names=FALSE){
+setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
+                                     columns = NULL, filter,
+                                     use.names = FALSE){
     by <- match.arg(by, c("tx", "gene"))
-    if(missing(filter)){
-        filter=list()
-    }else{
+    if (missing(filter)) {
+        filter = list()
+    } else {
         filter <- checkFilter(filter)
     }
     filter <- setFeatureInGRangesFilter(filter, by)
@@ -908,23 +911,19 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     ## Add a filter ensuring that only coding transcripts are queried.
     filter <- c(list(OnlyCodingTx()), filter)
     bySuff <- "_id"
-    if(by == "tx"){
+    if (by == "tx") {
         ## adding exon_id, exon_idx to the columns.
         columns <- unique(c(columns, "exon_id", "exon_idx"))
-        if(use.names)
+        if (use.names)
             warning("Not considering use.names as no transcript names are available.")
     } else {
         columns <- unique(c("gene_id", columns))
         if( use.names) {
             bySuff <- "_name"
-            columns <- "gene_name"
+            columns <- c(columns, "gene_name")
         }
     }
     byId <- paste0(by, bySuff)
-    byIdFull <- unlist(prefixColumns(x, columns=byId,
-                                     clean=FALSE), use.names=FALSE)
-    order.by <- paste0(byIdFull , ", case when seq_strand=1 then tx_seq_start",
-                       " when seq_strand=-1 then (tx_seq_end * -1) end")
     ## Query the data
     fetchCols <- unique(c(byId, columns, "tx_cds_seq_start", "tx_cds_seq_end",
                           "seq_name", "seq_strand", "exon_idx", "exon_id",
@@ -953,8 +952,19 @@ setMethod("cdsBy", "EnsDb", function(x, by=c("tx", "gene"),
     if (any(nas))
         Res <- Res[!nas, ]
     ## Remove exons that are not within the cds.
-    Res <- Res[Res$exon_seq_end >= Res$tx_cds_seq_start & Res$exon_seq_start <= Res$tx_cds_seq_end,
-             , drop=FALSE]
+    Res <- Res[Res$exon_seq_end >= Res$tx_cds_seq_start &
+               Res$exon_seq_start <= Res$tx_cds_seq_end,
+             , drop = FALSE]
+    if (orderR) {
+        ## And finally ordering them.
+        if (by == "tx") {
+            Res <- Res[order(Res$tx_id, Res$exon_idx, method = "radix"), ]
+        } else {
+            startend <- (Res$seq_strand == 1) * Res$tx_cds_seq_start +
+                (Res$seq_strand == -1) * (Res$tx_cds_seq_end * -1)
+            Res <- Res[order(Res$gene_id, startend, method = "radix"), ]
+        }
+    }
     if(nrow(Res)==0){
         warning("No cds found!")
         return(NULL)
@@ -1258,11 +1268,6 @@ setMethod("getWhat", "EnsDb",
               ## Eventually renaming seqnames according to the specified style.
               if(any(colnames(Res) == "seq_name"))
                   Res$seq_name <- formatSeqnamesFromQuery(x, Res$seq_name)
-              ## ## Eventually renaming chromosome names depending on the
-              ## ## value of ucscChromosomeNames.
-              ## if(any(colnames(Res) == "seq_name")){
-              ##     Res$seq_name <- prefixChromName(as.character(Res$seq_name))
-              ## }
               return(Res)
           })
 
@@ -1519,12 +1524,12 @@ setMethod("properties", "EnsDb", function(x, ...){
 ##  Return the value for the property with the specified name or
 ##  NA if not present.
 ####------------------------------------------------------------
-setMethod("getProperty", "EnsDb", function(x, name){
+setMethod("getProperty", "EnsDb", function(x, name, default = NA){
     props <- properties(x)
     if(any(names(props) == name)){
         return(props[[name]])
     }else{
-        return(NA)
+        return(default)
     }
 })
 
