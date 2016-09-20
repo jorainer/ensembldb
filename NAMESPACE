@@ -34,9 +34,9 @@ export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage
        ensDbFromGtf, ensDbFromGff, ensDbFromGRanges, ensDbFromAH, runEnsDbApp,
        listEnsDbs)
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
-              GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
-              SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter,
-              ExonrankFilter, SymbolFilter)
+              GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter,
+              SeqnameFilter, SeqstrandFilter, SeqstartFilter, SeqendFilter,
+              GRangesFilter, ExonrankFilter, SymbolFilter)
 ## for EnsFilter
 exportMethods(column, print, show, value, where, "condition<-", "value<-",
               seqnames, start, end, strand, seqlevels)
@@ -47,7 +47,7 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, gen
               disjointExons, metadata, promoters, cdsBy, fiveUTRsByTranscript,
               threeUTRsByTranscript, getGeneRegionTrackForGviz, updateEnsDb,
               transcriptsByOverlaps, exonsByOverlaps, returnFilterColumns,
-              "returnFilterColumns<-")
+              "returnFilterColumns<-", useMySQL)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
 ## Methods for GenomeInfoDb and related stuff
