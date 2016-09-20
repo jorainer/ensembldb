@@ -1,13 +1,62 @@
-## x... optional, the database file name.
-## v... verbosity
-## function to load the database...
+############################################################
+## EnsDb
+## Constructor function.
+##' @title Connect to an EnsDb object
+##'
+##' @description The \code{EnsDb} constructor function connects to the database
+##' specified with argument \code{x} and returns a corresponding
+##' \code{\linkS4class{EnsDb}} object.
+##'
+##' @details By providing the connection to a MySQL database, it is possible
+##' to use MySQL as the database backend and queries will be performed on that
+##' database. Note however that this requires the package \code{RMySQL} to be
+##' installed. In addition, the user needs to have access to a MySQL server
+##' providing already an EnsDb database, or must have write privileges on a
+##' MySQL server, in which case the \code{\link{useMySQL}} method can be used
+##' to insert the annotations from an EnsDB package into a MySQL database.
+##' @param x Either a character specifying the \emph{SQLite} database file, or
+##' a \code{DBIConnection} to e.g. a MySQL database.
+##' @return A \code{\linkS4class{EnsDb}} object.
+##' @author Johannes Rainer
+##' @examples
+##' ## "Standard" way to create an EnsDb object:
+##' library(EnsDb.Hsapiens.v75)
+##' EnsDb.Hsapiens.v75
+##'
+##' ## Alternatively, provide the full file name of a SQLite database file
+##' dbfile <- system.file("extdata/EnsDb.Hsapiens.v75.sqlite", package = "EnsDb.Hsapiens.v75")
+##' edb <- EnsDb(dbfile)
+##' edb
+##'
+##' ## Third way: connect to a MySQL database
+##' \dontrun{
+##' library(RMySQL)
+##' dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v75")
+##' edb <- EnsDb(dbcon)
+##' }
 EnsDb <- function(x){
     options(useFancyQuotes=FALSE)
     if(missing(x)){
         stop("No sqlite file provided!")
     }
-    lite <- dbDriver("SQLite")
-    con <- dbConnect(lite, dbname = x, flags=SQLITE_RO)
+    if (is.character(x)) {
+        lite <- dbDriver("SQLite")
+        con <- dbConnect(lite, dbname = x, flags=SQLITE_RO)
+    }
+    else if (is(x, "DBIConnection")) {
+        con <- x
+    } else {
+        stop("'x' should be either a character specifying the SQLite file to",
+             " be loaded, or a DBIConnection object providing the connection",
+             " to the database.")
+    }
+    ## Check if the database is valid.
+    OK <- dbHasRequiredTables(con)
+    if (is.character(OK))
+        stop(OK)
+    OK <- dbHasValidTables(con)
+    if (is.character(OK))
+        stop(OK)
     tables <- dbListTables(con)
     ## read the columns for these tables.
     Tables <- vector(length=length(tables), "list")
@@ -374,4 +423,63 @@ addFilterColumns <- function(cols, filter = list(), edb) {
         return(column(z))
     }))
     return(unique(c(cols, addC)))
+}
+
+############################################################
+## listEnsDbs
+## list databases
+##' @title List EnsDb databases in a MySQL server
+##' @description The \code{listEnsDbs} function lists EnsDb databases in a
+##' MySQL server.
+##'
+##' @details The use of this function requires that the \code{RMySQL} package
+##' is installed and that the user has either access to a MySQL server with
+##' already installed EnsDb databases, or write access to a MySQL server in
+##' which case EnsDb databases could be added with the \code{\link{useMySQL}}
+##' method. EnsDb databases follow the same naming conventions than the EnsDb
+##' packages, with the exception that the name is all lower case and that
+##' \code{"."} is replaced by \code{"_"}.
+##' @param dbcon A \code{DBIConnection} object providing access to a MySQL
+##' database. Either \code{dbcon} or all of the other arguments have to be
+##' specified.
+##' @param host Character specifying the host on which the MySQL server is
+##' running.
+##' @param port The port of the MySQL server (usually \code{3306}).
+##' @param user The username for the MySQL server.
+##' @param pass The password for the MySQL server.
+##' @return A \code{data.frame} listing the database names, organism name
+##' and Ensembl version of the EnsDb databases found on the server.
+##' @author Johannes Rainer
+##' @seealso \code{\link{useMySQL}}
+##' @examples
+##' \dontrun{
+##' library(RMySQL)
+##' dbcon <- dbConnect(MySQL(), host = "localhost", user = my_user, pass = my_pass)
+##' listEnsDbs(dbcon)
+##' }
+listEnsDbs <- function(dbcon, host, port, user, pass) {
+    if(requireNamespace("RMySQL", quietly = TRUE)) {
+        if (missing(dbcon)) {
+            if (missing(host) | missing(user) | missing(port) | missing(host))
+                stop("Arguments 'host', 'port', 'user' and 'pass' are required",
+                     " if 'dbcon' is not specified.")
+            dbcon <- dbConnect(RMySQL::MySQL(), host = host, port = port, user = user,
+                               pass = pass)
+        }
+        dbs <- dbGetQuery(dbcon, "show databases;")
+        edbs <- dbs[grep(dbs$Database, pattern = "^ensdb_"), "Database"]
+        edbTable <- data.frame(matrix(ncol = 3, nrow = length(edbs)))
+        colnames (edbTable) <- c("dbname", "organism", "ensembl_version")
+        for (i in seq_along(edbs)) {
+            edbTable[i, "dbname"] <- edbs[i]
+            tmp <- unlist(strsplit(edbs[i], split = "_"))
+            edbTable[i, "organism"] <- tmp[2]
+            edbTable[i, "ensembl_version"] <- as.numeric(gsub(pattern = "v",
+                                                              replacement = "",
+                                                              tmp[3]))
+        }
+        return(edbTable)
+    } else {
+        stop("Required package 'RMySQL' is not installed.")
+    }
 }
