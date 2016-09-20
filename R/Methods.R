@@ -1690,7 +1690,7 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 ##' ## Now change the backend to MySQL; my_user and my_pass should
 ##' ## be the user name and password to access the MySQL server.
 ##' \dontrun{
-##' edb_mysql <- useMySQL(edb, user = my_user, pass = my_pass)
+##' edb_mysql <- useMySQL(edb, host = "localhost", user = my_user, pass = my_pass)
 ##' }
 setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
                                         port = 3306, user, pass) {
@@ -1730,10 +1730,21 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
         OK <- dbHasValidTables(con)
         if (is.character(OK))
             stop(OK)
+        ## Check if the versions/creation date differ.
+        metadata_pkg <- metadata(x)
         ## Now store the connection into the @ensdb slot
         ## dbDisconnect(x@ensdb)
         ## x@ensdb <- NULL
         x@ensdb <- con
+        metadata_db <- metadata(x)
+        cre_pkg <- metadata_pkg[metadata_pkg$name == "Creation time", "value"]
+        cre_db <- metadata_db[metadata_db$name == "Creation time", "value"]
+        if (cre_pkg != cre_db) {
+            message("Creation date between the package and the information in",
+                    " the database differ:\n o package: ", cre_pkg,
+                    "\n o database: ", cre_db, ".\nYou might consider to delete",
+                    " the database and re-install it calling this function.")
+        }
         return(x)
     } else {
         stop("Package 'RMySQL' not available.")

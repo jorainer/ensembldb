@@ -2,7 +2,6 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{EnsDb-class}
-\alias{EnsDb}
 \alias{buildQuery}
 \alias{buildQuery,EnsDb-method}
 \alias{dbconn}
@@ -45,7 +44,7 @@
   A connection to the respective annotation database is created upon
   loading of an annotation package created with the
   \code{\link{makeEnsembldbPackage}} function. In addition, the
-  \code{EnsDb} constructor specifying the SQLite database file can be
+  \code{\link{EnsDb}} constructor specifying the SQLite database file can be
   called to generate an instance of the object (see
   \code{\link{makeEnsemblSQLiteFromTables}} for an example).
 }
@@ -56,8 +55,6 @@
                              order.type="asc", skip.order.check=FALSE)
 
 \S4method{dbconn}{EnsDb}(x)
-
-EnsDb(x)
 
 \S4method{ensemblVersion}{EnsDb}(x)
 
@@ -141,7 +138,7 @@ EnsDb(x)
   }
 
   \item{x}{
-    For \code{EnsDb}: the file name of the SQLite database.
+    An \code{EnsDb} instance.
   }
 
 }
@@ -301,6 +298,7 @@ EnsDb(x)
   Johannes Rainer
 }
 \seealso{
+  \code{\link{EnsDb}},
   \code{\link{makeEnsembldbPackage}}, \code{\linkS4class{BasicFilter}},
       \code{\link{exonsBy}}, \code{\link{genes}},
       \code{\link{transcripts}},
