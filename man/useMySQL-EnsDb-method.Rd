@@ -47,7 +47,7 @@ edb <- EnsDb.Hsapiens.v75
 ## Now change the backend to MySQL; my_user and my_pass should
 ## be the user name and password to access the MySQL server.
 \dontrun{
-edb_mysql <- useMySQL(edb, user = my_user, pass = my_pass)
+edb_mysql <- useMySQL(edb, host = "localhost", user = my_user, pass = my_pass)
 }
 }
 \author{
