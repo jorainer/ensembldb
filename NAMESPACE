@@ -1,4 +1,6 @@
+## ensembldb NAMESPACE
 import(methods)
+
 importFrom("utils", "read.table", "str")
 import(BiocGenerics)
 import(S4Vectors)
@@ -29,7 +31,8 @@ importFrom(Rsamtools, index)
 
 #exportPattern("^[[:alpha:]]+")
 export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
-       ensDbFromGtf, ensDbFromGff, ensDbFromGRanges, ensDbFromAH, runEnsDbApp)
+       ensDbFromGtf, ensDbFromGff, ensDbFromGRanges, ensDbFromAH, runEnsDbApp,
+       listEnsDbs)
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
               SeqstrandFilter, SeqstartFilter, SeqendFilter, GRangesFilter,

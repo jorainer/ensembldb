@@ -1,3 +1,22 @@
+CHANGES IN VERSION 1.5.14
+-------------------------
+
+NEW FEATURES:
+    o listEnsDbs function to list EnsDb databases in a MySQL server.
+    o EnsDb constructor function allows to directly connect to a EnsDb database
+      in a MySQL server.
+    o useMySQL compares the creation date between database and SQLite version and
+      proposes to update database if different.
+
+
+CHANGES IN VERSION 1.5.13
+-------------------------
+
+NEW FEATURES:
+    o useMySQL method to insert the data into a MySQL database and switch backend
+      from SQLite to MySQL.
+
+
 CHANGES IN VERSION 1.5.12
 -------------------------
 

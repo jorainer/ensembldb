@@ -1345,16 +1345,25 @@ Support multiple regions for a =GRangesFilter=.
 
 #+END_SRC
 
-** TODO Implement a =SymbolFilter= and support a =symbol= column
+** DONE Implement a =SymbolFilter= and support a =symbol= column
+   CLOSED: [2016-09-16 Fri 15:27]
+   - State "DONE"       from "TODO"       [2016-09-16 Fri 15:27]
 
+Done in issues #4 and #5.
 ** TODO What about using pipe and /formula-like/ filters?
 
-** TODO Fix the =select= method such that it always returns the values in the same order than the keys were
-
+** DONE Fix the =select= method such that it always returns the values in the same order than the keys were
+   CLOSED: [2016-09-16 Fri 15:26]
+   - State "DONE"       from "TODO"       [2016-09-16 Fri 15:26]
 This should be done if only a single filter was provided; for multiple filters
 this will not work; could do it with a simple =match=.
 
-** TODO *Always* return the attribute of the filter!
+This has been done in issue #1 on github.
 
+** DONE *Always* return the attribute of the filter!
+   CLOSED: [2016-09-16 Fri 15:26]
+   - State "DONE"       from "TODO"       [2016-09-16 Fri 15:26]
 I have to check that; eventually do that based on an user option, or even better
 on an internal property, which can be set by =returnFilterCols(edb) <- TRUE/FALSE=.
+
+Done in issue #6.
