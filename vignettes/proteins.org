@@ -36,13 +36,19 @@ transcripts and proteins.
 
 * TODOs								   :noexport:
 
-** TODO Fetch protein feature data from the database [1/1]
+** TODO Fetch protein feature data from the database [3/4]
 
 + [X] Check: do we have a 1:1 mapping between transcript ID and protein ID? *No*:
   ENST00000359635 for example maps to 13 different Uniprot IDs, hence we have 13
   mappings in the database table.
   - Multiple mappings between /protein_id/ and /uniprot_id/ exist.
   - For some proteins there is a n:1 mapping between /tx_id/ and /protein_id/.
++ [X] Check: is the genome_start/end of a protein the same as the CDS start and
+  end?
++ [ ] Check: is the peptide sequence identical to the sequence we would get if
+  we translated the CDS in R?
++ [X] Would it be better to split the protein table into a protein and
+  protein_uniprot table? Looks like it's better to split them.
 
 ** TODO Implement a =proteins= method
 
@@ -55,6 +61,24 @@ all of its exons (same like for e.g. the =cdsBy= method)?
 For these we've got just the start and end position within the protein
 sequence. We would have to calculate that back to genomic coordinates in case,
 or, just leave them as they are on per-protein coordinates.
+
+** TODO Add a =hasProtein= method for =EnsDb=
+
+Checks if the available /protein/ table is available.
+
+** TODO Add additional filters [/]
+
+These filters should check if the database has the required tables/columns
+available.
+
++ [ ] =ProteinidFilter=
++ [ ] =UniprotFilter=
+
+** TODO Add a validation method for protein data[/]
+
++ [ ] Check that all transcripts with a CDS have a protein.
++ [ ] Length of the protein sequence is the length of the CDS / 3.
+
 
 * Experimental perl code and docs				   :noexport:
 
