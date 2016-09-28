@@ -71,6 +71,15 @@ EnsDb <- function(x){
     returnFilterColumns(EDB) <- TRUE
     ## Defining the default for the ordering
     orderResultsInR(EDB) <- FALSE
+    ## Finally check if we've got protein tables
+    if (hasProteinData(EDB)) {
+        OK <- dbHasRequiredTables(con, tables = .ENSDB_PROTEIN_TABLES)
+        if (is.character(OK))
+            stop(OK)
+        OK <- dbHasValidTables(con, tables = .ENSDB_PROTEIN_TABLES)
+        if (is.character(OK))
+            stop(OK)
+    }
     return(EDB)
 }
 
@@ -187,7 +196,11 @@ joinQueryOnColumns <- function(x, columns){
     c("gene", "tx", "join tx on (gene.gene_id=tx.gene_id)"),
     c("gene", "chromosome", "join chromosome on (gene.seq_name=chromosome.seq_name)"),
     c("tx", "tx2exon", "join tx2exon on (tx.tx_id=tx2exon.tx_id)"),
-    c("tx2exon", "exon", "join exon on (tx2exon.exon_id=exon.exon_id)")
+    c("tx2exon", "exon", "join exon on (tx2exon.exon_id=exon.exon_id)"),
+    c("tx", "protein", "join protein on (tx.tx_id=protein.tx_id)"),
+    c("protein", "uniprot", "join uniprot on (protein.protein_id=uniprot.protein_id)"),
+    c("protein", "protein_domain", "join protein_domain on (protein.protein_id=protein_domain.protein_id)"),
+    c("uniprot", "protein_domain", "join protein_domain on (uniprot.protein_id=protein_domain.protein_id)")
 )
 ## tx is now no 1:
 ## .JOINS <- rbind(
@@ -219,9 +232,13 @@ joinQueryOnTables <- function(x, tab){
 ## layout is pretty simple.
 ## The tables are:
 ##
+##      uniprot -(protein_id=protein_id)-+-(protein_id=protein_id)- protein_domain
+##                                       |
+##                                    protein -(tx_id=tx_id)-+
+##                                                           |
 ##  exon -(exon_id=t2e_exon_id)- tx2exon -(t2e_tx_id=tx_id)- tx -(gene_id=gene_id)- gene
 ##                                                                                   |
-##                                                   chromosome -(seq_name=seq_name)-´
+##                                                   chromosome -(seq_name=seq_name)-+
 addRequiredTables <- function(x, tab){
     ## dash it, as long as I can't find a way to get connected objects in a
     ## graph I'll do it manually...
@@ -236,6 +253,16 @@ addRequiredTables <- function(x, tab){
     ## if we have exon and we have gene, we'll need also tx
     if((any(tab=="exon") | (any(tab=="tx2exon"))) & any(tab=="gene")){
         tab <- unique(c(tab, "tx"))
+    }
+    if (hasProteinData(x)) {
+        ## Resolve the proteins: need tx to map between proteome and genome
+        if (any(tab %in% c("uniprot", "protein_domain", "protein")) &
+            any(tab %in% c("exon", "tx2exon", "gene", "chromosome")))
+            tab <- unique(c(tab, "tx"))
+        ## Need protein.
+        if (any(tab %in% c("uniprot", "protein_domain")) &
+            any(tab %in% c("exon", "tx2exon", "tx", "gene", "chromosome")))
+            tab <- unique(c(tab, "protein"))
     }
     return(tablesByDegree(x, tab))
 }
@@ -435,14 +462,24 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                       exon = c("exon_id", "exon_seq_start", "exon_seq_end"),
                       chromosome = c("seq_name", "seq_length", "is_circular"),
                       metadata = c("name", "value"))
-dbHasRequiredTables <- function(con, returnError = TRUE) {
+.ENSDB_PROTEIN_TABLES <- list(protein = c("tx_id", "protein_id",
+                                          "protein_sequence"),
+                              uniprot = c("protein_id", "uniprot_id"),
+                              protein_domain = c("protein_id",
+                                                 "protein_domain_id",
+                                                 "protein_domain_source",
+                                                 "interpro_accession",
+                                                 "prot_dom_start",
+                                                 "prot_dom_end"))
+dbHasRequiredTables <- function(con, returnError = TRUE,
+                                tables = .ENSDB_TABLES) {
     tabs <- dbListTables(con)
     if (length(tabs) == 0) {
         if (returnError)
             return("Database does not have any tables!")
         return(FALSE)
     }
-    not_there <- names(.ENSDB_TABLES)[!(names(.ENSDB_TABLES) %in% tabs)]
+    not_there <- names(tables)[!(names(tables) %in% tabs)]
     if (length(not_there) > 0) {
         if (returnError)
             return(paste0("Required tables ", paste(not_there, collapse = ", "),
@@ -452,8 +489,8 @@ dbHasRequiredTables <- function(con, returnError = TRUE) {
     return(TRUE)
 }
 dbHasValidTables <- function(con, returnError = TRUE) {
-    for (tab in names(.ENSDB_TABLES)) {
-        cols <- .ENSDB_TABLES[[tab]]
+    for (tab in names(tables)) {
+        cols <- tables[[tab]]
         from_db <- colnames(dbGetQuery(con, paste0("select * from ", tab,
                                                    " limit 1")))
         not_there <- cols[!(cols %in% from_db)]
@@ -505,7 +542,7 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     return(TRUE)
 }
 ## Small helper function to cfeate all the indices.
-.createEnsDbIndices <- function(con, indexLength = "") {
+.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) {
     dbGetQuery(con, paste0("create index seq_name_idx on chromosome (seq_name",
                            indexLength, ");"))
     dbGetQuery(con, paste0("create index gene_gene_id_idx on gene (gene_id",
@@ -525,6 +562,16 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     dbGetQuery(con, paste0("create index t2e_exon_id_idx on tx2exon (exon_id",
                            indexLength, ");"))
     dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
+    if (proteins) {
+        dbGetQuery(con, paste0("create index protein_tx_id_idx on protein (tx_id",
+                               indexLength, ");"))
+        dbGetQuery(con, paste0("create index protein_protein_id_idx on protein",
+                               " (protein_id", indexLength, ");"))
+        dbGetQuery(con, paste0("create index uniprot_protein_id_idx on uniprot",
+                               " (protein_id", indexLength, ");"))
+        dbGetQuery(con, paste0("create index prot_dom_protein_id_idx on",
+                               " protein_domain (protein_id", indexLength, ");"))
+    }
 }
 
 ############################################################

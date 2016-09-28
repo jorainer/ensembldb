@@ -319,8 +319,9 @@ setMethod("cleanColumns", "EnsDb", function(x,
         bm <- columns %in% full.columns
         removed <- columns[ !bm ]
     }else{
-        bm <- columns %in% unlist(listTables(x)[ c("gene", "tx", "exon",
-                                                   "tx2exon", "chromosome") ])
+        dbtabs <- names(listTables(x))
+        dbtabs <- dbtabs[dbtabs != "metadata"]
+        bm <- columns %in% unlist(listTables(x)[dbtabs])
         removed <- columns[ !bm ]
     }
     if(length(removed) > 0){
@@ -358,14 +359,24 @@ setMethod("tablesByDegree", "EnsDb", function(x,
     ##                      chromosome="gene"
     ##                          ))
     ## Tab <- names(sort(degree(DBgraph), decreasing=TRUE))
-    Table.order <- c(gene=1, tx=2, tx2exon=3, exon=4, chromosome=5, metadata=6)
+    Table.order <- c(gene=1, tx=2, tx2exon=3, exon=4, chromosome=5,
+                     protein = 6, uniprot = 7, protein_domain = 8,
+                     metadata = 99)
     ##Table.order <- c(gene=2, tx=1, tx2exon=3, exon=4, chromosome=5, metadata=6)
     Tab <- tab[ order(Table.order[ tab ]) ]
     return(Tab)
 })
 
-
-
+############################################################
+## hasProteinData
+##
+## Simply check if the database has required tables protein, uniprot
+## and protein_domain.
+setMethod("hasProteinData", "EnsDb", function(x) {
+    tabs <- listTables(x)
+    return(all(c("protein", "uniprot", "protein_domain") %in%
+               names(tabs)))
+})
 
 ### genes:
 ## get genes from the database.
