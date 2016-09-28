@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #####################################
-## version 0.2.0: * Get protein IDs and (eventually) Uniprot IDs.
+## version 0.2.1: * Get protein IDs and (eventually) Uniprot IDs.
 ## version 0.0.2: * get also gene_seq_start, gene_seq_end, tx_seq_start and tx_seq_end from the database!
 ##                * did rename chrom_start to seq_start.
 
@@ -53,8 +53,9 @@ if($option{ h }){
   print("- ens_exon.txt: contains all (unique) exons, along with their genomic alignment.\n");
   print("- ens_tx2exon.txt: relates transcript ids to exon ids (m:n), along with the index of the exon in the respective transcript (since the same exon can be part of different transcripts and have a different index in each transcript).\n");
   print("- ens_chromosome.txt: the information of all chromosomes (chromosome/sequence/contig names). \n");
-  print("- ens_protein.txt: the mapping between (protein coding) transcripts and protein IDs. In addition to the Ensembl protein IDs the Uniprot ID is provided if available.\n");
-  print("- ens_protein_domain.txt: provides for each protein all annotated protein domains along with their start and end coordinates on the protein sequence.")
+  print("- ens_protein.txt: the mapping between (protein coding) transcripts and protein IDs including also the peptide sequence.\n");
+  print("- ens_protein_domain.txt: provides for each protein all annotated protein domains along with their start and end coordinates on the protein sequence.");
+  print("- ens_uniprot.txt: provides the mapping between Ensembl protein IDs and Uniprot IDs (if available). The mapping can be 1:n.")
   print("- ens_metadata.txt\n");
   exit 0;
 }
@@ -120,7 +121,11 @@ open(T2E , ">ens_tx2exon.txt");
 print T2E "tx_id\texon_id\texon_idx\n";
 
 open(PROTEIN, ">ens_protein.txt");
-print PROTEIN "tx_id\tprotein_id\tuniprot_id\n";
+## print PROTEIN "tx_id\tprotein_id\tuniprot_id\tprotein_sequence\n";
+print PROTEIN "tx_id\tprotein_id\tprotein_sequence\n";
+
+open(UNIPROT, ">ens_uniprot.txt");
+print UNIPROT "protein_id\tuniprot_id\n";
 
 open(PROTDOM, ">ens_protein_domain.txt");
 print PROTDOM "protein_id\tprotein_domain_id\tprotein_domain_source\tinterpro_accession\tprot_dom_start\tprot_dom_end\n";
@@ -233,16 +238,19 @@ foreach my $gene_id (@gene_ids){
       my $transl = $transcript->translation();
       if (defined($transl)) {
 	my $transl_id = $transl->stable_id();
+	my $prot_seq = $transl->seq();
 	## Check if we could get UNIPROT ID(s):
 	my @unip = @{ $transl->get_all_DBLinks('Uniprot%') };
 	if (scalar(@unip) > 0) {
 	  foreach my $uniprot (@unip) {
 	    my $unip_id = $uniprot->display_id();
-	    print PROTEIN "$tx_id\t$transl_id\t$unip_id\n";
+	    print UNIPROT "$transl_id\t$unip_id\n";
+	    ## print PROTEIN "$tx_id\t$transl_id\t$unip_id\t$prot_seq\n";
 	  }
 	} else {
-	  print PROTEIN "$tx_id\t$transl_id\t\n";
+	  ## print PROTEIN "$tx_id\t$transl_id\t\t$prot_seq\n";
 	}
+	print PROTEIN "$tx_id\t$transl_id\t$prot_seq\n";
 	my $prot_doms = $transl->get_all_DomainFeatures;
 	while ( my $prot_dom = shift @{$prot_doms}) {
 	  my $logic_name = $prot_dom->analysis()->logic_name();
@@ -309,4 +317,4 @@ close(T2E);
 close(CHR);
 close(PROTEIN);
 close(PROTDOM);
-
+close(UNIPROT);
