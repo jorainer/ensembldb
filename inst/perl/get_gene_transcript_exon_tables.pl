@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.2.0: * Get protein IDs and (eventually) Uniprot IDs.
 ## version 0.0.2: * get also gene_seq_start, gene_seq_end, tx_seq_start and tx_seq_end from the database!
 ##                * did rename chrom_start to seq_start.
 
@@ -14,7 +15,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.1.3";
+my $script_version = "0.2.0";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -52,6 +53,8 @@ if($option{ h }){
   print("- ens_exon.txt: contains all (unique) exons, along with their genomic alignment.\n");
   print("- ens_tx2exon.txt: relates transcript ids to exon ids (m:n), along with the index of the exon in the respective transcript (since the same exon can be part of different transcripts and have a different index in each transcript).\n");
   print("- ens_chromosome.txt: the information of all chromosomes (chromosome/sequence/contig names). \n");
+  print("- ens_protein.txt: the mapping between (protein coding) transcripts and protein IDs. In addition to the Ensembl protein IDs the Uniprot ID is provided if available.\n");
+  print("- ens_protein_domain.txt: provides for each protein all annotated protein domains along with their start and end coordinates on the protein sequence.")
   print("- ens_metadata.txt\n");
   exit 0;
 }
@@ -115,6 +118,12 @@ print EXON "exon_id\texon_seq_start\texon_seq_end\n";
 
 open(T2E , ">ens_tx2exon.txt");
 print T2E "tx_id\texon_id\texon_idx\n";
+
+open(PROTEIN, ">ens_protein.txt");
+print PROTEIN "tx_id\tprotein_id\tuniprot_id\n";
+
+open(PROTDOM, ">ens_protein_domain.txt");
+print PROTDOM "protein_id\tprotein_domain_id\tprotein_domain_source\tinterpro_accession\tprot_dom_start\tprot_dom_end\n";
 
 open(CHR , ">ens_chromosome.txt");
 print CHR "seq_name\tseq_length\tis_circular\n";
@@ -220,6 +229,30 @@ foreach my $gene_id (@gene_ids){
       print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\n";
 ##      print G2T "$gene_id\t$tx_id\n";
 
+      ## Process proteins/translations (if possible)
+      my $transl = $transcript->translation();
+      if (defined($transl)) {
+	my $transl_id = $transl->stable_id();
+	## Check if we could get UNIPROT ID(s):
+	my @unip = @{ $transl->get_all_DBLinks('Uniprot%') };
+	if (scalar(@unip) > 0) {
+	  foreach my $uniprot (@unip) {
+	    my $unip_id = $uniprot->display_id();
+	    print PROTEIN "$tx_id\t$transl_id\t$unip_id\n";
+	  }
+	} else {
+	  print PROTEIN "$tx_id\t$transl_id\t\n";
+	}
+	my $prot_doms = $transl->get_all_DomainFeatures;
+	while ( my $prot_dom = shift @{$prot_doms}) {
+	  my $logic_name = $prot_dom->analysis()->logic_name();
+	  my $prot_dom_id = $prot_dom->display_id();
+	  my $interpro_acc = $prot_dom->interpro_ac();
+	  my $prot_start = $prot_dom->start();
+	  my $prot_end = $prot_dom->end();
+	  print PROTDOM "$transl_id\t$prot_dom_id\t$logic_name\t$interpro_acc\t$prot_start\t$prot_end\n";
+	}
+      }
       ## process exon(s)
       ##my @exons = @{ $transcript->get_all_Exons(-constitutive => 1) };
       my @exons = @{ $transcript->get_all_Exons() };  ## exons always returned 5' 3' of transcript!
@@ -274,5 +307,6 @@ close(EXON);
 ##close(G2T);
 close(T2E);
 close(CHR);
-
+close(PROTEIN);
+close(PROTDOM);
 
