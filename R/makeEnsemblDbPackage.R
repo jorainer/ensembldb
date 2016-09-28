@@ -97,18 +97,23 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     dbWriteTable(con, name="metadata", info, row.names=FALSE)
 
     ## process chromosome
+    message("Processing 'chromosome' table ... ", appendLF = FALSE)
     tmp <- read.table(paste0(path, .Platform$file.sep ,"ens_chromosome.txt"), sep="\t", as.is=TRUE, header=TRUE)
     tmp[, "seq_name"] <- as.character(tmp[, "seq_name"])
     dbWriteTable(con, name="chromosome", tmp, row.names=FALSE)
     rm(tmp)
+    message("OK")
 
+    message("Processing 'gene' table ... ", appendLF = FALSE)
     ## process genes: some gene names might have fancy names...
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"), sep="\t", as.is=TRUE, header=TRUE,
                       quote="", comment.char="" )
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="gene", tmp, row.names=FALSE)
     rm(tmp)
+    message("OK")
 
+    message("Processing 'trancript' table ... ", appendLF = FALSE)
     ## process transcripts:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"), sep="\t", as.is=TRUE, header=TRUE)
     ## Fix the tx_cds_seq_start and tx_cds_seq_end columns: these should be integer!
@@ -121,18 +126,50 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
+    message("OK")
 
     ## process exons:
-    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_exon.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    message("Processing 'exon' table ... ", appendLF = FALSE)
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_exon.txt"),
+                      sep = "\t", as.is = TRUE, header = TRUE)
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="exon", tmp, row.names=FALSE)
     rm(tmp)
-    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx2exon.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    message("OK")
+    message("Processing 'tx2exon' table ... ", appendLF = FALSE)
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx2exon.txt"),
+                      sep = "\t", as.is = TRUE, header = TRUE)
     OK <- .checkIntegerCols(tmp)
-    dbWriteTable(con, name="tx2exon", tmp, row.names=FALSE)
+    dbWriteTable(con, name="tx2exon", tmp, row.names = FALSE)
     rm(tmp)
+    message("OK")
+
+    ## process proteins; if available.
+    prot_file <- paste0(path, .Platform$file.sep, "ens_protein.txt")
+    if (file.exists(prot_file)) {
+        message("Processing 'protein' table ... ", appendLF = FALSE)
+        tmp <- read.table(prot_file, sep = "\t", as.is = TRUE, header = TRUE)
+        OK <- .checkIntegerCols(tmp)
+        dbWriteTable(con, name = "protein", tmp, row.names = FALSE)
+        message("OK")
+        message("Processing 'uniprot' table ... ", appendLF = FALSE)
+        tmp <- read.table(paste0(path, .Platform$file.sep, "ens_uniprot.txt"),
+                          sep = "\t", as.is = TRUE, header = TRUE)
+        OK <- .checkIntegerCols(tmp)
+        dbWriteTable(con, name = "uniprot", tmp, row.names = FALSE)
+        message("OK")
+        message("Processing 'protein_domain' table ... ", appendLF = FALSE)
+        tmp <- read.table(paste0(path, .Platform$file.sep, "ens_protein_domain.txt"),
+                          sep = "\t", as.is = TRUE, header = TRUE)
+        OK <- .checkIntegerCols(tmp)
+        dbWriteTable(con, name = "protein_domain", tmp, row.names = FALSE)
+        message("OK")
+    }
+
     ## Create indices
-    .createEnsDbIndices(con)
+    message("Creating indices ... ", appendLF = FALSE)
+    .createEnsDbIndices(con, proteins = file.exists(prot_file))
+    message("OK")
     dbDisconnect(con)
     ## done.
     return(dbname)
@@ -144,7 +181,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
                                              "tx_seq_start", "tx_seq_start",
                                              "exon_seq_start", "exon_seq_end",
                                              "exon_idx", "tx_cds_seq_start",
-                                             "tx_cds_seq_end")) {
+                                             "tx_cds_seq_end", "prot_dom_start",
+                                             "prot_dom_end")) {
     cols <- columns[columns %in% colnames(x)]
     if(length(cols) > 0) {
         sapply(cols, function(z) {
