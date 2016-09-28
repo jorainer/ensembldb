@@ -1,0 +1,132 @@
+#+TITLE: Querying protein features
+#+AUTHOR: Johannes Rainer
+#+EMAIL:  johannes.rainer@eurac.edu
+#+OPTIONS: ^:{} toc:nil
+#+PROPERTY: exports code
+#+PROPERTY: session *R_prot*
+
+#+BEGIN_html
+---
+title: "Querying protein features"
+graphics: yes
+output:
+  BiocStyle::html_document2
+vignette: >
+  %\VignetteIndexEntry{Querying protein features}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
+  %\VignettePackage{ensembldb}
+  %\VignetteKeywords{annotation,database}
+---
+#+END_html
+
+# #+BEGIN_EXPORT html
+
+#+BEGIN_html
+**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
+**Authors**: `r packageDescription("ensembldb")$Author`<br />
+**Modified**: 28 September, 2016<br />
+**Compiled**: `r date()`
+#+END_html
+
+From Bioconductor release 3.5 on, =EnsDb= databases/packages created by the
+=ensembldb= package contain also, for transcripts with a CDS, mappings between
+transcripts and proteins.
+
+* TODOs								   :noexport:
+
+** TODO Fetch protein feature data from the database [1/1]
+
++ [X] Check: do we have a 1:1 mapping between transcript ID and protein ID? *No*:
+  ENST00000359635 for example maps to 13 different Uniprot IDs, hence we have 13
+  mappings in the database table.
+  - Multiple mappings between /protein_id/ and /uniprot_id/ exist.
+  - For some proteins there is a n:1 mapping between /tx_id/ and /protein_id/.
+
+** TODO Implement a =proteins= method
+
+The question here is what =start= and =end= we put into the resulting =GRanges=
+object, /just/ the CDS coding start and end, or the individual start and end of
+all of its exons (same like for e.g. the =cdsBy= method)?
+
+** TODO How to handle the protein domain features?
+
+For these we've got just the start and end position within the protein
+sequence. We would have to calculate that back to genomic coordinates in case,
+or, just leave them as they are on per-protein coordinates.
+
+* Experimental perl code and docs				   :noexport:
+
+Do you know which species each of these is from. If so the easiest
+thing to do is to use Biomart for each species. (if there are only a
+few species).
+Alternatively (if this is a lot of species, but you still need to know
+what this is)
+then you can use the API
+
+So if we pretend we have a list of acc and species in a file
+
+use Bio::EnsEMBL::Registry;
+use strict;
+my $reg = "Bio::EnsEMBL::Registry";
+
+$registry->load_registry_from_db(
+                 -host => 'ensembldb.ensembl.org',
+                 -user => 'anonymous',
+                 );
+
+while(<>){
+  my ($acc, $species) = split;
+
+  my $adap = $reg->get_adaptor($species,"core","translation");
+
+  my @trans = @{$adap->fetch_all_by_external_name($acc,"uniprot%")};
+
+  foreach my $translation (@trans){
+    print $translation->stable_id."\t".$acc."\n";
+  }
+}
+
+
+Please note i have not ran this code or compiled it or checked it,
+this is just a brief outline. But it looks okay to me.
+
+-Ian.
+
+
+Translations and ProteinFeatures
+
+Translation objects and protein sequence can be extracted from a Transcript object. It is important to remember that some Ensembl transcripts are non-coding (pseudo-genes, ncRNAs, etc.) and have no translation. The primary purpose of a Translation object is to define the CDS and UTRs of its associated Transcript object. Peptide sequence is obtained directly from a Transcript object not a Translation object as might be expected. Once you have a Translation you can go back to its Transcript. If you retrieved the Translation using a stable identifier then the API will fetch the appropriate Transcript automatically. The following example obtains the protein sequence of a Transcript and the Translation's stable identifier:
+
+my $stable_id = 'ENST00000528762';
+
+my $transcript_adaptor =
+  $registry->get_adaptor( 'Human', 'Core', 'Transcript' );
+my $transcript = $transcript_adaptor->fetch_by_stable_id($stable_id);
+
+print $transcript->translation()->stable_id(), "\n";
+print $transcript->translate()->seq(),         "\n";
+
+print $transcript->translation()->transcript()->stable_id(), "\n";
+
+ProteinFeatures are features which are on an amino acid sequence rather than a nucleotide sequence. The method get_all_ProteinFeatures() can be used to obtain a set of protein features from a Translation object.
+
+$translation = $transcript->translation();
+
+my $pfeatures = $translation->get_all_ProteinFeatures();
+while ( my $pfeature = shift @{$pfeatures} ) {
+    my $logic_name = $pfeature->analysis()->logic_name();
+
+    printf(
+        "%d-%d %s %s %s\n",
+        $pfeature->start(), $pfeature->end(), $logic_name,
+        $pfeature->interpro_ac(),
+        $pfeature->idesc()
+    );
+}
+
+If only the protein features created by a particular analysis are desired the name of the analysis can be provided as an argument. To obtain the subset of features which are considered to be 'domain' features the convenience method get_all_DomainFeatures() can be used:
+
+my $seg_features    = $translation->get_all_ProteinFeatures('Seg');
+my $domain_features = $translation->get_all_DomainFeatures();
