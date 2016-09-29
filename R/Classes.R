@@ -402,3 +402,12 @@ setClass("OnlyCodingTx", contains = "BasicFilter",
 OnlyCodingTx <- function() {
     return(new("OnlyCodingTx"))
 }
+
+############################################################
+## ProteinidFilter
+
+############################################################
+## UniprotFilter
+
+############################################################
+## ProtdomainidFilter

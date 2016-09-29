@@ -71,15 +71,10 @@ EnsDb <- function(x){
     returnFilterColumns(EDB) <- TRUE
     ## Defining the default for the ordering
     orderResultsInR(EDB) <- FALSE
-    ## Finally check if we've got protein tables
-    if (hasProteinData(EDB)) {
-        OK <- dbHasRequiredTables(con, tables = .ENSDB_PROTEIN_TABLES)
-        if (is.character(OK))
-            stop(OK)
-        OK <- dbHasValidTables(con, tables = .ENSDB_PROTEIN_TABLES)
-        if (is.character(OK))
-            stop(OK)
-    }
+    ## Check it again...
+    OK <- validateEnsDb(EDB)
+    if (is.character(OK))
+        stop(OK)
     return(EDB)
 }
 
@@ -194,36 +189,52 @@ joinQueryOnColumns <- function(x, columns){
 ## only list direct joins!!!
 .JOINS <- rbind(
     c("gene", "tx", "join tx on (gene.gene_id=tx.gene_id)"),
-    c("gene", "chromosome", "join chromosome on (gene.seq_name=chromosome.seq_name)"),
+    c("gene", "chromosome",
+      "join chromosome on (gene.seq_name=chromosome.seq_name)"),
     c("tx", "tx2exon", "join tx2exon on (tx.tx_id=tx2exon.tx_id)"),
     c("tx2exon", "exon", "join exon on (tx2exon.exon_id=exon.exon_id)"),
     c("tx", "protein", "join protein on (tx.tx_id=protein.tx_id)"),
-    c("protein", "uniprot", "join uniprot on (protein.protein_id=uniprot.protein_id)"),
-    c("protein", "protein_domain", "join protein_domain on (protein.protein_id=protein_domain.protein_id)"),
-    c("uniprot", "protein_domain", "join protein_domain on (uniprot.protein_id=protein_domain.protein_id)")
+    c("protein", "uniprot",
+      "join uniprot on (protein.protein_id=uniprot.protein_id)"),
+    c("protein", "protein_domain",
+      "join protein_domain on (protein.protein_id=protein_domain.protein_id)"),
+    c("uniprot", "protein_domain",
+      "join protein_domain on (uniprot.protein_id=protein_domain.protein_id)")
 )
-## tx is now no 1:
-## .JOINS <- rbind(
-##     c("tx", "gene", "join gene on (tx.gene_id=gene.gene_id)"),
-##     c("gene", "chromosome", "join chromosome on (gene.seq_name=chromosome.seq_name)"),
-##     c("tx", "tx2exon", "join tx2exon on (tx.tx_id=tx2exon.tx_id)"),
-##     c("tx2exon", "exon", "join exon on (tx2exon.exon_id=exon.exon_id)")
-##    )
 
-
+############################################################
+## joinQueryOnTables
+##
+## Helper function to generate the join query based on the provided tables.
 joinQueryOnTables <- function(x, tab){
-    ## just to be on the save side: evaluate whether we have all required tables to join;
+    ## Evaluate whether we have all required tables to join;
     ## this will also ensure that the order is by degree.
     tab <- addRequiredTables(x, tab)
-    Query <- tab[ 1 ]
-    previous.table <- tab[ 1 ]
-    for(i in 1:length(tab)){
-        if(i > 1){
-            Query <- paste(Query, .JOINS[ .JOINS[ , 2 ]==tab[ i ], 3 ])
+    Query <- tab[1]
+    previous.table <- tab[1]
+    for (i in 1:length(tab)) {
+        if (i > 1) {
+            Query <- paste(Query, .JOINS[.JOINS[, 1] %in% previous.table &
+                                         .JOINS[, 2] == tab[i], 3])
+            ## Add the table to the previous tables.
+            previous.table <- c(previous.table, tab[i])
         }
     }
     return(Query)
 }
+## joinQueryOnTables <- function(x, tab){
+##     ## just to be on the save side: evaluate whether we have all required tables to join;
+##     ## this will also ensure that the order is by degree.
+##     tab <- addRequiredTables(x, tab)
+##     Query <- tab[1]
+##     previous.table <- tab[1]
+##     for (i in 1:length(tab)) {
+##         if (i > 1) {
+##             Query <- paste(Query, .JOINS[.JOINS[, 2] == tab[i], 3])
+##         }
+##     }
+##     return(Query)
+## }
 
 
 ###
@@ -488,7 +499,8 @@ dbHasRequiredTables <- function(con, returnError = TRUE,
     }
     return(TRUE)
 }
-dbHasValidTables <- function(con, returnError = TRUE) {
+dbHasValidTables <- function(con, returnError = TRUE,
+                             tables = .ENSDB_TABLES) {
     for (tab in names(tables)) {
         cols <- tables[[tab]]
         from_db <- colnames(dbGetQuery(con, paste0("select * from ", tab,
