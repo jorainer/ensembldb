@@ -3,11 +3,16 @@ edb <- EnsDb.Hsapiens.v75
 
 test_ensDbFromGRanges <- function(){
     load(system.file("YGRanges.RData", package="ensembldb"))
-    DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
-                           organism="Homo_sapiens")
+    suppressWarnings(
+        DB <- ensDbFromGRanges(Y, path=tempdir(), version=75,
+                               organism="Homo_sapiens")
+    )
     edb <- EnsDb(DB)
     checkEquals(unname(genome(edb)), "GRCh37")
 
+    Test <- makeEnsembldbPackage(DB, destDir = tempdir(),
+                                 version = "0.0.1", author = "J Rainer",
+                                 maintainer = "")
     checkTrue(ensembldb:::checkValidEnsDb(edb))
 }
 
@@ -79,16 +84,25 @@ test_isEnsemblFileName <- function() {
 }
 
 test_ensDbFromGtf_Gff <- function() {
-    ## db_1 <- ensDbFromGff(system.file("gff/Devosia_geojensis.ASM96941v1.32.gff3.gz",
-    ##                                   package="ensembldb"),
-    ##                       outfile = tempfile())
     gff <- system.file("gff/Devosia_geojensis.ASM96941v1.32.gff3.gz",
                        package="ensembldb")
-    ##Test <- import()
-    db_2 <- ensDbFromGtf(system.file("gtf/Devosia_geojensis.ASM96941v1.32.gtf.gz",
-                                     package="ensembldb"),
-                         outfile = tempfile())
-    db_2 <- EnsDb(db_2)
-    checkEquals(ensemblVersion(db_2), "32")
+    gtf <- system.file("gtf/Devosia_geojensis.ASM96941v1.32.gtf.gz",
+                       package="ensembldb")
+    suppressWarnings(
+        db_gff <- EnsDb(ensDbFromGff(gff, outfile = tempfile()))
+    )
+    suppressWarnings(
+        db_gtf <- EnsDb(ensDbFromGtf(gtf, outfile = tempfile()))
+    )
+    checkEquals(ensemblVersion(db_gtf), "32")
+    checkEquals(ensemblVersion(db_gff), "32")
 
+    res <- ensembldb:::compareChromosomes(db_gtf, db_gff)
+    checkEquals(res, "OK")
+    res <- ensembldb:::compareGenes(db_gtf, db_gff)
+    checkEquals(res, "WARN")  ## differences in gene names and Entrezid.
+    res <- ensembldb:::compareTx(db_gtf, db_gff)
+    checkEquals(res, "OK")
+    res <- ensembldb:::compareExons(db_gtf, db_gff)
+    checkEquals(res, "OK")
 }
