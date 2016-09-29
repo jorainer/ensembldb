@@ -38,7 +38,8 @@ fetchTablesFromEnsembl <- function(version, ensemblapi, user="anonymous",
     if(missing(version))
         stop("The version of the Ensembl database has to be provided!")
     ## setting the stage for perl:
-    fn <- system.file("perl", "get_gene_transcript_exon_tables.pl", package="ensembldb")
+    fn <- system.file("perl", "get_gene_transcript_exon_tables.pl",
+                      package="ensembldb")
     ## parameters: s, U, H, P, e
     ## replacing white spaces with _
     species <- gsub(species, pattern=" ", replacement="_")
@@ -73,11 +74,12 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     ## check if we have all files...
     all_files <- dir(path, pattern="txt")
     if(sum(in_files %in% all_files)!=length(in_files))
-        stop("Something went wrong! I'm missing some of the txt files the perl script should have generated.")
+        stop("Something went wrong! I'm missing some of the txt files the",
+             " perl script should have generated.")
 
     ## read information
-    info <- read.table(paste0(path, .Platform$file.sep ,"ens_metadata.txt"), sep="\t",
-                       as.is=TRUE, header=TRUE)
+    info <- read.table(paste0(path, .Platform$file.sep ,"ens_metadata.txt"),
+                       sep="\t", as.is=TRUE, header=TRUE)
     species <- .organismName(info[ info$name=="Organism", "value" ])
     ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
     if(missing(dbname)){
@@ -92,7 +94,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     ## process chromosome
     message("Processing 'chromosome' table ... ", appendLF = FALSE)
-    tmp <- read.table(paste0(path, .Platform$file.sep ,"ens_chromosome.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    tmp <- read.table(paste0(path, .Platform$file.sep ,"ens_chromosome.txt"),
+                      sep="\t", as.is=TRUE, header=TRUE)
     tmp[, "seq_name"] <- as.character(tmp[, "seq_name"])
     dbWriteTable(con, name="chromosome", tmp, row.names=FALSE)
     rm(tmp)
@@ -100,7 +103,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     message("Processing 'gene' table ... ", appendLF = FALSE)
     ## process genes: some gene names might have fancy names...
-    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"), sep="\t", as.is=TRUE, header=TRUE,
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"),
+                      sep="\t", as.is=TRUE, header=TRUE,
                       quote="", comment.char="" )
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="gene", tmp, row.names=FALSE)
@@ -109,7 +113,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
 
     message("Processing 'trancript' table ... ", appendLF = FALSE)
     ## process transcripts:
-    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"),
+                      sep="\t", as.is=TRUE, header=TRUE)
     ## Fix the tx_cds_seq_start and tx_cds_seq_end columns: these should be integer!
     suppressWarnings(
         tmp[, "tx_cds_seq_start"] <- as.integer(tmp[, "tx_cds_seq_start"])
@@ -210,7 +215,7 @@ makeEnsembldbPackage <- function(ensdb,
     ## template filled out correctly.
     symvals <- list(
         PKGTITLE=paste("Ensembl based annotation package"),
-        PKGDESCRIPTION=paste("Exposes an annotation databases generated from Ensembl."),
+        PKGDESCRIPTION="Exposes an annotation databases generated from Ensembl.",
         PKGVERSION=version,
         AUTHOR=author,
         MAINTAINER=maintainer,
@@ -221,7 +226,8 @@ makeEnsembldbPackage <- function(ensdb,
         PROVIDERVERSION=as.character(ensembl_version),
         RELEASEDATE= .getMetaDataValue(con ,'Creation time'),
         SOURCEURL= .getMetaDataValue(con ,'ensembl_host'),
-        ORGANISMBIOCVIEW=gsub(" ","_",.organismName(.getMetaDataValue(con ,'Organism'))),
+        ORGANISMBIOCVIEW=gsub(" ","_",
+                              .organismName(.getMetaDataValue(con ,'Organism'))),
         TXDBOBJNAME=pkgName ## .makeObjectName(pkgName)
        )
     ## Should never happen
@@ -237,7 +243,8 @@ makeEnsembldbPackage <- function(ensdb,
     sqlfilename <- unlist(strsplit(ensdbfile, split=.Platform$file.sep))
     sqlfilename <- sqlfilename[ length(sqlfilename) ]
     dir.create(paste(c(destDir, pkgName, "inst", "extdata"),
-                      collapse=.Platform$file.sep), showWarnings=FALSE, recursive=TRUE)
+                     collapse=.Platform$file.sep),
+               showWarnings=FALSE, recursive=TRUE)
     db_path <- file.path(destDir, pkgName, "inst", "extdata",
                          paste(pkgName,"sqlite",sep="."))
     file.copy(ensdbfile, to=db_path)
@@ -267,7 +274,8 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version){
     if(any(!(wanted.features %in% levels(GTF$type)))){
         stop(paste0("One or more required types are not in the gtf file. Need ",
                     paste(wanted.features, collapse=","), " but got only ",
-                    paste(wanted.features[wanted.features %in% levels(GTF$type)], collapse=","),
+                    paste(wanted.features[wanted.features %in% levels(GTF$type)],
+                          collapse=","),
                     "."))
     }
     ## transcript biotype?
@@ -404,8 +412,10 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     if(!missing(organism)){
         if(!is.na(orgFromFile)){
             if(organism != orgFromFile){
-                warning("User specified organism (", organism, ") is different to the one extracted",
-                        " from the file name (", orgFromFile, ")! Using the one defined by the user.")
+                warning("User specified organism (", organism,
+                        ") is different to the one extracted",
+                        " from the file name (", orgFromFile,
+                        ")! Using the one defined by the user.")
             }
         }
         orgFromFile <- organism
@@ -413,8 +423,10 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     if(!missing(genomeVersion)){
         if(!is.na(genFromFile)){
             if(genomeVersion != genFromFile){
-                warning("User specified genome version (", genomeVersion, ") is different to the one extracted",
-                        " from the file name (", genFromFile, ")! Using the one defined by the user.")
+                warning("User specified genome version (", genomeVersion,
+                        ") is different to the one extracted",
+                        " from the file name (", genFromFile,
+                        ")! Using the one defined by the user.")
             }
         }
         genFromFile <- genomeVersion
@@ -422,8 +434,10 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     if(!missing(version)){
         if(!is.na(ensFromFile)){
             if(version != ensFromFile){
-            warning("User specified Ensembl version (", version, ") is different to the one extracted",
-                    " from the file name (", ensFromFile, ")! Using the one defined by the user.")
+                warning("User specified Ensembl version (", version,
+                        ") is different to the one extracted",
+                        " from the file name (", ensFromFile,
+                        ")! Using the one defined by the user.")
             }
         }
         ensFromFile <- version
@@ -458,16 +472,18 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
         stop("This function supports only GFF version 3 files!")
     tmp <- tmp[grep(tmp, pattern="^#!")]
     if(length(tmp) > 0){
-        tmp <- gsub(tmp, pattern="^#!", replacement="")
-        Header <- do.call(rbind, strsplit(tmp, split="[ ]+"))
-        colnames(Header) <- c("name", "value")
-        if(any(Header[, "name"] == "genome-version")){
-            genFromHeader <- Header[Header[, "name"] == "genome-version", "value"]
-            if(genFromHeader != genFromFile){
-                warning("Genome version extracted from file name (", genFromFile,
-                        ") does not match the genome version specified inside the file (",
-                        genFromHeader, "). Will consider the one defined inside the file.")
-                genFromFile <- genFromHeader
+        ## Check if I can extract the genome-version
+        idx <- grep(tmp, pattern = "^#!genome-version")
+        if (length(idx) > 0) {
+            genFromHeader <- sub(tmp[idx], pattern = "^#!genome-version",
+                                 replacement = "")
+            genFromHeader <- gsub(genFromHeader, pattern = " ",
+                                  replacement = "", fixed = TRUE)
+            if (genFromHeader != genFromFile) {
+                warning("Genome version extracted from file name (",
+                        genFromFile, ") does not match genome version",
+                        " defined within the gff file (", genFromHeader,
+                        "). Will use the version defined within the gff.")
             }
         }
     }
@@ -486,12 +502,14 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     gffcols <- c("type", "ID", "Name", "Parent")
     if(!all(gffcols %in% colnames(mcols(theGff))))
         stop("Required columns/fields ",
-             paste(gffcols[!(gffcols %in% colnames(mcols(theGff)))], collapse=";"),
+             paste(gffcols[!(gffcols %in% colnames(mcols(theGff)))],
+                   collapse=";"),
              " not present in the GFF file!")
     enscols <- c("gene_id", "transcript_id", "exon_id", "rank", "biotype")
     if(!all(enscols %in% colnames(mcols(theGff))))
         stop("Required columns/fields ",
-             paste(enscols[!(enscols %in% colnames(mcols(theGff)))], collapse=";"),
+             paste(enscols[!(enscols %in% colnames(mcols(theGff)))],
+                   collapse=";"),
              " not present in the GFF file!")
     ## Subsetting to eventually speed up further processing.
     theGff <- theGff[, c(gffcols, enscols)]
@@ -534,24 +552,30 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     ## Check if I've got multiple parents...
     parentGenes <- theGff$Parent[idx]
     if(any(lengths(parentGenes) > 1))
-        stop("Transcripts with multiple parents in GFF element 'Parent' not (yet) supported!")
+        stop("Transcripts with multiple parents in GFF element 'Parent'",
+             " not (yet) supported!")
     theGff$type[idx] <- "transcript"
     ## Setting the gene_id for these guys...
-    theGff$gene_id[idx] <- unlist(sub(parentGenes, pattern="gene:", replacement="", fixed=TRUE))
+    theGff$gene_id[idx] <- unlist(sub(parentGenes, pattern="gene:",
+                                      replacement="", fixed=TRUE))
     ## The CDS:
     idx <- which(theGff$type == "CDS")
     parentTx <- theGff$Parent[idx]
     if(any(lengths(parentTx) > 1))
-        stop("CDS with multiple parent transcripts in GFF element 'Parent' not (yet) supported!")
-    theGff$transcript_id[idx] <- unlist(sub(parentTx, pattern="transcript:", replacement="", fixed=TRUE))
+        stop("CDS with multiple parent transcripts in GFF element 'Parent'",
+             " not (yet) supported!")
+    theGff$transcript_id[idx] <- unlist(sub(parentTx, pattern="transcript:",
+                                            replacement="", fixed=TRUE))
     message("OK")
 
     message("Processing exons...", appendLF=FALSE)
     idx <- which(!is.na(theGff$exon_id))
     parentTx <- theGff$Parent[idx]
     if(any(lengths(parentTx) > 1))
-        stop("Exons with multiple parent transcripts in GFF element 'Parent' not (yet) supported!")
-    theGff$transcript_id[idx] <- unlist(sub(parentTx, pattern="transcript:", replacement="", fixed=TRUE))
+        stop("Exons with multiple parent transcripts in GFF element 'Parent'",
+             " not (yet) supported!")
+    theGff$transcript_id[idx] <- unlist(sub(parentTx, pattern="transcript:",
+                                            replacement="", fixed=TRUE))
     message("OK")
 
     theGff <- theGff[theGff$type %in% c("gene", "transcript", "exon", "CDS")]
@@ -562,7 +586,8 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     message("Proceeding to create the database.")
 
     ## Proceed.
-    dbname <- ensDbFromGRanges(theGff, outfile=outfile, path=path, organism=orgFromFile,
+    dbname <- ensDbFromGRanges(theGff, outfile=outfile, path=path,
+                               organism=orgFromFile,
                                genomeVersion=genFromFile, version=ensFromFile)
 
     gtfFilename <- unlist(strsplit(gff, split=.Platform$file.sep))
@@ -593,7 +618,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
         stop("This method can only be called on GRanges objects!")
     ## check for missing parameters
     if(missing(organism)){
-        stop("The organism has to be specified (e.g. using organism=\"Homo_sapiens\")")
+        stop("The organism has to be specified (e.g. using",
+             " organism=\"Homo_sapiens\")")
     }
     if(missing(version)){
         stop("The Ensembl version has to be specified!")
@@ -620,7 +646,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     }
     if(missing(outfile)){
         ## use the organism, genome version and ensembl version as the file name.
-        outfile <- paste0(c(organism, genomeVersion, version, "sqlite"), collapse=".")
+        outfile <- paste0(c(organism, genomeVersion, version, "sqlite"),
+                          collapse=".")
         if(missing(path))
             path <- "."
         dbname <- paste0(path, .Platform$file.sep, outfile)
@@ -646,8 +673,10 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## metadata table:
     message("Processing metadata...", appendLF=FALSE)
     Metadata <- buildMetadata(organism, version, host="unknown",
-                              sourceFile="GRanges object", genomeVersion=genomeVersion)
-    dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE, row.names=FALSE)
+                              sourceFile="GRanges object",
+                              genomeVersion=genomeVersion)
+    dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE,
+                 row.names=FALSE)
     message("OK")
     ## Check if we've got column "type"
     if(!any(colnames(mcols(x)) == "type"))
@@ -668,7 +697,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## Just really require the gene_id...
     reqCols <- c("gene_id")
     if(length(dontHave) > 0){
-        mess <- paste0(" I'm missing column(s): ", paste0(sQuote(dontHave), collapse=","),
+        mess <- paste0(" I'm missing column(s): ", paste0(sQuote(dontHave),
+                                                          collapse=","),
                        ".")
         warning(mess, " The corresponding database column(s) will be empty!")
     }
@@ -733,8 +763,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     wouldBeNice <- c("transcript_id", "gene_id", txBiotypeCol)
     dontHave <- wouldBeNice[!(wouldBeNice %in% gotColumns)]
     if(length(dontHave) > 0){
-        mess <- paste0("I'm missing column(s): ", paste0(sQuote(dontHave), collapse=","),
-                       ".")
+        mess <- paste0("I'm missing column(s): ", paste0(sQuote(dontHave),
+                                                         collapse=","), ".")
         warning(mess, " The corresponding database columns will be empty!")
     }
     haveGot <- wouldBeNice[wouldBeNice %in% gotColumns]
@@ -772,7 +802,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
         colnames(tx) <- c(cn, dontHave)
     }
     ## Add columns for UTR
-    tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)), tx_cds_seq_end=rep(NA, nrow(tx)))
+    tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)),
+                tx_cds_seq_end=rep(NA, nrow(tx)))
     ## Process CDS...
     if(any(gotTypes == "CDS")){
         ## Only do that if we've got type == "CDS"!
@@ -780,9 +811,11 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
         CDS <- as.data.frame(x[x$type == "CDS", "transcript_id"])
         ##
         startByTx <- split(CDS$start, f=CDS$transcript_id)
-        cdsStarts <- unlist(lapply(startByTx, function(z){return(min(z, na.rm=TRUE))}))
+        cdsStarts <- unlist(lapply(startByTx,
+                                   function(z){return(min(z, na.rm=TRUE))}))
         endByTx <- split(CDS$end, f=CDS$transcript_id)
-        cdsEnds <- unlist(lapply(endByTx, function(z){return(max(z, na.rm=TRUE))}))
+        cdsEnds <- unlist(lapply(endByTx,
+                                 function(z){return(max(z, na.rm=TRUE))}))
         idx <- match(names(cdsStarts), tx$transcript_id)
         areNas <- is.na(idx)
         idx <- idx[!areNas]
@@ -791,12 +824,13 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
         tx[idx, "tx_cds_seq_start"] <- cdsStarts
         tx[idx, "tx_cds_seq_end"] <- cdsEnds
     }else{
-        mess <- " I can't find type=='CDS'! The resulting database will lack CDS information!"
+        mess <- paste0(" I can't find type=='CDS'! The resulting database",
+                       " will lack CDS information!")
         message(mess, appendLF = TRUE)
         warning(mess)
     }
-    colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id", "tx_biotype",
-                      "tx_cds_seq_start", "tx_cds_seq_end")
+    colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id",
+                      "tx_biotype", "tx_cds_seq_start", "tx_cds_seq_end")
     ## rearranging data.frame:
     tx <- tx[ , c("tx_id", "tx_biotype", "tx_seq_start", "tx_seq_end",
                   "tx_cds_seq_start", "tx_cds_seq_end", "gene_id")]
@@ -850,14 +884,16 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
         ## now trying to get the sequence lengths directly from Ensembl using internal
         ## functions from the GenomicFeatures package. I will use "try" to not break
         ## the call if no seqlengths are available.
-        seqlengths <- tryGetSeqinfoFromEnsembl(organism, version, seqnames=chroms$seq_name)
+        seqlengths <- tryGetSeqinfoFromEnsembl(organism, version,
+                                               seqnames=chroms$seq_name)
         if(nrow(seqlengths)>0){
             seqlengths <- seqlengths[seqlengths[, "name"] %in% rownames(chroms), ]
             chroms[seqlengths[, "name"], "seq_length"] <- seqlengths[, "length"]
         }
     }else{
         ## have seqinfo available.
-        chroms <- data.frame(seq_name=seqnames(Seqinfo), seq_length=seqlengths(Seqinfo),
+        chroms <- data.frame(seq_name=seqnames(Seqinfo),
+                             seq_length=seqlengths(Seqinfo),
                              is_circular=isCircular(Seqinfo))
     }
     ## write the table.
@@ -880,16 +916,19 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
 ## transcript coordinates, cds within transcript)
 checkValidEnsDb <- function(x){
     message("Checking transcripts...", appendLF=FALSE)
-    tx <- transcripts(x, columns=c("gene_id", "tx_id", "gene_seq_start", "gene_seq_end",
-                             "tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
-                             "tx_cds_seq_end"), return.type="DataFrame")
+    tx <- transcripts(x, columns=c("gene_id", "tx_id", "gene_seq_start",
+                                   "gene_seq_end", "tx_seq_start",
+                                   "tx_seq_end", "tx_cds_seq_start",
+                                   "tx_cds_seq_end"), return.type="DataFrame")
     ## check if the tx are inside the genes...
-    isInside <- tx$tx_seq_start >= tx$gene_seq_start & tx$tx_seq_end <= tx$gene_seq_end
+    isInside <- tx$tx_seq_start >= tx$gene_seq_start &
+        tx$tx_seq_end <= tx$gene_seq_end
     if(any(!isInside))
         stop("Start and end coordinates for ", sum(!isInside),
              "transcripts are not within the gene coordinates!")
     ## check cds coordinates
-    notInside <- which(!(tx$tx_cds_seq_start >= tx$tx_seq_start & tx$tx_cds_seq_end <= tx$tx_seq_end))
+    notInside <- which(!(tx$tx_cds_seq_start >= tx$tx_seq_start &
+                         tx$tx_cds_seq_end <= tx$tx_seq_end))
     if(length(notInside) > 0){
         stop("The CDS start and end coordinates for ", length(notInside),
              " transcripts are not within the transcript coordinates!")
@@ -897,10 +936,11 @@ checkValidEnsDb <- function(x){
     rm(tx)
     message("OK\nChecking exons...", appendLF=FALSE)
     ex <- exons(x, columns=c("exon_id", "tx_id", "exon_seq_start", "exon_seq_end",
-                       "tx_seq_start", "tx_seq_end", "seq_strand", "exon_idx"),
+                             "tx_seq_start", "tx_seq_end", "seq_strand", "exon_idx"),
                 return.type="data.frame")
     ## check if exons are within tx
-    isInside <- ex$exon_seq_start >= ex$tx_seq_start & ex$exon_seq_end <= ex$tx_seq_end
+    isInside <- ex$exon_seq_start >= ex$tx_seq_start &
+        ex$exon_seq_end <= ex$tx_seq_end
     if(any(!isInside))
         stop("Start and end coordinates for ", sum(!isInside),
              " exons are not within the transcript coordinates!")
@@ -912,8 +952,8 @@ checkValidEnsDb <- function(x){
                                    return(any(z != seq(1, length(z))))
                                }))
     if(any(Different)){
-        stop(paste0("Provided exon index in transcript does not match with ordering",
-                    " of the exons by chromosomal coordinates for",
+        stop(paste0("Provided exon index in transcript does not match with",
+                    " ordering of the exons by chromosomal coordinates for",
                     sum(Different), "of the", length(Different),
                     "transcripts encoded on the + strand!"))
     }
@@ -924,8 +964,8 @@ checkValidEnsDb <- function(x){
                                    return(any(z != seq(1, length(z))))
                                }))
     if(any(Different)){
-        stop(paste0("Provided exon index in transcript does not match with ordering",
-                    " of the exons by chromosomal coordinates for",
+        stop(paste0("Provided exon index in transcript does not match with",
+                    " ordering of the exons by chromosomal coordinates for",
                     sum(Different), "of the", length(Different),
                     "transcripts encoded on the - strand!"))
     }
@@ -962,8 +1002,9 @@ tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames){
                                                              extra_seqnames=seqnames),
         silent=TRUE)
     if(class(tmp)=="try-error"){
-        message(paste0("Unable to get sequence lengths from Ensembl plants for dataset: ",
-                       Dataset, ". Error was: ", message(tmp), "\n"))
+        message(paste0("Unable to get sequence lengths from Ensembl plants",
+                       " for dataset: ", Dataset, ". Error was: ",
+                       message(tmp), "\n"))
     }else{
         message("OK")
         return(tmp)
@@ -1010,24 +1051,27 @@ compareEnsDbs <- function(x, y){
     if(length(idx)>0)
         Messages["metadata"] <- "NOTE"
     ## check ensembl version
-    if(metadataX["ensembl_version", "value"] == metadataY["ensembl_version", "value"]){
+    if(metadataX["ensembl_version", "value"] ==
+       metadataY["ensembl_version", "value"]){
         cat(" Ensembl versions match.\n")
     }else{
-        cat(" WARNING: databases base on different Ensembl versions! Expect considerable differences!\n")
+        cat(" WARNING: databases base on different Ensembl versions!",
+            " Expect considerable differences!\n", sep = "")
         Messages["metadata"] <- "WARN"
     }
     ## genome build
     if(metadataX["genome_build", "value"] == metadataY["genome_build", "value"]){
         cat(" Genome builds match.\n")
     }else{
-        cat(" WARNING: databases base on different Genome builds! Expect considerable differences!\n")
+        cat(" WARNING: databases base on different Genome builds!",
+            " Expect considerable differences!\n", sep = "")
         Messages["metadata"] <- "WARN"
     }
     if(length(idx)>0){
         cat(" All differences: <name>: <value x> != <value y>\n")
         for(i in idx){
-            cat(paste("  - ", metadataX[i, "name"], ":", metadataX[i, "value"], " != ",
-                      metadataY[i, "value"], "\n"))
+            cat(paste("  - ", metadataX[i, "name"], ":", metadataX[i, "value"],
+                      " != ", metadataY[i, "value"], "\n"))
         }
     }
     cat(paste0("Done. Result: ", Messages["metadata"],"\n"))
@@ -1055,10 +1099,20 @@ compareChromosomes <- function(x, y){
     if(length(onlyX) > 0 | length(onlyY) > 0)
         Ret <- "WARN"
     cat(paste0( " Sequence names: (", length(inboth), ") common, (",
-               length(onlyX), ") only in x, (", length(onlyY), ") only in y.\n" ))
-    same <- length(which(chromX[inboth, "seqlengths"]==chromY[inboth, "seqlengths"]))
-    different <- length(inboth) - same
-    cat(paste0( " Sequence lengths: (",same, ") identical, (", different, ") different.\n" ))
+               length(onlyX), ") only in x, (", length(onlyY),
+               ") only in y.\n" ))
+    ## seqlengths:
+    if (!all.equal(chromX[inboth, "seqlengths"],
+                   chromY[inboth, "seqlengths"])) {
+        same <- length(which(chromX[inboth, "seqlengths"] ==
+                             chromY[inboth, "seqlengths"]))
+        different <- length(inboth) - same
+    } else {
+        same <- length(inboth)
+        different <- 0
+    }
+    cat(paste0( " Sequence lengths: (",same, ") identical, (",
+               different, ") different.\n" ))
     if(different > 0)
         Ret <- "WARN"
     cat(paste0("Done. Result: ", Ret,"\n"))
@@ -1079,12 +1133,14 @@ compareGenes <- function(x, y){
                length(onlyX), ") only in x, (", length(onlyY), ") only in y.\n"))
     ## seq names
     same <- length(
-        which(as.character(seqnames(genesX[inboth]))==as.character(seqnames(genesY[inboth])))
+        which(as.character(seqnames(genesX[inboth])) ==
+              as.character(seqnames(genesY[inboth])))
         )
     different <- length(inboth) - same
     if(different > 0)
         Ret <- "ERROR"
-    cat(paste0( " Sequence names: (",same, ") identical, (", different, ") different.\n" ))
+    cat(paste0( " Sequence names: (",same, ") identical, (",
+               different, ") different.\n" ))
     ## start
     same <- length(
         which(start(genesX[inboth]) == start(genesY[inboth]))
@@ -1155,7 +1211,8 @@ compareTx <- function(x, y){
     if(length(onlyX) > 0 | length(onlyY) > 0)
         Ret <- "WARN"
     cat(paste0(" transcript IDs: (", length(inboth), ") common, (",
-               length(onlyX), ") only in x, (", length(onlyY), ") only in y.\n"))
+               length(onlyX), ") only in x, (", length(onlyY),
+               ") only in y.\n"))
     ## start
     same <- length(
         which(start(txX[inboth]) == start(txY[inboth]))
@@ -1194,8 +1251,9 @@ compareTx <- function(x, y){
     cdsOnlyY <- txCdsY[!(txCdsY %in% txCdsX)]
     if((length(cdsOnlyX) > 0 | length(cdsOnlyY)) & Ret!="ERROR")
         Ret <- "ERROR"
-    cat(paste0(" Common transcripts with defined CDS: (",length(cdsInBoth), ") common, (",
-               length(cdsOnlyX), ") only in x, (", length(cdsOnlyY), ") only in y.\n"))
+    cat(paste0(" Common transcripts with defined CDS: (", length(cdsInBoth),
+               ") common, (", length(cdsOnlyX), ") only in x, (",
+               length(cdsOnlyY), ") only in y.\n"))
     same <- length(
         which(txX[cdsInBoth]$tx_cds_seq_start == txY[cdsInBoth]$tx_cds_seq_start)
     )
