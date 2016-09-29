@@ -40,6 +40,15 @@ test_genes_with_proteins <- function() {
     }
 }
 
+test_transcripts_with_proteins <- function() {
+    suppressWarnings(
+        res <- transcripts(edb, columns = c("tx_biotype", "protein_id",
+                                            "uniprot_id"),
+                           filter = GenenameFilter("ZBTB16"),
+                           return.type = "data.frame")
+    )
+}
+
 ############################################################
 ## Using protein data based filters.
 

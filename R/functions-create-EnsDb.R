@@ -1,3 +1,249 @@
+############################################################
+## Functions related to the creation of EnsDb databases.
+
+## Separate helper function for abbreviating the genus and species name strings
+## this simply makes the first character uppercase
+.organismName <- function(x){
+    substring(x, 1, 1) <- toupper(substring(x, 1, 1))
+    return(x)
+}
+
+.abbrevOrganismName <- function(organism){
+  spc <- unlist(strsplit(organism, "_"))
+  ## this assumes a binomial nomenclature has been maintained.
+  return(paste0(substr(spc[[1]], 1, 1), spc[[2]]))
+}
+
+## x has to be the connection to the database.
+.makePackageName <- function(x){
+    species <- .getMetaDataValue(x, "Organism")
+    ensembl_version <- .getMetaDataValue(x, "ensembl_version")
+    pkgName <- paste0("EnsDb.",.abbrevOrganismName(.organismName(species)),
+                      ".v", ensembl_version)
+    return(pkgName)
+}
+
+.makeObjectName <- function(pkgName){
+  strs <- unlist(strsplit(pkgName, "\\."))
+  paste(c(strs[2:length(strs)],strs[1]), collapse="_")
+}
+
+
+## retrieve Ensembl data
+## save all files to local folder.
+## returns the path where files have been saved to.
+fetchTablesFromEnsembl <- function(version, ensemblapi, user="anonymous",
+                                   host="ensembldb.ensembl.org", pass="",
+                                   port=5306, species="human"){
+    if(missing(version))
+        stop("The version of the Ensembl database has to be provided!")
+    ## setting the stage for perl:
+    fn <- system.file("perl", "get_gene_transcript_exon_tables.pl", package="ensembldb")
+    ## parameters: s, U, H, P, e
+    ## replacing white spaces with _
+    species <- gsub(species, pattern=" ", replacement="_")
+
+    cmd <- paste0("perl ", fn, " -s ", species," -e ", version,
+                  " -U ", user, " -H ", host, " -p ", port, " -P ", pass)
+    if(!missing(ensemblapi)){
+        Sys.setenv(ENS=ensemblapi)
+    }
+    system(cmd)
+    if(!missing(ensemblapi)){
+        Sys.unsetenv("ENS")
+    }
+
+    ## we should now have the files:
+    in_files <- c("ens_gene.txt", "ens_tx.txt", "ens_exon.txt",
+                  "ens_tx2exon.txt", "ens_chromosome.txt", "ens_metadata.txt")
+    ## check if we have all files...
+    all_files <- dir(pattern="txt")
+    if(sum(in_files %in% all_files)!=length(in_files))
+        stop("Something went wrong! I'm missing some of the txt files the perl script should have generated.")
+}
+
+
+####
+##
+## create a SQLite database containing the information defined in the txt files.
+makeEnsemblSQLiteFromTables <- function(path=".", dbname){
+    ## check if we have all files...
+    in_files <- c("ens_gene.txt", "ens_tx.txt", "ens_exon.txt",
+                  "ens_tx2exon.txt", "ens_chromosome.txt", "ens_metadata.txt")
+    ## check if we have all files...
+    all_files <- dir(path, pattern="txt")
+    if(sum(in_files %in% all_files)!=length(in_files))
+        stop("Something went wrong! I'm missing some of the txt files the perl script should have generated.")
+
+    ## read information
+    info <- read.table(paste0(path, .Platform$file.sep ,"ens_metadata.txt"), sep="\t",
+                       as.is=TRUE, header=TRUE)
+    species <- .organismName(info[ info$name=="Organism", "value" ])
+    ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
+    if(missing(dbname)){
+        dbname <- paste0("EnsDb.",substring(species, 1, 1),
+                         unlist(strsplit(species, split="_"))[ 2 ], ".v",
+                         info[ info$name=="ensembl_version", "value" ], ".sqlite")
+    }
+    con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
+
+    ## write information table
+    dbWriteTable(con, name="metadata", info, row.names=FALSE)
+
+    ## process chromosome
+    message("Processing 'chromosome' table ... ", appendLF = FALSE)
+    tmp <- read.table(paste0(path, .Platform$file.sep ,"ens_chromosome.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    tmp[, "seq_name"] <- as.character(tmp[, "seq_name"])
+    dbWriteTable(con, name="chromosome", tmp, row.names=FALSE)
+    rm(tmp)
+    message("OK")
+
+    message("Processing 'gene' table ... ", appendLF = FALSE)
+    ## process genes: some gene names might have fancy names...
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"), sep="\t", as.is=TRUE, header=TRUE,
+                      quote="", comment.char="" )
+    OK <- .checkIntegerCols(tmp)
+    dbWriteTable(con, name="gene", tmp, row.names=FALSE)
+    rm(tmp)
+    message("OK")
+
+    message("Processing 'trancript' table ... ", appendLF = FALSE)
+    ## process transcripts:
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"), sep="\t", as.is=TRUE, header=TRUE)
+    ## Fix the tx_cds_seq_start and tx_cds_seq_end columns: these should be integer!
+    suppressWarnings(
+        tmp[, "tx_cds_seq_start"] <- as.integer(tmp[, "tx_cds_seq_start"])
+    )
+    suppressWarnings(
+        tmp[, "tx_cds_seq_end"] <- as.integer(tmp[, "tx_cds_seq_end"])
+    )
+    OK <- .checkIntegerCols(tmp)
+    dbWriteTable(con, name="tx", tmp, row.names=FALSE)
+    rm(tmp)
+    message("OK")
+
+    ## process exons:
+    message("Processing 'exon' table ... ", appendLF = FALSE)
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_exon.txt"),
+                      sep = "\t", as.is = TRUE, header = TRUE)
+    OK <- .checkIntegerCols(tmp)
+    dbWriteTable(con, name="exon", tmp, row.names=FALSE)
+    rm(tmp)
+    message("OK")
+    message("Processing 'tx2exon' table ... ", appendLF = FALSE)
+    tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx2exon.txt"),
+                      sep = "\t", as.is = TRUE, header = TRUE)
+    OK <- .checkIntegerCols(tmp)
+    dbWriteTable(con, name="tx2exon", tmp, row.names = FALSE)
+    rm(tmp)
+    message("OK")
+
+    ## process proteins; if available.
+    prot_file <- paste0(path, .Platform$file.sep, "ens_protein.txt")
+    if (file.exists(prot_file)) {
+        message("Processing 'protein' table ... ", appendLF = FALSE)
+        tmp <- read.table(prot_file, sep = "\t", as.is = TRUE, header = TRUE)
+        OK <- .checkIntegerCols(tmp)
+        dbWriteTable(con, name = "protein", tmp, row.names = FALSE)
+        message("OK")
+        message("Processing 'uniprot' table ... ", appendLF = FALSE)
+        tmp <- read.table(paste0(path, .Platform$file.sep, "ens_uniprot.txt"),
+                          sep = "\t", as.is = TRUE, header = TRUE)
+        OK <- .checkIntegerCols(tmp)
+        dbWriteTable(con, name = "uniprot", tmp, row.names = FALSE)
+        message("OK")
+        message("Processing 'protein_domain' table ... ", appendLF = FALSE)
+        tmp <- read.table(paste0(path, .Platform$file.sep, "ens_protein_domain.txt"),
+                          sep = "\t", as.is = TRUE, header = TRUE)
+        OK <- .checkIntegerCols(tmp)
+        dbWriteTable(con, name = "protein_domain", tmp, row.names = FALSE)
+        message("OK")
+    }
+
+    ## Create indices
+    message("Creating indices ... ", appendLF = FALSE)
+    .createEnsDbIndices(con, proteins = file.exists(prot_file))
+    message("OK")
+    dbDisconnect(con)
+    ## done.
+    return(dbname)
+}
+
+############################################################
+## Simply checking that some columns are integer
+.checkIntegerCols <- function(x, columns = c("gene_seq_start", "gene_seq_end",
+                                             "tx_seq_start", "tx_seq_start",
+                                             "exon_seq_start", "exon_seq_end",
+                                             "exon_idx", "tx_cds_seq_start",
+                                             "tx_cds_seq_end", "prot_dom_start",
+                                             "prot_dom_end")) {
+    cols <- columns[columns %in% colnames(x)]
+    if(length(cols) > 0) {
+        sapply(cols, function(z) {
+            if(!is.integer(x[, z]))
+                stop("Column '", z,"' is not of type integer!")
+        })
+    }
+    return(TRUE)
+}
+
+
+####
+## the function that creates the annotation package.
+## ensdb should be a connection to an SQLite database, or a character string...
+makeEnsembldbPackage <- function(ensdb,
+                                 version,
+                                 maintainer,
+                                 author,
+                                 destDir=".",
+                                 license="Artistic-2.0"){
+    if(class(ensdb)!="character")
+        stop("ensdb has to be the name of the SQLite database!")
+    ensdbfile <- ensdb
+    ensdb <- EnsDb(x=ensdbfile)
+    con <- dbconn(ensdb)
+    pkgName <- .makePackageName(con)
+    ensembl_version <- .getMetaDataValue(con, "ensembl_version")
+    ## there should only be one template
+    template_path <- system.file("pkg-template",package="ensembldb")
+    ## We need to define some symbols in order to have the
+    ## template filled out correctly.
+    symvals <- list(
+        PKGTITLE=paste("Ensembl based annotation package"),
+        PKGDESCRIPTION=paste("Exposes an annotation databases generated from Ensembl."),
+        PKGVERSION=version,
+        AUTHOR=author,
+        MAINTAINER=maintainer,
+        LIC=license,
+        ORGANISM=.organismName(.getMetaDataValue(con ,'Organism')),
+        SPECIES=.organismName(.getMetaDataValue(con,'Organism')),
+        PROVIDER="Ensembl",
+        PROVIDERVERSION=as.character(ensembl_version),
+        RELEASEDATE= .getMetaDataValue(con ,'Creation time'),
+        SOURCEURL= .getMetaDataValue(con ,'ensembl_host'),
+        ORGANISMBIOCVIEW=gsub(" ","_",.organismName(.getMetaDataValue(con ,'Organism'))),
+        TXDBOBJNAME=pkgName ## .makeObjectName(pkgName)
+       )
+    ## Should never happen
+    if (any(duplicated(names(symvals)))) {
+        str(symvals)
+        stop("'symvals' contains duplicated symbols")
+    }
+    createPackage(pkgname=pkgName,
+                  destinationDir=destDir,
+                  originDir=template_path,
+                  symbolValues=symvals)
+    ## then copy the contents of the database into the extdata dir
+    sqlfilename <- unlist(strsplit(ensdbfile, split=.Platform$file.sep))
+    sqlfilename <- sqlfilename[ length(sqlfilename) ]
+    dir.create(paste(c(destDir, pkgName, "inst", "extdata"),
+                      collapse=.Platform$file.sep), showWarnings=FALSE, recursive=TRUE)
+    db_path <- file.path(destDir, pkgName, "inst", "extdata",
+                         paste(pkgName,"sqlite",sep="."))
+    file.copy(ensdbfile, to=db_path)
+}
+
+
 ####
 ## function to create a EnsDb object (or rather the SQLite database) from
 ## a Ensembl GTF file.
@@ -684,6 +930,7 @@ checkValidEnsDb <- function(x){
                     "transcripts encoded on the - strand!"))
     }
     message("OK")
+    return(TRUE)
 }
 
 
@@ -1042,7 +1289,7 @@ compareExons <- function(x, y){
 ##  The problem is that the genome version can also be . separated.
 ####------------------------------------------------------------
 isEnsemblFileName <- function(x){
-    x <- file.name(x)
+    x <- basename(x)
     ## If we split by ., do we get at least 4 elements?
     els <- unlist(strsplit(x, split=".", fixed=TRUE))
     if(length(els) < 4)
@@ -1071,7 +1318,7 @@ organismFromGtfFileName <- function(x){
 ##  finds a numeric value it returns it, otherwise it returns NA.
 ####------------------------------------------------------------
 ensemblVersionFromGtfFileName <- function(x){
-    x <- file.name(x)
+    x <- basename(x)
     els <- unlist(strsplit(x, split=".", fixed=TRUE))
     ## Ensembl version is the last numeric value in the file name.
     for(elm in rev(els)){
@@ -1090,7 +1337,7 @@ ensemblVersionFromGtfFileName <- function(x){
 ## the first element (i.e. organism), or the ensembl version, that is one left of
 ## the gtf.
 genomeVersionFromGtfFileName <- function(x){
-    x <- file.name(x)
+    x <- basename(x)
     els <- unlist(strsplit(x, split=".", fixed=TRUE))
     ensVer <- ensemblVersionFromGtfFileName(x)
     if(is.na(ensVer)){
@@ -1104,21 +1351,6 @@ genomeVersionFromGtfFileName <- function(x){
              " The file name does not follow the expected naming convention from Ensembl!")
     return(paste(els[2:(idx-1)], collapse="."))
 }
-old_ensemblVersionFromGtfFileName <- function(x){
-    tmp <- unlist(strsplit(x, split=.Platform$file.sep, fixed=TRUE))
-    splitty <- unlist(strsplit(tmp[length(tmp)], split=".", fixed=TRUE))
-    return(splitty[(grep(splitty, pattern="gtf")-1)])
-}
-
-## the genome build can also contain .! thus, I return everything which is not
-## the first element (i.e. organism), or the ensembl version, that is one left of
-## the gtf.
-old_genomeVersionFromGtfFileName <- function(x){
-    tmp <- unlist(strsplit(x, split=.Platform$file.sep, fixed=TRUE))
-    splitty <- unlist(strsplit(tmp[length(tmp)], split=".", fixed=TRUE))
-    gvparts <- splitty[2:(grep(splitty, pattern="gtf")-2)]
-    return(paste(gvparts, collapse="."))
-}
 
 ## Returns NULL if there was a problem.
 elementFromEnsemblFilename <- function(x, which=1){
@@ -1131,8 +1363,3 @@ elementFromEnsemblFilename <- function(x, which=1){
     return(splitty[which])
 }
 
-file.name <- function(x){
-    fn <- unlist(strsplit(x, split=.Platform$file.sep, fixed=TRUE))
-    fn <- fn[length(fn)]
-    return(fn)
-}
