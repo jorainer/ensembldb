@@ -78,6 +78,13 @@ EnsDb <- function(x){
     return(EDB)
 }
 
+## loadEnsDb <- function(x) {
+##     ## con <- ensDb( x )
+##     ## EDB <- new( "EnsDb", ensdb=con )
+##     return(EnsDb(x))
+## }
+
+
 ## x is the connection to the database, name is the name of the entry to fetch
 .getMetaDataValue <- function(x, name){
     return(dbGetQuery(x, paste0("select value from metadata where name='", name, "'"))[ 1, 1])
