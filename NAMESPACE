@@ -48,6 +48,8 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, gen
               threeUTRsByTranscript, getGeneRegionTrackForGviz, updateEnsDb,
               transcriptsByOverlaps, exonsByOverlaps, returnFilterColumns,
               "returnFilterColumns<-", useMySQL)
+## Protein data related stuff
+exportMethods(hasProteinData)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
 ## Methods for GenomeInfoDb and related stuff

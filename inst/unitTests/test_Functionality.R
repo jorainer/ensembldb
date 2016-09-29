@@ -1,5 +1,4 @@
 ## that's just a plain simple R-script calling the standard methods.
-
 library( "EnsDb.Hsapiens.v75" )
 DB <- EnsDb.Hsapiens.v75
 
@@ -502,6 +501,23 @@ notrun_lengthOf <- function(){
     head(Test)
 }
 
+test_buildQuery_getWhat <- function() {
+    library(RSQLite)
+    Q <- buildQuery(DB, columns = c("gene_name", "gene_id"))
+    checkEquals(Q, "select distinct gene.gene_name,gene.gene_id from gene")
 
+    gf <- GeneidFilter("ENSG00000000005")
+    Q <- buildQuery(DB, columns = c("gene_name", "exon_idx"),
+                    filter = list(gf))
+    res <- dbGetQuery(dbconn(DB), Q)
+    Q_2 <- paste0("select * from gene join tx on (gene.gene_id=tx.gene_id)",
+                  " join tx2exon on (tx.tx_id=tx2exon.tx_id) where",
+                  " gene.gene_id = 'ENSG00000000005'")
+    res_2 <- dbGetQuery(dbconn(DB), Q_2)
+    checkEquals(res, unique(res_2[, colnames(res)]))
+    res_3 <- ensembldb:::getWhat(DB, columns = c("gene_name", "exon_idx"),
+                                 filter = list(gf))
+    checkEquals(res_3, unique(res_2[, colnames(res_3)]))
+}
 
 
