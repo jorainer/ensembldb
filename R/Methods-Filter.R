@@ -931,3 +931,68 @@ setMethod("column", signature(object = "OnlyCodingTx", db = "EnsDb",
           function(object, db, with.tables, ...) {
               return("tx.tx_cds_seq_start")
 })
+
+.requireTable <- function(db, attr){
+    return(names(prefixColumns(db, columns=attr)))
+}
+## these function determine which tables we need for the submitted filters.
+setMethod("requireTable", signature(x="GeneidFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="gene_id"))
+          })
+setMethod("requireTable", signature(x="EntrezidFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="entrezid"))
+          })
+setMethod("requireTable", signature(x="GenebiotypeFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="gene_biotype"))
+          })
+setMethod("requireTable", signature(x="GenenameFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="gene_name"))
+          })
+setMethod("requireTable", signature(x="TxidFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="tx_id"))
+          })
+setMethod("requireTable", signature(x="TxbiotypeFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="tx_biotype"))
+          })
+setMethod("requireTable", signature(x="ExonidFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="exon_id"))
+          })
+setMethod("requireTable", signature(x="SeqnameFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="seq_name"))
+          })
+setMethod("requireTable", signature(x="SeqstrandFilter", db="EnsDb"),
+          function(x, db, ...){
+              return(.requireTable(db=db, attr="seq_name"))
+          })
+setMethod("requireTable", signature(x="SeqstartFilter", db="EnsDb"),
+          function(x, db, ...){
+              if(x@feature=="gene")
+                  return(.requireTable(db=db, attr="gene_seq_start"))
+              if(x@feature=="transcript" | x@feature=="tx")
+                  return(.requireTable(db=db, attr="tx_seq_start"))
+              if(x@feature=="exon")
+                  return(.requireTable(db=db, attr="exon_seq_start"))
+              return(NA)
+          })
+setMethod("requireTable", signature(x="SeqendFilter", db="EnsDb"),
+          function(x, db, ...){
+              if(x@feature=="gene")
+                  return(.requireTable(db=db, attr="gene_seq_end"))
+              if(x@feature=="transcript" | x@feature=="tx")
+                  return(.requireTable(db=db, attr="tx_seq_end"))
+              if(x@feature=="exon")
+                  return(.requireTable(db=db, attr="exon_seq_end"))
+              return(NA)
+          })
+setMethod("requireTable", signature(x = "SymbolFilter", db = "EnsDb"),
+          function(x, db, ...) {
+    return(.requireTable(db = db, attr = "gene_name"))
+})
