@@ -51,10 +51,7 @@ Collate:
     dbhelpers.R
     Methods.R
     Methods-Filter.R
-    loadEnsDb.R
-    makeEnsemblDbPackage.R
-    EnsDbFromGTF.R
-    runEnsDbApp.R
+    functions-create-EnsDb.R
     select-methods.R
     seqname-utils.R
     zzz.R
