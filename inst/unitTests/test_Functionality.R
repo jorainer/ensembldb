@@ -34,6 +34,13 @@ test_transcripts <- function(){
     checkEquals(order(Tns$seq_name, method = "radix"), 1:nrow(Tns))
 }
 
+test_promoters <- function() {
+    res <- promoters(DB, filter = GenenameFilter("ZBTB16"))
+    res_2 <- transcripts(DB, filter = GenenameFilter("ZBTB16"))
+    checkEquals(length(res), length(res_2))
+    checkTrue(all(width(res) == 2200))
+}
+
 test_transcriptsBy <- function(){
     ## Expect results on the forward strand to be ordered by tx_seq_start
     res <- transcriptsBy(DB, filter = list(SeqnameFilter("Y"),
@@ -267,6 +274,15 @@ test_UTRs <- function() {
     tx <- names(fUTRs)[3]
     checkGeneUTRs(fUTRs[[tx]], tUTRs[[tx]], cds[[tx]], tx = tx,
                   do.plot = do.plot)
+
+    res_1 <- ensembldb:::getUTRsByTranscript(DB, what = "five",
+                                             filter = TxidFilter("ENST00000335953"))
+    res_2 <- fiveUTRsByTranscript(DB, filter = TxidFilter("ENST00000335953"))
+    checkEquals(res_1, res_2)
+    res_1 <- ensembldb:::getUTRsByTranscript(DB, what = "three",
+                                             filter = TxidFilter("ENST00000335953"))
+    res_2 <- threeUTRsByTranscript(DB, filter = TxidFilter("ENST00000335953"))
+    checkEquals(res_1, res_2)
 }
 
 ## The "test_UTRs" has a very poor performance with the RSQLite 1.0.9011
@@ -451,7 +467,8 @@ test_lengthOf <- function(){
     )
     ## Check what would happen if we do it ourselfs...
     system.time(
-        lenY2 <- sum(width(reduce(exonsBy(DB, "tx", filter=SeqnameFilter("Y")))))
+        lenY2 <- sum(width(reduce(exonsBy(DB, "tx",
+                                          filter=SeqnameFilter("Y")))))
     )
     checkEquals(lenY, lenY2)
     ## Same for genes.
@@ -460,13 +477,17 @@ test_lengthOf <- function(){
     )
     ## Check what would happen if we do it ourselfs...
     system.time(
-        lenY2 <- sum(width(reduce(exonsBy(DB, "gene", filter=SeqnameFilter("Y")))))
+        lenY2 <- sum(width(reduce(exonsBy(DB, "gene",
+                                          filter=SeqnameFilter("Y")))))
     )
     checkEquals(lenY, lenY2)
     ## Just using the transcriptLengths
 
-
+    res <- ensembldb:::.transcriptLengths(DB, filter = GenenameFilter("ZBTB16"))
+    res_2 <- lengthOf(DB, "tx", filter = GenenameFilter("ZBTB16"))
+    checkEquals(sort(res$tx_len), unname(sort(res_2)))
 }
+
 
 ####============================================================
 ##  ExonrankFilter
@@ -520,4 +541,23 @@ test_buildQuery_getWhat <- function() {
     checkEquals(res_3, unique(res_2[, colnames(res_3)]))
 }
 
+test_toSaf <- function() {
+    txs <- transcriptsBy(DB, filter = GenenameFilter("ZBTB16"))
+    saf <- ensembldb:::.toSaf(txs)
+    checkEquals(nrow(saf), sum(lengths(txs)))
+    saf2 <- toSAF(txs)
+    checkEquals(saf2, saf)
+}
 
+test_disjointExons <- function() {
+    dje <- disjointExons(DB, filter = GenenameFilter("ZBTB16"))
+    exns <- exons(DB, filter = GenenameFilter("ZBTB16"))
+    ## Expect that dje is shorter than exns, since overlapping exon parts have
+    ## been fused.
+    checkTrue(length(dje) < length(exns))
+}
+
+test_getGeneRegionTrackForGviz <- function() {
+    res <- getGeneRegionTrackForGviz(DB, filter = GenenameFilter("ZBTB16"))
+    checkTrue(all(res$feature %in% c("protein_coding", "utr5", "utr3")))
+}

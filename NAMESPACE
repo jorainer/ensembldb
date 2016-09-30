@@ -36,17 +36,19 @@ export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage
 exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
               GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter,
               SeqnameFilter, SeqstrandFilter, SeqstartFilter, SeqendFilter,
-              GRangesFilter, ExonrankFilter, SymbolFilter)
+              GRangesFilter, ExonrankFilter, SymbolFilter,
+              ProteinidFilter, UniprotidFilter, ProtdomidFilter)
 ## for EnsFilter
 exportMethods(column, print, show, value, where, "condition<-", "value<-",
               seqnames, start, end, strand, seqlevels)
 ## for class EnsDb:
-exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, genes,
-              getGenomeFaFile, lengthOf, listColumns, listGenebiotypes, listTxbiotypes,
-              listTables, organism, seqinfo, toSAF, transcripts, transcriptsBy,
-              disjointExons, metadata, promoters, cdsBy, fiveUTRsByTranscript,
-              threeUTRsByTranscript, getGeneRegionTrackForGviz, updateEnsDb,
-              transcriptsByOverlaps, exonsByOverlaps, returnFilterColumns,
+exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy,
+              genes, getGenomeFaFile, lengthOf, listColumns, listGenebiotypes,
+              listTxbiotypes, listTables, organism, seqinfo, toSAF,
+              transcripts, transcriptsBy, disjointExons, metadata, promoters,
+              cdsBy, fiveUTRsByTranscript, threeUTRsByTranscript,
+              getGeneRegionTrackForGviz, updateEnsDb, transcriptsByOverlaps,
+              exonsByOverlaps, returnFilterColumns,
               "returnFilterColumns<-", useMySQL)
 ## Protein data related stuff
 exportMethods(hasProteinData)
@@ -57,9 +59,11 @@ exportMethods("seqlevelsStyle", "seqlevelsStyle<-", "supportedSeqlevelsStyles",
               seqlevels)
 
 ## constructors
-export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
-       TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,
-       SeqendFilter, EnsDb, GRangesFilter, ExonrankFilter, SymbolFilter)
+export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter,
+       TxidFilter, TxbiotypeFilter, ExonidFilter, SeqnameFilter,
+       SeqstrandFilter, SeqstartFilter, SeqendFilter, EnsDb, GRangesFilter,
+       ExonrankFilter, SymbolFilter, ProteinidFilter, UniprotidFilter,
+       ProtdomidFilter)
 
 
 

@@ -405,9 +405,66 @@ OnlyCodingTx <- function() {
 
 ############################################################
 ## ProteinidFilter
+setClass("ProteinidFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             value = "",
+             .valueIsCharacter = TRUE
+         ))
+ProteinidFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("ProteinidFilter", condition = condition,
+               value = as.character(value)))
+}
 
 ############################################################
 ## UniprotFilter
+setClass("UniprotidFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             value = "",
+             .valueIsCharacter = TRUE
+         ))
+UniprotidFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("UniprotidFilter", condition = condition,
+               value = as.character(value)))
+}
 
 ############################################################
-## ProtdomainidFilter
+## ProtdomidFilter
+setClass("ProtdomidFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             value = "",
+             .valueIsCharacter = TRUE
+         ))
+ProtdomidFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("ProtdomidFilter", condition = condition,
+               value = as.character(value)))
+}
