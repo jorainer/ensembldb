@@ -55,7 +55,7 @@ if($option{ h }){
   print("- ens_chromosome.txt: the information of all chromosomes (chromosome/sequence/contig names). \n");
   print("- ens_protein.txt: the mapping between (protein coding) transcripts and protein IDs including also the peptide sequence.\n");
   print("- ens_protein_domain.txt: provides for each protein all annotated protein domains along with their start and end coordinates on the protein sequence.");
-  print("- ens_uniprot.txt: provides the mapping between Ensembl protein IDs and Uniprot IDs (if available). The mapping can be 1:n.")
+  print("- ens_uniprot.txt: provides the mapping between Ensembl protein IDs and Uniprot IDs (if available). The mapping can be 1:n.");
   print("- ens_metadata.txt\n");
   exit 0;
 }
