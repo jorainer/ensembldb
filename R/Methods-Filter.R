@@ -13,7 +13,8 @@ validateConditionFilter <- function(object){
         }
     }else{
         ## condition has to be = < > >= <=
-        if(!any(c("=", ">", "<", ">=", "<=", "in", "not in")==object@condition)){
+        if(!any(c("=", ">", "<", ">=", "<=", "in", "not in") ==
+                object@condition)){
             return(paste0("only \"=\", \">\", \"<\", \">=\", \"<=\" , \"in\"",
                           " and \"not in\" are allowed for condition, ",
                           "I've got \"", object@condition, "\""))
@@ -33,8 +34,8 @@ validateConditionFilter <- function(object){
         }
         ## value has to be numeric!!!
         suppressWarnings(
-            if(any(is.na(is.numeric(vals))))
-                return(paste("value has to be numeric!!!"))
+            if(any(is.na(as.numeric(vals))))
+                return("value has to be numeric!!!")
         )
     }
     return(TRUE)
@@ -140,11 +141,26 @@ setMethod("value", signature(x="BasicFilter", db="EnsDb"),
               return(x@value)
           })
 setReplaceMethod("value", "BasicFilter", function(x, value){
-    if(is.numeric(value)){
-        x@.valueIsCharacter <- FALSE
-    }else{
-        x@.valueIsCharacter <- TRUE
+    ## Check if the value is what we expect it is!
+    if (x@.valueIsCharacter) {
+        value <- as.character(value)
+    } else {
+        if (!is.numeric(value)) {
+            if (is.character(value)) {
+                suppressWarnings(
+                    vals <- as.numeric(value)
+                )
+                if (any(is.na(vals)))
+                    stop("'value' is supposed to be a numeric value!")
+            } else
+                stop("'value' is supposed to be a numeric value!")
+        }
     }
+    ## if(is.numeric(value)){
+    ##     x@.valueIsCharacter <- FALSE
+    ## }else{
+    ##     x@.valueIsCharacter <- TRUE
+    ## }
     x@value <- as.character(value)
     ## Checking if condition matches the value.
     if(length(value) > 1){
@@ -187,7 +203,8 @@ setMethod("where", signature(object="list",db="missing", with.tables="missing"),
           })
 setMethod("where", signature(object="list",db="EnsDb", with.tables="missing"),
           function(object, db, with.tables, ...){
-              wherequery <- paste(" where", paste(unlist(lapply(object, where, db)),
+              wherequery <- paste(" where",
+                                  paste(unlist(lapply(object, where, db)),
                                                   collapse=" and "))
               return(wherequery)
           })
@@ -1106,11 +1123,28 @@ setMethod("column", signature(object = "OnlyCodingTx", db = "EnsDb",
 ##     Methods for ProteinidFilter classes.
 ##
 ##***********************************************************************
+##' @aliases where,ProteinidFilter,EnsDb,missing-method
+##' where,ProteinidFilter,EnsDb,character-method
+##' column,ProteinidFilter,EnsDb,missing-method
+##' column,ProteinidFilter,EnsDb,character-method
+##' @note The \code{column} and \code{where} methods for the filter objects are
+##' for internal use and not meant to be called directly by the user.
+##' @param object A \code{ProteinidFilter}, \code{UniprotidFilter} or a
+##' \code{ProtdomidFilter} object.
+##' @param db Either missing or an \code{\linkS4class{EnsDb}} object.
+##' @param with.tables Optional character vector specifying the database table
+##' names on which the query should be performed. For internal use only.
+##' @return For \code{where}: A character with the \emph{where} condition of
+##' the SQL query to be executed in the database.
+##' @return For \code{column}: A character specifying the database column name
+##' on which the filter will be applied.
+##' @rdname ProteinFilters
 setMethod("where", signature(object = "ProteinidFilter", db = "missing",
                              with.tables = "missing"),
           function(object, db, with.tables, ...){
               return(paste(column(object), callNextMethod()))
           })
+##' @rdname ProteinFilters
 setMethod("column", signature(object = "ProteinidFilter", db = "missing",
                               with.tables = "missing"),
           function(object, db, with.tables, ...){
@@ -1153,11 +1187,17 @@ setMethod("column", signature(object = "ProteinidFilter", db = "EnsDb",
 ##     Methods for UniprotidFilter classes.
 ##
 ##***********************************************************************
+##' @aliases where,UniprotidFilter,EnsDb,missing-method
+##' where,UniprotidFilter,EnsDb,character-method
+##' column,UniprotidFilter,EnsDb,missing-method
+##' column,ProteinidFilter,EnsDb,character-method
+##' @rdname ProteinFilters
 setMethod("where", signature(object = "UniprotidFilter", db = "missing",
                              with.tables = "missing"),
           function(object, db, with.tables, ...){
               return(paste(column(object), callNextMethod()))
           })
+##' @rdname ProteinFilters
 setMethod("column", signature(object = "UniprotidFilter", db = "missing",
                               with.tables = "missing"),
           function(object, db, with.tables, ...){
@@ -1200,11 +1240,17 @@ setMethod("column", signature(object = "UniprotidFilter", db = "EnsDb",
 ##     Methods for ProtdomidFilter classes.
 ##
 ##***********************************************************************
+##' @aliases where,ProtdomidFilter,EnsDb,missing-method
+##' where,ProtdomidFilter,EnsDb,character-method
+##' column,ProtdomidFilter,EnsDb,missing-method
+##' column,ProtdomidFilter,EnsDb,character-method
+##' @rdname ProteinFilters
 setMethod("where", signature(object = "ProtdomidFilter", db = "missing",
                              with.tables = "missing"),
           function(object, db, with.tables, ...){
               return(paste(column(object), callNextMethod()))
           })
+##' @rdname ProteinFilters
 setMethod("column", signature(object = "ProtdomidFilter", db = "missing",
                               with.tables = "missing"),
           function(object, db, with.tables, ...){
