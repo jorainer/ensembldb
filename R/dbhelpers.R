@@ -582,14 +582,20 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
                            indexLength, ");"))
     dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
     if (proteins) {
-        dbGetQuery(con, paste0("create index protein_tx_id_idx on protein (tx_id",
-                               indexLength, ");"))
-        dbGetQuery(con, paste0("create index protein_protein_id_idx on protein",
-                               " (protein_id", indexLength, ");"))
-        dbGetQuery(con, paste0("create index uniprot_protein_id_idx on uniprot",
-                               " (protein_id", indexLength, ");"))
+        dbGetQuery(con, paste0("create index protein_tx_id_idx on",
+                               " protein (tx_id", indexLength, ");"))
+        dbGetQuery(con, paste0("create index protein_protein_id_idx",
+                               " on protein (protein_id", indexLength, ");"))
+        dbGetQuery(con, paste0("create index uniprot_protein_id_idx",
+                               " on uniprot (protein_id", indexLength, ");"))
+        dbGetQuery(con, paste0("create index uniprot_uniprot_id_idx",
+                               " on uniprot (uniprot_id", indexLength, ");"))
         dbGetQuery(con, paste0("create index prot_dom_protein_id_idx on",
-                               " protein_domain (protein_id", indexLength, ");"))
+                               " protein_domain (protein_id",
+                               indexLength, ");"))
+        dbGetQuery(con, paste0("create index prot_dom_prodom_id_idx on",
+                               " protein_domain (protein_domain_id",
+                               indexLength, ");"))
     }
 }
 
