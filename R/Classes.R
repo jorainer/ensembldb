@@ -403,14 +403,81 @@ OnlyCodingTx <- function() {
     return(new("OnlyCodingTx"))
 }
 
+#' Protein annotation related filters
+#'
+#' @description These filters allow to query specific information from an
+#' \code{\linkS4class{EnsDb}} database. Filters should be created using the
+#' dedicated constructor functions \code{ProteinidFilter},
+#' \code{ProtdomidFilter} and \code{UniprotidFilter}. Protein annotation-based
+#' filters are:
+#'
+#' @slot condition The condition to be used in the filter.
+#' @slot value The value(s) for the filter.
+#' @note These filters can only be used if the \code{\linkS4class{EnsDb}}
+#' database contains protein annotations, i.e. if \code{\link{hasProteinData}}
+#' is \code{TRUE}. Also, only protein coding transcripts will have protein
+#' annotations available, thus, non-coding transcripts/genes will not be
+#' returned by the queries.
+#' @name ProteinFilters
+#' @seealso \link{RNA-DNA-filters} for filters using RNA/DNA annotations.
+#' @author Johannes Rainer
+#' @examples
+#' library(EnsDb.Hsapiens.v75)
+#' edb <- EnsDb.Hsapiens.v75
+#' ## Create a ProteinidFilter:
+#' pf <- ProteinidFilter("ENSP00000362111")
+#' pf
+#' ## Using this filter would retrieve all database entries matching the
+#' ## condition:
+#' where(pf)
+#' ## i.e. all entries that are associated with a protein with the ID
+#' ## "ENSP00000362111"
+#' if (hasProteinData(edb)) {
+#'     res <- genes(edb, filter = pf)
+#'     res
+#' }
+#'
+#' ## To get all entries except those associated with that protein:
+#' condition(pf) <- "!="
+#' where(pf)
+#'
+#' ## UniprotidFilter:
+#' uf <- UniprotidFilter("O60762")
+#' ## Get the transcripts encoding that protein:
+#' if (hasProteinData(edb)) {
+#'     transcripts(edb, filter = uf)
+#'     ## The mapping Ensembl protein ID to Uniprot ID can however be 1:n:
+#'     transcripts(edb, filter = TxidFilter("ENST00000371588"),
+#'         columns = c("protein_id", "uniprot_id"))
+#' }
+#'
+#' ## ProtdomidFilter:
+#' pdf <- ProtdomidFilter("PF00335")
+#' ## Also here we could get all transcripts related to that protein domain
+#' if (hasProteinData(edb)) {
+#'     transcripts(edb, filter = pdf, columns = "protein_id")
+#' }
+NULL
+#> NULL
+
 ############################################################
 ## ProteinidFilter
+##' @description The \code{ProteinidFilter} allows to filter based on the
+##' (Ensembl) protein ID of the (coding) transcripts' proteins.
+##' @rdname ProteinFilters
 setClass("ProteinidFilter", contains = "BasicFilter",
          prototype = list(
              condition = "=",
              value = "",
              .valueIsCharacter = TRUE
          ))
+##' @param value A character vector of length 1 or larger with the value(s)
+##' for the filter.
+##' @param condition A character of length 1 specifying the condition of the
+##' filter. Can be one of \code{"="}, \code{"!="}, \code{"like"}, or, for
+##' \code{value} of length larger 1 \code{"in"} and \code{"not in"}.
+##' @return For \code{ProteinidFilter}: A \code{ProteinidFilter} object.
+##' @rdname ProteinFilters
 ProteinidFilter <- function(value, condition = "=") {
     if (missing(value)) {
         stop("A filter without a value makes no sense!")
@@ -427,12 +494,18 @@ ProteinidFilter <- function(value, condition = "=") {
 
 ############################################################
 ## UniprotFilter
+##' @description The \code{UniprotidFilter} allows to retrieve annotations
+##' filtering by the provided Uniprot ID associated with the transcript's
+##' protein.
+##' @rdname ProteinFilters
 setClass("UniprotidFilter", contains = "BasicFilter",
          prototype = list(
              condition = "=",
              value = "",
              .valueIsCharacter = TRUE
          ))
+##' @return For \code{UniprotidFilter}: A \code{UniprotidFilter} object.
+##' @rdname ProteinFilters
 UniprotidFilter <- function(value, condition = "=") {
     if (missing(value)) {
         stop("A filter without a value makes no sense!")
@@ -449,12 +522,18 @@ UniprotidFilter <- function(value, condition = "=") {
 
 ############################################################
 ## ProtdomidFilter
+##' @description The \code{ProtdomidFilter} allows to retrieve entries from
+##' the database matching the provided filter criteria based on their protein
+##' domain ID (\emph{protein_domain_id}).
+##' @rdname ProteinFilters
 setClass("ProtdomidFilter", contains = "BasicFilter",
          prototype = list(
              condition = "=",
              value = "",
              .valueIsCharacter = TRUE
          ))
+##' @return For \code{ProtdomidFilter}: A \code{ProtdomidFilter} object.
+##' @rdname ProteinFilters
 ProtdomidFilter <- function(value, condition = "=") {
     if (missing(value)) {
         stop("A filter without a value makes no sense!")
