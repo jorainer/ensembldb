@@ -51,6 +51,79 @@ test_transcripts_with_proteins <- function() {
 
 ############################################################
 ## Using protein data based filters.
+test_ProteinidFilter <- function() {
+    pf <- ProteinidFilter("ABC")
+    checkEquals(value(pf), "ABC")
+    checkEquals(column(pf), "protein_id")
+    checkEquals(where(pf), "protein_id = 'ABC'")
+    if (hasProteinData(edb)) {
+        checkEquals(column(pf, edb), "protein.protein_id")
+        checkEquals(column(pf, edb, with.tables = "protein_domain"),
+                    "protein_domain.protein_id")
+        checkEquals(column(pf, edb, with.tables = "uniprot"),
+                    "uniprot.protein_id")
+        checkEquals(where(pf, edb), "protein.protein_id = 'ABC'")
+        checkEquals(where(pf, edb, with.tables = "uniprot"),
+                    "uniprot.protein_id = 'ABC'")
+    } else {
+        checkException(column(pf, edb))
+        checkException(where(pf, edb))
+        checkException(column(pf, edb, with.tables = "uniprot"))
+        checkException(where(pf, edb, with.tables = "uniprot"))
+    }
+    pf <- ProteinidFilter(c("A", "B"))
+    checkEquals(where(pf), "protein_id in ('A','B')")
+    checkException(ProteinidFilter("B", condition = ">"))
+}
+
+test_UniprotidFilter <- function() {
+    pf <- UniprotidFilter("ABC")
+    checkEquals(value(pf), "ABC")
+    checkEquals(column(pf), "uniprot_id")
+    checkEquals(where(pf), "uniprot_id = 'ABC'")
+    if (hasProteinData(edb)) {
+        checkEquals(column(pf, edb), "uniprot.uniprot_id")
+        checkEquals(column(pf, edb, with.tables = "protein_domain"),
+                    "protein_domain.protein_id")
+        checkEquals(column(pf, edb, with.tables = "uniprot"),
+                    "uniprot.protein_id")
+        checkEquals(where(pf, edb), "protein.protein_id = 'ABC'")
+        checkEquals(where(pf, edb, with.tables = "uniprot"),
+                    "uniprot.protein_id = 'ABC'")
+    } else {
+        checkException(column(pf, edb))
+        checkException(where(pf, edb))
+        checkException(column(pf, edb, with.tables = "uniprot"))
+        checkException(where(pf, edb, with.tables = "uniprot"))
+    }
+    pf <- UniprotidFilter(c("A", "B"))
+    checkEquals(where(pf), "uniprot_id in ('A','B')")
+    checkException(UniprotidFilter("B", condition = ">"))
+}
+
+test_ProtdomidFilter <- function() {
+    pf <- ProtdomidFilter("ABC")
+    checkEquals(value(pf), "ABC")
+    checkEquals(column(pf), "protein_domain_id")
+    checkEquals(where(pf), "protein_domain_id = 'ABC'")
+    if (hasProteinData(edb)) {
+        checkEquals(column(pf, edb), "protein_domain.protein_domain_id")
+        checkEquals(column(pf, edb, with.tables = "protein_domain"),
+                    "protein_domain.protein_domain_id")
+        checkEquals(where(pf, edb), "protein_domain.protein_domain_id = 'ABC'")
+        checkEquals(where(pf, edb, with.tables = "protein_domain"),
+                    "protein.protein_domain_id = 'ABC'")
+    } else {
+        checkException(column(pf, edb))
+        checkException(where(pf, edb))
+        checkException(column(pf, edb, with.tables = "protein_domain"))
+        checkException(where(pf, edb, with.tables = "protein_domain"))
+    }
+    pf <- ProtdomidFilter(c("A", "B"))
+    checkEquals(where(pf), "protein_domain_id in ('A','B')")
+    checkException(ProtdomidFilter("B", condition = ">"))
+}
+
 
 ############################################################
 ## The dedicated methods to fetch protein data.

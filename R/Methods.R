@@ -1363,7 +1363,8 @@ checkFilter <- function(x){
         if(is(x, "BasicFilter")){
             x <- list(x)
         }else{
-            stop("'filter' has to be a filter object or a list of filter objects!")
+            stop("'filter' has to be a filter object or a list of",
+                 " filter objects!")
         }
     }
     return(x)

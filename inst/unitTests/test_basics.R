@@ -4,6 +4,11 @@ library(EnsDb.Hsapiens.v75)
 library(RSQLite)
 edb <- EnsDb.Hsapiens.v75
 
+test_organism <- function() {
+    res <- organism(edb)
+    checkEquals(res, "Homo sapiens")
+}
+
 test_metadata <- function() {
     res <- metadata(edb)
     checkEquals(res, dbGetQuery(dbconn(edb), "select * from metadata"))
@@ -16,6 +21,32 @@ test_ensemblVersion <- function() {
 
 test_getMetadataValue <- function() {
     checkException(ensembldb:::getMetadataValue(edb))
+}
+
+test_seqinfo_seqlevels <- function() {
+    si <- seqinfo(edb)
+    checkTrue(is(si, "Seqinfo"))
+
+    sl <- seqlevels(edb)
+    library(RSQLite)
+    chrs <- dbGetQuery(dbconn(edb), "select seq_name from chromosome")[, 1]
+    checkTrue(all(sl %in% chrs))
+    checkTrue(all(seqlevels(si) %in% chrs))
+}
+
+test_ensVersionFromSourceUrl <- function() {
+    res <- ensembldb:::.ensVersionFromSourceUrl("ftp://ftp.ensembl.org/release-85/gtf")
+    checkEquals(res, 85)
+}
+
+test_listBiotypes <- function() {
+    res <- listTxbiotypes(edb)
+    library(RSQLite)
+    res_2 <- dbGetQuery(dbconn(edb), "select distinct tx_biotype from tx")[, 1]
+    checkTrue(all(res %in% res_2))
+    res <- listGenebiotypes(edb)
+    res_2 <- dbGetQuery(dbconn(edb), "select distinct gene_biotype from gene")[, 1]
+    checkTrue(all(res %in% res_2))
 }
 
 test_listTables <- function() {
@@ -110,3 +141,11 @@ test_properties <- function(){
     checkEquals(length(ensembldb:::properties(edb)),
                 length(origProps) + 1)
 }
+
+test_checkFilter <- function() {
+    checkException(ensembldb:::checkFilter("a"))
+    checkException(ensembldb:::checkFilter(list("b", GenenameFilter("b"))))
+    flts <- list(GenenameFilter("a"), TxbiotypeFilter("b"))
+    checkEquals(flts, ensembldb:::checkFilter(flts))
+}
+
