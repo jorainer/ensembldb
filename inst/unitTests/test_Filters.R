@@ -210,6 +210,14 @@ test_GRangesFilter <- function() {
                 "exon_seq_start >= 1 and exon_seq_end <= 5 and seq_name == 'a'")
 }
 
+test_strand2something <- function() {
+    checkEquals(ensembldb:::strand2num("+"), 1)
+    checkEquals(ensembldb:::strand2num("-"), -1)
+    checkException(ensembldb:::strand2num("a"))
+    checkEquals(ensembldb:::num2strand(-1), "-")
+    checkEquals(ensembldb:::num2strand(1), "+")
+}
+
 ## SeqnameFilter
 test_SeqnameFilter <- function(){
     Filt <- SeqnameFilter("a")
