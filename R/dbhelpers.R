@@ -561,42 +561,51 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     return(TRUE)
 }
 ## Small helper function to cfeate all the indices.
-.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) {
-    dbGetQuery(con, paste0("create index seq_name_idx on chromosome (seq_name",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index gene_gene_id_idx on gene (gene_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index gene_gene_name_idx on gene (gene_name",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index gene_seq_name_idx on gene (seq_name",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index tx_tx_id_idx on tx (tx_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index tx_gene_id_idx on tx (gene_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index exon_exon_id_idx on exon (exon_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index t2e_tx_id_idx on tx2exon (tx_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index t2e_exon_id_idx on tx2exon (exon_id",
-                           indexLength, ");"))
-    dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
-    if (proteins) {
-        dbGetQuery(con, paste0("create index protein_tx_id_idx on",
-                               " protein (tx_id", indexLength, ");"))
-        dbGetQuery(con, paste0("create index protein_protein_id_idx",
-                               " on protein (protein_id", indexLength, ");"))
-        dbGetQuery(con, paste0("create index uniprot_protein_id_idx",
-                               " on uniprot (protein_id", indexLength, ");"))
-        dbGetQuery(con, paste0("create index uniprot_uniprot_id_idx",
-                               " on uniprot (uniprot_id", indexLength, ");"))
-        dbGetQuery(con, paste0("create index prot_dom_protein_id_idx on",
-                               " protein_domain (protein_id",
-                               indexLength, ");"))
-        dbGetQuery(con, paste0("create index prot_dom_prodom_id_idx on",
-                               " protein_domain (protein_domain_id",
-                               indexLength, ");"))
+.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) main = "protein_id")
     }
+    for (i in 1:length(indexCols)) {
+        tabname <- names(indexCols)[i]
+        colname <- indexCols[i]
+        dbGetQuery(con, paste0("create index ", tabname, "_", colname, "_idx ",
+                                "on ", tabname, " (",colname, indexLength,")"))
+    }
+    ## Add the one on the numeric index:
+    dbGetQuery(con, "create index tx2exon_exon_idx_idx on tx2exon (exon_idx);")
+    ## dbGetQuery(con, paste0("create index seq_name_idx on chromosome (seq_name",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index gene_gene_id_idx on gene (gene_id",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index gene_gene_name_idx on gene (gene_name",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index gene_seq_name_idx on gene (seq_name",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index tx_tx_id_idx on tx (tx_id",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index tx_gene_id_idx on tx (gene_id",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index exon_exon_id_idx on exon (exon_id",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index t2e_tx_id_idx on tx2exon (tx_id",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, paste0("create index t2e_exon_id_idx on tx2exon (exon_id",
+    ##                        indexLength, ");"))
+    ## dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
+    ## if (proteins) {
+    ##     dbGetQuery(con, paste0("create index protein_tx_id_idx on",
+    ##                            " protein (tx_id", indexLength, ");"))
+    ##     dbGetQuery(con, paste0("create index protein_protein_id_idx",
+    ##                            " on protein (protein_id", indexLength, ");"))
+    ##     dbGetQuery(con, paste0("create index uniprot_protein_id_idx",
+    ##                            " on uniprot (protein_id", indexLength, ");"))
+    ##     dbGetQuery(con, paste0("create index uniprot_uniprot_id_idx",
+    ##                            " on uniprot (uniprot_id", indexLength, ");"))
+    ##     dbGetQuery(con, paste0("create index prot_dom_protein_id_idx on",
+    ##                            " protein_domain (protein_id",
+    ##                            indexLength, ");"))
+    ##     dbGetQuery(con, paste0("create index prot_dom_prodom_id_idx on",
+    ##                            " protein_domain (protein_domain_id",
+    ##                            indexLength, ");"))
+    ## }
 }
 
 ############################################################

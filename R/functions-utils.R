@@ -54,6 +54,8 @@ checkOrderBy <- function(orderBy, supported = character()) {
 ## b) GRangesFilter: the feature is set based on the specified feature parameter
 ## Args:
 addFilterColumns <- function(cols, filter = list(), edb) {
+    if (missing(cols))
+        cols <- NULL
     gimmeAll <- returnFilterColumns(edb)
     if (!missing(filter)) {
         if(!is.list(filter))
