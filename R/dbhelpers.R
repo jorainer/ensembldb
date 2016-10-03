@@ -561,7 +561,15 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     return(TRUE)
 }
 ## Small helper function to cfeate all the indices.
-.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) main = "protein_id")
+.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) {
+    indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
+                   gene = "seq_name", tx = "tx_id", tx = "gene_id",
+                   exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
+    if (proteins) {
+        indexCols <- c(indexCols, protein = "tx_id", protein = "protein_id",
+                       uniprot = "protein_id", uniprot = "uniprot_id",
+                       protein_domain = "protein_domain_id",
+                       protein_domain = "protein_id")
     }
     for (i in 1:length(indexCols)) {
         tabname <- names(indexCols)[i]
