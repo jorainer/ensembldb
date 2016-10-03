@@ -488,4 +488,15 @@ notrun_test_newstuff <- function(){
     genomeStyles()
 }
 
+test_prefixChromName <- function() {
+    res <- ensembldb:::ucscToEns("chrY")
+    checkEquals(res, "Y")
+    res <- ensembldb:::prefixChromName("Y")
+    checkEquals(res, "Y")
+    useU <- getOption("ucscChromosomeNames", default = FALSE)
+    options(ucscChromosomeNames = TRUE)
+    res <- ensembldb:::prefixChromName("Y")
+    checkEquals(res, "chrY")
+    options(ucscChromosomeNames = useU)
+}
 
