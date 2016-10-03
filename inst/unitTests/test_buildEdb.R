@@ -105,4 +105,31 @@ test_ensDbFromGtf_Gff <- function() {
     checkEquals(res, "OK")
     res <- ensembldb:::compareExons(db_gtf, db_gff)
     checkEquals(res, "OK")
+    ## Compare them all in one call
+    res <- ensembldb:::compareEnsDbs(db_gtf, db_gff)
+    checkEquals(unname(res["metadata"]), "NOTE")
+    checkEquals(unname(res["chromosome"]), "OK")
+    checkEquals(unname(res["transcript"]), "OK")
+    checkEquals(unname(res["exon"]), "OK")
+}
+
+test_checkExtractVersions <- function() {
+    fn <- "Devosia_geojensis.ASM96941v1.32.gff3.gz"
+    res <- ensembldb:::.checkExtractVersions(fn)
+    checkEquals(unname(res["organism"]), "Devosia_geojensis")
+    checkEquals(unname(res["genomeVersion"]), "ASM96941v1")
+    checkEquals(unname(res["version"]), "32")
+    suppressWarnings(
+        res <- ensembldb:::.checkExtractVersions(fn, organism = "Homo_sapiens")
+        )
+    checkEquals(unname(res["organism"]), "Homo_sapiens")
+    checkException(ensembldb:::.checkExtractVersions("afdfhjd"))
+}
+
+test_buildMetadata <- function() {
+    res <- ensembldb:::buildMetadata(organism = "Mus_musculus",
+                                     ensemblVersion = "88",
+                                     genomeVersion = "38")
+    checkEquals(colnames(res), c("name", "value"))
+    checkEquals(res[res$name == "Organism", "value"], "Mus_musculus")
 }

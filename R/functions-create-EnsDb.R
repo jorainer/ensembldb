@@ -404,9 +404,10 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
         orgFromFile <- NA
         genFromFile <- NA
         if(missing(organism) | missing(genomeVersion) | missing(version))
-            stop("The file name does not match the expected naming scheme of Ensembl",
-                 " files hence I cannot extract any information from it! Parameters",
-                 " 'organism', 'genomeVersion' and 'version' are thus required!")
+            stop("The file name does not match the expected naming scheme",
+                 " of Ensembl files hence I cannot extract any information",
+                 " from it! Parameters 'organism', 'genomeVersion' and",
+                 " 'version' are thus required!")
     }
     ## Do some more testing with versions provided from the user.
     if(!missing(organism)){
