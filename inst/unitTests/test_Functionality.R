@@ -74,6 +74,13 @@ test_exonsBy <- function() {
                       columns = c("tx_name"))
     checkEquals(sort(colnames(mcols(ExnsBy[[1]]))),
                 sort(c("exon_id", "exon_rank", "tx_name")))
+    suppressWarnings(
+        ExnsBy <- exonsBy(DB, filter = list(SeqnameFilter("Y")), by = "tx",
+                          columns = c("tx_name"), use.names = TRUE)
+    )
+    checkEquals(sort(colnames(mcols(ExnsBy[[1]]))),
+                sort(c("exon_id", "exon_rank", "tx_name")))
+
 
     ## Check what happens if we specify tx_id.
     ExnsBy <- exonsBy(DB, filter=list(SeqnameFilter("Y")), by="tx",
@@ -514,6 +521,19 @@ test_lengthOf <- function(){
     res <- ensembldb:::.transcriptLengths(DB, filter = GenenameFilter("ZBTB16"))
     res_2 <- lengthOf(DB, "tx", filter = GenenameFilter("ZBTB16"))
     checkEquals(sort(res$tx_len), unname(sort(res_2)))
+    ## also cds lengths etc.
+    res <- ensembldb:::.transcriptLengths(DB, filter = GenenameFilter("ZBTB16"),
+                                          with.cds_len = TRUE,
+                                          with.utr5_len = TRUE,
+                                          with.utr3_len = TRUE)
+    checkEquals(colnames(res), c("tx_id", "gene_id", "nexon", "tx_len",
+                                 "cds_len", "utr5_len", "utr3_len"))
+    tx <- transcripts(DB, filter = list(GenenameFilter("ZBTB16"),
+                                        TxbiotypeFilter("protein_coding")))
+    checkTrue(all(!is.na(res[names(tx), "cds_len"])))
+    checkEquals(unname(res[names(tx), "tx_len"]),
+                unname(rowSums(res[names(tx),
+                                   c("utr5_len", "cds_len", "utr3_len")])))
 }
 
 
@@ -583,11 +603,17 @@ test_disjointExons <- function() {
     ## Expect that dje is shorter than exns, since overlapping exon parts have
     ## been fused.
     checkTrue(length(dje) < length(exns))
+    dje <- disjointExons(DB, filter = GenenameFilter("ZBTB16"),
+                         aggregateGenes = TRUE)
+    checkTrue(length(dje) < length(exns))
 }
 
 test_getGeneRegionTrackForGviz <- function() {
     res <- getGeneRegionTrackForGviz(DB, filter = GenenameFilter("ZBTB16"))
     checkTrue(all(res$feature %in% c("protein_coding", "utr5", "utr3")))
+    ## Do the same without a filter:
+    res <- getGeneRegionTrackForGviz(DB, chromosome = "11", start = 113930000,
+                                     end = 113935000)
 }
 
 test_addFilterColumns <- function() {

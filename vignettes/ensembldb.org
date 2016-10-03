@@ -39,7 +39,7 @@ vignette: >
 #+BEGIN_html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 12 September, 2016<br />
+**Modified**: 03 October, 2016<br />
 **Compiled**: `r date()`
 #+END_html
 
@@ -70,17 +70,16 @@ r=). That way we don't need to edit the resulting =Rmd= file.
 
 The =ensembldb= package provides functions to create and use transcript centric
 annotation databases/packages. The annotation for the databases are directly
-fetched from Ensembl [fn:1] using their Perl API.  The functionality and data is
-similar to that of the =TxDb= packages from the =GenomicFeatures= package, but,
-in addition to retrieve all gene/transcript models and annotations from the
+fetched from Ensembl [fn:1] using their Perl API. The functionality and data is
+similar to that of the =TxDb= packages from the =GenomicFeatures= package, but, in
+addition to retrieve all gene/transcript models and annotations from the
 database, the =ensembldb= package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
-region or transcript models of lincRNA genes.  In the databases, along with the
-gene and transcript models and their chromosomal coordinates, additional
-annotations including the gene name (symbol) and NCBI Entrezgene identifiers as
-well as the gene and transcript biotypes are stored too (see Section
-[[section.database.layout]] for the database layout and an overview of available
-attributes/columns).
+region or transcript models of lincRNA genes. From version 1.7 on =EnsDb=
+databases created by the =ensembldb= package contain also protein annotation data
+(see Section [[section.database.layout]] for the database layout and an overview of
+available attributes/columns). For more information on the use of the protein
+annotations refer to the /proteins/ vignette.
 
 Another main goal of this package is to generate /versioned/ annotation
 packages, i.e. annotation packages that are build for a specific Ensembl
@@ -151,6 +150,15 @@ alphabetical order):
 + =TxbiotypeFilter=: filter on the transcript biotype defined in Ensembl; use
   the =listTxbiotypes= method to list all available biotypes.
 + =TxidFilter=: filter on the Ensembl transcript identifiers.
+
+In addition to the above /DNA-RNA-based/ filters, the following /protein-specific/
+filters are available (Note however that these can only be used on =EnsDb=
+databases that provide such annotations, i.e. for which a call to =hasProteinData=
+returns =TRUE=):
+
++ =ProteinidFilter=: filter by Ensembl protein ID filters.
++ =UniprotidFilter=: filter by the Uniprot ID.
++ =ProtdomidFilter=: filter by the protein domain ID.
 
 Each of the filter classes can take a single value or a vector of values (with
 the exception of the =SeqendFilter= and =SeqstartFilter=) for comparison. In
@@ -786,7 +794,10 @@ functions allow to build EnsDb SQLite files from a =GRanges= object or GFF/GTF
 files from Ensembl (either provided as files or /via/ =AnnotationHub=). These
 functions do not depend on the Ensembl Perl API, but require a working internet
 connection to fetch the chromosome lengths from Ensembl as these are not
-provided within GTF or GFF files.
+provided within GTF or GFF files. Also note that protein annotations are usually
+not available in GTF or GFF files, thus, such annotations will not be included
+in the generated =EnsDb= database - protein annotations are only available in
+=EnsDb= databases created with the Ensembl Perl API.
 
 
 ** Building annotation packages
@@ -925,7 +936,9 @@ Below we create the annotation from a gtf file that we fetch directly from Ensem
 * Database layout<<section.database.layout>>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [[fig.database.layout]]):
+shown in Figure [[fig.database.layout]]). Note that the protein-specific annotations
+might not be available in all =EnsDB= databases (e.g. such ones created with
+=ensembldb= version < 1.7 or created from GTF or GFF files).
 
 + *gene*: all gene specific annotations.
   - =gene_id=: the Ensembl ID of the gene.
@@ -970,10 +983,36 @@ shown in Figure [[fig.database.layout]]):
   - =seq_length=: the length of the sequence.
   - =is_circular=: whether the sequence in circular.
 
-+ *information*: some additional, internal, informations (Genome build, Ensembl
++ *protein*: provides protein annotation for a (coding) transcript.
+  - =protein_id=: the Ensembl protein ID.
+  - =tx_id=: the transcript ID which CDS encodes the protein.
+  - =protein_sequence=: the peptide sequence of the protein (translated from the
+    transcript's coding sequence after applying eventual RNA editing).
+
++ *uniprot*: provides the mapping from Ensembl protein ID(s) to Uniprot ID(s). Not
+  all Ensembl proteins are annotated to Uniprot IDs, also, each Ensembl protein
+  might be mapped to multiple Uniprot IDs.
+  - =protein_id=: the Ensembl protein ID.
+  - =uniprot_id=: the Uniprot ID.
+
++ *protein_domain*: provides protein domain annotations and mapping to proteins.
+  - =protein_id=: the Ensembl protein ID on which the protein domain is present.
+  - =protein_domain_id=: the ID of the protein domain (from the protein domain
+    source).
+  - =protein_domain_source=: the source/analysis method in/by which the protein
+    domain was defined (such as pfam etc).
+  - =interpro_accession=: the Interpro accession ID of the protein domain.
+  - =prot_dom_start=: the start position of the protein domain within the
+    protein's sequence.
+  - =prot_dom_end=: the end position of the protein domain within the protein's
+    sequence.
+
++ *metadata*: some additional, internal, informations (Genome build, Ensembl
   version etc).
-  - =key=
+  - =name=
   - =value=
+
+
 
 + /virtual/ columns:
   - =symbol=: the database does not have such a database column, but it is still
@@ -981,6 +1020,9 @@ shown in Figure [[fig.database.layout]]):
     =gene_name= column.
   - =tx_name=: similar to the =symbol= column, this column is /symlinked/ to the =tx_id=
     column.
+
+The database layout: as already described above, protein related annotations
+(green) might not be available in each =EnsDb= database.
 
 #+ATTR_LATEX: :center :placement [h!] :width 14cm
 #+NAME: fig.database.layout

@@ -4,6 +4,12 @@ library(EnsDb.Hsapiens.v75)
 library(RSQLite)
 edb <- EnsDb.Hsapiens.v75
 
+test_show <- function() {
+    res <- capture.output(show(edb))
+    checkEquals(res[1], "EnsDb for Ensembl:")
+    checkEquals(res[9], "|ensembl_version: 75")
+}
+
 test_organism <- function() {
     res <- organism(edb)
     checkEquals(res, "Homo sapiens")
@@ -58,9 +64,39 @@ test_listTables <- function() {
                                   "chromosome", "protein", "uniprot",
                                   "protein_domain", "metadata"))
     }
+    ## Repeat with deleting the cached tables
+    edb@tables <- list()
+    res <- listTables(edb)
+    if (!hasProteinData(edb)) {
+        checkEquals(names(res), names(ensembldb:::.ENSDB_TABLES))
+    } else {
+        checkEquals(names(res), c("gene", "tx", "tx2exon", "exon",
+                                  "chromosome", "protein", "uniprot",
+                                  "protein_domain", "metadata"))
+    }
 }
 
 test_listColumns <- function() {
+    res <- listColumns(edb, table = "gene")
+    checkEquals(res, c(ensembldb:::.ENSDB_TABLES$gene, "symbol"))
+    res <- listColumns(edb, table = "tx")
+    checkEquals(res, c(ensembldb:::.ENSDB_TABLES$tx, "tx_name"))
+    res <- listColumns(edb, table = "exon")
+    checkEquals(res, c(ensembldb:::.ENSDB_TABLES$exon))
+    res <- listColumns(edb, table = "chromosome")
+    checkEquals(res, c(ensembldb:::.ENSDB_TABLES$chromosome))
+    res <- listColumns(edb, table = "tx2exon")
+    checkEquals(res, c(ensembldb:::.ENSDB_TABLES$tx2exon))
+    if (hasProteinData(edb)) {
+        res <- listColumns(edb, table = "protein")
+        checkEquals(res, ensembldb:::.ENSDB_PROTEIN_TABLES$protein)
+        res <- listColumns(edb, table = "uniprot")
+        checkEquals(res, ensembldb:::.ENSDB_PROTEIN_TABLES$uniprot)
+        res <- listColumns(edb, table = "protein_domain")
+        checkEquals(res, ensembldb:::.ENSDB_PROTEIN_TABLES$protein_domain)
+    }
+    ## Repeat with deleting the cached tables
+    edb@tables <- list()
     res <- listColumns(edb, table = "gene")
     checkEquals(res, c(ensembldb:::.ENSDB_TABLES$gene, "symbol"))
     res <- listColumns(edb, table = "tx")
@@ -91,6 +127,17 @@ test_cleanColumns <- function() {
     )
     checkEquals(cols[1:3], res)
     cols <- c("gene_id", "protein_id", "tx_id", "protein_sequence")
+    suppressWarnings(
+        res <- ensembldb:::cleanColumns(edb, cols)
+    )
+    if (hasProteinData(edb)) {
+        checkEquals(res, cols)
+    } else {
+        checkEquals(res, cols[c(1, 3)])
+    }
+    ## with full names:
+    cols <- c("gene.gene_id", "protein.protein_id", "tx.tx_id",
+              "protein_sequence")
     suppressWarnings(
         res <- ensembldb:::cleanColumns(edb, cols)
     )
