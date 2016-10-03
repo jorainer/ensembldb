@@ -272,7 +272,7 @@ test_SeqstartFilter <- function(){
     ## column
     checkEquals(column(Filt), "exon_seq_start")
     checkEquals(column(Filt, edb), "exon.exon_seq_start")
-    checkEquals(column(Filt, edb, with.tables = "exon"), "exon.tx_seq_start")
+    checkEquals(column(Filt, edb, with.tables = "exon"), "exon.exon_seq_start")
     ## where
     checkEquals(where(Filt), "exon_seq_start = 123")
     checkEquals(where(Filt, edb), "exon.exon_seq_start = 123")
@@ -309,8 +309,8 @@ test_SeqendFilter <- function(){
     checkEquals(column(Filt, edb), "exon.exon_seq_end")
     checkEquals(column(Filt, edb, with.tables = "exon"), "exon.exon_seq_end")
     ## where
-    checkEquals(where(Filt), "tx_seq_end = 123")
-    checkEquals(where(Filt, edb), "tx.tx_seq_end = 123")
+    checkEquals(where(Filt), "exon_seq_end = 123")
+    checkEquals(where(Filt, edb), "exon.exon_seq_end = 123")
     checkEquals(where(Filt, edb, with.tables = "exon"),
                 "exon.exon_seq_end = 123")
 }
