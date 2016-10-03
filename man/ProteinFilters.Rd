@@ -15,6 +15,7 @@
 \alias{column,ProteinidFilter,EnsDb,character-method}
 \alias{column,ProteinidFilter,EnsDb,missing-method}
 \alias{column,ProteinidFilter,missing,missing-method}
+\alias{column,UniprotidFilter,EnsDb,character-method}
 \alias{column,UniprotidFilter,EnsDb,missing-method}
 \alias{column,UniprotidFilter,missing,missing-method}
 \alias{where,ProtdomidFilter,EnsDb,character-method}
@@ -61,6 +62,8 @@ filter. Can be one of \code{"="}, \code{"!="}, \code{"like"}, or, for
 
 \item{with.tables}{Optional character vector specifying the database table
 names on which the query should be performed. For internal use only.}
+
+\item{...}{Optional additional arguments; currently not used.}
 }
 \value{
 For \code{ProteinidFilter}: A \code{ProteinidFilter} object.

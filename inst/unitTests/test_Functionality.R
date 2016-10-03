@@ -11,7 +11,8 @@ test_genes <- function(){
                  columns=c("gene_id", "tx_name"))
     checkEquals(colnames(Gns), c("gene_id", "tx_name", "seq_name"))
 
-    Gns <- genes(DB, filter=SeqnameFilter("Y"), columns=c("gene_id", "gene_name"))
+    Gns <- genes(DB, filter=SeqnameFilter("Y"), columns=c("gene_id",
+                                                          "gene_name"))
     ## Here we don't need the seqnames in mcols!
     checkEquals(colnames(mcols(Gns)), c("gene_id", "gene_name"))
 
@@ -24,7 +25,8 @@ test_transcripts <- function(){
     Tns <- transcripts(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
     checkEquals(sort(colnames(Tns)), sort(c(listColumns(DB, "tx"), "seq_name")))
 
-    Tns <- transcripts(DB, columns=c("tx_id", "tx_name"), filter=SeqnameFilter("Y"))
+    Tns <- transcripts(DB, columns=c("tx_id", "tx_name"),
+                       filter = SeqnameFilter("Y"))
     checkEquals(sort(colnames(mcols(Tns))), sort(c("tx_id", "tx_name")))
 
     ## Check the default ordering.
@@ -58,7 +60,8 @@ test_transcriptsBy <- function(){
 
 test_exons <- function(){
     Exns <- exons(DB, filter=SeqnameFilter("Y"), return.type="DataFrame")
-    checkEquals(sort(colnames(Exns)), sort(c(listColumns(DB, "exon"), "seq_name")))
+    checkEquals(sort(colnames(Exns)), sort(c(listColumns(DB, "exon"),
+                                             "seq_name")))
 
     ## Check correct ordering.
     Exns <- exons(DB, return.type = "data.frame", filter = SeqnameFilter(20:23))
@@ -128,10 +131,12 @@ test_promoters <- function(){
 
 test_return_columns_gene <- function(){
     cols <- c("gene_name", "tx_id")
-    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
+    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols,
+                  return.type = "data.frame")
     checkEquals(sort(c(cols, "seq_name", "gene_id")), sort(colnames(Resu)))
 
-    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
+    Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols,
+                  return.type = "DataFrame")
     checkEquals(sort(c(cols, "seq_name", "gene_id")), sort(colnames(Resu)))
 
     Resu <- genes(DB, filter=SeqnameFilter("Y"), columns=cols)
@@ -140,10 +145,12 @@ test_return_columns_gene <- function(){
 
 test_return_columns_tx <- function(){
     cols <- c("tx_id", "exon_id", "tx_biotype")
-    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
+    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols,
+                        return.type = "data.frame")
     checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
 
-    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
+    Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols,
+                        return.type = "DataFrame")
     checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
 
     Resu <- transcripts(DB, filter=SeqnameFilter("Y"), columns=cols)
@@ -151,10 +158,12 @@ test_return_columns_tx <- function(){
 }
 test_return_columns_exon <- function(){
     cols <- c("tx_id", "exon_id", "tx_biotype")
-    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="data.frame")
+    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols,
+                  return.type = "data.frame")
     checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
 
-    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols, return.type="DataFrame")
+    Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols,
+                  return.type = "DataFrame")
     checkEquals(sort(c(cols, "seq_name")), sort(colnames(Resu)))
 
     Resu <- exons(DB, filter=SeqnameFilter("Y"), columns=cols)
@@ -174,17 +183,20 @@ test_cdsBy <- function(){
     whichTx <- names(cs)[1]
     whichCs <- cs[[1]]
     tx <- transcripts(DB, filter=TxidFilter(whichTx),
-                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
-                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
+                      columns=c("tx_seq_start", "tx_seq_end",
+                                "tx_cds_seq_start", "tx_cds_seq_end",
+                                "exon_seq_start", "exon_seq_end",
                                 "exon_idx", "exon_id", "seq_strand"),
                       return.type="data.frame")
     checkSingleTx(tx=tx, cds=whichCs, do.plot=do.plot)
     ## Next one:
     whichTx <- names(cs)[2]
     tx <- transcripts(DB, filter=TxidFilter(whichTx),
-                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
-                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
-                                "exon_idx", "exon_id"), return.type="data.frame")
+                      columns=c("tx_seq_start", "tx_seq_end",
+                                "tx_cds_seq_start", "tx_cds_seq_end",
+                                "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id"),
+                      return.type="data.frame")
     checkSingleTx(tx=tx, cds=cs[[2]], do.plot=do.plot)
 
     ## Now for reverse strand:
@@ -192,9 +204,11 @@ test_cdsBy <- function(){
     whichTx <- names(cs)[1]
     whichCs <- cs[[1]]
     tx <- transcripts(DB, filter=TxidFilter(whichTx),
-                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
-                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
-                                "exon_idx", "exon_id"), return.type="data.frame")
+                      columns=c("tx_seq_start", "tx_seq_end",
+                                "tx_cds_seq_start", "tx_cds_seq_end",
+                                "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id"),
+                      return.type="data.frame")
     ## order the guys by seq_start
     whichCs <- whichCs[order(start(whichCs))]
     checkSingleTx(tx=tx, cds=whichCs, do.plot=do.plot)
@@ -202,9 +216,11 @@ test_cdsBy <- function(){
     whichTx <- names(cs)[2]
     whichCs <- cs[[2]]
     tx <- transcripts(DB, filter=TxidFilter(whichTx),
-                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
-                                "tx_cds_seq_end", "exon_seq_start", "exon_seq_end",
-                                "exon_idx", "exon_id"), return.type="data.frame")
+                      columns=c("tx_seq_start", "tx_seq_end",
+                                "tx_cds_seq_start", "tx_cds_seq_end",
+                                "exon_seq_start", "exon_seq_end",
+                                "exon_idx", "exon_id"),
+                      return.type="data.frame")
     ## order the guys by seq_start
     whichCs <- whichCs[order(start(whichCs))]
     checkSingleTx(tx=tx, cds=whichCs, do.plot=do.plot)
@@ -296,11 +312,13 @@ dontrun_test_UTRs_performance <- function() {
     ## 6.4 secs.
     system.time(fUTRs <- fiveUTRsByTranscript(DB,
                                               filter = list(SeqnameFilter("Y"),
-                                                            SeqstrandFilter("+"))))
+                                                            SeqstrandFilter("+")
+                                                            )))
     ## 6.4 secs.
     system.time(tUTRs <- threeUTRsByTranscript(DB,
                                                filter = list(SeqnameFilter("Y"),
-                                                             SeqstrandFilter("+"))))
+                                                             SeqstrandFilter("+")
+                                                             )))
     ## 6.3 secs.
     system.time(cds <- cdsBy(DB, "tx", filter = list(SeqnameFilter("Y"),
                                                      SeqstrandFilter("+"))))
@@ -332,7 +350,8 @@ checkGeneUTRs <- function(f, t, c, tx, do.plot=FALSE){
     }
     ## just plot...
     if(do.plot){
-        tx <- transcripts(DB, filter=TxidFilter(tx), columns=c("exon_seq_start", "exon_seq_end"),
+        tx <- transcripts(DB, filter=TxidFilter(tx),
+                          columns=c("exon_seq_start", "exon_seq_end"),
                           return.type="data.frame")
         XL <- range(c(start(f), start(c), start(t), end(f), end(c), end(t)))
         YL <- c(0, 4)
@@ -344,14 +363,17 @@ checkGeneUTRs <- function(f, t, c, tx, do.plot=FALSE){
         ## three UTR
         rect(xleft=start(t), xright=end(t), ybottom=2.1, ytop=2.9, col="red")
         ## all exons
-        rect(xleft=tx$exon_seq_start, xright=tx$exon_seq_end, ybottom=3.1, ytop=3.9)
+        rect(xleft=tx$exon_seq_start, xright=tx$exon_seq_end,
+             ybottom=3.1, ytop=3.9)
     }
 }
 
 checkSingleGene <- function(whichCs, gene, do.plot=FALSE){
     tx <- transcripts(DB, filter=GeneidFilter(gene),
-                      columns=c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start", "tx_cds_seq_end", "tx_id",
-                                "exon_id", "exon_seq_start", "exon_seq_end"), return.type="data.frame")
+                      columns=c("tx_seq_start", "tx_seq_end",
+                                "tx_cds_seq_start", "tx_cds_seq_end", "tx_id",
+                                "exon_id", "exon_seq_start", "exon_seq_end"),
+                      return.type="data.frame")
     XL <- range(tx[, c("tx_seq_start", "tx_seq_end")])
     tx <- split(tx, f=tx$tx_id)
     if(do.plot){
@@ -362,13 +384,16 @@ checkSingleGene <- function(whichCs, gene, do.plot=FALSE){
         for(i in 1:length(tx)){
             current <- tx[[i]]
             rect(xleft=current$exon_seq_start, xright=current$exon_seq_end,
-                 ybottom=rep((i-1+0.1), nrow(current)), ytop=rep((i-0.1), nrow(current)))
+                 ybottom=rep((i-1+0.1), nrow(current)), ytop=rep((i-0.1),
+                                                                 nrow(current)))
             ## coding:
             rect(xleft=current$tx_cds_seq_start, xright=current$tx_cds_seq_end,
-                 ybottom=rep((i-1+0.1), nrow(current)), ytop=rep((i-0.1), nrow(current)),
+                 ybottom=rep((i-1+0.1), nrow(current)), ytop=rep((i-0.1),
+                                                                 nrow(current)),
                  border="blue")
         }
-        rect(xleft=start(whichCs), xright=end(whichCs), ybottom=rep(length(tx)+0.1, length(whichCs)),
+        rect(xleft=start(whichCs), xright=end(whichCs),
+             ybottom=rep(length(tx)+0.1, length(whichCs)),
              ytop=rep(length(tx)+0.9, length(whichCs)), border="red")
     }
 }
@@ -389,7 +414,8 @@ checkSingleTx <- function(tx, cds, do.plot=FALSE){
         YL <- c(0, 4)
         plot(3, 3, pch=NA, xlim=XL, ylim=YL, xlab="", yaxt="n", ylab="")
         ## plotting the "real" exons:
-        rect(xleft=tx$exon_seq_start, xright=tx$exon_seq_end, ybottom=rep(0, nrow(tx)),
+        rect(xleft=tx$exon_seq_start, xright=tx$exon_seq_end,
+             ybottom=rep(0, nrow(tx)),
              ytop=rep(1, nrow(tx)))
         ## plotting the cds:
         rect(xleft=start(cds), xright=end(cds), ybottom=rep(1.2, nrow(tx)),
@@ -410,14 +436,16 @@ notrun_test_genetrack_df <- function(){
         chr <- 7
         start <- min(geneModels$start)
         end <- max(geneModels$end)
-        myGeneModels <- getGeneRegionTrackForGviz(DB, chromosome=chr, start=start,
+        myGeneModels <- getGeneRegionTrackForGviz(DB, chromosome=chr,
+                                                  start=start,
                                                   end=end)
         ## chromosome has to be the same....
         gtrack <- GenomeAxisTrack()
         gvizTrack <- GeneRegionTrack(geneModels, name="Gviz")
         ensdbTrack <- GeneRegionTrack(myGeneModels, name="ensdb")
         plotTracks(list(gtrack, gvizTrack, ensdbTrack))
-        plotTracks(list(gtrack, gvizTrack, ensdbTrack), from=26700000, to=26780000)
+        plotTracks(list(gtrack, gvizTrack, ensdbTrack), from=26700000,
+                   to=26780000)
         ## Looks very nice...
     }
     ## Put the stuff below into the vignette:
@@ -561,3 +589,15 @@ test_getGeneRegionTrackForGviz <- function() {
     res <- getGeneRegionTrackForGviz(DB, filter = GenenameFilter("ZBTB16"))
     checkTrue(all(res$feature %in% c("protein_coding", "utr5", "utr3")))
 }
+
+test_addFilterColumns <- function() {
+    filtList <- list(GenenameFilter("a"), SeqstartFilter(123, feature = "exon"),
+                     SymbolFilter("b"), TxidFilter("c"))
+    res <- ensembldb:::addFilterColumns(cols = c("a"), filter = filtList,
+                                        edb = DB)
+    checkEquals(res, c("a", "gene_name", "exon_seq_start", "symbol", "tx_id"))
+    res <- ensembldb:::addFilterColumns(filter = filtList,
+                                        edb = DB)
+    checkEquals(res, c("gene_name", "exon_seq_start", "symbol", "tx_id"))
+}
+

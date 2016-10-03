@@ -1134,6 +1134,7 @@ setMethod("column", signature(object = "OnlyCodingTx", db = "EnsDb",
 ##' @param db Either missing or an \code{\linkS4class{EnsDb}} object.
 ##' @param with.tables Optional character vector specifying the database table
 ##' names on which the query should be performed. For internal use only.
+##' @param ... Optional additional arguments; currently not used.
 ##' @return For \code{where}: A character with the \emph{where} condition of
 ##' the SQL query to be executed in the database.
 ##' @return For \code{column}: A character specifying the database column name
@@ -1190,7 +1191,7 @@ setMethod("column", signature(object = "ProteinidFilter", db = "EnsDb",
 ##' @aliases where,UniprotidFilter,EnsDb,missing-method
 ##' where,UniprotidFilter,EnsDb,character-method
 ##' column,UniprotidFilter,EnsDb,missing-method
-##' column,ProteinidFilter,EnsDb,character-method
+##' column,UniprotidFilter,EnsDb,character-method
 ##' @rdname ProteinFilters
 setMethod("where", signature(object = "UniprotidFilter", db = "missing",
                              with.tables = "missing"),
