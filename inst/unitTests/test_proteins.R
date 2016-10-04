@@ -6,46 +6,163 @@ edb <- EnsDb.Hsapiens.v75
 ############################################################
 ## Getting protein data in other methods.
 test_genes_with_proteins <- function() {
-    suppressWarnings(
+    if (hasProteinData(edb)) {
         res <- genes(edb, columns = c("gene_name", "gene_id", "protein_id",
-                                      "uniprot_id"),
+                                      "uniprot_id", "tx_id", "tx_biotype"),
                      filter = GenenameFilter("ZBTB16"),
                      return.type = "data.frame")
-    )
-    if (hasProteinData(edb)) {
         ## have a 1:n mapping of protein_id to uniprot id:
         checkTrue(length(unique(res$protein_id)) <
                   nrow(res))
         checkEquals(colnames(res), c("gene_name", "gene_id", "protein_id",
-                                     "uniprot_id"))
-    } else {
-        checkEquals(colnames(res), c("gene_name", "gene_id"))
-        checkEquals(nrow(res), length(unique(res$gene_id)))
-    }
-    ## Next one fetching also protein domain data.
-    suppressWarnings(
+                                     "uniprot_id", "tx_id", "tx_biotype"))
+        ## All protein_coding have an uniprot_id
+        checkTrue(all(!is.na(res[res$tx_biotype == "protein_coding",
+                                 "uniprot_id"])))
+        ## combine with cdsBy:
+        cds <- cdsBy(edb, columns = c("tx_biotype", "protein_id"),
+                     filter = GenenameFilter("ZBTB16"))
+        codingTx <- unique(res[!is.na(res$protein_id), "tx_id"])
+        checkEquals(sort(names(cds)), sort(codingTx))
+        ## Next one fetching also protein domain data.
         res <- genes(edb, columns = c("gene_name", "tx_id", "protein_id",
                                       "protein_domain_id"),
                      filter = GenenameFilter("ZBTB16"),
                      return.type = "data.frame")
-    )
-    if (hasProteinData(edb)) {
         checkEquals(colnames(res), c("gene_name", "tx_id", "protein_id",
                                      "protein_domain_id", "gene_id"))
         checkTrue(nrow(res) > length(unique(res$protein_id)))
         checkTrue(nrow(res) > length(unique(res$tx_id)))
-    } else {
-        checkEquals(colnames(res), c("gene_name", "tx_id", "gene_id"))
-        checkTrue(nrow(res) == length(unique(res$tx_id)))
     }
 }
 
+## transcripts
 test_transcripts_with_proteins <- function() {
-    suppressWarnings(
+    if (hasProteinData(edb)) {
         res <- transcripts(edb, columns = c("tx_biotype", "protein_id",
                                             "uniprot_id"),
-                           filter = GenenameFilter("ZBTB16"),
+                           filter = TxidFilter("ENST00000335953"),
                            return.type = "data.frame")
+        ## 1:1 mapping for tx_id <-> protein_id
+        checkTrue(nrow(unique(res[, c("tx_id", "protein_id")])) == 1)
+        ## Mapping tx_id -> uniprot_id is (0,1):n
+        checkTrue(nrow(res) > length(unique(res$tx_id)))
+        ## Add protein domains.
+        res <- transcripts(edb, columns = c("tx_biotype", "protein_id",
+                                            "uniprot_id",
+                                            "protein_domain_id"),
+                           filter = TxidFilter("ENST00000335953"),
+                           return.type = "data.frame")
+        resL <- split(res, f = res$uniprot_id)
+        ## All have the same protein domains:
+        resM <- do.call(rbind, lapply(resL, function(z) z$protein_domain_id))
+        checkEquals(nrow(unique(resM)), 1)
+    }
+}
+
+## exons
+test_exons_with_proteins <- function() {
+    if (hasProteinData(edb)) {
+        ## Check if a call that includes a protein_id returns same data than one
+        ## without.
+        exns <- exons(edb, filter = GenenameFilter("BCL2L11"),
+                      return.type = "data.frame")
+        exns_2 <- exons(edb, filter = GenenameFilter("BCL2L11"),
+                        return.type = "data.frame",
+                        columns = c("exon_id", "protein_id"))
+        checkEquals(sort(unique(exns$exon_id)),
+                    sort(unique(exns_2$exon_id)))
+        ## ZBTB16
+        exns <- exons(edb, filter = GenenameFilter("ZBTB16"),
+                      return.type = "data.frame")
+        exns_2 <- exons(edb, filter = GenenameFilter("ZBTB16"),
+                        return.type = "data.frame",
+                        columns = c("exon_id", "protein_id"))
+        checkEquals(sort(unique(exns$exon_id)),
+                    sort(unique(exns_2$exon_id)))
+    }
+}
+
+## exonsBy
+test_exonsBy_with_proteins <- function() {
+    if (hasProteinData(edb)) {
+        exns <- exonsBy(edb, filter = GenenameFilter("ZBTB16"),
+                        columns = "tx_biotype")
+        exns_2 <- exonsBy(edb, filter = GenenameFilter("ZBTB16"),
+                          columns = c("protein_id", "tx_biotype"))
+        checkEquals(names(exns), names(exns_2))
+        exns <- unlist(exns)
+        exns_2 <- unlist(exns_2)
+        checkTrue(any(is.na(exns_2$protein_id)))
+        checkEquals(exns$exon_id, exns_2$exon_id)
+    }
+}
+
+## transcriptsBy
+test_transcriptsBy_with_proteins <- function() {
+    if (hasProteinData(edb)) {
+        txs <- transcriptsBy(edb, filter = GenenameFilter("ZBTB16"),
+                             columns = "gene_biotype")
+        txs_2 <- transcriptsBy(edb, filter = GenenameFilter("ZBTB16"),
+                               columns = c("protein_id", "gene_biotype"))
+        checkEquals(names(txs), names(txs_2))
+        txs <- unlist(txs)
+        txs_2 <- unlist(txs_2)
+        checkTrue(any(is.na(txs_2$protein_id)))
+        checkEquals(start(txs), start(txs_2))
+    }
+}
+
+## cdsBy
+test_cdsBy_with_proteins <- function() {
+    if (hasProteinData(edb)) {
+        cds <- cdsBy(edb, filter = GenenameFilter("ZBTB16"),
+                     columns = "gene_biotype")
+        cds_2 <- cdsBy(edb, filter = GenenameFilter("ZBTB16"),
+                       columns = c("protein_id", "gene_biotype"))
+        checkEquals(names(cds), names(cds_2))
+        cds <- unlist(cds)
+        cds_2 <- unlist(cds_2)
+        checkTrue(all(!is.na(cds_2$protein_id)))
+        checkEquals(start(cds), start(cds_2))
+    }
+}
+
+## fiveUTRsByTranscript
+test_fiveUTRsByTranscript_with_proteins <- function() {
+    if (hasProteinData(edb)) {
+        utrs <- fiveUTRsByTranscript(edb, filter = GenenameFilter("ZBTB16"),
+                                     columns = "tx_biotype")
+        cds_2 <- cdsBy(edb, filter = GenenameFilter("ZBTB16"),
+                       columns = c("protein_id", "gene_biotype"))
+        checkEquals(names(cds), names(cds_2))
+        cds <- unlist(cds)
+        cds_2 <- unlist(cds_2)
+        checkTrue(all(!is.na(cds_2$protein_id)))
+        checkEquals(start(cds), start(cds_2))
+    }
+}
+
+############################################################
+## Tests using protein filters
+test_genes_with_protein_filters <- function() {
+    ## o ProteinidFilter
+    pif <- ProteinidFilter("ENSP00000376721")
+    gns <- genes(edb, filter = pif, return.type = "data.frame")
+    checkEquals(gns$gene_name, "ZBTB16")
+    ## o UniprotidFilter
+    uif <- UniprotidFilter("Q71UL7_HUMAN")
+    gns <- genes(edb, filter = uif, return.type = "data.frame",
+                 columns = c("protein_id", "gene_name", "tx_id"))
+    checkTrue("ENSP00000376721" %in% gns$protein_id)
+    checkTrue(nrow(gns) == 2)
+    ## o ProtdomidFilter
+    pdif <- ProtdomidFilter("PF00096")
+    system.time(
+        gns <- genes(edb, filter = list(pdif, GenenameFilter("ZBTB%", "like")),
+                     return.type = "data.frame",
+                     column = c("gene_name", "gene_biotype"))
+        checkTrue(all(gns$gene_biotype == "protein_coding"))
     )
 }
 
@@ -125,3 +242,8 @@ test_ProtdomidFilter <- function() {
 
 ############################################################
 ## The dedicated methods to fetch protein data.
+notrun_test_protein_domains <- function() {
+    res <- ensembldb:::getWhat(edb, columns = c("protein_id", "tx_id", "gene_id",
+                                                "gene_name"),
+                               filter = list(ProtdomidFilter("PF00096")))
+}
