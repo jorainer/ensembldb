@@ -170,6 +170,12 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     .createEnsDbIndices(con, proteins = file.exists(prot_file))
     message("OK")
     dbDisconnect(con)
+    ## Check if the data could be loaded.
+    message("Checking validity of the database ... ", appendLF = FALSE)
+    msg <- validObject(EnsDb(dbname))
+    if (!is.logical(msg))
+        stop(msg)
+    message("OK")
     ## done.
     return(dbname)
 }

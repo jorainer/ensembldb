@@ -317,60 +317,55 @@ test_joinQueryOnTables2_joinQueryOnColumns2 <- function() {
 ## from the database, e.g. if we query gene and join with protein that we don't
 ## miss any non-coding transcripts, or if we join protein with uniprot or
 ## protein_domain that we don't miss any values.
-test_outer_join_validity <- function() {
+test_query_validity <- function() {
+    ## Check RNA/DNA tables; shouldn't be a problem there, though.
+    Ygns <- genes(edb, filter = SeqnameFilter("Y"), return.type = "data.frame")
+    Ytxs <- transcripts(edb, filter = SeqnameFilter("Y"),
+                        return.type = "data.frame",
+                        columns = c("gene_id", "tx_id", "tx_biotype"))
+    Yexns <- exons(edb, filter = SeqnameFilter("Y"), return.type = "data.frame",
+                   columns = c("exon_id", "gene_id"))
+    checkTrue(all(unique(Ygns$gene_id) %in% unique(Yexns$gene_id)))
+    checkTrue(all(unique(Ygns$gene_id) %in% unique(Ytxs$gene_id)))
     ## Check gene with protein
     if (hasProteinData(edb)) {
         library(RSQLite)
-        gns <- genes(edb, filter = SeqnameFilter("Y"),
-                     return.type = "data.frame",
-                     columns = c("gene_id", "tx_id", "tx_biotype"))
+        ## Simulate what a simple join would do:
         gns_f <- dbGetQuery(dbconn(edb),
                             paste0("select gene.gene_id, tx.tx_id, tx_biotype, ",
                                    "protein_id from gene join tx on ",
                                    "(gene.gene_id=tx.gene_id) join protein on ",
                                    "(tx.tx_id=protein.tx_id) ",
                                    "where seq_name = 'Y'"))
-        gns_2 <- genes(edb, filter = SeqnameFilter("Y"),
-                       return.type = "data.frame",
-                       columns = c("gene_id", "tx_id", "tx_biotype",
-                                   "protein_id"))
-        checkTrue(nrow(gns_f) < nrow(gns_2))
-        checkTrue(all(unique(gns$gene_id) %in% unique(gns_2$gene_id)))
+        ## We expect that gns_f is smaller, but that all protein_coding tx are
+        ## there.
+        checkTrue(length(unique(gns_f$gene_id)) < length(unique(Ygns$gene_id)))
+        checkTrue(all(unique(Ytxs[Ytxs$tx_biotype == "protein_coding", "tx_id"])
+                      %in% unique(gns_f$tx_id)))
+        ## Now test the "real" query:
+        Ygns_2 <- genes(edb, filter = SeqnameFilter("Y"),
+                        return.type = "data.frame",
+                        columns = c("gene_id", "tx_id", "tx_biotype",
+                                    "protein_id"))
+        ## We expect that ALL genes are present and ALL tx:
+        checkTrue(all(unique(Ygns$gene_id) %in% unique(Ygns_2$gene_id)))
+        checkTrue(all(unique(Ygns$tx_id) %in% unique(Ygns_2$tx_id)))
 
-        ## Check transcript with protein
-        txs <- transcripts(edb, filter = SeqnameFilter("Y"),
-                           return.type = "data.frame",
-                           columns = c("tx_id", "tx_biotype"))
-        txs_f <- dbGetQuery(dbconn(edb),
-                            paste0("select tx.tx_id, tx_biotype, ",
-                                   "protein_id from ",
-                                   "tx join gene on (tx.gene_id=gene.gene_id) ",
-                                   "join protein on (tx.tx_id=protein.tx_id)",
-                                   " where seq_name = 'Y'"))
-        txs_2 <- transcripts(edb, filter = SeqnameFilter("Y"),
-                             return.type = "data.frame",
-                             columns = c("tx_id", "tx_biotype", "protein_id"))
-        checkTrue(nrow(txs_f) < nrow(txs_2))
-        checkTrue(all(unique(txs$tx_id) %in% unique(txs_2$tx_id)))
-        ## Just getting tx_id and prote_id;
-        txs_2 <- transcripts(edb, filter = SeqnameFilter("Y"),
-                             return.type = "data.frame",
-                             columns = c("tx_id", "protein_id"))
-        checkTrue(all(unique(txs$tx_id) %in% unique(txs_2$tx_id)))
+        ## Get all the tx with protein_id
+        txs <- transcripts(edb, columns = c("tx_id", "protein_id"),
+                           return.type = "data.frame")
+        txids <- dbGetQuery(dbconn(edb), "select tx_id from tx;")[, "tx_id"]
+        protids <- dbGetQuery(dbconn(edb),
+                              "select protein_id from protein;")[, "protein_id"]
+        checkTrue(all(txids %in% txs$tx_id))
+        checkTrue(all(protids %in% txs$protein_id))
 
         ## Check protein with uniprot
-        prts <- dbGetQuery(dbconn(edb), "select protein_id from protein")
-        prts_2 <- dbGetQuery(dbconn(edb),
-                             paste0("select protein.protein_id,uniprot_id from",
-                                    " protein left outer join",
-                                    " uniprot on (protein.protein_id=",
-                                    "uniprot.protein_id)"))
-        prts_f <- dbGetQuery(dbconn(edb),
-                             paste0("select * from protein join",
-                                    " uniprot on (protein.protein_id=",
-                                    "uniprot.protein_id)"))
-    ## Check protein with protein domain
-    ## Check protein_domain with uniprot
+        uniprotids <- dbGetQuery(dbconn(edb),
+                                 "select uniprot_id from uniprot")$uniprot_id
+
+        ## Check protein with protein domain
+        ## Check protein_domain with uniprot
     }
 }
 

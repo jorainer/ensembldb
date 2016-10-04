@@ -55,22 +55,42 @@ setMethod("metadata", "EnsDb", function(x, ...){
 validateEnsDb <- function(object){
     ## check if the database contains all required tables...
     if(!is.null(object@ensdb)){
+        msg <- validMsg(NULL, NULL)
         OK <- dbHasRequiredTables(object@ensdb)
         if (is.character(OK))
-            return(OK)
+            msg <- validMsg(msg, OK)
         OK <- dbHasValidTables(object@ensdb)
         if (is.character(OK))
-            return(OK)
+            msg <- validMsg(msg, OK)
         if (hasProteinData(object)) {
             OK <- dbHasRequiredTables(object@ensdb,
                                       tables = .ENSDB_PROTEIN_TABLES)
             if (is.character(OK))
-                return(OK)
+                msg <- validMsg(msg, OK)
             OK <- dbHasValidTables(object@ensdb,
                                    tables = .ENSDB_PROTEIN_TABLES)
             if (is.character(OK))
-                return(OK)
+                msg <- validMsg(msg, OK)
+            cdsTx <- dbGetQuery(dbconn(object),
+                                "select tx_id, tx_cds_seq_start from tx");
+            if (is.character(cdsTx$tx_cds_seq_start)) {
+                suppressWarnings(
+                    cdsTx[, "tx_cds_seq_start"] <- as.numeric(cdsTx$tx_cds_seq_start)
+                )
+            }
+            cdsTx <- cdsTx[!is.na(cdsTx$tx_cds_seq_start), "tx_id"]
+            protTx <- dbGetQuery(dbconn(object),
+                                 "select distinct tx_id from protein")$tx_id
+            if (!all(cdsTx %in% protTx))
+                msg <- validMsg(msg, paste0("Not all transcripts with a CDS ",
+                                            "are assigned to a protein ID!"))
+            if (!all(protTx %in% cdsTx))
+                msg <- validMsg(msg, paste0("Not all proteins are assigned to ",
+                                            "a transcript with a CDS!"))
+
         }
+        if (is.null(msg)) TRUE
+        else msg
     }
     return(TRUE)
 }
