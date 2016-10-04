@@ -92,7 +92,10 @@ or =transcripts= methods.
   txs
 #+END_SRC
 
-
+In addition to retrieve protein annotations from the database, we can also use
+protein data to filter the results. In the example below we fetch for example
+all genes from the database that have a certain protein domain in the protein
+encoded by any of its transcripts.
 
 * Retrieve proteins from the database
 
@@ -133,6 +136,10 @@ A) =proteins= returns a =GRanges= with start being 1, width being the length of 
 peptide and the seqname being the protein ID.
 
 
+** TODO Implement a =proteinDomains= method
+
+That's tricky, the same protein domain might be on several protein sequences.
+
 ** TODO How to handle the protein domain features?
 
 For these we've got just the start and end position within the protein
@@ -155,17 +162,22 @@ and =stop= if no protein data available.
 + [X] =UniprotFilter=
 + [X] =ProtdomFilter=
 
-** TODO Add a validation method for protein data[/]
-
-+ [ ] Check that all transcripts with a CDS have a protein.
+** DONE Add a validation method for protein data[1/2]
+   CLOSED: [2016-10-04 Tue 18:09]
+   - State "DONE"       from "TODO"       [2016-10-04 Tue 18:09]
++ [X] Check that all transcripts with a CDS have a protein.
 + [ ] Length of the protein sequence is the length of the CDS / 3.
 
-** TODO Add an argument =startWith= to the =.buildQuery= function.
-
+** DONE Add an argument =startWith= to the =.buildQuery= function.
+   CLOSED: [2016-10-04 Tue 15:29]
+   - State "DONE"       from "TODO"       [2016-10-04 Tue 15:29]
 ** TODO Add protein data to the =select= method
 
 Add the required functionality to allow querying protein data also with =select=
 and related methods
+
+
+** TODO Add protein data comparison to =compareEnsDb=.
 
 * Experimental perl code and docs				   :noexport:
 

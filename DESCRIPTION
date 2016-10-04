@@ -18,7 +18,8 @@ Imports:
     S4Vectors,
     AnnotationHub,
     Rsamtools,
-    IRanges
+    IRanges,
+    ProtGenerics
 Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.23.21),
