@@ -9,3 +9,6 @@ test_validity_functions <- function() {
     checkTrue(OK)
 }
 
+test_validateEnsDb <- function() {
+    checkTrue(ensembldb:::validateEnsDb(edb))
+}
