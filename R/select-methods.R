@@ -147,8 +147,9 @@ setMethod("select", "EnsDb",
     if (all(notAvailable))
         stop("None of the specified columns are avaliable in the database!")
     if (any(notAvailable)){
-        warning("The following columns are not available in the database and have",
-                " thus been removed: ", paste(columns[notAvailable], collapse = ", "))
+        warning("The following columns are not available in the database and",
+                " have thus been removed: ",
+                paste(columns[notAvailable], collapse = ", "))
         columns <- columns[!notAvailable]
     }
     ## keys:
@@ -157,18 +158,21 @@ setMethod("select", "EnsDb",
         keys <- list()
     } else {
         if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
-            stop("Argument keys should be a character vector, an object extending BasicFilter ",
-                 "or a list of objects extending BasicFilter.")
+            stop("Argument keys should be a character vector, an object",
+                 " extending BasicFilter",
+                 " or a list of objects extending BasicFilter.")
         if (is(keys, "list")) {
             if (!all(vapply(keys, is, logical(1L), "BasicFilter")))
-                stop("If keys is a list it should be a list of objects extending BasicFilter!")
+                stop("If keys is a list it should be a list of objects",
+                     " extending BasicFilter!")
         }
         if (is(keys, "BasicFilter")) {
             keys <- list(keys)
         }
         if (is(keys, "character")) {
             if (is.null(keytype)) {
-                stop("Argument keytype is mandatory if keys is a character vector!")
+                stop("Argument keytype is mandatory if keys is a",
+                     " character vector!")
             }
             ## Check also keytype:
             if (!(keytype %in% keytypes(x)))
@@ -183,17 +187,22 @@ setMethod("select", "EnsDb",
                 columns <- c(keytype, columns)
         }
     }
-    ## Map the columns to column names we have in the database and add filter columns too.
+    ## Map the columns to column names we have in the database and
+    ## add filter columns too.
     ensCols <- unique(c(ensDbColumnForColumn(x, columns),
                         addFilterColumns(character(), filter = keys, x)))
     ## OK, now perform the query given the filters we've got.
+    ## TODO @jo: fix the startWith argument!
+    ## o Use gene if we have any DNA/RNA related properties.
+    ## o Use protein for any other join.
     res <- getWhat(x, columns = ensCols, filter = keys)
     ## Order results if length of filters is 1.
     if (length(keys) == 1) {
         ## Define the filters on which we could sort.
-        sortFilts <- c("GenenameFilter", "GeneidFilter", "EntrezidFilter", "GenebiotypeFilter",
-                       "SymbolFilter", "TxidFilter", "TxbiotypeFilter", "ExonidFilter",
-                       "ExonrankFilter", "SeqnameFilter")
+        sortFilts <- c("GenenameFilter", "GeneidFilter", "EntrezidFilter",
+                       "GenebiotypeFilter", "SymbolFilter", "TxidFilter",
+                       "TxbiotypeFilter", "ExonidFilter", "ExonrankFilter",
+                       "SeqnameFilter")
         if (class(keys[[1]]) %in% sortFilts) {
             keyvals <- value(keys[[1]])
             ## Handle symlink Filter differently:
@@ -206,17 +215,14 @@ setMethod("select", "EnsDb",
         }
     } else {
         ## Show a mild warning message
-        message("Note: ordering of the results might not match ordering of keys!")
+        message(paste0("Note: ordering of the results might not match ordering",
+                       " of keys!"))
     }
     colMap <- .getColMappings(x)
     colnames(res) <- colMap[colnames(res)]
     rownames(res) <- NULL
     if (returnFilterColumns(x))
         return(res)
-    ## ## Now, if we've got a "TXNAME" in columns, we have to replace at least one of the "TXID"s
-    ## ## in the colnames...
-    ## if(any(columns == "TXNAME"))
-    ##     colnames(res)[match("TXID", colnames(res))] <- "TXNAME"
     return(res[, columns])
 }
 

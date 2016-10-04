@@ -32,8 +32,8 @@ vignette: >
 
 From Bioconductor release 3.5 on, =EnsDb= databases/packages created by the
 =ensembldb= package contain also, for transcripts with a coding regions, mappings
-between transcripts and proteins. Thus, in addition to the RNA based features
-also the following protein related information is available:
+between transcripts and proteins. Thus, in addition to the RNA/DNA-based
+features also the following protein related information is available:
 + =protein_id=: the Ensembl protein ID. This is the primary ID for the proteins
   defined in Ensembl.
 + =uniprot_id=: the Uniprot ID for a protein. Note that not every Ensembl
@@ -50,6 +50,62 @@ also the following protein related information is available:
   the protein.
 + =prot_dom_start=: the end position of the protein domain within the peptide
   sequence of the protein.
+
+Thus, for protein coding transcripts, these annotations can in addition be
+fetched from the database, given that protein annotations are available. Note
+that only =EnsDb= databases created through the Ensembl Perl API contain protein
+annotation, databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges=
+and =ensDbFromGtf= don't contain such information.
+
+#+NAME: loadlib
+#+BEGIN_SRC R
+  library(ensembldb)
+  library(EnsDb.Hsapiens.v75)
+  edb <- EnsDb.Hsapiens.v75
+  ## Evaluate whether we have protein annotation available
+  hasProteinData(edb)
+#+END_SRC
+
+If protein annotation is available, the additional tables and columns are also
+listed by the =listTables= and =listColumns= methods.
+
+#+NAME: listCols
+#+BEGIN_SRC R
+  listTables(edb)
+#+END_SRC
+
+In the following sections we show examples how to 1) fetch protein annotations
+as additional columns to gene/transcript annotations, 2) fetch protein
+annotation data and 3) map proteins to the genome.
+
+* Retrieve protein annotation for genes and transcripts
+
+Protein annotations for (protein coding) transcripts can be retrieved by simply
+adding the desired annotation columns to the =columns= parameter of the e.g. =genes=
+or =transcripts= methods.
+
+#+NAME: a_transcripts
+#+BEGIN_SRC R
+  ## Get also protein information for ZBTB16 transcripts
+  txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
+                     columns = c("protein_id", "uniprot_id"))
+  txs
+#+END_SRC
+
+
+
+* Retrieve proteins from the database
+
+Proteins can be fetched using the dedicated =proteins= method. Unlike DNA/RNA-based
+methods like =genes= or =transcripts=, protein related methods return protein
+centered coordinates. Thus, coordinates e.g. of protein domains are always
+relative to the peptide sequence of the protein.
+
+* Map proteins to the genome
+
+To map proteins to the genome, the =cdsBy= method can be used.
+
+
 
 * TODOs								   :noexport:
 
@@ -73,30 +129,38 @@ The question here is what =start= and =end= we put into the resulting =GRanges=
 object, /just/ the CDS coding start and end, or the individual start and end of
 all of its exons (same like for e.g. the =cdsBy= method)?
 
+A) =proteins= returns a =GRanges= with start being 1, width being the length of the
+peptide and the seqname being the protein ID.
+
+
 ** TODO How to handle the protein domain features?
 
 For these we've got just the start and end position within the protein
 sequence. We would have to calculate that back to genomic coordinates in case,
 or, just leave them as they are on per-protein coordinates.
 
-** TODO Add a =hasProtein= method for =EnsDb=
-
+** DONE Add a =hasProtein= method for =EnsDb=
+   CLOSED: [2016-10-03 Mon 13:43]
+   - State "DONE"       from "TODO"       [2016-10-03 Mon 13:43]
 Checks if the available /protein/ table is available.
 
-** TODO Add additional filters [/]
-
+** DONE Add additional filters [3/3]
+   CLOSED: [2016-10-03 Mon 13:44]
+   - State "DONE"       from "TODO"       [2016-10-03 Mon 13:44]
 These filters should check if the database has the required tables/columns
 available, i.e. should call =hasProtein= within the =column= and =where= methods
 and =stop= if no protein data available.
 
-+ [ ] =ProteinidFilter=
-+ [ ] =UniprotFilter=
++ [X] =ProteinidFilter=
++ [X] =UniprotFilter=
++ [X] =ProtdomFilter=
 
 ** TODO Add a validation method for protein data[/]
 
 + [ ] Check that all transcripts with a CDS have a protein.
 + [ ] Length of the protein sequence is the length of the CDS / 3.
 
+** TODO Add an argument =startWith= to the =.buildQuery= function.
 
 ** TODO Add protein data to the =select= method
 

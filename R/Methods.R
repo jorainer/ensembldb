@@ -20,10 +20,12 @@ setMethod("show", "EnsDb", function(object) {
         ## gene and transcript info.
         cat(paste0("| No. of genes: ",
                    dbGetQuery(object@ensdb,
-                              "select count(distinct gene_id) from gene")[1, 1], ".\n"))
+                              "select count(distinct gene_id) from gene")[1, 1],
+                   ".\n"))
         cat(paste0("| No. of transcripts: ",
                    dbGetQuery(object@ensdb,
-                              "select count(distinct tx_id) from tx")[1, 1], ".\n"))
+                              "select count(distinct tx_id) from tx")[1, 1],
+                   ".\n"))
         if (hasProteinData(object))
             cat("|Protein data available.\n")
     }
@@ -336,17 +338,17 @@ setMethod("cleanColumns", "EnsDb", function(x, columns, ...){
         stop("No columns submitted!")
     ## vote of the majority
     full.name <- length(grep(columns, pattern=".", fixed=TRUE)) >
-        floor(length(columns) /2)
-    if(full.name){
+        floor(length(columns) / 2)
+    if (full.name) {
         suppressWarnings(
             full.columns <- unlist(prefixColumns(x,
                                                  unlist(listTables(x)),
-                                                 clean=FALSE),
+                                                 clean = FALSE),
                                    use.names=TRUE)
-          )
+        )
         bm <- columns %in% full.columns
         removed <- columns[ !bm ]
-    }else{
+    } else {
         dbtabs <- names(listTables(x))
         dbtabs <- dbtabs[dbtabs != "metadata"]
         bm <- columns %in% unlist(listTables(x)[dbtabs])
@@ -464,11 +466,13 @@ setMethod("genes", "EnsDb", function(x,
             order.by <- ""
     }
     Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, order.type=order.type)
+                   order.by=order.by, order.type=order.type,
+                   startWith = "gene", join = "suggested")
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
-            warning(paste0("Columns ", paste(retColumns[notThere], collapse=", "),
+            warning(paste0("Columns ",
+                           paste(retColumns[notThere], collapse=", "),
                            " not present in the result data.frame!"))
         retColumns <- retColumns[!notThere]
         Res <- Res[, retColumns]
@@ -533,11 +537,13 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
             order.by <- ""
     }
     Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, order.type=order.type)
+                   order.by=order.by, order.type=order.type,
+                   startWith = "tx", join = "suggested")
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
-            warning(paste0("Columns ", paste(retColumns[notThere], collapse=", "),
+            warning(paste0("Columns ", paste(retColumns[notThere],
+                                             collapse=", "),
                            " not present in the result data.frame!"))
         retColumns <- retColumns[!notThere]
         Res <- Res[, retColumns]
@@ -624,11 +630,13 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
             order.by <- ""
     }
     Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, order.type=order.type)
+                   order.by=order.by, order.type=order.type,
+                   startWith = "exon", join = "suggested")
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
-            warning(paste0("Columns ", paste(retColumns[notThere], collapse=", "),
+            warning(paste0("Columns ", paste(retColumns[notThere],
+                                             collapse=", "),
                            " not present in the result data.frame!"))
         retColumns <- retColumns[!notThere]
         Res <- Res[, retColumns]
@@ -696,7 +704,7 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
     min.columns <- c(paste0(by, "_id"), "seq_name","exon_seq_start",
                      "exon_seq_end", "exon_id", "seq_strand")
     by.id.full <- unlist(prefixColumns(x, columns = paste0(by, "_id"),
-                                       clean = FALSE),
+                                        clean = FALSE),
                          use.names = FALSE)
     if (by == "gene") {
         ## tx columns have to be removed, since the same exon can be part of
@@ -737,7 +745,8 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
         }
     }
     Res <- getWhat(x, columns = columns, filter = filter,
-                   order.by = order.by, skip.order.check = TRUE)
+                   order.by = order.by, skip.order.check = TRUE,
+                   startWith = by, join = "suggested")
     ## Now, order in R, if not already done in SQL.
     if (orderR) {
         if (by == "gene") {
@@ -824,7 +833,8 @@ setMethod("transcriptsBy", "EnsDb", function(x, by = c("gene", "exon"),
                            " when seq_strand = -1 then (tx_seq_end * -1) end")
     }
     Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, skip.order.check=TRUE)
+                   order.by=order.by, skip.order.check=TRUE,
+                   startWith = by, join = "suggested")
     if (orderR) {
         startEnd <- (Res$seq_strand == 1) * Res$tx_seq_start +
             (Res$seq_strand == -1) * (Res$tx_seq_end * -1)
@@ -987,7 +997,8 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
         ## adding exon_id, exon_idx to the columns.
         columns <- unique(c(columns, "exon_id", "exon_idx"))
         if (use.names)
-            warning("Not considering use.names as no transcript names are available.")
+            warning("Not considering use.names as no transcript names are",
+                    " available.")
     } else {
         columns <- unique(c("gene_id", columns))
         if( use.names) {
@@ -1012,14 +1023,18 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
             order.by <- "tx.tx_id, tx2exon.exon_idx"
         } else {
             ## Here we want to sort the transcripts by tx start.
-            order.by <- "gene.gene_id, case when seq_strand = 1 then tx_cds_seq_start when seq_strand = -1 then (tx_cds_seq_end * -1) end"
+            order.by <- paste0("gene.gene_id, case when seq_strand = 1 then",
+                               " tx_cds_seq_start when seq_strand = -1 then",
+                               "(tx_cds_seq_end * -1) end")
         }
     }
     Res <- getWhat(x, columns = fetchCols,
                    filter = filter,
                    order.by = order.by,
-                   skip.order.check = TRUE)
-    ## Remove rows with NA in tx_cds_seq_start; that's the case for "old" databases.
+                   skip.order.check = TRUE,
+                   startWith = by, join = "suggested")
+    ## Remove rows with NA in tx_cds_seq_start; that's the case for "old"
+    ## databases.
     nas <- is.na(Res$tx_cds_seq_start)
     if (any(nas))
         Res <- Res[!nas, ]
@@ -1110,7 +1125,8 @@ getUTRsByTranscript <- function(x, what, columns = NULL, filter) {
     Res <- getWhat(x, columns=fetchCols,
                    filter=filter,
                    order.by=order.by,
-                   skip.order.check=TRUE)
+                   skip.order.check=TRUE,
+                   startWith = "tx", join = "suggested")
     nas <- is.na(Res$tx_cds_seq_start)
     if (any(nas))
         Res <- Res[!nas, ]
@@ -1272,17 +1288,25 @@ setMethod("buildQuery", "EnsDb",
 ## Method that wraps the internal .getWhat function to retrieve data from the
 ## database. In addition, if present, we're renaming chromosome names depending
 ## on the ucscChromosomeNames option.
+## Additional parameters:
+## o startWith: the name of the database table from which the join should start
+##   or NULL for the default behaviour (i.e. genes-> tx etc).
+## o join: the type of join that should be used; one of "join",
+##   "left outer join" or "suggested".
 setMethod("getWhat", "EnsDb",
           function(x, columns = c("gene_id", "gene_biotype", "gene_name"),
                    filter = list(), order.by = "", order.type = "asc",
-                   group.by = NULL, skip.order.check = FALSE) {
+                   group.by = NULL, skip.order.check = FALSE, startWith = NULL,
+                   join = "suggested") {
               Res <- .getWhat(x = x,
                               columns = columns,
                               filter = filter,
                               order.by = order.by,
                               order.type = order.type,
                               group.by = group.by,
-                              skip.order.check = skip.order.check)
+                              skip.order.check = skip.order.check,
+                              startWith = startWith,
+                              join = join)
               ## Eventually renaming seqnames according to the specified style.
               if(any(colnames(Res) == "seq_name"))
                   Res$seq_name <- formatSeqnamesFromQuery(x, Res$seq_name)
