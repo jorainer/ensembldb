@@ -83,13 +83,11 @@ test_UniprotidFilter <- function() {
     checkEquals(where(pf), "uniprot_id = 'ABC'")
     if (hasProteinData(edb)) {
         checkEquals(column(pf, edb), "uniprot.uniprot_id")
-        checkEquals(column(pf, edb, with.tables = "protein_domain"),
-                    "protein_domain.protein_id")
         checkEquals(column(pf, edb, with.tables = "uniprot"),
-                    "uniprot.protein_id")
-        checkEquals(where(pf, edb), "protein.protein_id = 'ABC'")
+                    "uniprot.uniprot_id")
+        checkEquals(where(pf, edb), "uniprot.uniprot_id = 'ABC'")
         checkEquals(where(pf, edb, with.tables = "uniprot"),
-                    "uniprot.protein_id = 'ABC'")
+                    "uniprot.uniprot_id = 'ABC'")
     } else {
         checkException(column(pf, edb))
         checkException(where(pf, edb))
@@ -112,7 +110,7 @@ test_ProtdomidFilter <- function() {
                     "protein_domain.protein_domain_id")
         checkEquals(where(pf, edb), "protein_domain.protein_domain_id = 'ABC'")
         checkEquals(where(pf, edb, with.tables = "protein_domain"),
-                    "protein.protein_domain_id = 'ABC'")
+                    "protein_domain.protein_domain_id = 'ABC'")
     } else {
         checkException(column(pf, edb))
         checkException(where(pf, edb))
