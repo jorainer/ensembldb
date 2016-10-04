@@ -183,9 +183,9 @@ test_buildQuery_startWith <- function() {
                                      columns = c("protein_id", "uniprot_id",
                                                  "protein_domain_id"))
         want <- paste0("select distinct protein.protein_id,uniprot.uniprot_id,",
-                       "protein_domain.protein_domain_id from protein join ",
-                       "protein_domain on (protein.protein_id=",
-                       "protein_domain.protein_id) join ",
+                       "protein_domain.protein_domain_id from protein left ",
+                       "outer join protein_domain on (protein.protein_id=",
+                       "protein_domain.protein_id) left outer join ",
                        "uniprot on (protein.protein_id=uniprot.protein_id)")
         checkEquals(Q, want)
         ## start at protein
@@ -194,9 +194,9 @@ test_buildQuery_startWith <- function() {
                                                  "protein_domain_id"),
                                      startWith = "protein")
         want <- paste0("select distinct protein.protein_id,uniprot.uniprot_id,",
-                       "protein_domain.protein_domain_id from protein join ",
-                       "protein_domain on (protein.protein_id=",
-                       "protein_domain.protein_id) join ",
+                       "protein_domain.protein_domain_id from protein left ",
+                       "outer join protein_domain on (protein.protein_id=",
+                       "protein_domain.protein_id) left outer join ",
                        "uniprot on (protein.protein_id=uniprot.protein_id)")
         checkEquals(Q, want)
         ## start at uniprot.
@@ -205,10 +205,30 @@ test_buildQuery_startWith <- function() {
                                                  "protein_domain_id"),
                                      startWith = "uniprot")
         want <- paste0("select distinct protein.protein_id,uniprot.uniprot_id,",
-                       "protein_domain.protein_domain_id from uniprot join ",
-                       "protein on (protein.protein_id=uniprot.protein_id) join",
+                       "protein_domain.protein_domain_id from uniprot left ",
+                       "outer join protein on (protein.protein_id=",
+                       "uniprot.protein_id) left outer join",
                        " protein_domain on (protein.protein_id=",
                        "protein_domain.protein_id)")
+        checkEquals(Q, want)
+        ## join with tx.
+        Q <- ensembldb:::.buildQuery(edb, columns = c("tx_id", "protein_id",
+                                                      "uniprot_id", "gene_id"))
+        want <- paste0("select distinct tx.tx_id,protein.protein_id,",
+                       "uniprot.uniprot_id,gene.gene_id from gene join ",
+                       "tx on (gene.gene_id=tx.gene_id) left outer join protein",
+                       " on (tx.tx_id=protein.tx_id) left outer join uniprot on",
+                       " (protein.protein_id=uniprot.protein_id)")
+        checkEquals(Q, want)
+        ## if we started from protein:
+        Q <- ensembldb:::.buildQuery(edb, columns = c("tx_id", "protein_id",
+                                                      "uniprot_id", "gene_id"),
+                                     startWith = "protein")
+        want <- paste0("select distinct tx.tx_id,protein.protein_id,",
+                       "uniprot.uniprot_id,gene.gene_id from protein left outer",
+                       " join tx on (tx.tx_id=protein.tx_id) join gene on",
+                       " (gene.gene_id=tx.gene_id) left outer join uniprot on",
+                       " (protein.protein_id=uniprot.protein_id)")
         checkEquals(Q, want)
     }
 }
@@ -273,7 +293,7 @@ test_joinQueryOnTables2_joinQueryOnColumns2 <- function() {
         ## That should be: gene->tx->tx2exon->exon->protein
         want <- paste0("gene join tx on (gene.gene_id=tx.gene_id) join",
                        " tx2exon on (tx.tx_id=tx2exon.tx_id) join",
-                       " exon on (tx2exon.exon_id=exon.exon_id) join",
+                       " exon on (tx2exon.exon_id=exon.exon_id) left outer join",
                        " protein on (tx.tx_id=protein.tx_id)")
         checkEquals(res, want)
         res <- ensembldb:::joinQueryOnColumns2(edb,
@@ -282,15 +302,13 @@ test_joinQueryOnTables2_joinQueryOnColumns2 <- function() {
                                                            "exon_seq_start"))
         checkEquals(res, want)
         res <- ensembldb:::joinQueryOnTables2(edb, tab = c("protein", "gene"),
-                                              startWith = "protein",
-                                              join = "left outer join")
+                                              startWith = "protein")
         want <- paste0("protein left outer join tx on (tx.tx_id=protein.tx_id)",
-                       " left outer join gene on (gene.gene_id=tx.gene_id)")
+                       " join gene on (gene.gene_id=tx.gene_id)")
         checkEquals(res, want)
         res <- ensembldb:::joinQueryOnColumns2(edb, columns = c("protein_id",
                                                                 "gene_name"),
-                                               startWith = "protein",
-                                               join = "left outer join")
+                                               startWith = "protein")
         checkEquals(res, want)
     }
 }
