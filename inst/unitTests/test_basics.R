@@ -137,7 +137,7 @@ test_cleanColumns <- function() {
     }
     ## with full names:
     cols <- c("gene.gene_id", "protein.protein_id", "tx.tx_id",
-              "protein_sequence")
+              "protein.protein_sequence")
     suppressWarnings(
         res <- ensembldb:::cleanColumns(edb, cols)
     )
@@ -196,3 +196,7 @@ test_checkFilter <- function() {
     checkEquals(flts, ensembldb:::checkFilter(flts))
 }
 
+test_anyProteinColumns <- function() {
+    checkTrue(ensembldb:::anyProteinColumns(c("gene_id", "protein_id")))
+    checkTrue(!ensembldb:::anyProteinColumns(c("gene_id", "exon_id")))
+}
