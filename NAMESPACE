@@ -5,9 +5,10 @@ importFrom("utils", "read.table", "str")
 import(BiocGenerics)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
-importFrom(Biobase, createPackage)
-importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels,
-           keepSeqlevels, seqlevelsStyle, "seqlevelsStyle<-", genomeStyles)
+importFrom(Biobase, createPackage, validMsg)
+importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths,
+           seqnames, seqlevels, keepSeqlevels, seqlevelsStyle,
+           "seqlevelsStyle<-", genomeStyles)
 importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
 importFrom(rtracklayer, import)
 import(RSQLite)
