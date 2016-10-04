@@ -3,6 +3,7 @@ import(methods)
 
 importFrom("utils", "read.table", "str")
 import(BiocGenerics)
+importMethodsFrom(ProtGenerics, proteins)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
 importFrom(Biobase, createPackage, validMsg)
@@ -52,7 +53,7 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy,
               exonsByOverlaps, returnFilterColumns,
               "returnFilterColumns<-", useMySQL)
 ## Protein data related stuff
-exportMethods(hasProteinData)
+exportMethods(hasProteinData, proteins)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
 ## Methods for GenomeInfoDb and related stuff

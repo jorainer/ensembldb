@@ -1259,9 +1259,9 @@ setMethod("threeUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
 ## fiveUTRsByTranscript
 ##
 setMethod("fiveUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
-    if(missing(filter)){
+    if (missing(filter)) {
         filter=list()
-    }else{
+    } else {
         filter <- checkFilter(filter)
     }
     return(getUTRsByTranscript(x=x, what="five", columns=columns, filter=filter))
@@ -1832,5 +1832,84 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
         return(x)
     } else {
         stop("Package 'RMySQL' not available.")
+    }
+})
+
+############################################################
+## proteins
+##
+## If return type is GRanges, make a seqlevel and seqinfo for each protein, i.e.
+## put each protein on its own sequence.
+setMethod("proteins", "EnsDb", function(object,
+                                        columns = listColumns(x, "protein"),
+                                        filter,
+                                        order.by = "",
+                                        order.type = "asc",
+                                        return.type = "GRanges") {
+    if (!hasProteinData(object))
+        stop("The used EnsDb does not provide protein annotations!",
+             " Thus, 'proteins' can not be used.")
+    return.type <- match.arg(return.type, c("data.frame", "GRanges",
+                                            "DataFrame"))
+    columns <- cleanColumns(x, unique(c(columns, "protein_id")))
+    if (missing(filter)) {
+        filter = list()
+    } else {
+        filter <- checkFilter(filter)
+    }
+    filter <- setFeatureInGRangesFilter(filter, "gene")
+    ## Eventually add columns for the filters:
+    columns <- addFilterColumns(columns, filter, x)
+    retColumns <- columns
+
+
+
+
+    if(return.type=="GRanges"){
+        columns <- unique(c(columns, c("gene_seq_start", "gene_seq_end",
+                                       "seq_name", "seq_strand")))
+    }
+    ## If we don't have an order.by define one.
+    if(all(order.by == "")){
+        order.by <- NULL
+        if (any(columns == "seq_name"))
+            order.by <- c(order.by, "seq_name")
+        if( any(columns == "gene_seq_start"))
+            order.by <- c(order.by, "gene_seq_start")
+        if(is.null(order.by))
+            order.by <- ""
+    }
+    Res <- getWhat(x, columns=columns, filter=filter,
+                   order.by=order.by, order.type=order.type,
+                   startWith = "gene", join = "suggested")
+    if(return.type=="data.frame" | return.type=="DataFrame"){
+        notThere <- !(retColumns %in% colnames(Res))
+        if(any(notThere))
+            warning(paste0("Columns ",
+                           paste(retColumns[notThere], collapse=", "),
+                           " not present in the result data.frame!"))
+        retColumns <- retColumns[!notThere]
+        Res <- Res[, retColumns]
+        if(return.type=="DataFrame")
+            Res <- DataFrame(Res)
+        return(Res)
+    }
+    if(return.type=="GRanges"){
+        metacols <- columns[ !(columns %in% c("seq_name",
+                                              "seq_strand",
+                                              "gene_seq_start",
+                                              "gene_seq_end")) ]
+        suppressWarnings(
+            SI <- seqinfo(x)
+        )
+        SI <- SI[as.character(unique(Res$seq_name))]
+        GR <- GRanges(seqnames=Rle(Res$seq_name),
+                      ranges=IRanges(start=Res$gene_seq_start, end=Res$gene_seq_end),
+                      strand=Rle(Res$seq_strand),
+                      seqinfo=SI[as.character(unique(Res$seq_name))],
+                      Res[ , metacols, drop=FALSE ]
+                    )
+        names(GR) <- Res$gene_id
+        return(GR)
     }
 })
