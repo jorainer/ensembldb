@@ -13,7 +13,7 @@ vignette: >
 ---
 
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")$Author`<br />
+**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
 **Modified**: 04 October, 2016<br />
 **Compiled**: `r date()`
 
@@ -64,13 +64,18 @@ In the following sections we show examples how to 1) fetch protein annotations
 as additional columns to gene/transcript annotations, 2) fetch protein
 annotation data and 3) map proteins to the genome.
 
+```{r echo=FALSE, results="silent"}
+## Use this to conditionally disable eval on following chunks
+haveProt <- hasProteinData(edb)
+```
+
 # Retrieve protein annotation for genes and transcripts
 
 Protein annotations for (protein coding) transcripts can be retrieved by simply
 adding the desired annotation columns to the `columns` parameter of the e.g. `genes`
 or `transcripts` methods.
 
-```{r a_transcripts}
+```{r a_transcripts, eval = haveProt}
 ## Get also protein information for ZBTB16 transcripts
 txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
 		   columns = c("protein_id", "uniprot_id", "tx_biotype"))
@@ -82,7 +87,7 @@ protein ID for the coding- and `NA` for the non-coding transcripts. Note also th
 we have a transcript targeted for nonsense mediated mRNA-decay, that however has
 also a protein ID associated with it, but no Uniprot ID.
 
-```{r a_transcripts_coding_noncoding}
+```{r a_transcripts_coding_noncoding, eval = haveProt}
 ## Subset to transcripts with tx_biotype other than protein_coding.
 txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
 					  "protein_id")]
@@ -94,7 +99,7 @@ While the mapping from a protein coding transcript to a Ensembl protein ID
 transcripts are fetched from the database including Uniprot IDs or even protein
 domain IDs, as in such cases a redundant list of transcripts is returned.
 
-```{r a_transcripts_coding}
+```{r a_transcripts_coding, eval = haveProt}
 ## List the protein IDs and uniprot IDs for the coding transcripts
 mcols(txs[txs$tx_biotype == "protein_coding",
 	  c("tx_id", "protein_id", "uniprot_id")])
@@ -110,10 +115,13 @@ protein data to filter the results. In the example below we fetch for example
 all genes from the database that have a certain protein domain in the protein
 encoded by any of its transcripts.
 
-```{r a_genes_protdomid_filter}
+```{r a_genes_protdomid_filter, eval = haveProt}
 ## Get all genes that encode a transcript encoding for a protein that contains
 ## a certain protein domain.
-genes(edb, filter = ProtdomidFilter("PS50097"))
+gns <- genes(edb, filter = ProtdomidFilter("PS50097"))
+length(gns)
+
+sort(gns$gene_name)
 ```
 
 So, in total we got 152 genes with that protein domain. In addition to the
