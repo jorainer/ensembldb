@@ -1,3 +1,13 @@
+CHANGES IN VERSION 1.XX
+-------------------------
+
+NEW FEATURES:
+    o The perl script to create EnsDb databases fetches also protein annotations.
+    o Added functionality to extract protein annotations from the database
+      (if available) ensuring backward compatibility.
+    o Add proteins vignette.
+
+
 CHANGES IN VERSION 1.5.14
 -------------------------
 

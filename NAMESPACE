@@ -54,6 +54,7 @@ exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy,
               "returnFilterColumns<-", useMySQL)
 ## Protein data related stuff
 exportMethods(hasProteinData, proteins)
+export(listProteinColumns)
 ## Methods for AnnotationDbi
 exportMethods(columns, keytypes, keys, select, mapIds)
 ## Methods for GenomeInfoDb and related stuff

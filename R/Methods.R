@@ -314,12 +314,13 @@ setMethod("listColumns", "EnsDb", function(x,
         x@tables <- Tables
     }
     Tab <- x@tables
-    ## Manually add tx_name as a "virtual" column; getWhat will insert the tx_id into that.
+    ## Manually add tx_name as a "virtual" column; getWhat will insert
+    ## the tx_id into that.
     Tab$tx <- unique(c(Tab$tx, "tx_name"))
     ## Manually add the symbol as a "virtual" column.
     Tab$gene <- unique(c(Tab$gene, "symbol"))
     if(!missing(table)){
-        columns <- Tab[[ table ]]
+        columns <- unlist(Tab[names(Tab) %in% table], use.names = FALSE)
     }else{
         columns <- unlist(Tab, use.names=FALSE)
     }
@@ -332,7 +333,7 @@ setMethod("listColumns", "EnsDb", function(x,
         if(length(idx) > 0)
             columns <- columns[ -idx ]
     }
-    return(columns)
+    return(unique(columns))
 })
 
 ############################################################
@@ -491,11 +492,11 @@ setMethod("genes", "EnsDb", function(x,
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
-            warning(paste0("Columns ",
-                           paste(retColumns[notThere], collapse=", "),
-                           " not present in the result data.frame!"))
+            warning("Columns ",
+                           paste0("'", retColumns[notThere], "'", collapse=", "),
+                           " not found in the database!")
         retColumns <- retColumns[!notThere]
-        Res <- Res[, retColumns]
+        Res <- Res[, retColumns, drop = FALSE]
         if(return.type=="DataFrame")
             Res <- DataFrame(Res)
         return(Res)
@@ -562,11 +563,11 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
-            warning(paste0("Columns ", paste(retColumns[notThere],
-                                             collapse=", "),
-                           " not present in the result data.frame!"))
+            warning("Columns ", paste0("'", retColumns[notThere], "'",
+                                       collapse=", "),
+                           " not found in the database!")
         retColumns <- retColumns[!notThere]
-        Res <- Res[, retColumns]
+        Res <- Res[, retColumns, drop = FALSE]
         if(return.type=="DataFrame")
             Res <- DataFrame(Res)
         return(Res)
@@ -655,11 +656,11 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
-            warning(paste0("Columns ", paste(retColumns[notThere],
-                                             collapse=", "),
-                           " not present in the result data.frame!"))
+            warning("Columns ", paste0("'", retColumns[notThere], "'",
+                                       collapse=", "),
+                           " not found in the database!")
         retColumns <- retColumns[!notThere]
-        Res <- Res[, retColumns]
+        Res <- Res[, retColumns, drop = FALSE]
         if(return.type=="DataFrame")
             Res <- DataFrame(Res)
         return(Res)
@@ -786,8 +787,9 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
     ret_cols[ret_cols == "exon_idx"] <- "exon_rank"
     notThere <- !(ret_cols %in% colnames(Res))
     if (any(notThere))
-        warning(paste0("Columns ", paste(ret_cols[notThere], collapse = ", "),
-                       " not present in the result data.frame!"))
+        warning("Columns ", paste0("'", ret_cols[notThere], "'",
+                                   collapse = ", "),
+                " not found in the database!")
     ret_cols <- ret_cols[!notThere]
     columns.metadata <- ret_cols[!(ret_cols %in% c("seq_name", "seq_strand",
                                                    "exon_seq_start",
@@ -867,13 +869,13 @@ setMethod("transcriptsBy", "EnsDb", function(x, by = c("gene", "exon"),
     ret_cols[ret_cols == "exon_idx"] <- "exon_rank"
     notThere <- !(ret_cols %in% colnames(Res))
     if(any(notThere))
-        warning(paste0("Columns ", paste(ret_cols[notThere], collapse=", "),
-                       " not present in the result data.frame!"))
+        warning("Columns ", paste0("'", ret_cols[notThere], "'", collapse=", "),
+                " not found in the database!")
     ret_cols <- ret_cols[!notThere]
     columns.metadata <- ret_cols[!(ret_cols %in% c("seq_name", "seq_strand",
                                                    "tx_seq_start",
                                                    "tx_seq_end"))]
-    columns.metadata <- match(columns.metadata, colnames(Res))   ## presumably faster...
+    columns.metadata <- match(columns.metadata, colnames(Res))
     GR <- GRanges(seqnames=Rle(Res$seq_name),
                   strand=Rle(Res$seq_strand),
                   ranges=IRanges(start=Res$tx_seq_start, end=Res$tx_seq_end),
@@ -1840,8 +1842,53 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##
 ## If return type is GRanges, make a seqlevel and seqinfo for each protein, i.e.
 ## put each protein on its own sequence.
+##' @title Protein related functionality
+##' @aliases proteins
+##'
+##' @description This help page provides information about most of the
+##' functionality related to protein annotations in \code{ensembldb}.
+##'
+##' The \code{proteins} method retrieves protein related annotations from
+##' an \code{\linkS4class{EnsDb}} database.
+##'
+##' @details The \code{proteins} method performs the query starting from the
+##' \code{protein} tables and can hence return all annotations from the database
+##' that are related to proteins and transcripts encoding these proteins from
+##' the database. Since \code{proteins} does thus only query annotations for
+##' protein coding transcripts, the \code{\link{genes}} or
+##' \code{\link{transcripts}} methods have to be used to retrieve annotations
+##' for non-coding transcripts.
+##' @param object The \code{\linkS4class{EnsDb}} object.
+##' @param columns For \code{proteins}: character vector defining the columns to
+##' be extracted from the database. Can be any column(s) listed by the
+##' \code{\link{listColumns}} method.
+##' @param filter For \code{proteins}: A filter object extending
+##' \code{\linkS4class{BasicFilter}} or a list of such objects to select
+##' specific entries from the database. See \code{\link{RNA-DNA-filters}} and
+##' \code{\link{ProteinFilters}} for the full list of supported filters.
+##' @param order.by For \code{proteins}: a character vector specifying the
+##' column(s) by which the result should be ordered.
+##' @param order.type For \code{proteins}: if the results should be ordered
+##' ascending (\code{order.type = "asc"}) or descending
+##' (\code{order.type = "desc"})
+##' @param return.type For \code{proteins}: character of lenght one specifying
+##' the type of the returned object. Can be either \code{"data.frame"},
+##' \code{"DataFrame"} or \code{"GRanges"}.
+##' @return The \code{proteins} method returns protein related annotations from
+##' an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
+##' allowing to define the type of the returned object.
+##' @rdname ProteinFunctionality
+##' @author Johannes Rainer
+##' @examples
+##' library(ensembldb)
+##' library(EnsDb.Hsapiens.v75)
+##' edb <- EnsDb.Hsapiens.v75
+##' ## Get all proteins from tha database for the gene ZBTB16, if protein
+##' ## annotations are available
+##' if (hasProteinData(edb))
+##'     proteins(edb, filter = GenenameFilter("ZBTB16"))
 setMethod("proteins", "EnsDb", function(object,
-                                        columns = listColumns(x, "protein"),
+                                        columns = listColumns(object, "protein"),
                                         filter,
                                         order.by = "",
                                         order.type = "asc",
@@ -1851,65 +1898,67 @@ setMethod("proteins", "EnsDb", function(object,
              " Thus, 'proteins' can not be used.")
     return.type <- match.arg(return.type, c("data.frame", "GRanges",
                                             "DataFrame"))
-    columns <- cleanColumns(x, unique(c(columns, "protein_id")))
+    columns <- cleanColumns(object, unique(c(columns, "protein_id")))
     if (missing(filter)) {
         filter = list()
     } else {
         filter <- checkFilter(filter)
     }
-    filter <- setFeatureInGRangesFilter(filter, "gene")
+    filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
-    columns <- addFilterColumns(columns, filter, x)
+    columns <- addFilterColumns(columns, filter, object)
     retColumns <- columns
-
-
-
-
-    if(return.type=="GRanges"){
-        columns <- unique(c(columns, c("gene_seq_start", "gene_seq_end",
-                                       "seq_name", "seq_strand")))
-    }
-    ## If we don't have an order.by define one.
-    if(all(order.by == "")){
+    ## Process order.by:
+    ## If not specified we might want to order them by seq_name or tx_seq_start
+    ## if present in parameter columns
+    if (all(order.by == "")) {
         order.by <- NULL
         if (any(columns == "seq_name"))
-            order.by <- c(order.by, "seq_name")
-        if( any(columns == "gene_seq_start"))
-            order.by <- c(order.by, "gene_seq_start")
-        if(is.null(order.by))
+            order.by <- "seq_name"
+        seq_col_idx <- grep(columns, pattern = "_seq_")
+        if (length(seq_col_idx) > 0)
+            order.by <- c(order.by, columns[seq_col_idx[1]])
+        if (is.null(order.by))
             order.by <- ""
     }
-    Res <- getWhat(x, columns=columns, filter=filter,
-                   order.by=order.by, order.type=order.type,
-                   startWith = "gene", join = "suggested")
-    if(return.type=="data.frame" | return.type=="DataFrame"){
-        notThere <- !(retColumns %in% colnames(Res))
-        if(any(notThere))
-            warning(paste0("Columns ",
-                           paste(retColumns[notThere], collapse=", "),
-                           " not present in the result data.frame!"))
-        retColumns <- retColumns[!notThere]
-        Res <- Res[, retColumns]
-        if(return.type=="DataFrame")
+    ## If we're going to return a GRanges we need to know the length of the
+    ## peptide sequence.
+    if (return.type == "GRanges") {
+        columns <- unique(c(columns, "protein_sequence"))
+    }
+    ## Get the data
+    Res <- getWhat(object, columns = columns, filter = filter,
+                   order.by = order.by, order.type = order.type,
+                   startWith = "protein", join = "suggested")
+    ## Now process the result.
+    cols_not_found <- !(retColumns %in% colnames(Res))
+    retColumns <- retColumns[!cols_not_found]
+    if (any(cols_not_found))
+        warning("Columns ", paste0("'", retColumns[cols_not_found], "'",
+                                   collapse = ", "),
+                " not found in the database!")
+    if (return.type == "GRanges") {
+        ## Build the SeqInfo.
+        prots <- unique(Res[, c("protein_id", "protein_sequence"),
+                            drop = FALSE])
+        seq_lengths <- nchar(prots[, "protein_sequence"])
+        si <- Seqinfo(seqnames = prots$protein_id, seqlengths = seq_lengths,
+                      genome = unname(unique(genome(object))))
+        ## Define start and width.
+        GR <- GRanges(seqnames = Res$protein_id,
+                      ranges = IRanges(start = rep(1, nrow(Res)),
+                                       end = seq_lengths),
+                      seqinfo = si,
+                      strand = "+",
+                      Res[, retColumns, drop = FALSE])
+        names(GR) <- Res$protein_id
+        return(GR)
+    } else {
+        Res <- Res[, retColumns, drop = FALSE]
+        if (return.type == "DataFrame")
             Res <- DataFrame(Res)
         return(Res)
     }
-    if(return.type=="GRanges"){
-        metacols <- columns[ !(columns %in% c("seq_name",
-                                              "seq_strand",
-                                              "gene_seq_start",
-                                              "gene_seq_end")) ]
-        suppressWarnings(
-            SI <- seqinfo(x)
-        )
-        SI <- SI[as.character(unique(Res$seq_name))]
-        GR <- GRanges(seqnames=Rle(Res$seq_name),
-                      ranges=IRanges(start=Res$gene_seq_start, end=Res$gene_seq_end),
-                      strand=Rle(Res$seq_strand),
-                      seqinfo=SI[as.character(unique(Res$seq_name))],
-                      Res[ , metacols, drop=FALSE ]
-                    )
-        names(GR) <- Res$gene_id
-        return(GR)
-    }
+    return(NULL)
 })
+
