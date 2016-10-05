@@ -78,6 +78,11 @@ In the following sections we show examples how to 1) fetch protein annotations
 as additional columns to gene/transcript annotations, 2) fetch protein
 annotation data and 3) map proteins to the genome.
 
+#+BEGIN_SRC R :ravel echo=FALSE, results="silent"
+  ## Use this to conditionally disable eval on following chunks
+  haveProt <- hasProteinData(edb)
+#+END_SRC
+
 * Retrieve protein annotation for genes and transcripts
 
 Protein annotations for (protein coding) transcripts can be retrieved by simply
@@ -85,7 +90,7 @@ adding the desired annotation columns to the =columns= parameter of the e.g. =ge
 or =transcripts= methods.
 
 #+NAME: a_transcripts
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel eval = haveProt
   ## Get also protein information for ZBTB16 transcripts
   txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
                      columns = c("protein_id", "uniprot_id", "tx_biotype"))
@@ -98,7 +103,7 @@ we have a transcript targeted for nonsense mediated mRNA-decay, that however has
 also a protein ID associated with it, but no Uniprot ID.
 
 #+NAME: a_transcripts_coding_noncoding
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel eval = haveProt
   ## Subset to transcripts with tx_biotype other than protein_coding.
   txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
                                             "protein_id")]
@@ -111,7 +116,7 @@ transcripts are fetched from the database including Uniprot IDs or even protein
 domain IDs, as in such cases a redundant list of transcripts is returned.
 
 #+NAME: a_transcripts_coding
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel eval = haveProt
   ## List the protein IDs and uniprot IDs for the coding transcripts
   mcols(txs[txs$tx_biotype == "protein_coding",
             c("tx_id", "protein_id", "uniprot_id")])
@@ -128,7 +133,7 @@ all genes from the database that have a certain protein domain in the protein
 encoded by any of its transcripts.
 
 #+NAME: a_genes_protdomid_filter
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel eval = haveProt
   ## Get all genes that encode a transcript encoding for a protein that contains
   ## a certain protein domain.
   gns <- genes(edb, filter = ProtdomidFilter("PS50097"))

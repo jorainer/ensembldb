@@ -4,10 +4,14 @@ library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
 test_listProteinColumns <- function() {
-    res <- listProteinColumns(edb)
-    checkTrue(any(res == "protein_id"))
-    checkTrue(any(res == "uniprot_id"))
-    checkTrue(any(res == "protein_domain_id"))
+    if (hasProteinData(edb)) {
+        res <- listProteinColumns(edb)
+        checkTrue(any(res == "protein_id"))
+        checkTrue(any(res == "uniprot_id"))
+        checkTrue(any(res == "protein_domain_id"))
+    } else {
+        checkException(listProteinColumns(edb))
+    }
 }
 
 ############################################################
@@ -155,20 +159,26 @@ test_fiveUTRsByTranscript_with_proteins <- function() {
 test_genes_with_protein_filters <- function() {
     ## o ProteinidFilter
     pif <- ProteinidFilter("ENSP00000376721")
-    gns <- genes(edb, filter = pif, return.type = "data.frame")
-    checkEquals(gns$gene_name, "ZBTB16")
+    if (hasProteinData(edb)) {
+        gns <- genes(edb, filter = pif, return.type = "data.frame")
+        checkEquals(gns$gene_name, "ZBTB16")
+    }
     ## o UniprotidFilter
     uif <- UniprotidFilter("Q71UL7_HUMAN")
-    gns <- genes(edb, filter = uif, return.type = "data.frame",
-                 columns = c("protein_id", "gene_name", "tx_id"))
-    checkTrue("ENSP00000376721" %in% gns$protein_id)
-    checkTrue(nrow(gns) == 2)
+    if (hasProteinData(edb)) {
+        gns <- genes(edb, filter = uif, return.type = "data.frame",
+                     columns = c("protein_id", "gene_name", "tx_id"))
+        checkTrue("ENSP00000376721" %in% gns$protein_id)
+        checkTrue(nrow(gns) == 2)
+    }
     ## o ProtdomidFilter
     pdif <- ProtdomidFilter("PF00096")
-    gns <- genes(edb, filter = list(pdif, GenenameFilter("ZBTB%", "like")),
-                 return.type = "data.frame",
-                 column = c("gene_name", "gene_biotype"))
-    checkTrue(all(gns$gene_biotype == "protein_coding"))
+    if (hasProteinData(edb)) {
+        gns <- genes(edb, filter = list(pdif, GenenameFilter("ZBTB%", "like")),
+                     return.type = "data.frame",
+                     column = c("gene_name", "gene_biotype"))
+        checkTrue(all(gns$gene_biotype == "protein_coding"))
+    }
 }
 
 ############################################################
@@ -248,40 +258,42 @@ test_ProtdomidFilter <- function() {
 ############################################################
 ## The dedicated methods to fetch protein data.
 test_proteins <- function() {
-    prts_gr <- proteins(edb, filter = GenenameFilter("ZBTB16"))
-    prts_df <- proteins(edb, filter = GenenameFilter("ZBTB16"),
-                        return.type = "data.frame")
-    prts_DF <- proteins(edb, filter = GenenameFilter("ZBTB16"),
-                        return.type = "DataFrame")
-    library(RSQLite)
-    res_q <- dbGetQuery(dbconn(edb),
-                        paste0("select tx.tx_id, protein_id, gene_name from ",
-                               "protein left outer join tx on (protein.tx_id=",
-                               "tx.tx_id) join gene on (gene.gene_id=",
-                               "tx.gene_id) where gene_name = 'ZBTB16'"))
-    checkEquals(res_q$tx_id, prts_df$tx_id)
-    checkEquals(res_q$protein_id, prts_df$protein_id)
-    checkTrue(is(prts_gr, "GRanges"))
-    checkEquals(class(prts_df), "data.frame")
-    checkTrue(is(prts_DF,"DataFrame"))
-    checkEquals(prts_df$protein_id, names(prts_gr))
+    if (hasProteinData(edb)) {
+        prts_gr <- proteins(edb, filter = GenenameFilter("ZBTB16"))
+        prts_df <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+                            return.type = "data.frame")
+        prts_DF <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+                            return.type = "DataFrame")
+        library(RSQLite)
+        res_q <- dbGetQuery(dbconn(edb),
+                            paste0("select tx.tx_id, protein_id, gene_name from ",
+                                   "protein left outer join tx on (protein.tx_id=",
+                                   "tx.tx_id) join gene on (gene.gene_id=",
+                                   "tx.gene_id) where gene_name = 'ZBTB16'"))
+        checkEquals(res_q$tx_id, prts_df$tx_id)
+        checkEquals(res_q$protein_id, prts_df$protein_id)
+        checkTrue(is(prts_gr, "GRanges"))
+        checkEquals(class(prts_df), "data.frame")
+        checkTrue(is(prts_DF,"DataFrame"))
+        checkEquals(prts_df$protein_id, names(prts_gr))
 
-    ## Add protein domain information to the proteins.
-    prts_df <- proteins(edb, filter = ProteinidFilter(c("ENSP00000338157",
-                                                        "ENSP00000443013")),
-                        columns = c("protein_id", "protein_domain_id",
-                                    "uniprot_id"), return.type = "data.frame")
-    ## Check if we have all data that we expect:
-    uniprots <- dbGetQuery(dbconn(edb),
-                           paste0("select uniprot_id from uniprot where",
-                                  " protein_id in ('ENSP00000338157',",
-                                  "'ENSP00000443013')"))$uniprot_id
-    checkTrue(all(uniprots %in% prts_df$uniprot_id))
-    protdoms <- dbGetQuery(dbconn(edb),
-                           paste0("select protein_domain_id from protein_domain",
-                                  " where protein_id in ('ENSP00000338157',",
-                                  "'ENSP00000443013')"))$protein_domain_id
-    checkTrue(all(protdoms %in% prts_df$protein_domain_id))
+        ## Add protein domain information to the proteins.
+        prts_df <- proteins(edb, filter = ProteinidFilter(c("ENSP00000338157",
+                                                            "ENSP00000443013")),
+                            columns = c("protein_id", "protein_domain_id",
+                                        "uniprot_id"), return.type = "data.frame")
+        ## Check if we have all data that we expect:
+        uniprots <- dbGetQuery(dbconn(edb),
+                               paste0("select uniprot_id from uniprot where",
+                                      " protein_id in ('ENSP00000338157',",
+                                      "'ENSP00000443013')"))$uniprot_id
+        checkTrue(all(uniprots %in% prts_df$uniprot_id))
+        protdoms <- dbGetQuery(dbconn(edb),
+                               paste0("select protein_domain_id from protein_domain",
+                                      " where protein_id in ('ENSP00000338157',",
+                                      "'ENSP00000443013')"))$protein_domain_id
+        checkTrue(all(protdoms %in% prts_df$protein_domain_id))
+    }
 }
 
 notrun_test_protein_domains <- function() {
