@@ -103,4 +103,29 @@ anyProteinColumns <- function(x){
     return(any(x %in% unlist(.ENSDB_PROTEIN_TABLES, use.names = FALSE)))
 }
 
-
+############################################################
+## listProteinColumns
+##
+##' @description The \code{listProteinColumns} function allows to conveniently
+##' extract all database columns containing protein annotations from
+##' an \code{\linkS4class{EnsDb}} database.
+##' @return The \code{listProteinColumns} function returns a character vector
+##' with the column names containing protein annotations or throws an error
+##' if no such annotations are available.
+##' @rdname ProteinFunctionality
+##' @examples
+##'
+##' ## List all columns containing protein annotations
+##' library(EnsDb.Hsapiens.v75)
+##' edb <- EnsDb.Hsapiens.v75
+##' if (hasProteinData(edb))
+##'     listProteinColumns(edb)
+listProteinColumns <- function(object) {
+    if (missing(object))
+        stop("'object' is missing with no default.")
+    if (!is(object, "EnsDb"))
+        stop("'object' has to be an instance of an 'EnsDb' object.")
+    if (!hasProteinData(object))
+        stop("The provided EnsDb database does not contain protein annotations!")
+    return(listColumns(object, c("protein", "uniprot", "protein_domain")))
+}
