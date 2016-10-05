@@ -1,0 +1,133 @@
+---
+title: "Querying protein features"
+graphics: yes
+output:
+  BiocStyle::html_document2
+vignette: >
+  %\VignetteIndexEntry{Querying protein features}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
+  %\VignettePackage{ensembldb}
+  %\VignetteKeywords{annotation,database}
+---
+
+**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
+**Authors**: `r packageDescription("ensembldb")$Author`<br />
+**Modified**: 04 October, 2016<br />
+**Compiled**: `r date()`
+
+From Bioconductor release 3.5 on, `EnsDb` databases/packages created by the
+`ensembldb` package contain also, for transcripts with a coding regions, mappings
+between transcripts and proteins. Thus, in addition to the RNA/DNA-based
+features also the following protein related information is available:
+
+-   `protein_id`: the Ensembl protein ID. This is the primary ID for the proteins
+    defined in Ensembl.
+-   `uniprot_id`: the Uniprot ID for a protein. Note that not every Ensembl
+    `protein_id` has a Uniprot ID, and each `protein_id` might be mapped to several
+    `uniprot_id`.
+-   `protein_sequence`: the peptide sequence of a protein.
+-   `protein_domain_id`: the ID of the protein domain according to the
+    source/analysis in/by which is was defined.
+-   `protein_domain_source`: the source of the protein domain information, one of
+    *pfscan*, *scanprosite*, *superfamily*, *pfam*, *prints*, *smart*, *pirsf* or *tigrfam*.
+-   `interpro_accession`: the Interpro accession ID of the protein domain (if
+    available).
+-   `prot_dom_start`: the start of the protein domain within the peptide sequence of
+    the protein.
+-   `prot_dom_start`: the end position of the protein domain within the peptide
+    sequence of the protein.
+
+Thus, for protein coding transcripts, these annotations can in addition be
+fetched from the database, given that protein annotations are available. Note
+that only `EnsDb` databases created through the Ensembl Perl API contain protein
+annotation, databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges`
+and `ensDbFromGtf` don't contain such information.
+
+```{r loadlib, messages = FALSE}
+library(ensembldb)
+library(EnsDb.Hsapiens.v75)
+edb <- EnsDb.Hsapiens.v75
+## Evaluate whether we have protein annotation available
+hasProteinData(edb)
+```
+
+If protein annotation is available, the additional tables and columns are also
+listed by the `listTables` and `listColumns` methods.
+
+```{r listCols}
+listTables(edb)
+```
+
+In the following sections we show examples how to 1) fetch protein annotations
+as additional columns to gene/transcript annotations, 2) fetch protein
+annotation data and 3) map proteins to the genome.
+
+# Retrieve protein annotation for genes and transcripts
+
+Protein annotations for (protein coding) transcripts can be retrieved by simply
+adding the desired annotation columns to the `columns` parameter of the e.g. `genes`
+or `transcripts` methods.
+
+```{r a_transcripts}
+## Get also protein information for ZBTB16 transcripts
+txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
+		   columns = c("protein_id", "uniprot_id", "tx_biotype"))
+txs
+```
+
+The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the
+protein ID for the coding- and `NA` for the non-coding transcripts. Note also that
+we have a transcript targeted for nonsense mediated mRNA-decay, that however has
+also a protein ID associated with it, but no Uniprot ID.
+
+```{r a_transcripts_coding_noncoding}
+## Subset to transcripts with tx_biotype other than protein_coding.
+txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
+					  "protein_id")]
+```
+
+While the mapping from a protein coding transcript to a Ensembl protein ID
+(column `protein_id`) is 1:1, the mapping can be 1:n (including 1:0) from
+`protein_id` to Uniprot ID(s) (column `uniprot_id`). This should be kept in mind if
+transcripts are fetched from the database including Uniprot IDs or even protein
+domain IDs, as in such cases a redundant list of transcripts is returned.
+
+```{r a_transcripts_coding}
+## List the protein IDs and uniprot IDs for the coding transcripts
+mcols(txs[txs$tx_biotype == "protein_coding",
+	  c("tx_id", "protein_id", "uniprot_id")])
+```
+
+Protein annotations can be added in a similar fashion as *metadata columns* to the
+results of the `genes`, `exons`, `exonsBy`, `transcriptsBy`, `cdsBy`, `fiveUTRsByTranscript`
+and `threeUTRsByTranscript` methods. These methods report for non-coding
+transcripts an `NA` in the protein annotation columns.
+
+In addition to retrieve protein annotations from the database, we can also use
+protein data to filter the results. In the example below we fetch for example
+all genes from the database that have a certain protein domain in the protein
+encoded by any of its transcripts.
+
+```{r a_genes_protdomid_filter}
+## Get all genes that encode a transcript encoding for a protein that contains
+## a certain protein domain.
+genes(edb, filter = ProtdomidFilter("PS50097"))
+```
+
+So, in total we got 152 genes with that protein domain. In addition to the
+`ProtdomidFilter`, also the `ProteinidFilter` and the `UniprotidFilter` can be used to
+query the database for entries matching conditions on their protein ID or
+Uniprot ID.
+
+# Retrieve proteins from the database
+
+Proteins can be fetched using the dedicated `proteins` method. Unlike DNA/RNA-based
+methods like `genes` or `transcripts`, protein related methods return protein
+centered coordinates. Thus, coordinates e.g. of protein domains are always
+relative to the peptide sequence of the protein.
+
+# Map proteins to the genome
+
+To map proteins to the genome, the `cdsBy` method can be used.

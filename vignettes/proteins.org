@@ -25,8 +25,8 @@ vignette: >
 
 #+BEGIN_html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 28 September, 2016<br />
+**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
+**Modified**: 04 October, 2016<br />
 **Compiled**: `r date()`
 #+END_html
 
@@ -58,7 +58,7 @@ annotation, databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRa
 and =ensDbFromGtf= don't contain such information.
 
 #+NAME: loadlib
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel messages = FALSE
   library(ensembldb)
   library(EnsDb.Hsapiens.v75)
   edb <- EnsDb.Hsapiens.v75
@@ -88,14 +88,60 @@ or =transcripts= methods.
 #+BEGIN_SRC R
   ## Get also protein information for ZBTB16 transcripts
   txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
-                     columns = c("protein_id", "uniprot_id"))
+                     columns = c("protein_id", "uniprot_id", "tx_biotype"))
   txs
 #+END_SRC
+
+The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the
+protein ID for the coding- and =NA= for the non-coding transcripts. Note also that
+we have a transcript targeted for nonsense mediated mRNA-decay, that however has
+also a protein ID associated with it, but no Uniprot ID.
+
+#+NAME: a_transcripts_coding_noncoding
+#+BEGIN_SRC R
+  ## Subset to transcripts with tx_biotype other than protein_coding.
+  txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
+                                            "protein_id")]
+#+END_SRC
+
+While the mapping from a protein coding transcript to a Ensembl protein ID
+(column =protein_id=) is 1:1, the mapping can be 1:n (including 1:0) from
+=protein_id= to Uniprot ID(s) (column =uniprot_id=). This should be kept in mind if
+transcripts are fetched from the database including Uniprot IDs or even protein
+domain IDs, as in such cases a redundant list of transcripts is returned.
+
+#+NAME: a_transcripts_coding
+#+BEGIN_SRC R
+  ## List the protein IDs and uniprot IDs for the coding transcripts
+  mcols(txs[txs$tx_biotype == "protein_coding",
+            c("tx_id", "protein_id", "uniprot_id")])
+#+END_SRC
+
+Protein annotations can be added in a similar fashion as /metadata columns/ to the
+results of the =genes=, =exons=, =exonsBy=, =transcriptsBy=, =cdsBy=, =fiveUTRsByTranscript=
+and =threeUTRsByTranscript= methods. These methods report for non-coding
+transcripts an =NA= in the protein annotation columns.
 
 In addition to retrieve protein annotations from the database, we can also use
 protein data to filter the results. In the example below we fetch for example
 all genes from the database that have a certain protein domain in the protein
 encoded by any of its transcripts.
+
+#+NAME: a_genes_protdomid_filter
+#+BEGIN_SRC R
+  ## Get all genes that encode a transcript encoding for a protein that contains
+  ## a certain protein domain.
+  gns <- genes(edb, filter = ProtdomidFilter("PS50097"))
+  length(gns)
+
+  sort(gns$gene_name)
+#+END_SRC
+
+So, in total we got 152 genes with that protein domain. In addition to the
+=ProtdomidFilter=, also the =ProteinidFilter= and the =UniprotidFilter= can be used to
+query the database for entries matching conditions on their protein ID or
+Uniprot ID.
+
 
 * Retrieve proteins from the database
 
@@ -128,13 +174,15 @@ To map proteins to the genome, the =cdsBy= method can be used.
 
 ** TODO Implement a =proteins= method
 
+See also issue #20 https://github.com/jotsetung/ensembldb/issues/20.
+
 The question here is what =start= and =end= we put into the resulting =GRanges=
 object, /just/ the CDS coding start and end, or the individual start and end of
 all of its exons (same like for e.g. the =cdsBy= method)?
 
 A) =proteins= returns a =GRanges= with start being 1, width being the length of the
 peptide and the seqname being the protein ID.
-
+B) A =Proteins= object?
 
 ** TODO Implement a =proteinDomains= method
 
@@ -178,6 +226,11 @@ and related methods
 
 
 ** TODO Add protein data comparison to =compareEnsDb=.
+
+
+** TODO Which object best represents protein annotation (issue #20)
+
+https://github.com/jotsetung/ensembldb/issues/20
 
 * Experimental perl code and docs				   :noexport:
 
