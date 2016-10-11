@@ -19,7 +19,9 @@ Imports:
     AnnotationHub,
     Rsamtools,
     IRanges,
-    ProtGenerics
+    ProtGenerics,
+    Biostrings,
+    RCurl
 Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.23.21),

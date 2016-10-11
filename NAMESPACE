@@ -3,30 +3,50 @@ import(methods)
 
 importFrom("utils", "read.table", "str")
 import(BiocGenerics)
+importFrom(Biobase, createPackage, validMsg)
 importMethodsFrom(ProtGenerics, proteins)
 import(S4Vectors)
 importFrom(DBI, dbDriver)
-importFrom(Biobase, createPackage, validMsg)
+import(RSQLite)
+importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
 importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths,
            seqnames, seqlevels, keepSeqlevels, seqlevelsStyle,
            "seqlevelsStyle<-", genomeStyles)
-importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
 importFrom(rtracklayer, import)
-import(RSQLite)
+
+## Ranges and stuff
+importFrom(IRanges, IRanges)
+##importClassesFrom(IRanges, IRanges, IRangesList)
+importMethodsFrom(IRanges,subsetByOverlaps)
+import(GenomicRanges)
 import(GenomicFeatures)
 ##importMethodsFrom(GenomicFeatures, extractTranscriptSeqs)
-import(GenomicRanges)
-importFrom(IRanges, IRanges)
-importMethodsFrom(IRanges,subsetByOverlaps)
+
 ## AnnotationHub
 importFrom(AnnotationHub, AnnotationHub)
 importClassesFrom(AnnotationHub, AnnotationHub)
 importMethodsFrom(AnnotationHub, query, mcols)
+
 ## Rsamtools
 importClassesFrom(Rsamtools, FaFile, RsamtoolsFile)
 importFrom(Rsamtools, FaFile)
 importMethodsFrom(Rsamtools, getSeq, indexFa, path)
 importFrom(Rsamtools, index)
+
+## Stuff needed for protein annotations.
+importClassesFrom(Biostrings, AAStringSet)
+importFrom(Biostrings, AAStringSet)
+## importClassesFrom(Pbase, Proteins) ## causes a cyclic namespace dependency???
+
+importFrom(RCurl, getURL)
+
+## Testing:
+## 1) importing Gviz, but not Pbase: cycle error: biovizBase, Gviz, ensembldb
+## import(Gviz)
+## 2) import just biovizBase: cycle error: biovizBase, ensembldb
+## import(biovizBase)
+## Seems to be OK, biovizBase imports ensembldb, thus if we're importing
+## biovizBase we have the cyclic namespace.
 
 ## biovizBase
 ##importMethodsFrom(biovizBase, crunch)

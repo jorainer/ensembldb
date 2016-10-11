@@ -269,7 +269,7 @@ makeEnsembldbPackage <- function(ensdb,
 ##   start and end for each exon.
 ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version){
     options(useFancyQuotes=FALSE)
-    message("Importing GTF file...", appendLF=FALSE)
+    message("Importing GTF file ... ", appendLF=FALSE)
     ## wanted.features <- c("gene", "transcript", "exon", "CDS")
     wanted.features <- c("exon")
     ## GTF <- import(con=gtf, format="gtf", feature.type=wanted.features)
@@ -378,7 +378,7 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     orgFromAH <- Parms["organism"]
     genFromAH <- Parms["genomeVersion"]
     gtfFilename <- ah$title
-    message("Fetching data ...", appendLF=FALSE)
+    message("Fetching data ... ", appendLF=FALSE)
     suppressMessages(
         gff <- ah[[1]]
     )
@@ -495,7 +495,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
         }
     }
 
-    message("Importing GFF...", appendLF=FALSE)
+    message("Importing GFF ... ", appendLF=FALSE)
     suppressWarnings(
         theGff <- import(gff, format=paste0("gff", gffVersion))
     )
@@ -530,7 +530,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     ## Processing that stuff...
     ## Replace the ID format type:ID.
     ids <- strsplit(theGff$ID, split=":")
-    message("Fixing IDs...", appendLF=FALSE)
+    message("Fixing IDs ... ", appendLF=FALSE)
     ## For those that have length > 1 use the second element.
     theGff$ID <- unlist(lapply(ids, function(z){
         if(length(z) > 1)
@@ -539,7 +539,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     }))
     message("OK")
     ## Process genes...
-    message("Processing genes...", appendLF=FALSE)
+    message("Processing genes ... ", appendLF=FALSE)
     ## Bring the GFF into the correct format for EnsDb/ensDbFromGRanges.
     idx <- which(!is.na(theGff$gene_id))
     theGff$type[idx] <- "gene"
@@ -554,7 +554,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     ## message("OK")
 
     ## Process transcripts...
-    message("Processing transcripts...", appendLF=FALSE)
+    message("Processing transcripts ... ", appendLF=FALSE)
     idx <- which(!is.na(theGff$transcript_id))
     ## Check if I've got multiple parents...
     parentGenes <- theGff$Parent[idx]
@@ -575,7 +575,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
                                             replacement="", fixed=TRUE))
     message("OK")
 
-    message("Processing exons...", appendLF=FALSE)
+    message("Processing exons ... ", appendLF=FALSE)
     idx <- which(!is.na(theGff$exon_id))
     parentTx <- theGff$Parent[idx]
     if(any(lengths(parentTx) > 1))
@@ -678,7 +678,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     on.exit(dbDisconnect(con))
     ## ----------------------------
     ## metadata table:
-    message("Processing metadata...", appendLF=FALSE)
+    message("Processing metadata ... ", appendLF=FALSE)
     Metadata <- buildMetadata(organism, version, host="unknown",
                               sourceFile="GRanges object",
                               genomeVersion=genomeVersion)
@@ -695,7 +695,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## process genes
     ## we're lacking NCBI Entrezids and also the coord system, but these are not
     ## required columns anyway...
-    message("Processing genes...")
+    message("Processing genes ... ")
     ## want to have: gene_id, gene_name, entrezid, gene_biotype, gene_seq_start,
     ##               gene_seq_end, seq_name, seq_strand, seq_coord_system.
     wouldBeNice <- c("gene_id", "gene_name", "entrezid", "gene_biotype")
@@ -711,8 +711,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     }
     message(" Attribute availability:", appendLF=TRUE)
     for(i in 1:length(wouldBeNice)){
-        message("  o ", wouldBeNice[i], "...",
-                ifelse(any(gotColumns == wouldBeNice[i]), yes=" OK", no=" Nope"))
+        message("  o ", wouldBeNice[i], " ... ",
+                ifelse(any(gotColumns == wouldBeNice[i]), yes="OK", no="Nope"))
     }
     if(!any(reqCols %in% haveGot))
         stop(paste0("One or more required fields are not defined in the",
@@ -764,7 +764,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## ----------------------------
     ##
     ## process transcripts
-    message("Processing transcripts...", appendLF=TRUE)
+    message("Processing transcripts ... ", appendLF=TRUE)
     ## want to have: tx_id, tx_biotype, tx_seq_start, tx_seq_end, tx_cds_seq_start,
     ##               tx_cds_seq_end, gene_id
     wouldBeNice <- c("transcript_id", "gene_id", txBiotypeCol)
@@ -777,8 +777,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     haveGot <- wouldBeNice[wouldBeNice %in% gotColumns]
     message(" Attribute availability:", appendLF=TRUE)
     for(i in 1:length(wouldBeNice)){
-        message("  o ", wouldBeNice[i], "...",
-                ifelse(any(gotColumns == wouldBeNice[i]), yes=" OK", no=" Nope"))
+        message("  o ", wouldBeNice[i], " ... ",
+                ifelse(any(gotColumns == wouldBeNice[i]), yes="OK", no="Nope"))
     }
     reqCols <- c("transcript_id", "gene_id")
     if(!any(reqCols %in% gotColumns))
@@ -852,7 +852,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## ----------------------------
     ##
     ## process exons
-    message("Processing exons...", appendLF=FALSE)
+    message("Processing exons ... ", appendLF=FALSE)
     reqCols <- c("exon_id", "transcript_id", "exon_number")
     if(!any(reqCols %in% gotColumns))
         stop(paste0("One or more required fields are not defined in",
@@ -881,33 +881,31 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
     ## ----------------------------
     ##
     ## process chromosomes
-    message("Processing chromosomes...", appendLF=FALSE)
-    if(fetchSeqinfo){
+    message("Processing chromosomes ... ", appendLF=FALSE)
+    if (fetchSeqinfo) {
         ## problem is I don't have these available...
-        chroms <- data.frame(seq_name=unique(as.character(genes$seq_name)))
-        chroms <- cbind(chroms, seq_length=rep(NA, nrow(chroms)),
-                        is_circular=rep(NA, nrow(chroms)))
+        chroms <- data.frame(seq_name = unique(as.character(genes$seq_name)))
+        chroms <- cbind(chroms, seq_length = rep(NA, nrow(chroms)),
+                        is_circular = rep(NA, nrow(chroms)))
         rownames(chroms) <- chroms$seq_name
-        ## now trying to get the sequence lengths directly from Ensembl using internal
-        ## functions from the GenomicFeatures package. I will use "try" to not break
-        ## the call if no seqlengths are available.
-        seqlengths <- tryGetSeqinfoFromEnsembl(organism, version,
-                                               seqnames=chroms$seq_name)
-        if(nrow(seqlengths)>0){
-            seqlengths <- seqlengths[seqlengths[, "name"] %in% rownames(chroms), ]
-            chroms[seqlengths[, "name"], "seq_length"] <- seqlengths[, "length"]
+        ## Try to get sequence lengths from Ensembl or Ensemblgenomes.
+        sl <- tryGetSeqinfoFromEnsembl(organism, version,
+                                       seqnames = chroms$seq_name)
+        if (nrow(sl) > 0) {
+            sl <- sl[sl[, "name"] %in% rownames(chroms), ]
+            chroms[sl[, "name"], "seq_length"] <- sl[, "length"]
         }
-    }else{
+    } else {
         ## have seqinfo available.
-        chroms <- data.frame(seq_name=seqnames(Seqinfo),
-                             seq_length=seqlengths(Seqinfo),
-                             is_circular=isCircular(Seqinfo))
+        chroms <- data.frame(seq_name = seqnames(Seqinfo),
+                             seq_length = seqlengths(Seqinfo),
+                             is_circular = isCircular(Seqinfo))
     }
     ## write the table.
     dbWriteTable(con, name="chromosome", chroms, overwrite=TRUE, row.names=FALSE)
     rm(genes)
     message("OK")
-    message("Generating index...", appendLF=FALSE)
+    message("Generating index ... ", appendLF=FALSE)
     ## generating all indices...
     .createEnsDbIndices(con)
     message("OK")
@@ -922,7 +920,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version)
 ## EnsDb database is correct (i.e. transcript within gene coordinates, exons within
 ## transcript coordinates, cds within transcript)
 checkValidEnsDb <- function(x){
-    message("Checking transcripts...", appendLF=FALSE)
+    message("Checking transcripts ... ", appendLF=FALSE)
     tx <- transcripts(x, columns=c("gene_id", "tx_id", "gene_seq_start",
                                    "gene_seq_end", "tx_seq_start",
                                    "tx_seq_end", "tx_cds_seq_start",
@@ -941,7 +939,7 @@ checkValidEnsDb <- function(x){
              " transcripts are not within the transcript coordinates!")
     }
     rm(tx)
-    message("OK\nChecking exons...", appendLF=FALSE)
+    message("OK\nChecking exons ... ", appendLF=FALSE)
     ex <- exons(x, columns=c("exon_id", "tx_id", "exon_seq_start", "exon_seq_end",
                              "tx_seq_start", "tx_seq_end", "seq_strand", "exon_idx"),
                 return.type="data.frame")
@@ -983,42 +981,66 @@ checkValidEnsDb <- function(x){
 
 ## organism is expected to be e.g. Homo_sapiens, so the full organism name, with
 ## _ as a separator
+## tryGetSeqinfoFromEnsembl_old <- function(organism, ensemblVersion, seqnames){
+##     ## Quick fix if organism contains whitespace instead of _:
+##     organism <- gsub(organism, pattern=" ", replacement="_", fixed=TRUE)
+##     Dataset <- paste0(c(tolower(.abbrevOrganismName(organism)), "gene_ensembl"),
+##                       collapse="_")
+##     message("Fetch seqlengths from ensembl, dataset ", Dataset, " version ",
+##             ensemblVersion, "...", appendLF=FALSE)
+##     ## get it all from the ensemblgenomes.org host???
+##     tmp <- try(
+##         GenomicFeatures:::fetchChromLengthsFromEnsembl(dataset=Dataset,
+##                                                        release=ensemblVersion,
+##                                                        extra_seqnames=seqnames),
+##         silent=TRUE)
+##     if(class(tmp)=="try-error"){
+##         message(paste0("Unable to get sequence lengths from Ensembl for dataset: ",
+##                        Dataset, ". Error was: ", message(tmp), "\n"))
+##     }else{
+##         message("OK")
+##         return(tmp)
+##     }
+##     ## try plant genomes...
+##     tmp <- try(
+##         GenomicFeatures:::fetchChromLengthsFromEnsemblPlants(dataset=Dataset,
+##                                                              extra_seqnames=seqnames),
+##         silent=TRUE)
+##     if(class(tmp)=="try-error"){
+##         message(paste0("Unable to get sequence lengths from Ensembl plants",
+##                        " for dataset: ", Dataset, ". Error was: ",
+##                        message(tmp), "\n"))
+##     }else{
+##         message("OK")
+##         return(tmp)
+##     }
+##     message("FAIL")
+##     return(matrix(ncol=2, nrow=0))
+## }
+
+############################################################
+##' Fetch chromosome sequence lengths from Ensembl.
+##' @param organism The organism. Has to be in the form "Homo sapiens"
+##' @param ensemblVersion The Ensembl version.
+##' @param seqnames The names of the chromosomes/sequences; optional.
+##' @return A matrix with two columns name and seq_length.
+##' @noRd
 tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames){
-    ## Quick fix if organism contains whitespace instead of _:
-    organism <- gsub(organism, pattern=" ", replacement="_", fixed=TRUE)
-    Dataset <- paste0(c(tolower(.abbrevOrganismName(organism)), "gene_ensembl"),
-                      collapse="_")
-    message("Fetch seqlengths from ensembl, dataset ", Dataset, " version ",
-            ensemblVersion, "...", appendLF=FALSE)
-    ## get it all from the ensemblgenomes.org host???
+    message("Fetch seqlengths from ensembl ... ", appendLF=FALSE)
     tmp <- try(
-        GenomicFeatures:::fetchChromLengthsFromEnsembl(dataset=Dataset,
-                                                       release=ensemblVersion,
-                                                       extra_seqnames=seqnames),
-        silent=TRUE)
-    if(class(tmp)=="try-error"){
-        message(paste0("Unable to get sequence lengths from Ensembl for dataset: ",
-                       Dataset, ". Error was: ", message(tmp), "\n"))
-    }else{
-        message("OK")
-        return(tmp)
+        .getSeqlengthsFromMysqlFolder(organism = organism,
+                                      ensembl = ensemblVersion,
+                                      seqnames = seqnames)
+    , silent = TRUE)
+    if (is(tmp, "try-error") | is.null(tmp)) {
+        message("FAIL")
+        warning("Unable to retrieve sequence lengths from Ensembl.")
+        return(matrix(nrow = 0, ncol = 2))
     }
-    ## try plant genomes...
-    tmp <- try(
-        GenomicFeatures:::fetchChromLengthsFromEnsemblPlants(dataset=Dataset,
-                                                             extra_seqnames=seqnames),
-        silent=TRUE)
-    if(class(tmp)=="try-error"){
-        message(paste0("Unable to get sequence lengths from Ensembl plants",
-                       " for dataset: ", Dataset, ". Error was: ",
-                       message(tmp), "\n"))
-    }else{
-        message("OK")
-        return(tmp)
-    }
-    message("FAIL")
-    return(matrix(ncol=2, nrow=0))
+    colnames(tmp) <- c("name", "length")
+    return(tmp)
 }
+
 
 buildMetadata <- function(organism="", ensemblVersion="", genomeVersion="",
                           host="", sourceFile=""){
@@ -1428,3 +1450,172 @@ elementFromEnsemblFilename <- function(x, which=1){
     return(splitty[which])
 }
 
+############################################################
+## Utilities to fetch sequence lengths from Ensembl's ftp server, more
+## specifically from the MySQL tables there.
+## These replace the (unexported) functions from GenomicFeatures used thus far.
+.ENSEMBL_URL <- "ftp://ftp.ensembl.org/pub/"
+.ENSEMBLGENOMES_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
+##' Get the base url containing the mysql database for the specified host,
+##' orgnism and Ensembl version.
+##' @details The function will first build an approximate database name (without
+##' the trailing <_genome version number> as this is not easy to guess).
+##' Next all directories in the base MySQL folder will be scanned for the best
+##' matching folder.
+##' @param type Either "ensembl" or "ensemblgenomes"
+##' @param organism Character specifying the organism. Has to be the full name,
+##' i.e "homo_sapiens" or "Homo sapiens".
+##' @param ensembl The Ensembl version.
+##' @param genone The Genome version.
+##' @noRd
+.getEnsemblMysqlUrl <- function(type = "ensembl", organism, ensembl, genome) {
+    type <- match.arg(type, c("ensembl", "ensemblgenomes"))
+    if (type == "ensembl") {
+        my_url <- paste0(.ENSEMBL_URL, "release-", ensembl, "/mysql/")
+        db_name <- .guessDatabaseName(organism, ensembl)
+        ## List folders
+        res <- getURL(my_url, dirlistonly = TRUE)
+        if (length(res) > 0) {
+            dirs <- unlist(strsplit(res, split = "\n"))
+            idx <- grep(dirs, pattern = db_name)
+            if (length(idx) > 1)
+                stop("Found more than one database matching '", db_name,
+                     "' in Ensembl's ftp server!")
+            if (length(idx) == 0)
+                stop("No database matching '", db_name, "' found in Ensembl's",
+                     " ftp server.")
+            return(paste0(my_url, dirs[idx]))
+        }
+    } else {
+        ## That's tricky! Have to find out whether the species is in plants,
+        ## fungi, bacteria etc.
+        ## List dirs of bacteria, fungi, metazoa, plants, protists
+        sub_folders <- c("bacteria", "fungi", "metazoa", "plants", "protists")
+        db_name <- .guessDatabaseName(organism, ensembl)
+        for (fold in sub_folders) {
+            my_url <- paste0(.ENSEMBLGENOMES_URL, "release-", ensembl, "/",
+                             fold, "/mysql/")
+            res <- getURL(my_url, dirlistonly = TRUE)
+            if (length(res) > 0) {
+                dirs <- unlist(strsplit(res, split = "\n"))
+                idx <- grep(dirs, pattern = db_name)
+                if (length(idx) == 1)
+                    return(paste0(my_url, dirs[idx]))
+                if (length(idx) > 1)
+                    stop("Found more than one database matching '", db_name,
+                         "' in Ensembl's ftp server!")
+                ## Well, then let's go to the next one.
+            }
+        }
+        stop("No database matching '", db_name, "' found in Ensembl's",
+             " ftp server")
+    }
+}
+
+############################################################
+## .guessDatabaseName
+##' build the database name from species, ensembl version and genome version.
+##' The latter is specifically difficult, as it is not quite clear how Ensembl
+##' defines the Genome version number.
+##' @param organism Character specifying the organism. Has to be in the format
+##' "homo_sapiens" or "Homo sapiens", i.e. the full name.
+##' @param ensembl The Ensembl version number.
+##' @param genome The Genome version, e.g. GRCh38 (optional!).
+##' @return A character representing the guessed database name in Ensembl.
+##' @noRd
+.guessDatabaseName <- function(organism, ensembl, genome) {
+    if (missing(organism) & missing(ensembl))
+        stop("'organism' and 'ensembl' are required!")
+    ## Organism: all lower case, replace . with _
+    organism <- tolower(gsub(organism, pattern = ".", replacement = "_",
+                             fixed = TRUE))
+    organism <- gsub(organism, pattern = " ", replacement = "_",
+                     fixed = TRUE)
+    dbname <- paste0(organism, "_core_", ensembl)
+    ## Genome: remove all letters and keep just the numbers.
+    if (!missing(genome)) {
+        genome <- gsub(genome, pattern = "[a-zA-Z]", replacement = "")
+        ## replace .0 at the end
+        genome <- gsub(genome, pattern = ".0$", replacement = "")
+        genome <- gsub(genome, pattern = ".", replacement = "", fixed = TRUE)
+        genome <- gsub(genome, pattern = "_", replacement = "", fixed = TRUE)
+        dbname <- paste0(dbname, "_", genome)
+    }
+    return(dbname)
+}
+
+############################################################
+## .getSeqlengthsFromMysqlFolder
+##' Fetch the coord_system.txt.gz and seq_region.txt.gz and extract the
+##' seqlengths from there.
+##' @noRd
+.getSeqlengthsFromMysqlFolder <- function(organism, ensembl, seqnames) {
+    ## Test whether we have the database in ensembl
+    mysql_url <- try(.getEnsemblMysqlUrl(type = "ensembl", organism = organism,
+                                         ensembl = ensembl), silent = TRUE)
+    if (is(mysql_url, "try-error")) {
+        mysql_url <- try(.getEnsemblMysqlUrl(type = "ensemblgenomes",
+                                             organism = organism,
+                                             ensembl = ensembl), silent = TRUE)
+    }
+    if (is(mysql_url, "try-error")) {
+        warning("Can not get the sequence lengths from Ensembl or",
+                " Ensemblgenomes. Seqinfo will lack the sequence lengths.")
+        return(NULL)
+    }
+    ## Get the coord_system table
+    coord_syst <- .getReadMysqlTable(mysql_url, "coord_system.txt.gz",
+                                     colnames = c("coord_system_id",
+                                                  "species_id", "name",
+                                                  "version", "rank", "attrib"))
+    ## Subset to the ones with "default" in "attrib"
+    coord_syst <- coord_syst[grep(coord_syst$attrib, pattern = "default"),
+                           , drop = FALSE]
+    rownames(coord_syst) <- as.character(coord_syst$coord_system_id)
+    ## Get the seq_region table
+    seq_region <- .getReadMysqlTable(mysql_url, "seq_region.txt.gz",
+                                     colnames = c("seq_region_id", "name",
+                                                  "coord_system_id", "length"))
+    ## Sub-set to the ones matching the coord_syst_ids and from these, select
+    ## the one entry with the smallest rank, if more than one present.
+    seq_region <- seq_region[seq_region$coord_system_id %in%
+                             coord_syst$coord_system_id,
+                           , drop = FALSE]
+    seq_region <- cbind(seq_region,
+                        rank = coord_syst[as.character(seq_region$coord_system_id),
+                                          "rank"])
+    ## Sub-set to the seqlevels we've got.
+    if (!missing(seqnames)) {
+        seq_region <- seq_region[seq_region$name %in% seqnames, , drop = FALSE]
+        if (!all(seqnames %in% seq_region$name))
+            warning("Could not determine length for all seqnames.")
+    }
+    sr <- split(seq_region, f = seq_region$name)
+    if (length(sr) == 0)
+        return(NULL)
+    sr <- lapply(sr, function(z) {
+        if (nrow(z) == 1)
+            return(z)
+        z <- z[order(z$rank), ]
+        return(z[1, , drop = FALSE])
+    })
+    sr <- do.call(rbind, sr)
+    rownames(sr) <- sr$name
+    return(sr[, c("name", "length")])
+}
+
+##' Download and read a table from Ensembl
+##' @param base_url the base url to the mysql folder on the server.
+##' @param file_name the file name of the table.
+##' @param colnames the column names.
+##' @return A data.frame with the table's content.
+##' @noRd
+.getReadMysqlTable <- function(base_url, file_name, colnames) {
+    tmp_file <- tempfile()
+    download.file(url = paste0(base_url, "/", file_name), destfile = tmp_file,
+                  quiet = TRUE)
+    tmp <- read.table(tmp_file, sep = "\t", quote = "", comment.char = "",
+                      as.is = TRUE)
+    colnames(tmp) <- colnames
+    return(tmp)
+}
