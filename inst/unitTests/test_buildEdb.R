@@ -202,9 +202,11 @@ test_getEnsemblMysqlUrl <- function() {
 }
 
 check_getReadMysqlTable <- function(url) {
-    res <- .getReadMysqlTable(url, "coord_system.txt.gz",
-                              colnames = c("coord_system_id", "species_id",
-                                           "name", "version", "rank", "attrib"))
+    res <- ensembldb:::.getReadMysqlTable(url, "coord_system.txt.gz",
+                                          colnames = c("coord_system_id",
+                                                       "species_id",
+                                                       "name", "version",
+                                                       "rank", "attrib"))
     checkTrue(nrow(res) > 0)
 }
 
