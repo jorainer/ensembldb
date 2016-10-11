@@ -259,11 +259,16 @@ test_ProtdomidFilter <- function() {
 ## The dedicated methods to fetch protein data.
 test_proteins <- function() {
     if (hasProteinData(edb)) {
-        prts_gr <- proteins(edb, filter = GenenameFilter("ZBTB16"))
+        ## Check return type.
+        prts_DF <- proteins(edb, filter = GenenameFilter("ZBTB16"))
+        checkTrue(is(prts_DF, "DataFrame"))
         prts_df <- proteins(edb, filter = GenenameFilter("ZBTB16"),
                             return.type = "data.frame")
-        prts_DF <- proteins(edb, filter = GenenameFilter("ZBTB16"),
-                            return.type = "DataFrame")
+        checkTrue(is(prts_df, "data.frame"))
+        prts_aa <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+                            return.type = "AAStringSet")
+        checkTrue(is(prts_aa, "AAStringSet"))
+        ## Check content.
         library(RSQLite)
         res_q <- dbGetQuery(dbconn(edb),
                             paste0("select tx.tx_id, protein_id, gene_name from ",
@@ -272,16 +277,14 @@ test_proteins <- function() {
                                    "tx.gene_id) where gene_name = 'ZBTB16'"))
         checkEquals(res_q$tx_id, prts_df$tx_id)
         checkEquals(res_q$protein_id, prts_df$protein_id)
-        checkTrue(is(prts_gr, "GRanges"))
-        checkEquals(class(prts_df), "data.frame")
-        checkTrue(is(prts_DF,"DataFrame"))
-        checkEquals(prts_df$protein_id, names(prts_gr))
+        checkEquals(prts_df$protein_id, names(prts_aa))
 
         ## Add protein domain information to the proteins.
         prts_df <- proteins(edb, filter = ProteinidFilter(c("ENSP00000338157",
                                                             "ENSP00000443013")),
                             columns = c("protein_id", "protein_domain_id",
-                                        "uniprot_id"), return.type = "data.frame")
+                                        "uniprot_id"),
+                            return.type = "data.frame")
         ## Check if we have all data that we expect:
         uniprots <- dbGetQuery(dbconn(edb),
                                paste0("select uniprot_id from uniprot where",
@@ -289,8 +292,9 @@ test_proteins <- function() {
                                       "'ENSP00000443013')"))$uniprot_id
         checkTrue(all(uniprots %in% prts_df$uniprot_id))
         protdoms <- dbGetQuery(dbconn(edb),
-                               paste0("select protein_domain_id from protein_domain",
-                                      " where protein_id in ('ENSP00000338157',",
+                               paste0("select protein_domain_id from",
+                                      " protein_domain where protein_id",
+                                      " in ('ENSP00000338157',",
                                       "'ENSP00000443013')"))$protein_domain_id
         checkTrue(all(protdoms %in% prts_df$protein_domain_id))
     }
@@ -301,3 +305,32 @@ notrun_test_protein_domains <- function() {
                                                 "gene_name"),
                                filter = list(ProtdomidFilter("PF00096")))
 }
+
+## test_ProteinsFromDataframe <- function() {
+##     if (hasProteinData(edb)) {
+##         prt_df <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+##                            return.type = "data.frame")
+##         prt <- ensembldb:::.ProteinsFromDataframe(prt_df)
+##     }
+## }
+
+
+
+## What would be nice for Proteins: be a little more like a GRanges.
+## o Access mcols of the aa directly.
+## o Access columns from the metadata with $
+## o inherit directly from AAStringSet?
+## o names() returns result from seqnames?
+## o show method be a little more like a GRanges.
+## o do 'names' really have to be unique? what with 1:n mapping between
+##   protein_id and Uniprot ID? would be nice if the binding would NOT be by
+##   name but rather by index!
+
+## How should a result object look like:
+## ProteinResult:
+## o extend an AAStringSet (that's fine!)
+## o transcript_id is required.
+## o domain data as IRangesList
+## Functionality:
+## o getGenomeMapping get a GRanges with the cds for this (cdsBy tx).
+

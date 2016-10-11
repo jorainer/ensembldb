@@ -129,3 +129,56 @@ listProteinColumns <- function(object) {
         stop("The provided EnsDb database does not contain protein annotations!")
     return(listColumns(object, c("protein", "uniprot", "protein_domain")))
 }
+
+############################################################
+## .ProteinsFromDataframe
+##' @x \code{EnsDb} object.
+##' @param data \code{data.frame} with the results from a call to the
+##' \code{proteins} method; has to have required columns \code{"protein_id"} and
+##' \code{"protein_sequence"}.
+##' @noRd
+.ProteinsFromDataframe <- function(x, data) {
+    if (!all(c("protein_id", "protein_sequence") %in% colnames(data)))
+        stop("Reguired columns 'protein_id' and 'protein_sequence' not in 'data'!")
+    ## Get the column names for uniprot and protein_domain
+    uniprot_cols <- listColumns(x, "uniprot")
+    uniprot_cols <- uniprot_cols[uniprot_cols != "protein_id"]
+    uniprot_cols <- uniprot_cols[uniprot_cols %in% colnames(data)]
+    if (length(uniprot_cols) > 0)
+        warning("Don't know yet how to handle the 1:n mapping between",
+                " protein_id and uniprot_id!")
+
+    prot_dom_cols <- listColumns(x, "protein_domain")
+    prot_dom_cols <- prot_dom_cols[prot_dom_cols != "protein_id"]
+    prot_dom_cols <- prot_dom_cols[prot_dom_cols %in% colnames(data)]
+
+    ## Create the protein part of the object, i.e. the AAStringSet.
+    ## Use all columns other than protein_id, protein_sequence
+    prot_cols <- colnames(data)
+    prot_cols <- prot_cols[!(prot_cols %in% c(uniprot_cols, prot_dom_cols))]
+    protein_sub <- unique(data[, prot_cols, drop = FALSE])
+    aass <- AAStringSet(protein_sub$protein_sequence)
+    names(aass) <- protein_sub$protein_id
+    prot_cols <- prot_cols[!(prot_cols %in% c("protein_id", "protein_sequence"))]
+    if (length(prot_cols) > 0) {
+        mcols(aass) <- DataFrame(protein_sub[, prot_cols, drop = FALSE])
+        ## drop these columns from data to eventually speed up splits
+        data <- data[, !(colnames(data) %in% prot_cols), drop = FALSE]
+    }
+
+    ## How to process the Uniprot here??? have a 1:n mapping!
+
+    ## Create the protein domain part
+    if (length(prot_dom_cols) > 0) {
+        message("Processing protein domains not yet implemented!")
+        ## Split the dataframe by protein_id
+        ## process this list to create the IRangesList.
+        ## pranges should have the same order and the same names
+    } else {
+        pranges <- IRangesList(replicate(length(aass), IRanges()))
+        names(pranges) <- names(aass)
+    }
+    metadata <- list(created = date())
+
+    ##return(new("Proteins", aa = aass, pranges = pranges, metadata = metadata))
+}
