@@ -1907,6 +1907,15 @@ setMethod("proteins", "EnsDb", function(object,
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, object)
+    ## Check that we don't have any exon columns here.
+    ex_cols <- unique(listColumns(object, c("exon", "tx2exon")))
+    ex_cols <- ex_cols[ex_cols != "tx_id"]
+    if (any(columns %in% ex_cols)) {
+        warning("Exon specific columns are not allowed for proteins. Columns ",
+                paste0("'", columns[columns %in% ex_cols], "'", collapse = ", "),
+                " have been removed.")
+        columns <- columns[!(columns %in% ex_cols)]
+    }
     retColumns <- columns
     ## Process order.by:
     ## If not specified we might want to order them by seq_name or tx_seq_start
