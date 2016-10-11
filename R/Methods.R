@@ -1872,8 +1872,8 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##' ascending (\code{order.type = "asc"}) or descending
 ##' (\code{order.type = "desc"})
 ##' @param return.type For \code{proteins}: character of lenght one specifying
-##' the type of the returned object. Can be either \code{"data.frame"},
-##' \code{"DataFrame"} or \code{"GRanges"}.
+##' the type of the returned object. Can be either \code{"DataFrame"},
+##' \code{"data.frame"} or \code{"AAStringSet"}.
 ##' @return The \code{proteins} method returns protein related annotations from
 ##' an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
 ##' allowing to define the type of the returned object.
@@ -1892,12 +1892,12 @@ setMethod("proteins", "EnsDb", function(object,
                                         filter,
                                         order.by = "",
                                         order.type = "asc",
-                                        return.type = "GRanges") {
+                                        return.type = "DataFrame") {
     if (!hasProteinData(object))
         stop("The used EnsDb does not provide protein annotations!",
              " Thus, 'proteins' can not be used.")
-    return.type <- match.arg(return.type, c("data.frame", "GRanges",
-                                            "DataFrame"))
+    return.type <- match.arg(return.type, c("DataFrame", "AAStringSet",
+                                            "data.frame"))
     columns <- cleanColumns(object, unique(c(columns, "protein_id")))
     if (missing(filter)) {
         filter = list()
@@ -1923,9 +1923,11 @@ setMethod("proteins", "EnsDb", function(object,
     }
     ## If we're going to return a GRanges we need to know the length of the
     ## peptide sequence.
-    if (return.type == "GRanges") {
+    if (return.type == "AAStringSet") {
         columns <- unique(c(columns, "protein_sequence"))
     }
+    ## protein_id is *always* required
+    columns <- unique(c(columns), "protein_id")
     ## Get the data
     Res <- getWhat(object, columns = columns, filter = filter,
                    order.by = order.by, order.type = order.type,
@@ -1937,22 +1939,14 @@ setMethod("proteins", "EnsDb", function(object,
         warning("Columns ", paste0("'", retColumns[cols_not_found], "'",
                                    collapse = ", "),
                 " not found in the database!")
-    if (return.type == "GRanges") {
-        ## Build the SeqInfo.
-        prots <- unique(Res[, c("protein_id", "protein_sequence"),
-                            drop = FALSE])
-        seq_lengths <- nchar(prots[, "protein_sequence"])
-        si <- Seqinfo(seqnames = prots$protein_id, seqlengths = seq_lengths,
-                      genome = unname(unique(genome(object))))
-        ## Define start and width.
-        GR <- GRanges(seqnames = Res$protein_id,
-                      ranges = IRanges(start = rep(1, nrow(Res)),
-                                       end = seq_lengths),
-                      seqinfo = si,
-                      strand = "+",
-                      Res[, retColumns, drop = FALSE])
-        names(GR) <- Res$protein_id
-        return(GR)
+    if (return.type == "AAStringSet") {
+        aass <- AAStringSet(Res$protein_sequence)
+        names(aass) <- Res$protein_id
+        ## Add the mcols:
+        retColumns <- retColumns[retColumns != "protein_sequence"]
+        if (length(retColumns) > 0)
+            mcols(aass) <- DataFrame(Res[, retColumns, drop = FALSE])
+        return(aass)
     } else {
         Res <- Res[, retColumns, drop = FALSE]
         if (return.type == "DataFrame")

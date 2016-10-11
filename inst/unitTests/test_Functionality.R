@@ -436,7 +436,7 @@ checkSingleTx <- function(tx, cds, do.plot=FALSE){
 notrun_test_genetrack_df <- function(){
     do.plot <- FALSE
     if(do.plot){
-        library(Gviz)
+        ##library(Gviz)
         options(ucscChromosomeNames=FALSE)
         data(geneModels)
         geneModels$chromosome <- 7
