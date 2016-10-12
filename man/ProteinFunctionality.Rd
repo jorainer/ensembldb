@@ -10,7 +10,7 @@
 listProteinColumns(object)
 
 \S4method{proteins}{EnsDb}(object, columns = listColumns(object, "protein"),
-  filter, order.by = "", order.type = "asc", return.type = "GRanges")
+  filter, order.by = "", order.type = "asc", return.type = "DataFrame")
 }
 \arguments{
 \item{object}{The \code{\linkS4class{EnsDb}} object.}
@@ -32,8 +32,8 @@ ascending (\code{order.type = "asc"}) or descending
 (\code{order.type = "desc"})}
 
 \item{return.type}{For \code{proteins}: character of lenght one specifying
-the type of the returned object. Can be either \code{"data.frame"},
-\code{"DataFrame"} or \code{"GRanges"}.}
+the type of the returned object. Can be either \code{"DataFrame"},
+\code{"data.frame"} or \code{"AAStringSet"}.}
 }
 \value{
 The \code{listProteinColumns} function returns a character vector
