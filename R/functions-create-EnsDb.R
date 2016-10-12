@@ -1112,6 +1112,11 @@ compareEnsDbs <- function(x, y){
     Messages["transcript"] <- compareTx(x, y)
     ## comparing exons
     Messages["exon"] <- compareExons(x, y)
+    ## If we've got protein data in one of the two:
+    if (hasProteinData(x) | hasProteinData(y)) {
+        Messages <- c(Messages, protein = "OK")
+        Messages["protein"] <- compareProteins(x, y)
+    }
     return(Messages)
 }
 
@@ -1308,6 +1313,47 @@ compareTx <- function(x, y){
     if(different > 0)
         Ret <- "ERROR"
     cat(paste0( " Associated gene IDs: (",same,
+               ") identical, (", different, ") different.\n" ))
+    cat(paste0("Done. Result: ", Ret,"\n"))
+    return(Ret)
+}
+
+compareProteins <- function(x, y){
+    cat("\nComparing protein data:\n")
+    Ret <- "OK"
+    if (!hasProteinData(x) | !hasProteinData(y)) {
+        Ret <- "WARN"
+        cat(paste0("No protein data available for one or both EnsDbs."))
+        return(Ret)
+    }
+    X <- proteins(x)
+    Y <- proteins(y)
+    inboth <- X$protein_id[X$protein_id %in% Y$protein_id]
+    onlyX <- X$protein_id[!(X$protein_id %in% Y$protein_id)]
+    onlyY <- Y$protein_id[!(Y$protein_id %in% X$protein_id)]
+    if(length(onlyX) > 0 | length(onlyY) > 0)
+        Ret <- "WARN"
+    cat(paste0(" protein IDs: (", length(inboth), ") common, (",
+               length(onlyX), ") only in x, (", length(onlyY),
+               ") only in y.\n"))
+    X <- X[X$protein_id %in% inboth, ]
+    Y <- Y[Y$protein_id %in% inboth, ]
+    rownames(X) <- X$protein_id
+    rownames(Y) <- Y$protein_id
+    Y <- Y[rownames(X), ]
+    ## tx_id
+    same <- length(which(X$tx_id == Y$tx_id))
+    different <- length(inboth) - same
+    if(different > 0)
+        Ret <- "ERROR"
+    cat(paste0( " Transcript IDs: (",same,
+               ") identical, (", different, ") different.\n" ))
+    ## sequence
+    same <- length(which(X$protein_sequence == Y$protein_sequence))
+    different <- length(inboth) - same
+    if(different > 0)
+        Ret <- "ERROR"
+    cat(paste0( " Protein sequence: (",same,
                ") identical, (", different, ") different.\n" ))
     cat(paste0("Done. Result: ", Ret,"\n"))
     return(Ret)
