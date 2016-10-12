@@ -39,16 +39,16 @@ features also the following protein related information is available:
 + =uniprot_id=: the Uniprot ID for a protein. Note that not every Ensembl
   =protein_id= has a Uniprot ID, and each =protein_id= might be mapped to several
   =uniprot_id=.
-+ =protein_sequence=: the peptide sequence of a protein.
++ =protein_sequence=: the amino acid sequence of a protein.
 + =protein_domain_id=: the ID of the protein domain according to the
   source/analysis in/by which is was defined.
 + =protein_domain_source=: the source of the protein domain information, one of
   /pfscan/, /scanprosite/, /superfamily/, /pfam/, /prints/, /smart/, /pirsf/ or /tigrfam/.
 + =interpro_accession=: the Interpro accession ID of the protein domain (if
   available).
-+ =prot_dom_start=: the start of the protein domain within the peptide sequence of
++ =prot_dom_start=: the start of the protein domain within the sequence of
   the protein.
-+ =prot_dom_start=: the end position of the protein domain within the peptide
++ =prot_dom_start=: the end position of the protein domain within the
   sequence of the protein.
 
 Thus, for protein coding transcripts, these annotations can in addition be
@@ -227,7 +227,7 @@ To map proteins to the genome, the =cdsBy= method can be used.
   - For some proteins there is a n:1 mapping between /tx_id/ and /protein_id/.
 + [X] Check: is the genome_start/end of a protein the same as the CDS start and
   end?
-+ [ ] Check: is the peptide sequence identical to the sequence we would get if
++ [ ] Check: is the aa sequence identical to the sequence we would get if
   we translated the CDS in R?
 + [X] Would it be better to split the protein table into a protein and
   protein_uniprot table? Looks like it's better to split them.
@@ -241,7 +241,7 @@ object, /just/ the CDS coding start and end, or the individual start and end of
 all of its exons (same like for e.g. the =cdsBy= method)?
 
 A) =proteins= returns a =GRanges= with start being 1, width being the length of the
-peptide and the seqname being the protein ID.
+aa and the seqname being the protein ID.
 B) A =Proteins= object?
 
 ** TODO Implement a =proteinDomains= method

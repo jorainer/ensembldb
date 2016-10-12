@@ -12,3 +12,14 @@ test_validity_functions <- function() {
 test_validateEnsDb <- function() {
     checkTrue(ensembldb:::validateEnsDb(edb))
 }
+
+test_compareProteins <- function() {
+    if (hasProteinData(edb)) {
+        res <- ensembldb:::compareProteins(edb, edb)
+        checkEquals(res, "OK")
+    }
+}
+
+notrun_compareEnsDbs <- function() {
+    res <- ensembldb:::compareEnsDbs(edb, edb)
+}
