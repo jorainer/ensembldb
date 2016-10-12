@@ -132,7 +132,7 @@ listProteinColumns <- function(object) {
 
 ############################################################
 ## .ProteinsFromDataframe
-##' @x \code{EnsDb} object.
+##' @param x \code{EnsDb} object.
 ##' @param data \code{data.frame} with the results from a call to the
 ##' \code{proteins} method; has to have required columns \code{"protein_id"} and
 ##' \code{"protein_sequence"}.
