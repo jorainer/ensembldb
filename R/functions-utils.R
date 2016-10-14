@@ -182,3 +182,15 @@ listProteinColumns <- function(object) {
 
     ##return(new("Proteins", aa = aass, pranges = pranges, metadata = metadata))
 }
+
+############################################################
+## isProteinFilter
+##' evaluates whether the filter is a protein annotation related filter.
+##' @param x The object that should be evaluated.
+##' @return Returns TRUE if 'x' is a filter for protein annotation tables and
+##' FALSE otherwise.
+##' @noRd
+isProteinFilter <- function(x) {
+    return(is(x, "ProteinidFilter") | is(x, "UniprotidFilter") |
+           is(x, "ProtdomidFilter"))
+}

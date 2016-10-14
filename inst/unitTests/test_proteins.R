@@ -300,6 +300,19 @@ test_proteins <- function() {
     }
 }
 
+test_isProteinFilter <- function() {
+    ## TRUE
+    checkTrue(ensembldb:::isProteinFilter(ProteinidFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(UniprotidFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(ProtdomidFilter("a")))
+    ## FALSE
+    checkTrue(!ensembldb:::isProteinFilter(GeneidFilter("a")))
+    checkTrue(!ensembldb:::isProteinFilter(SymbolFilter("a")))
+    checkTrue(!ensembldb:::isProteinFilter(3))
+    checkTrue(!ensembldb:::isProteinFilter("dfdf"))
+}
+
+
 notrun_test_protein_domains <- function() {
     res <- ensembldb:::getWhat(edb, columns = c("protein_id", "tx_id", "gene_id",
                                                 "gene_name"),
