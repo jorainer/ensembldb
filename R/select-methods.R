@@ -128,6 +128,14 @@ setMethod("keys", "EnsDb",
               if(is(filter, "BasicFilter"))
                   filter <- list(filter)
               keyt <- keytypes(x)
+              if (length(keytype) > 1) {
+                  keytype <- keytype[1]
+                  warning("Using only first provided keytype.")
+              }
+              if (!any(keyt == keytype))
+                  stop("keytype '", keytype, "' not supported! ",
+                       "Allowed choices are: ",
+                       paste0("'", keyt ,"'", collapse = ", "), ".")
               keytype <- match.arg(keytype, keyt)
               ## Map the keytype to the appropriate column name.
               dbColumn <- ensDbColumnForColumn(x, keytype)
@@ -228,9 +236,7 @@ setMethod("select", "EnsDb",
             startWith <- "uniprot"
         if (any(unlist(lapply(keys, function(z) is(z, "ProteinidFilter")))))
             startWith <- "protein"
-        cat("startWith is ", startWith, "\n")
     } else {
-        cat("Setting startWith to NULL\n")
         startWith <- NULL
     }
     ## Otherwise set startWith to NULL
@@ -265,15 +271,13 @@ setMethod("select", "EnsDb",
     return(res[, columns])
 }
 
-
-####============================================================
+############################################################
 ##  mapIds method
 ##
 ##  maps the submitted keys (names of the returned vector) to values
 ##  of the column specified by column.
 ##  x, key, column, keytype, ..., multiVals
-####------------------------------------------------------------
-setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals){
+setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) {
     if(missing(keys))
         keys <- NULL
     if(missing(column))
@@ -282,20 +286,22 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals){
         keytype <- NULL
     if(missing(multiVals))
         multiVals <- NULL
-    return(.mapIds(x=x, keys=keys, column=column, keytype=keytype, multiVals=multiVals, ...))
+    return(.mapIds(x = x, keys = keys, column = column, keytype = keytype,
+                   multiVals = multiVals, ...))
 })
 ## Other methods: saveDb, species, dbfile, dbconn, taxonomyId
-.mapIds <- function(x, keys=NULL, column=NULL, keytype=NULL, ..., multiVals=NULL){
-    if(is.null(keys))
+.mapIds <- function(x, keys = NULL, column = NULL, keytype = NULL, ...,
+                    multiVals = NULL) {
+    if (is.null(keys))
         stop("Argument keys has to be provided!")
-    if(!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
-        stop("Argument keys should be a character vector, an object extending BasicFilter ",
-             "or a list of objects extending BasicFilter.")
-    if(is.null(column))
+    if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
+        stop("Argument keys should be a character vector, an object extending",
+             " BasicFilter or a list of objects extending BasicFilter.")
+    if (is.null(column))
         column <- "GENEID"
     ## Have to specify the columns argument. Has to be keytype and column.
-    if(is(keys, "character")){
-        if(is.null(keytype))
+    if (is(keys, "character")){
+        if (is.null(keytype))
             stop("Argument keytype is mandatory if keys is a character vector!")
         columns <- c(keytype, column)
     }
@@ -321,13 +327,6 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals){
         multiVals <- "first"
     if(is(multiVals, "function"))
         stop("Not yet implemented!")
-    ## Eventually re-order the data.frame in the same order than the keys...
-    ## That's amazingly slow!!!
-    ## if(is.character(keys)){
-    ##     res <- split(res, f=factor(res[, 1], levels=keys))
-    ##     res <- do.call(rbind, res)
-    ##     rownames(res) <- NULL
-    ## }
     if(is.character(keys)){
         theNames <- keys
     }else{
