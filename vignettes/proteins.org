@@ -26,7 +26,7 @@ vignette: >
 #+BEGIN_html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
-**Modified**: 10 October, 2016<br />
+**Modified**: 14 October, 2016<br />
 **Compiled**: `r date()`
 #+END_html
 
@@ -51,11 +51,11 @@ features also the following protein related information is available:
 + =prot_dom_start=: the end position of the protein domain within the
   sequence of the protein.
 
-Thus, for protein coding transcripts, these annotations can in addition be
-fetched from the database, given that protein annotations are available. Note
-that only =EnsDb= databases created through the Ensembl Perl API contain protein
-annotation, databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges=
-and =ensDbFromGtf= don't contain such information.
+Thus, for protein coding transcripts, these annotations can be fetched from the
+database too, given that protein annotations are available. Note that only =EnsDb=
+databases created through the Ensembl Perl API contain protein annotation,
+databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
+=ensDbFromGtf= don't contain such information.
 
 #+NAME: loadlib
 #+BEGIN_SRC R :ravel messages = FALSE
@@ -65,6 +65,9 @@ and =ensDbFromGtf= don't contain such information.
   ## Evaluate whether we have protein annotation available
   hasProteinData(edb)
 #+END_SRC
+
+#+RESULTS: loadlib
+: TRUE
 
 If protein annotation is available, the additional tables and columns are also
 listed by the =listTables= and =listColumns= methods.
@@ -83,7 +86,10 @@ annotation data and 3) map proteins to the genome.
   haveProt <- hasProteinData(edb)
 #+END_SRC
 
-* Retrieve protein annotation for genes and transcripts
+#+RESULTS:
+: TRUE
+
+* Fetch protein annotation for genes and transcripts
 
 Protein annotations for (protein coding) transcripts can be retrieved by simply
 adding the desired annotation columns to the =columns= parameter of the e.g. =genes=
@@ -147,6 +153,43 @@ So, in total we got 152 genes with that protein domain. In addition to the
 query the database for entries matching conditions on their protein ID or
 Uniprot ID.
 
+* Use methods from the =AnnotationDbi= package to query protein annotation
+
+The =select=, =keys= and =mapIds= methods from the =AnnotationDbi= package can also be
+used to query =EnsDb= objects for protein annotations. Supported columns and
+key types are returned by the =columns= and =keytypes= methods.
+
+#+NAME: a_2_annotationdbi
+#+BEGIN_SRC R
+  ## Show all columns that are provided by the database
+  columns(edb)
+
+  ## Show all key types/filters that are supported
+  keytypes(edb)
+#+END_SRC
+
+Below we fetch all Uniprot IDs annotated to the gene /ZBTB16/.
+
+#+NAME: a_2_select
+#+BEGIN_SRC R :ravel eval = haveProt
+  select(edb, keys = "ZBTB16", keytype = "GENENAME",
+         columns = "UNIPROTID")
+#+END_SRC
+
+This returns us all Uniprot IDs of all proteins encoded by the gene's
+transcripts. One of the transcripts from ZBTB16, while having a CDS and being
+annotated to a protein, does not have an Uniprot ID assigned (thus =NA= is
+returned by the above call). As we see below, this transcript is targeted for
+non sense mediated mRNA decay.
+
+#+NAME: a_2_select_nmd
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Call select, this time providing a GenenameFilter.
+  select(edb, keys = GenenameFilter("ZBTB16"),
+         columns = c("TXBIOTYPE", "UNIPROTID", "PROTEINID"))
+#+END_SRC
+
+Note also that we passed this time a =GenenameFilter= with the =keys= parameter.
 
 * Retrieve proteins from the database
 
@@ -168,7 +211,9 @@ In the code chunk below we fetch all protein annotations for the gene /ZBTB16/.
 #+END_SRC
 
 Besides the amino acid sequence, the =prts= contains also additional annotations
-that can be accessed with the =mcols= method (metadata columns).
+that can be accessed with the =mcols= method (metadata columns). All additional
+columns provided with the parameter =columns= are also added to the =mcols=
+=DataFrame=.
 
 #+NAME: b_proteins_mcols
 #+BEGIN_SRC R :ravel eval = haveProt
@@ -212,6 +257,7 @@ end coordinates within the amino acid sequence being reported in columns
 
 * Map proteins to the genome
 
+Protein mapping functionality is provided by the =Pbase= Bioconductor package.
 To map proteins to the genome, the =cdsBy= method can be used.
 
 
