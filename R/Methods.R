@@ -1876,7 +1876,10 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##' \code{"data.frame"} or \code{"AAStringSet"}.
 ##' @return The \code{proteins} method returns protein related annotations from
 ##' an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
-##' allowing to define the type of the returned object.
+##' allowing to define the type of the returned object. Note that if
+##' \code{return.type = "AAStringSet"} additional annotation columns are stored
+##' in a \code{DataFrame} that can be accessed with the \code{mcols} method on
+##' the returned object.
 ##' @rdname ProteinFunctionality
 ##' @author Johannes Rainer
 ##' @examples
