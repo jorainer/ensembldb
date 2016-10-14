@@ -65,28 +65,44 @@ setMethod("columns", "EnsDb",
 ####------------------------------------------------------------
 setMethod("keytypes", "EnsDb",
           function(x){
-              return(.filterKeytypes())
+              return(.filterKeytypes(withProteins = hasProteinData(x)))
           }
 )
 ## This just returns some (eventually) usefull names for keys
 .simpleKeytypes <- function(x){
     return(c("GENEID","TXID","TXNAME","EXONID","EXONNAME","CDSID","CDSNAME"))
 }
-.filterKeytypes <- function(x){
-    return(names(.keytype2FilterMapping()))
+.filterKeytypes <- function(withProteins = FALSE){
+    return(names(.keytype2FilterMapping(withProteins = withProteins)))
 }
 ## returns a vector mapping keytypes (names of vector) to filter names (elements).
-.keytype2FilterMapping <- function(){
-    filters <- c("EntrezidFilter", "GeneidFilter", "GenebiotypeFilter", "GenenameFilter",
-                 "TxidFilter", "TxbiotypeFilter", "ExonidFilter", "SeqnameFilter",
-                 "SeqstrandFilter", "TxidFilter", "SymbolFilter")
-    names(filters) <- c("ENTREZID", "GENEID", "GENEBIOTYPE", "GENENAME", "TXID",
-                        "TXBIOTYPE", "EXONID", "SEQNAME", "SEQSTRAND", "TXNAME",
-                        "SYMBOL")
+.keytype2FilterMapping <- function(withProteins = FALSE){
+    filters <- c(ENTREZID = "EntrezidFilter",
+                 GENEID = "GeneidFilter",
+                 GENEBIOTYPE = "GenebiotypeFilter",
+                 GENENAME = "GenenameFilter",
+                 TXID = "TxidFilter",
+                 TXBIOTYPE = "TxbiotypeFilter",
+                 EXONID = "ExonidFilter",
+                 SEQNAME = "SeqnameFilter",
+                 SEQSTRAND = "SeqstrandFilter",
+                 TXNAME = "TxidFilter",
+                 SYMBOL = "SymbolFilter")
+    if (withProteins) {
+        filters <- c(filters,
+                     PROTEINID = "ProteinidFilter",
+                     UNIPROTID = "UniprotidFilter",
+                     PROTEINDOMAINID = "ProtdomidFilter")
+    }
     return(filters)
 }
-filterForKeytype <- function(keytype){
-    filters <- .keytype2FilterMapping()
+filterForKeytype <- function(keytype, x){
+    if (!missing(x)) {
+        withProts <- hasProteinData(x)
+    } else {
+        withProts <- FALSE
+    }
+    filters <- .keytype2FilterMapping(withProts)
     if(any(names(filters) == keytype)){
         filt <- new(filters[keytype])
         return(filt)
@@ -121,11 +137,21 @@ setMethod("keys", "EnsDb",
           })
 
 
-####============================================================
-##  select method
+############################################################
+## select method
 ##
-##
-####------------------------------------------------------------
+##  We have to be carefull, if the database contains protein annotations too:
+##  o If the keys are DNA/RNA related, start from a DNA/RNA related table.
+##  o if keys are protein related: start from a protein column.
+##  Reason is that we do have only protein annotations for protein coding genes
+##  and no annotation for the remaining. Thus the type of the join (left join,
+##  left outer join) is crucial, as well as the table with which we start the
+##  query!
+##  What if we provide more than one filter?
+##  a) GenenameFilter and ProteinidFilter: doesn't really matter from which table
+##     we start, because the query will only return results with protein
+##     annotions. -> if there is one DNA/RNA related filter: don't do anything.
+##  b) Only protein filters: start from the highest protein table.
 setMethod("select", "EnsDb",
           function(x, keys, columns, keytype, ...) {
               if (missing(keys))
@@ -179,7 +205,7 @@ setMethod("select", "EnsDb",
                 stop("keytype ", keytype, " not available in the database.",
                      " Use keytypes method to list all available keytypes.")
             ## Generate a filter object for the filters.
-            keyFilter <- filterForKeytype(keytype)
+            keyFilter <- filterForKeytype(keytype, x)
             value(keyFilter) <- keys
             keys <- list(keyFilter)
             ## Add also the keytype itself to the columns.
@@ -191,11 +217,24 @@ setMethod("select", "EnsDb",
     ## add filter columns too.
     ensCols <- unique(c(ensDbColumnForColumn(x, columns),
                         addFilterColumns(character(), filter = keys, x)))
+    ## TODO @jo: Do we have to check that we are allowed to have proteni filters
+    ##           or columns?
     ## OK, now perform the query given the filters we've got.
-    ## TODO @jo: fix the startWith argument!
-    ## o Use gene if we have any DNA/RNA related properties.
-    ## o Use protein for any other join.
-    res <- getWhat(x, columns = ensCols, filter = keys)
+    ## Check if keys does only contain protein annotation columns; in that case
+    ## select one of tables "protein", "uniprot", "protein_domain" in that order
+    if (all(unlist(lapply(keys, isProteinFilter)))) {
+        startWith <- "protein_domain"
+        if (any(unlist(lapply(keys, function(z) is(z, "UniprotidFilter")))))
+            startWith <- "uniprot"
+        if (any(unlist(lapply(keys, function(z) is(z, "ProteinidFilter")))))
+            startWith <- "protein"
+        cat("startWith is ", startWith, "\n")
+    } else {
+        cat("Setting startWith to NULL\n")
+        startWith <- NULL
+    }
+    ## Otherwise set startWith to NULL
+    res <- getWhat(x, columns = ensCols, filter = keys, startWith = startWith)
     ## Order results if length of filters is 1.
     if (length(keys) == 1) {
         ## Define the filters on which we could sort.
