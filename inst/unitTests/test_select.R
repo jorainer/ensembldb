@@ -308,6 +308,43 @@ test_mapIds <- function(){
                     columns=c("SEQNAME", "SEQSTRAND"))
     checkTrue(all(TestS$SEQNAME == "Y"))
     checkTrue(all(TestS$SEQSTRAND == -1))
+
+    ## Now using protein annotations:
+    if (hasProteinData(edb)) {
+        library(RSQLite)
+        txids <- keys(edb, keytype = "TXID", filter = GenenameFilter("ZBTB16"))
+        mapd <- mapIds(edb, keys = txids, keytype = "TXID", column = "GENENAME")
+        checkEquals(names(mapd), txids)
+        checkTrue(all(mapd == "ZBTB16"))
+        ## Map to protein ids.
+        mapd <- mapIds(edb, keys = txids, keytype = "TXID", column = "PROTEINID")
+        res <- dbGetQuery(dbconn(edb),
+                          paste0("select protein_id from protein where tx_id in",
+                                 " (", paste0("'", txids,"'", collapse = ", "),
+                                 ")"))
+        pids <- mapd[!is.na(mapd)]
+        checkTrue(all(pids %in% res$protein_id))
+        ## multi-mapping:
+        ## proteins and uniprot.
+        mapd <- mapIds(edb, keys = pids, keytype = "PROTEINID",
+                       column = "UNIPROTID", multiVals = "list")
+        mapd <- mapd[!is.na(mapd)]
+        res <- dbGetQuery(dbconn(edb),
+                          paste0("select protein_id, uniprot_id from uniprot ",
+                                 "where protein_id in (",
+                                 paste0("'", pids, "'", collapse = ", "), ")"))
+        res <- split(res$uniprot_id, res$protein_id)
+        checkEquals(mapd, res[names(mapd)])
+        ## Just to ensure:
+        tmp <- proteins(edb, filter = ProteinidFilter(pids),
+                        columns = c("uniprot_id", "protein_id"))
+        upids <- tmp$uniprot[!is.na(tmp$uniprot)]
+        checkTrue(all(res$uniprot_id %in% upids))
+        ## map protein ids to gene name
+        mapd <- mapIds(edb, keys = pids, keytype = "PROTEINID",
+                       column = "GENENAME")
+        checkTrue(all(mapd == "ZBTB16"))
+    }
 }
 
 ## Test if the results are properly sorted if we submit a single filter or just keys.
