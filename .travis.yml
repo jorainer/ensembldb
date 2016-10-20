@@ -1,33 +1,40 @@
-# Sample .travis.yml for R projects
+## Sample .travis.yml file for use with metacran/r-builder
+## See https://github.com/metacran/r-builder for details.
 
-language: r
-warnings_are_errors: true
-bioc_required: true
-
-##
+language: c
 sudo: required
 
-r_binary_packages:
- - RUnit
- - knitr
- - rmarkdown
+before_install:
+  - curl -OL https://raw.githubusercontent.com/metacran/r-builder/master/pkg-build.sh
+  - chmod 755 pkg-build.sh
+  - ./pkg-build.sh bootstrap
 
-bioc_packages:
- - BiocGenerics
- - BiocStyle
+install:
+  - ./pkg-build.sh install_bioc_deps
+  - ./pkg-build.sh install_github jimhester/covr
 
-r_github_packages:
-  - jimhester/covr
+script:
+  - ./pkg-build.sh run_tests
+
+after_failure:
+  - ./pkg-build.sh dump_logs
 
 after_success:
-  - Rscript -e 'covr::codecov()'
+  - if [[ ! -z "$COVERAGE" ]];then ./pkg-build.sh run_script -e 'covr::codecov()'; fi
 
 notifications:
   email:
     on_success: change
     on_failure: change
 
+## env:
+##   matrix:
+##     - RVERSION=oldrel
+##     - RVERSION=release
+##     - RVERSION=devel
+
 env:
   global:
-    - BIOC_USE_DEVEL="FALSE"
+      - RVERSION=devel BIOC_USE_DEVEL=TRUE _R_CHECK_FORCE_SUGGESTS_=FALSE COVERAGE=true
+
 

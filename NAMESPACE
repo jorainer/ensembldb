@@ -1,63 +1,195 @@
 ## ensembldb NAMESPACE
 import(methods)
 
-importFrom("utils", "read.table", "str")
-import(BiocGenerics)
-import(S4Vectors)
-importFrom(DBI, dbDriver)
-importFrom(Biobase, createPackage)
-importFrom(GenomeInfoDb, Seqinfo, isCircular, genome, seqlengths, seqnames, seqlevels,
-           keepSeqlevels, seqlevelsStyle, "seqlevelsStyle<-", genomeStyles)
-importMethodsFrom(AnnotationDbi, dbconn, columns, keytypes, keys, select, mapIds)
-importFrom(rtracklayer, import)
-import(RSQLite)
-import(GenomicFeatures)
+importFrom("utils",
+           "read.table",
+           "str",
+           "download.file")
+import("BiocGenerics")
+importFrom("Biobase",
+           "createPackage",
+           "validMsg")
+importMethodsFrom("ProtGenerics",
+                  "proteins")
+import("S4Vectors")
+importFrom("DBI",
+           "dbDriver")
+import("RSQLite")
+importMethodsFrom("AnnotationDbi",
+                  "columns",
+                  "dbconn",
+                  "keys",
+                  "keytypes",
+                  "mapIds",
+                  "select")
+importFrom("GenomeInfoDb",
+           "Seqinfo",
+           "isCircular",
+           "genome",
+           "seqlengths",
+           "seqnames",
+           "seqlevels",
+           "keepSeqlevels",
+           "seqlevelsStyle",
+           "seqlevelsStyle<-",
+           "genomeStyles")
+importFrom("rtracklayer",
+           "import")
+
+## Ranges and stuff
+importFrom("IRanges",
+           "IRanges",
+           "IRangesList")
+importMethodsFrom("IRanges",
+                  "subsetByOverlaps")
+import("GenomicRanges")
+import("GenomicFeatures")
 ##importMethodsFrom(GenomicFeatures, extractTranscriptSeqs)
-import(GenomicRanges)
-importFrom(IRanges, IRanges)
-importMethodsFrom(IRanges,subsetByOverlaps)
+
 ## AnnotationHub
-importFrom(AnnotationHub, AnnotationHub)
-importClassesFrom(AnnotationHub, AnnotationHub)
-importMethodsFrom(AnnotationHub, query, mcols)
+importFrom("AnnotationHub",
+           "AnnotationHub")
+importClassesFrom("AnnotationHub",
+                  "AnnotationHub")
+importMethodsFrom("AnnotationHub",
+                  "query",
+                  "mcols")
 ## Rsamtools
-importClassesFrom(Rsamtools, FaFile, RsamtoolsFile)
-importFrom(Rsamtools, FaFile)
-importMethodsFrom(Rsamtools, getSeq, indexFa, path)
-importFrom(Rsamtools, index)
+importClassesFrom("Rsamtools",
+                  "FaFile",
+                  "RsamtoolsFile")
+importFrom("Rsamtools",
+           "FaFile")
+importMethodsFrom("Rsamtools",
+                  "getSeq",
+                  "indexFa",
+                  "path")
+importFrom("Rsamtools",
+           "index")
 
-## biovizBase
-##importMethodsFrom(biovizBase, crunch)
+## Stuff needed for protein annotations.
+importClassesFrom("Biostrings",
+                  "AAStringSet")
+importFrom("Biostrings",
+           "AAStringSet")
 
-#exportPattern("^[[:alpha:]]+")
-export(fetchTablesFromEnsembl, makeEnsemblSQLiteFromTables, makeEnsembldbPackage,
-       ensDbFromGtf, ensDbFromGff, ensDbFromGRanges, ensDbFromAH, runEnsDbApp,
-       listEnsDbs)
-exportClasses(EnsDb, BasicFilter, EntrezidFilter, GeneidFilter, GenebiotypeFilter,
-              GenenameFilter, TxidFilter, TxbiotypeFilter, ExonidFilter,
-              SeqnameFilter, SeqstrandFilter, SeqstartFilter, SeqendFilter,
-              GRangesFilter, ExonrankFilter, SymbolFilter)
-## for EnsFilter
-exportMethods(column, print, show, value, where, "condition<-", "value<-",
-              seqnames, start, end, strand, seqlevels)
-## for class EnsDb:
-exportMethods(dbconn, condition, buildQuery, ensemblVersion, exons, exonsBy, genes,
-              getGenomeFaFile, lengthOf, listColumns, listGenebiotypes, listTxbiotypes,
-              listTables, organism, seqinfo, toSAF, transcripts, transcriptsBy,
-              disjointExons, metadata, promoters, cdsBy, fiveUTRsByTranscript,
-              threeUTRsByTranscript, getGeneRegionTrackForGviz, updateEnsDb,
-              transcriptsByOverlaps, exonsByOverlaps, returnFilterColumns,
-              "returnFilterColumns<-", useMySQL)
+importFrom("RCurl",
+           "getURL")
+
+## Functions
+export("ensDbFromAH",
+       "ensDbFromGff",
+       "ensDbFromGRanges",
+       "ensDbFromGtf",
+       "fetchTablesFromEnsembl",
+       "listEnsDbs",
+       "makeEnsemblSQLiteFromTables",
+       "makeEnsembldbPackage",
+       "runEnsDbApp"
+       )
+## Classes
+exportClasses("BasicFilter",
+              "EnsDb",
+              "EntrezidFilter",
+              "GenebiotypeFilter",
+              "GeneidFilter",
+              "GenenameFilter",
+              "GRangesFilter",
+              "ExonidFilter",
+              "ExonrankFilter",
+              "ProtdomidFilter",
+              "ProteinidFilter",
+              "SeqnameFilter",
+              "SeqstrandFilter",
+              "SeqstartFilter",
+              "SeqendFilter",
+              "SymbolFilter",
+              "TxidFilter",
+              "TxbiotypeFilter",
+              "UniprotidFilter"
+              )
+## Methods for EnsFilter
+exportMethods("column",
+              "condition",
+              "condition<-",
+              "end",
+              "print",
+              "seqnames",
+              "start",
+              "strand",
+              "seqlevels",
+              "show",
+              "value",
+              "value<-",
+              "where"
+              )
+## Methods for class EnsDb:
+exportMethods("cdsBy",
+              "dbconn",
+              "disjointExons",
+              "buildQuery",
+              "ensemblVersion",
+              "exons",
+              "exonsBy",
+              "exonsByOverlaps",
+              "fiveUTRsByTranscript",
+              "genes",
+              "getGeneRegionTrackForGviz",
+              "getGenomeFaFile",
+              "lengthOf",
+              "listColumns",
+              "listGenebiotypes",
+              "listTxbiotypes",
+              "listTables",
+              "metadata",
+              "organism",
+              "promoters",
+              "returnFilterColumns",
+              "returnFilterColumns<-",
+              "seqinfo",
+              "threeUTRsByTranscript",
+              "toSAF",
+              "transcripts",
+              "transcriptsBy",
+              "transcriptsByOverlaps",
+              "updateEnsDb",
+              "useMySQL")
+## Protein data related stuff
+exportMethods("hasProteinData",
+              "proteins")
+export("listProteinColumns")
 ## Methods for AnnotationDbi
-exportMethods(columns, keytypes, keys, select, mapIds)
+exportMethods("columns",
+              "keytypes",
+              "keys",
+              "select",
+              "mapIds")
 ## Methods for GenomeInfoDb and related stuff
-exportMethods("seqlevelsStyle", "seqlevelsStyle<-", "supportedSeqlevelsStyles",
-              seqlevels)
+exportMethods("seqlevelsStyle",
+              "seqlevelsStyle<-",
+              "supportedSeqlevelsStyles",
+              "seqlevels")
 
-## constructors
-export(EntrezidFilter, GeneidFilter, GenenameFilter, GenebiotypeFilter, TxidFilter,
-       TxbiotypeFilter, ExonidFilter, SeqnameFilter, SeqstrandFilter, SeqstartFilter,
-       SeqendFilter, EnsDb, GRangesFilter, ExonrankFilter, SymbolFilter)
+## Constructor functions:
+export("EnsDb",
+       "EntrezidFilter",
+       "ExonidFilter",
+       "ExonrankFilter",
+       "GeneidFilter",
+       "GenenameFilter",
+       "GenebiotypeFilter",
+       "GRangesFilter",
+       "ProtdomidFilter",
+       "ProteinidFilter",
+       "SeqnameFilter",
+       "SeqstrandFilter",
+       "SeqstartFilter",
+       "SeqendFilter",
+       "SymbolFilter",
+       "TxidFilter",
+       "TxbiotypeFilter",
+       "UniprotidFilter"
+       )
 
 
 

@@ -302,23 +302,6 @@ test_fiveUTRsByTranscript_seqnames <- function(){
     options(ensembldb.seqnameNotFound=orig)
 }
 
-
-test_updateEnsDb <- function(){
-    edb2 <- updateEnsDb(edb)
-    checkEquals(edb2@tables, edb@tables)
-    checkTrue(.hasSlot(edb2, ".properties"))
-}
-
-test_properties <- function(){
-    checkEquals(ensembldb:::getProperty(edb, "foo"), NA)
-
-    checkException(ensembldb:::setProperty(edb, "foo"))
-
-    edb <- ensembldb:::setProperty(edb, foo="bar")
-    checkEquals(ensembldb:::getProperty(edb, "foo"), "bar")
-    checkEquals(length(ensembldb:::properties(edb)), 4)
-}
-
 test_set_get_seqlevelsStyle <- function(){
     edb <- EnsDb.Hsapiens.v75
     ## Testing the getter/setter for the seqlevelsStyle.
@@ -505,4 +488,15 @@ notrun_test_newstuff <- function(){
     genomeStyles()
 }
 
+test_prefixChromName <- function() {
+    res <- ensembldb:::ucscToEns("chrY")
+    checkEquals(res, "Y")
+    res <- ensembldb:::prefixChromName("Y")
+    checkEquals(res, "Y")
+    useU <- getOption("ucscChromosomeNames", default = FALSE)
+    options(ucscChromosomeNames = TRUE)
+    res <- ensembldb:::prefixChromName("Y")
+    checkEquals(res, "chrY")
+    options(ucscChromosomeNames = useU)
+}
 

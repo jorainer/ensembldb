@@ -1,3 +1,17 @@
+CHANGES IN VERSION 1.99.0
+-------------------------
+
+NEW FEATURES:
+    o The perl script to create EnsDb databases fetches also protein annotations.
+    o Added functionality to extract protein annotations from the database
+      (if available) ensuring backward compatibility.
+    o Add proteins vignette.
+
+USER VISIBLE CHANGES:
+    o Improved functionality to fetch sequence lengths for chromosomes from
+      Ensembl or ensemblgenomes.
+
+
 CHANGES IN VERSION 1.5.14
 -------------------------
 
@@ -89,10 +103,10 @@ BUG FIXES
 CHANGES IN VERSION 1.5.4
 -------------------------
 
-Bug fixes
-    o Column tx_id was always removed from exonsBy result even if in the
-      columns argument.
-    o exon_idx was of type character if database generated from a GTF file.
+BUG FIXES
+    o tx_id was removed from metadata columns in txBy.
+    o Fixed a bug that caused exon_idx column to be character if database created
+      from a GTF.
 
 
 CHANGES IN VERSION 1.5.2

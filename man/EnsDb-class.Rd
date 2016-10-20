@@ -127,7 +127,7 @@
   }
 
   \item{table}{
-    For \code{listColumns}: optionally specify the table name for
+    For \code{listColumns}: optionally specify the table name(s) for
     which the columns should be returned.
   }
 
