@@ -35,6 +35,21 @@ test_ordering_genes <- function() {
     ensembldb:::orderResultsInR(edb) <- orig
 }
 
+test_orderDataFrameBy <- function() {
+    res <- exons(edb, filter = GenenameFilter("ZBTB16"),
+                 return.type = "DataFrame")
+    ## Order by end
+    res_2 <- ensembldb:::orderDataFrameBy(res, by = "exon_seq_end")
+    idx <- order(res_2$exon_seq_end)
+    checkEquals(idx, 1:nrow(res_2))
+}
+
+test_SQLiteName2MySQL <- function() {
+    have <- "EnsDb.Hsapiens.v75"
+    want <- "ensdb_hsapiens_v75"
+    checkEquals(ensembldb:::SQLiteName2MySQL(have), want)
+}
+
 dontrun_benchmark_ordering_genes <- function() {
     .withR <- function(x, ...) {
         ensembldb:::orderResultsInR(x) <- TRUE

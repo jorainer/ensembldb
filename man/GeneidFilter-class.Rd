@@ -1,6 +1,7 @@
 \name{GeneidFilter-class}
 \Rdversion{1.1}
 \docType{class}
+\alias{RNA-DNA-filters}
 \alias{BasicFilter-class}
 \alias{EntrezidFilter-class}
 \alias{GeneidFilter-class}
@@ -145,7 +146,9 @@
 \title{Filter results fetched from the Ensembl database}
 \description{
   These classes allow to specify which entries (i.e. genes, transcripts
-  or exons) should be retrieved from the database.
+  or exons) should be retrieved from the database. The filters listed on
+  this help page are \emph{RNA/DNA-based} filters. Additional filters
+  for protein based annotation are also available (see \link{ProteinFilters}).
 }
 \section{Objects from the Class}{
   While objects can be created by calls e.g. of the form
@@ -164,7 +167,8 @@
   \describe{
     \item{\code{condition}:}{
       Object of class \code{"character"}: can be
-      either \code{"="}, \code{"in"} or \code{"like"} to filter on character values
+      either \code{"="}, \code{"in"} or \code{"like"} to filter on
+      character values
       (e.g. gene id, gene biotype, seqname etc), or \code{"="}, \code{">"}
       or \code{"<"} for numerical values (chromosome/seq
       coordinates). Note that for \code{"like"} \code{value} should be a
@@ -383,7 +387,8 @@
 }
 \seealso{
   \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
-  \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}
+  \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}},
+  \code{\link{ProteinFilters}} for protein annotation based filters.
 }
 \examples{
 

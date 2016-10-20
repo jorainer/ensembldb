@@ -65,28 +65,44 @@ setMethod("columns", "EnsDb",
 ####------------------------------------------------------------
 setMethod("keytypes", "EnsDb",
           function(x){
-              return(.filterKeytypes())
+              return(.filterKeytypes(withProteins = hasProteinData(x)))
           }
 )
 ## This just returns some (eventually) usefull names for keys
 .simpleKeytypes <- function(x){
     return(c("GENEID","TXID","TXNAME","EXONID","EXONNAME","CDSID","CDSNAME"))
 }
-.filterKeytypes <- function(x){
-    return(names(.keytype2FilterMapping()))
+.filterKeytypes <- function(withProteins = FALSE){
+    return(names(.keytype2FilterMapping(withProteins = withProteins)))
 }
 ## returns a vector mapping keytypes (names of vector) to filter names (elements).
-.keytype2FilterMapping <- function(){
-    filters <- c("EntrezidFilter", "GeneidFilter", "GenebiotypeFilter", "GenenameFilter",
-                 "TxidFilter", "TxbiotypeFilter", "ExonidFilter", "SeqnameFilter",
-                 "SeqstrandFilter", "TxidFilter", "SymbolFilter")
-    names(filters) <- c("ENTREZID", "GENEID", "GENEBIOTYPE", "GENENAME", "TXID",
-                        "TXBIOTYPE", "EXONID", "SEQNAME", "SEQSTRAND", "TXNAME",
-                        "SYMBOL")
+.keytype2FilterMapping <- function(withProteins = FALSE){
+    filters <- c(ENTREZID = "EntrezidFilter",
+                 GENEID = "GeneidFilter",
+                 GENEBIOTYPE = "GenebiotypeFilter",
+                 GENENAME = "GenenameFilter",
+                 TXID = "TxidFilter",
+                 TXBIOTYPE = "TxbiotypeFilter",
+                 EXONID = "ExonidFilter",
+                 SEQNAME = "SeqnameFilter",
+                 SEQSTRAND = "SeqstrandFilter",
+                 TXNAME = "TxidFilter",
+                 SYMBOL = "SymbolFilter")
+    if (withProteins) {
+        filters <- c(filters,
+                     PROTEINID = "ProteinidFilter",
+                     UNIPROTID = "UniprotidFilter",
+                     PROTEINDOMAINID = "ProtdomidFilter")
+    }
     return(filters)
 }
-filterForKeytype <- function(keytype){
-    filters <- .keytype2FilterMapping()
+filterForKeytype <- function(keytype, x){
+    if (!missing(x)) {
+        withProts <- hasProteinData(x)
+    } else {
+        withProts <- FALSE
+    }
+    filters <- .keytype2FilterMapping(withProts)
     if(any(names(filters) == keytype)){
         filt <- new(filters[keytype])
         return(filt)
@@ -112,6 +128,14 @@ setMethod("keys", "EnsDb",
               if(is(filter, "BasicFilter"))
                   filter <- list(filter)
               keyt <- keytypes(x)
+              if (length(keytype) > 1) {
+                  keytype <- keytype[1]
+                  warning("Using only first provided keytype.")
+              }
+              if (!any(keyt == keytype))
+                  stop("keytype '", keytype, "' not supported! ",
+                       "Allowed choices are: ",
+                       paste0("'", keyt ,"'", collapse = ", "), ".")
               keytype <- match.arg(keytype, keyt)
               ## Map the keytype to the appropriate column name.
               dbColumn <- ensDbColumnForColumn(x, keytype)
@@ -121,11 +145,21 @@ setMethod("keys", "EnsDb",
           })
 
 
-####============================================================
-##  select method
+############################################################
+## select method
 ##
-##
-####------------------------------------------------------------
+##  We have to be carefull, if the database contains protein annotations too:
+##  o If the keys are DNA/RNA related, start from a DNA/RNA related table.
+##  o if keys are protein related: start from a protein column.
+##  Reason is that we do have only protein annotations for protein coding genes
+##  and no annotation for the remaining. Thus the type of the join (left join,
+##  left outer join) is crucial, as well as the table with which we start the
+##  query!
+##  What if we provide more than one filter?
+##  a) GenenameFilter and ProteinidFilter: doesn't really matter from which table
+##     we start, because the query will only return results with protein
+##     annotions. -> if there is one DNA/RNA related filter: don't do anything.
+##  b) Only protein filters: start from the highest protein table.
 setMethod("select", "EnsDb",
           function(x, keys, columns, keytype, ...) {
               if (missing(keys))
@@ -147,8 +181,9 @@ setMethod("select", "EnsDb",
     if (all(notAvailable))
         stop("None of the specified columns are avaliable in the database!")
     if (any(notAvailable)){
-        warning("The following columns are not available in the database and have",
-                " thus been removed: ", paste(columns[notAvailable], collapse = ", "))
+        warning("The following columns are not available in the database and",
+                " have thus been removed: ",
+                paste(columns[notAvailable], collapse = ", "))
         columns <- columns[!notAvailable]
     }
     ## keys:
@@ -157,25 +192,28 @@ setMethod("select", "EnsDb",
         keys <- list()
     } else {
         if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
-            stop("Argument keys should be a character vector, an object extending BasicFilter ",
-                 "or a list of objects extending BasicFilter.")
+            stop("Argument keys should be a character vector, an object",
+                 " extending BasicFilter",
+                 " or a list of objects extending BasicFilter.")
         if (is(keys, "list")) {
             if (!all(vapply(keys, is, logical(1L), "BasicFilter")))
-                stop("If keys is a list it should be a list of objects extending BasicFilter!")
+                stop("If keys is a list it should be a list of objects",
+                     " extending BasicFilter!")
         }
         if (is(keys, "BasicFilter")) {
             keys <- list(keys)
         }
         if (is(keys, "character")) {
             if (is.null(keytype)) {
-                stop("Argument keytype is mandatory if keys is a character vector!")
+                stop("Argument keytype is mandatory if keys is a",
+                     " character vector!")
             }
             ## Check also keytype:
             if (!(keytype %in% keytypes(x)))
                 stop("keytype ", keytype, " not available in the database.",
                      " Use keytypes method to list all available keytypes.")
             ## Generate a filter object for the filters.
-            keyFilter <- filterForKeytype(keytype)
+            keyFilter <- filterForKeytype(keytype, x)
             value(keyFilter) <- keys
             keys <- list(keyFilter)
             ## Add also the keytype itself to the columns.
@@ -183,17 +221,33 @@ setMethod("select", "EnsDb",
                 columns <- c(keytype, columns)
         }
     }
-    ## Map the columns to column names we have in the database and add filter columns too.
+    ## Map the columns to column names we have in the database and
+    ## add filter columns too.
     ensCols <- unique(c(ensDbColumnForColumn(x, columns),
                         addFilterColumns(character(), filter = keys, x)))
+    ## TODO @jo: Do we have to check that we are allowed to have proteni filters
+    ##           or columns?
     ## OK, now perform the query given the filters we've got.
-    res <- getWhat(x, columns = ensCols, filter = keys)
+    ## Check if keys does only contain protein annotation columns; in that case
+    ## select one of tables "protein", "uniprot", "protein_domain" in that order
+    if (all(unlist(lapply(keys, isProteinFilter)))) {
+        startWith <- "protein_domain"
+        if (any(unlist(lapply(keys, function(z) is(z, "UniprotidFilter")))))
+            startWith <- "uniprot"
+        if (any(unlist(lapply(keys, function(z) is(z, "ProteinidFilter")))))
+            startWith <- "protein"
+    } else {
+        startWith <- NULL
+    }
+    ## Otherwise set startWith to NULL
+    res <- getWhat(x, columns = ensCols, filter = keys, startWith = startWith)
     ## Order results if length of filters is 1.
     if (length(keys) == 1) {
         ## Define the filters on which we could sort.
-        sortFilts <- c("GenenameFilter", "GeneidFilter", "EntrezidFilter", "GenebiotypeFilter",
-                       "SymbolFilter", "TxidFilter", "TxbiotypeFilter", "ExonidFilter",
-                       "ExonrankFilter", "SeqnameFilter")
+        sortFilts <- c("GenenameFilter", "GeneidFilter", "EntrezidFilter",
+                       "GenebiotypeFilter", "SymbolFilter", "TxidFilter",
+                       "TxbiotypeFilter", "ExonidFilter", "ExonrankFilter",
+                       "SeqnameFilter")
         if (class(keys[[1]]) %in% sortFilts) {
             keyvals <- value(keys[[1]])
             ## Handle symlink Filter differently:
@@ -206,29 +260,24 @@ setMethod("select", "EnsDb",
         }
     } else {
         ## Show a mild warning message
-        message("Note: ordering of the results might not match ordering of keys!")
+        message(paste0("Note: ordering of the results might not match ordering",
+                       " of keys!"))
     }
     colMap <- .getColMappings(x)
     colnames(res) <- colMap[colnames(res)]
     rownames(res) <- NULL
     if (returnFilterColumns(x))
         return(res)
-    ## ## Now, if we've got a "TXNAME" in columns, we have to replace at least one of the "TXID"s
-    ## ## in the colnames...
-    ## if(any(columns == "TXNAME"))
-    ##     colnames(res)[match("TXID", colnames(res))] <- "TXNAME"
     return(res[, columns])
 }
 
-
-####============================================================
+############################################################
 ##  mapIds method
 ##
 ##  maps the submitted keys (names of the returned vector) to values
 ##  of the column specified by column.
 ##  x, key, column, keytype, ..., multiVals
-####------------------------------------------------------------
-setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals){
+setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) {
     if(missing(keys))
         keys <- NULL
     if(missing(column))
@@ -237,20 +286,22 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals){
         keytype <- NULL
     if(missing(multiVals))
         multiVals <- NULL
-    return(.mapIds(x=x, keys=keys, column=column, keytype=keytype, multiVals=multiVals, ...))
+    return(.mapIds(x = x, keys = keys, column = column, keytype = keytype,
+                   multiVals = multiVals, ...))
 })
 ## Other methods: saveDb, species, dbfile, dbconn, taxonomyId
-.mapIds <- function(x, keys=NULL, column=NULL, keytype=NULL, ..., multiVals=NULL){
-    if(is.null(keys))
+.mapIds <- function(x, keys = NULL, column = NULL, keytype = NULL, ...,
+                    multiVals = NULL) {
+    if (is.null(keys))
         stop("Argument keys has to be provided!")
-    if(!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
-        stop("Argument keys should be a character vector, an object extending BasicFilter ",
-             "or a list of objects extending BasicFilter.")
-    if(is.null(column))
+    if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
+        stop("Argument keys should be a character vector, an object extending",
+             " BasicFilter or a list of objects extending BasicFilter.")
+    if (is.null(column))
         column <- "GENEID"
     ## Have to specify the columns argument. Has to be keytype and column.
-    if(is(keys, "character")){
-        if(is.null(keytype))
+    if (is(keys, "character")){
+        if (is.null(keytype))
             stop("Argument keytype is mandatory if keys is a character vector!")
         columns <- c(keytype, column)
     }
@@ -276,13 +327,6 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals){
         multiVals <- "first"
     if(is(multiVals, "function"))
         stop("Not yet implemented!")
-    ## Eventually re-order the data.frame in the same order than the keys...
-    ## That's amazingly slow!!!
-    ## if(is.character(keys)){
-    ##     res <- split(res, f=factor(res[, 1], levels=keys))
-    ##     res <- do.call(rbind, res)
-    ##     rownames(res) <- NULL
-    ## }
     if(is.character(keys)){
         theNames <- keys
     }else{

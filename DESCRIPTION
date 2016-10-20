@@ -18,7 +18,10 @@ Imports:
     S4Vectors,
     AnnotationHub,
     Rsamtools,
-    IRanges
+    IRanges,
+    ProtGenerics,
+    Biostrings,
+    RCurl
 Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.23.21),
@@ -51,10 +54,7 @@ Collate:
     dbhelpers.R
     Methods.R
     Methods-Filter.R
-    loadEnsDb.R
-    makeEnsemblDbPackage.R
-    EnsDbFromGTF.R
-    runEnsDbApp.R
+    functions-create-EnsDb.R
     select-methods.R
     seqname-utils.R
     zzz.R
