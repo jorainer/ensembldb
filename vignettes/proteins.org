@@ -1,0 +1,428 @@
+#+TITLE: Querying protein features
+#+AUTHOR: Johannes Rainer
+#+EMAIL:  johannes.rainer@eurac.edu
+#+OPTIONS: ^:{} toc:nil
+#+PROPERTY: exports code
+#+PROPERTY: session *R_prot*
+
+#+BEGIN_html
+---
+title: "Querying protein features"
+graphics: yes
+output:
+  BiocStyle::html_document2
+vignette: >
+  %\VignetteIndexEntry{Querying protein features}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
+  %\VignettePackage{ensembldb}
+  %\VignetteKeywords{annotation,database}
+---
+#+END_html
+
+# #+BEGIN_EXPORT html
+
+#+BEGIN_html
+**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
+**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
+**Modified**: 14 October, 2016<br />
+**Compiled**: `r date()`
+#+END_html
+
+From Bioconductor release 3.5 on, =EnsDb= databases/packages created by the
+=ensembldb= package contain also, for transcripts with a coding regions, mappings
+between transcripts and proteins. Thus, in addition to the RNA/DNA-based
+features also the following protein related information is available:
++ =protein_id=: the Ensembl protein ID. This is the primary ID for the proteins
+  defined in Ensembl.
++ =uniprot_id=: the Uniprot ID for a protein. Note that not every Ensembl
+  =protein_id= has a Uniprot ID, and each =protein_id= might be mapped to several
+  =uniprot_id=.
++ =protein_sequence=: the amino acid sequence of a protein.
++ =protein_domain_id=: the ID of the protein domain according to the
+  source/analysis in/by which is was defined.
++ =protein_domain_source=: the source of the protein domain information, one of
+  /pfscan/, /scanprosite/, /superfamily/, /pfam/, /prints/, /smart/, /pirsf/ or /tigrfam/.
++ =interpro_accession=: the Interpro accession ID of the protein domain (if
+  available).
++ =prot_dom_start=: the start of the protein domain within the sequence of
+  the protein.
++ =prot_dom_start=: the end position of the protein domain within the
+  sequence of the protein.
+
+Thus, for protein coding transcripts, these annotations can be fetched from the
+database too, given that protein annotations are available. Note that only =EnsDb=
+databases created through the Ensembl Perl API contain protein annotation,
+databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
+=ensDbFromGtf= don't contain such information.
+
+#+NAME: loadlib
+#+BEGIN_SRC R :ravel messages = FALSE
+  library(ensembldb)
+  library(EnsDb.Hsapiens.v75)
+  edb <- EnsDb.Hsapiens.v75
+  ## Evaluate whether we have protein annotation available
+  hasProteinData(edb)
+#+END_SRC
+
+#+RESULTS: loadlib
+: TRUE
+
+If protein annotation is available, the additional tables and columns are also
+listed by the =listTables= and =listColumns= methods.
+
+#+NAME: listCols
+#+BEGIN_SRC R
+  listTables(edb)
+#+END_SRC
+
+In the following sections we show examples how to 1) fetch protein annotations
+as additional columns to gene/transcript annotations, 2) fetch protein
+annotation data and 3) map proteins to the genome.
+
+#+BEGIN_SRC R :ravel echo=FALSE, results="silent"
+  ## Use this to conditionally disable eval on following chunks
+  haveProt <- hasProteinData(edb)
+#+END_SRC
+
+#+RESULTS:
+: TRUE
+
+* Fetch protein annotation for genes and transcripts
+
+Protein annotations for (protein coding) transcripts can be retrieved by simply
+adding the desired annotation columns to the =columns= parameter of the e.g. =genes=
+or =transcripts= methods.
+
+#+NAME: a_transcripts
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Get also protein information for ZBTB16 transcripts
+  txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
+                     columns = c("protein_id", "uniprot_id", "tx_biotype"))
+  txs
+#+END_SRC
+
+The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the
+protein ID for the coding- and =NA= for the non-coding transcripts. Note also that
+we have a transcript targeted for nonsense mediated mRNA-decay, that however has
+also a protein ID associated with it, but no Uniprot ID.
+
+#+NAME: a_transcripts_coding_noncoding
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Subset to transcripts with tx_biotype other than protein_coding.
+  txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
+                                            "protein_id")]
+#+END_SRC
+
+While the mapping from a protein coding transcript to a Ensembl protein ID
+(column =protein_id=) is 1:1, the mapping can be 1:n (including 1:0) from
+=protein_id= to Uniprot ID(s) (column =uniprot_id=). This should be kept in mind if
+transcripts are fetched from the database including Uniprot IDs or even protein
+domain IDs, as in such cases a redundant list of transcripts is returned.
+
+#+NAME: a_transcripts_coding
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## List the protein IDs and uniprot IDs for the coding transcripts
+  mcols(txs[txs$tx_biotype == "protein_coding",
+            c("tx_id", "protein_id", "uniprot_id")])
+#+END_SRC
+
+Protein annotations can be added in a similar fashion as /metadata columns/ to the
+results of the =genes=, =exons=, =exonsBy=, =transcriptsBy=, =cdsBy=, =fiveUTRsByTranscript=
+and =threeUTRsByTranscript= methods. These methods report for non-coding
+transcripts an =NA= in the protein annotation columns.
+
+In addition to retrieve protein annotations from the database, we can also use
+protein data to filter the results. In the example below we fetch for example
+all genes from the database that have a certain protein domain in the protein
+encoded by any of its transcripts.
+
+#+NAME: a_genes_protdomid_filter
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Get all genes that encode a transcript encoding for a protein that contains
+  ## a certain protein domain.
+  gns <- genes(edb, filter = ProtdomidFilter("PS50097"))
+  length(gns)
+
+  sort(gns$gene_name)
+#+END_SRC
+
+So, in total we got 152 genes with that protein domain. In addition to the
+=ProtdomidFilter=, also the =ProteinidFilter= and the =UniprotidFilter= can be used to
+query the database for entries matching conditions on their protein ID or
+Uniprot ID.
+
+* Use methods from the =AnnotationDbi= package to query protein annotation
+
+The =select=, =keys= and =mapIds= methods from the =AnnotationDbi= package can also be
+used to query =EnsDb= objects for protein annotations. Supported columns and
+key types are returned by the =columns= and =keytypes= methods.
+
+#+NAME: a_2_annotationdbi
+#+BEGIN_SRC R
+  ## Show all columns that are provided by the database
+  columns(edb)
+
+  ## Show all key types/filters that are supported
+  keytypes(edb)
+#+END_SRC
+
+Below we fetch all Uniprot IDs annotated to the gene /ZBTB16/.
+
+#+NAME: a_2_select
+#+BEGIN_SRC R :ravel eval = haveProt
+  select(edb, keys = "ZBTB16", keytype = "GENENAME",
+         columns = "UNIPROTID")
+#+END_SRC
+
+This returns us all Uniprot IDs of all proteins encoded by the gene's
+transcripts. One of the transcripts from ZBTB16, while having a CDS and being
+annotated to a protein, does not have an Uniprot ID assigned (thus =NA= is
+returned by the above call). As we see below, this transcript is targeted for
+non sense mediated mRNA decay.
+
+#+NAME: a_2_select_nmd
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Call select, this time providing a GenenameFilter.
+  select(edb, keys = GenenameFilter("ZBTB16"),
+         columns = c("TXBIOTYPE", "UNIPROTID", "PROTEINID"))
+#+END_SRC
+
+Note also that we passed this time a =GenenameFilter= with the =keys= parameter.
+
+* Retrieve proteins from the database
+
+Proteins can be fetched using the dedicated =proteins= method that returns, unlike
+DNA/RNA-based methods like =genes= or =transcripts=, not a =GRanges= object by
+default, but a =DataFrame= object. Alternatively, results can be returned as a
+=data.frame= or as an =AAStringSet= object from the =Biobase= package. Note that this
+might change in future releases if a more appropriate object to represent
+protein annotations becomes available.
+
+In the code chunk below we fetch all protein annotations for the gene /ZBTB16/.
+
+#+NAME: b_proteins
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Get all proteins and return them as an AAStringSet
+  prts <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+                   return.type = "AAStringSet")
+  prts
+#+END_SRC
+
+Besides the amino acid sequence, the =prts= contains also additional annotations
+that can be accessed with the =mcols= method (metadata columns). All additional
+columns provided with the parameter =columns= are also added to the =mcols=
+=DataFrame=.
+
+#+NAME: b_proteins_mcols
+#+BEGIN_SRC R :ravel eval = haveProt
+  mcols(prts)
+#+END_SRC
+
+Note that the =proteins= method will retrieve only gene/transcript annotations of
+transcripts encoding a protein. Thus annotations for the non-coding transcripts
+of the gene /ZBTB16/, that were returned by calls to =genes= or =transcripts= in the
+previous section are not fetched.
+
+Querying in addition Uniprot identifiers or protein domain data will result at
+present in a redundant list of proteins as shown in the code block below.
+
+#+NAME: b_proteins_prot_doms
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## Get also protein domain annotations in addition to the protein annotations.
+  pd <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+                 columns = c("tx_id", listColumns(edb, "protein_domain")),
+                 return.type = "AAStringSet")
+  pd
+#+END_SRC
+
+The result contains one row/element for each protein domain in each of the
+proteins. The number of protein domains per protein and the =mcols= are shown
+below.
+
+#+NAME: b_proteins_prot_doms_2
+#+BEGIN_SRC R :ravel eval = haveProt
+  ## The number of protein domains per protein:
+  table(names(pd))
+
+  ## The mcols
+  mcols(pd)
+#+END_SRC
+
+As we can see each protein can have several protein domains with the start and
+end coordinates within the amino acid sequence being reported in columns
+=prot_dom_start= and =prot_dom_end=. Also, not all Ensembl protein IDs, like
+=protein_id= /ENSP00000445047/ are mapped to an Uniprot ID or have protein domains.
+
+* Map proteins to the genome
+
+Protein mapping functionality is provided by the =Pbase= Bioconductor package.
+To map proteins to the genome, the =cdsBy= method can be used.
+
+
+
+* TODOs								   :noexport:
+
+** TODO Fetch protein feature data from the database [3/4]
+
++ [X] Check: do we have a 1:1 mapping between transcript ID and protein ID? *No*:
+  ENST00000359635 for example maps to 13 different Uniprot IDs, hence we have 13
+  mappings in the database table.
+  - Multiple mappings between /protein_id/ and /uniprot_id/ exist.
+  - For some proteins there is a n:1 mapping between /tx_id/ and /protein_id/.
++ [X] Check: is the genome_start/end of a protein the same as the CDS start and
+  end?
++ [ ] Check: is the aa sequence identical to the sequence we would get if
+  we translated the CDS in R?
++ [X] Would it be better to split the protein table into a protein and
+  protein_uniprot table? Looks like it's better to split them.
+
+** TODO Implement a =proteins= method
+
+See also issue #20 https://github.com/jotsetung/ensembldb/issues/20.
+
+The question here is what =start= and =end= we put into the resulting =GRanges=
+object, /just/ the CDS coding start and end, or the individual start and end of
+all of its exons (same like for e.g. the =cdsBy= method)?
+
+A) =proteins= returns a =GRanges= with start being 1, width being the length of the
+aa and the seqname being the protein ID.
+B) A =Proteins= object?
+
+** TODO Implement a =proteinDomains= method
+
+That's tricky, the same protein domain might be on several protein sequences.
+
+** TODO How to handle the protein domain features?
+
+For these we've got just the start and end position within the protein
+sequence. We would have to calculate that back to genomic coordinates in case,
+or, just leave them as they are on per-protein coordinates.
+
+** DONE Add a =hasProtein= method for =EnsDb=
+   CLOSED: [2016-10-03 Mon 13:43]
+   - State "DONE"       from "TODO"       [2016-10-03 Mon 13:43]
+Checks if the available /protein/ table is available.
+
+** DONE Add additional filters [3/3]
+   CLOSED: [2016-10-03 Mon 13:44]
+   - State "DONE"       from "TODO"       [2016-10-03 Mon 13:44]
+These filters should check if the database has the required tables/columns
+available, i.e. should call =hasProtein= within the =column= and =where= methods
+and =stop= if no protein data available.
+
++ [X] =ProteinidFilter=
++ [X] =UniprotFilter=
++ [X] =ProtdomFilter=
+
+** DONE Add a validation method for protein data[1/2]
+   CLOSED: [2016-10-04 Tue 18:09]
+   - State "DONE"       from "TODO"       [2016-10-04 Tue 18:09]
++ [X] Check that all transcripts with a CDS have a protein.
++ [ ] Length of the protein sequence is the length of the CDS / 3.
+
+** DONE Add an argument =startWith= to the =.buildQuery= function.
+   CLOSED: [2016-10-04 Tue 15:29]
+   - State "DONE"       from "TODO"       [2016-10-04 Tue 15:29]
+** TODO Add protein data to the =select= method [3/4]
+
+Add the required functionality to allow querying protein data also with =select=
+and related methods
+
++ [X] =keys=.
++ [X] =keytypes=.
++ [X] =select=.
++ [ ] =mapIds=.
+
+** TODO Add protein data comparison to =compareEnsDb=.
+
+
+** TODO Which object best represents protein annotation (issue #20)
+
+https://github.com/jotsetung/ensembldb/issues/20
+
+
+** TODO Method to select the /best suited/ transcript for a protein
+
+Idea is to select, for proteins encoded by different transcripts, the transcript
+which CDS best represents the sequence. That way we could get rid of transcripts
+with an incomplete 5' sequence (e.g. lacking the start codon), or transcripts
+without stop codon. We could select the transcript which CDS length is equal to
+the length of the (AA + 1) * 3; + 1 because the stop codon, which is part of the
+CDS is not encoded.
+
+* Experimental perl code and docs				   :noexport:
+
+Do you know which species each of these is from. If so the easiest
+thing to do is to use Biomart for each species. (if there are only a
+few species).
+Alternatively (if this is a lot of species, but you still need to know
+what this is)
+then you can use the API
+
+So if we pretend we have a list of acc and species in a file
+
+use Bio::EnsEMBL::Registry;
+use strict;
+my $reg = "Bio::EnsEMBL::Registry";
+
+$registry->load_registry_from_db(
+                 -host => 'ensembldb.ensembl.org',
+                 -user => 'anonymous',
+                 );
+
+while(<>){
+  my ($acc, $species) = split;
+
+  my $adap = $reg->get_adaptor($species,"core","translation");
+
+  my @trans = @{$adap->fetch_all_by_external_name($acc,"uniprot%")};
+
+  foreach my $translation (@trans){
+    print $translation->stable_id."\t".$acc."\n";
+  }
+}
+
+
+Please note i have not ran this code or compiled it or checked it,
+this is just a brief outline. But it looks okay to me.
+
+-Ian.
+
+
+Translations and ProteinFeatures
+
+Translation objects and protein sequence can be extracted from a Transcript object. It is important to remember that some Ensembl transcripts are non-coding (pseudo-genes, ncRNAs, etc.) and have no translation. The primary purpose of a Translation object is to define the CDS and UTRs of its associated Transcript object. Peptide sequence is obtained directly from a Transcript object not a Translation object as might be expected. Once you have a Translation you can go back to its Transcript. If you retrieved the Translation using a stable identifier then the API will fetch the appropriate Transcript automatically. The following example obtains the protein sequence of a Transcript and the Translation's stable identifier:
+
+my $stable_id = 'ENST00000528762';
+
+my $transcript_adaptor =
+  $registry->get_adaptor( 'Human', 'Core', 'Transcript' );
+my $transcript = $transcript_adaptor->fetch_by_stable_id($stable_id);
+
+print $transcript->translation()->stable_id(), "\n";
+print $transcript->translate()->seq(),         "\n";
+
+print $transcript->translation()->transcript()->stable_id(), "\n";
+
+ProteinFeatures are features which are on an amino acid sequence rather than a nucleotide sequence. The method get_all_ProteinFeatures() can be used to obtain a set of protein features from a Translation object.
+
+$translation = $transcript->translation();
+
+my $pfeatures = $translation->get_all_ProteinFeatures();
+while ( my $pfeature = shift @{$pfeatures} ) {
+    my $logic_name = $pfeature->analysis()->logic_name();
+
+    printf(
+        "%d-%d %s %s %s\n",
+        $pfeature->start(), $pfeature->end(), $logic_name,
+        $pfeature->interpro_ac(),
+        $pfeature->idesc()
+    );
+}
+
+If only the protein features created by a particular analysis are desired the name of the analysis can be provided as an argument. To obtain the subset of features which are considered to be 'domain' features the convenience method get_all_DomainFeatures() can be used:
+
+my $seg_features    = $translation->get_all_ProteinFeatures('Seg');
+my $domain_features = $translation->get_all_DomainFeatures();

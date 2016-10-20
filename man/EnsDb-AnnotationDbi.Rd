@@ -144,6 +144,11 @@
       Returns a \code{data.frame} with the column names corresponding to
       the argument \code{columns} and rows with all data matching the
       criteria specified with \code{keys}.
+
+      The use of \code{select} without filters or keys and without
+      restricting to specicic columns is strongly discouraged, as the
+      SQL query to join all of the tables, especially if protein
+      annotation data is available is very expensive.
     }
 
   }

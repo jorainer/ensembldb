@@ -71,15 +71,29 @@ EnsDb <- function(x){
     returnFilterColumns(EDB) <- TRUE
     ## Defining the default for the ordering
     orderResultsInR(EDB) <- FALSE
+    ## Check it again...
+    OK <- validateEnsDb(EDB)
+    if (is.character(OK))
+        stop(OK)
     return(EDB)
 }
 
+## loadEnsDb <- function(x) {
+##     ## con <- ensDb( x )
+##     ## EDB <- new( "EnsDb", ensdb=con )
+##     return(EnsDb(x))
+## }
+
+
 ## x is the connection to the database, name is the name of the entry to fetch
 .getMetaDataValue <- function(x, name){
-    return(dbGetQuery(x, paste0("select value from metadata where name='", name, "'"))[ 1, 1])
+    return(dbGetQuery(x, paste0("select value from metadata where name='",
+                                name, "'"))[ 1, 1])
 }
 
 ####
+## THIS HAS BEEN REPLACED WITH prefixColumns!
+##
 ## Note: that's the central function that checks which tables are needed for the
 ## least expensive join!!! The names of the tables should then also be submitted
 ## to any other method that calls prefixColumns (e.g. where of the Filter classes)
@@ -91,6 +105,85 @@ EnsDb <- function(x){
 ## named: <table name>.<column name>
 ## clean: whether a cleanColumns should be called on the submitted columns.
 ## with.tables: force the prefix to be specifically on the submitted tables.
+## prefixColumns_old <- function(x, columns, clean = TRUE, with.tables){
+##     if (missing(columns))
+##         stop("columns is empty! No columns provided!")
+##     ## first get to the tables that contain these columns
+##     Tab <- listTables(x)   ## returns the tables by degree!
+##     if (!missing(with.tables)) {
+##         with.tables <- with.tables[ with.tables %in% names(Tab) ]
+##         if (length(with.tables) > 0) {
+##             Tab <- Tab[ with.tables ]
+##         } else {
+##             warning("The submitted table names are not valid in the database",
+##                     " and were thus dropped.")
+##         }
+##         if (length(Tab) == 0)
+##             stop("None of the tables submitted with with.tables is present",
+##                  " in the database!")
+##     }
+##     if (clean)
+##         columns <- cleanColumns(x, columns)
+##     if (length(columns) == 0) {
+##         return(NULL)
+##     }
+##     ## group the columns by table.
+##     columns.bytable <- sapply(Tab, function(z){
+##         return(z[ z %in% columns ])
+##     }, simplify=FALSE, USE.NAMES=TRUE)
+##     ## kick out empty tables...
+##     columns.bytable <- columns.bytable[ unlist(lapply(columns.bytable,
+##                                                       function(z){
+##                                                           return(length(z) > 0)
+##                                                       })) ]
+##     if(length(columns.bytable)==0)
+##         stop("No columns available!")
+##     have.columns <- NULL
+##     ## new approach! order the tables by number of elements, and after that,
+##     ## re-order them.
+##     columns.bytable <- columns.bytable[ order(unlist(lapply(columns.bytable,
+##                                                             length)),
+##                                               decreasing=TRUE) ]
+##     ## has to be a for loop!!!
+##     ## loop throught the columns by table and sequentially kick out columns
+##     ## for the current table if they where already
+##     ## in a previous (more relevant) table
+##     ## however, prefer also cases were fewer tables are returned.
+##     for(i in 1:length(columns.bytable)){
+##         bm <- columns.bytable[[ i ]] %in% have.columns
+##         keepvals <- columns.bytable[[ i  ]][ !bm ]   ## keep those
+##         if(length(keepvals) > 0){
+##             have.columns <- c(have.columns, keepvals)
+##         }
+##         if(length(keepvals) > 0){
+##             columns.bytable[[ i ]] <- paste(names(columns.bytable)[ i ],
+##                                             keepvals, sep=".")
+##         }else{
+##             columns.bytable[[ i ]] <- keepvals
+##         }
+##     }
+##     ## kick out those tables with no elements left...
+##     columns.bytable <- columns.bytable[ unlist(lapply(columns.bytable,
+##                                                       function(z){
+##                                                           return(length(z) > 0)
+##     })) ]
+##     ## re-order by degree.
+##     columns.bytable <- columns.bytable[ tablesByDegree(x,
+##                                                        names(columns.bytable)) ]
+##     return(columns.bytable)
+## }
+
+############################################################
+## prefixColumns
+##
+## Determines which tables (along with the table attributes) are required for
+## the join.
+## Updated version of prefixColumns:
+## o Uses the order of the tables returned by listTables and adds the first
+##   table in which the column was found. That's different to the previous
+##   default of trying to join as few tables as possible but avoids problems
+##   with table joins between e.g. tx and protein in which not all tx_id are
+##   present in the protein table.
 prefixColumns <- function(x, columns, clean = TRUE, with.tables){
     if (missing(columns))
         stop("columns is empty! No columns provided!")
@@ -101,53 +194,38 @@ prefixColumns <- function(x, columns, clean = TRUE, with.tables){
         if (length(with.tables) > 0) {
             Tab <- Tab[ with.tables ]
         } else {
-            warning("The submitted table names are not valid in the database and were thus dropped.")
+            warning("The submitted table names are not valid in the database",
+                    " and were thus dropped.")
         }
         if (length(Tab) == 0)
-            stop("None of the tables submitted with with.tables is present in the database!")
+            stop("None of the tables submitted with with.tables is present",
+                 " in the database!")
     }
     if (clean)
         columns <- cleanColumns(x, columns)
     if (length(columns) == 0) {
         return(NULL)
     }
-    ## group the columns by table.
-    columns.bytable <- sapply(Tab, function(z){
-        return(z[ z %in% columns ])
-    }, simplify=FALSE, USE.NAMES=TRUE)
-    ## kick out empty tables...
-    columns.bytable <- columns.bytable[ unlist(lapply(columns.bytable, function(z){
-        return(length(z) > 0)
-    })) ]
-    if(length(columns.bytable)==0)
-        stop("No columns available!")
-    have.columns <- NULL
-    ## new approach! order the tables by number of elements, and after that, re-order them.
-    columns.bytable <- columns.bytable[ order(unlist(lapply(columns.bytable, length)),
-                                              decreasing=TRUE) ]
-    ## has to be a for loop!!!
-    ## loop throught the columns by table and sequentially kick out columns for the current table if they where already
-    ## in a previous (more relevant) table
-    ## however, prefer also cases were fewer tables are returned.
-    for(i in 1:length(columns.bytable)){
-        bm <- columns.bytable[[ i ]] %in% have.columns
-        keepvals <- columns.bytable[[ i  ]][ !bm ]   ## keep those
-        if(length(keepvals) > 0){
-            have.columns <- c(have.columns, keepvals)
+    getCols <- columns
+    result <- lapply(Tab, function(z) {
+        if (length(getCols) > 0) {
+            gotIt <- z[z %in% getCols]
+            if (length(gotIt) > 0) {
+                getCols <<- getCols[!(getCols %in% gotIt)]
+                return(gotIt)
+            } else {
+                return(character())
+            }
         }
-        if(length(keepvals) > 0){
-            columns.bytable[[ i ]] <- paste(names(columns.bytable)[ i ], keepvals, sep=".")
-        }else{
-            columns.bytable[[ i ]] <- keepvals
-        }
-    }
-    ## kick out those tables with no elements left...
-    columns.bytable <- columns.bytable[ unlist(lapply(columns.bytable, function(z){
-        return(length(z) > 0)
-    })) ]
-    ## re-order by degree.
-    columns.bytable <- columns.bytable[ tablesByDegree(x, names(columns.bytable)) ]
-    return(columns.bytable)
+    })
+    ## If getCols length > 0 it contains columns not present in the db.
+    result <- result[lengths(result) > 0]
+    if (length(result) == 0)
+        stop("None of the columns could be found in the database!")
+    result <- mapply(result, names(result), FUN = function(z, y) {
+        paste0(y, ".", z)
+    }, SIMPLIFY = FALSE)
+    return(result)
 }
 
 ############################################################
@@ -172,43 +250,141 @@ prefixColumnsKeepOrder <- function(x, columns, clean = TRUE, with.tables) {
 ## and then select, for columns present in more than one
 ## x... EnsDb
 ## columns... the columns
-joinQueryOnColumns <- function(x, columns){
-    columns.bytable <- prefixColumns(x, columns)
-    ## based on that we can build the query based on the tables we've got. Note that the
-    ## function internally
-    ## adds tables that might be needed for the join.
-    Query <- joinQueryOnTables(x, names(columns.bytable))
-    return(Query)
-}
+## joinQueryOnColumns <- function(x, columns, join = "join"){
+##     columns.bytable <- prefixColumns(x, columns)
+##     ## based on that we can build the query based on the tables we've got. Note that the
+##     ## function internally
+##     ## adds tables that might be needed for the join.
+##     Query <- joinQueryOnTables(x, names(columns.bytable))
+##     return(Query)
+## }
 
 
 ## only list direct joins!!!
-.JOINS <- rbind(
-    c("gene", "tx", "join tx on (gene.gene_id=tx.gene_id)"),
-    c("gene", "chromosome", "join chromosome on (gene.seq_name=chromosome.seq_name)"),
-    c("tx", "tx2exon", "join tx2exon on (tx.tx_id=tx2exon.tx_id)"),
-    c("tx2exon", "exon", "join exon on (tx2exon.exon_id=exon.exon_id)")
-)
-## tx is now no 1:
 ## .JOINS <- rbind(
-##     c("tx", "gene", "join gene on (tx.gene_id=gene.gene_id)"),
-##     c("gene", "chromosome", "join chromosome on (gene.seq_name=chromosome.seq_name)"),
-##     c("tx", "tx2exon", "join tx2exon on (tx.tx_id=tx2exon.tx_id)"),
-##     c("tx2exon", "exon", "join exon on (tx2exon.exon_id=exon.exon_id)")
-##    )
+##     c("gene", "tx", "tx on (gene.gene_id=tx.gene_id)"),
+##     c("gene", "chromosome",
+##       "chromosome on (gene.seq_name=chromosome.seq_name)"),
+##     c("tx", "tx2exon", "tx2exon on (tx.tx_id=tx2exon.tx_id)"),
+##     c("tx2exon", "exon", "exon on (tx2exon.exon_id=exon.exon_id)"),
+##     c("tx", "protein", "protein on (tx.tx_id=protein.tx_id)"),
+##     c("protein", "uniprot",
+##       "uniprot on (protein.protein_id=uniprot.protein_id)"),
+##     c("protein", "protein_domain",
+##       "protein_domain on (protein.protein_id=protein_domain.protein_id)"),
+##     c("uniprot", "protein_domain",
+##       "protein_domain on (uniprot.protein_id=protein_domain.protein_id)")
+## )
 
+############################################################
+## joinQueryOnTables
+##
+## Helper function to generate the join query based on the provided tables.
+## joinQueryOnTables <- function(x, tab, join = "join"){
+##     ## Evaluate whether we have all required tables to join;
+##     ## this will also ensure that the order is by degree.
+##     tab <- addRequiredTables(x, tab)
+##     Query <- tab[1]
+##     previous.table <- tab[1]
+##     for (i in 1:length(tab)) {
+##         if (i > 1) {
+##             Query <- paste(Query, join, .JOINS[.JOINS[, 1] %in% previous.table &
+##                                                .JOINS[, 2] == tab[i], 3])
+##             ## Add the table to the previous tables.
+##             previous.table <- c(previous.table, tab[i])
+##         }
+##     }
+##     return(Query)
+## }
 
-joinQueryOnTables <- function(x, tab){
-    ## just to be on the save side: evaluate whether we have all required tables to join;
-    ## this will also ensure that the order is by degree.
-    tab <- addRequiredTables(x, tab)
-    Query <- tab[ 1 ]
-    previous.table <- tab[ 1 ]
-    for(i in 1:length(tab)){
-        if(i > 1){
-            Query <- paste(Query, .JOINS[ .JOINS[ , 2 ]==tab[ i ], 3 ])
-        }
+############################################################
+## ** NEW JOIN ENGINE **
+##
+## 1: table 1
+## 2: table 2
+## 3: on
+## 4: suggested join
+.JOINS2 <- rbind(
+    c("gene", "tx", "on (gene.gene_id=tx.gene_id)", "join"),
+    c("gene", "chromosome", "on (gene.seq_name=chromosome.seq_name)", "join"),
+    c("tx", "tx2exon", "on (tx.tx_id=tx2exon.tx_id)", "join"),
+    c("tx2exon", "exon", "on (tx2exon.exon_id=exon.exon_id)", "join"),
+    c("tx", "protein", "on (tx.tx_id=protein.tx_id)", "left outer join"),
+    c("protein", "protein_domain",
+      "on (protein.protein_id=protein_domain.protein_id)", "left outer join"),
+    c("protein", "uniprot", "on (protein.protein_id=uniprot.protein_id)",
+      "left outer join"),
+    c("uniprot", "protein_domain",
+      "on (uniprot.protein_id=protein_domain.protein_id)", "left outer join")
+)
+## Takes the names of two tables, determines how to join them and returns the
+## join query row, if found.
+joinTwoTables <- function(a, b) {
+    gotIt <- which((.JOINS2[, 1] %in% a & .JOINS2[, 2] %in% b) |
+                   (.JOINS2[, 2] %in% a & .JOINS2[, 1] %in% b))
+    if (length(gotIt) == 0) {
+        stop("Table(s) ", paste(a, collapse = ", "), " can not be joined with ",
+             paste(b, collapse = ", "), "!")
+    } else {
+        return(.JOINS2[gotIt[1], ])
     }
+}
+## x: EnsDb.
+## tab: tables to join.
+## join: which type of join should be used?
+## startWith: optional table name from which the join should start. That's
+## specifically important for a left outer join call.
+joinQueryOnTables2 <- function(x, tab, join = "suggested", startWith = NULL) {
+    ## join can be join, left join, left outer join or suggested in which case
+    ## the join defined in the .JOINS2 table will be used.
+    join <- match.arg(join, c("join", "left join", "left outer join",
+                              "suggested"))
+    ## Order the tables.
+    ## Start with startWith, or with the first one.
+    if (missing(tab))
+        stop("Argument 'tab' missing! Need some tables to make a join!")
+    if (!is.null(startWith)) {
+        if (!any(tab == startWith))
+            stop("If provided, 'startWith' has to be the name of one of the",
+                 " tables that should be joined!")
+    }
+    ## Add eventually needed tables to link the ones provided. The tables will
+    ## be ordered by degree.
+    tab <- addRequiredTables(x, tab)
+    if (!is.null(startWith)) {
+        alreadyUsed <- startWith
+        tab <- tab[tab != startWith]
+    } else {
+        alreadyUsed <- tab[1]
+        tab <- tab[-1]
+    }
+    Query <- alreadyUsed
+    ## Iteratively build the query.
+    while (length(tab) > 0) {
+        res <- joinTwoTables(a = alreadyUsed, b = tab)
+        newTab <- res[1:2][!(res[1:2] %in% alreadyUsed)]
+        ## Could also use the suggested join which is in element 4.
+        Query <- paste(Query, ifelse(join == "suggested", res[4], join),
+                       newTab, res[3])
+        alreadyUsed <- c(alreadyUsed, newTab)
+        tab <- tab[tab != newTab]
+    }
+    return(Query)
+}
+## this function has to first get all tables that contain the columns,
+## and then select, for columns present in more than one
+## x... EnsDb
+## columns... the columns
+## NOTE: if "startWith" is not NULL, we're adding it to the tables!!!!
+joinQueryOnColumns2 <- function(x, columns, join = "suggested",
+                                startWith = NULL) {
+    columns.bytable <- prefixColumns(x, columns)
+    ## based on that we can build the query based on the tables we've got.
+    ## Note that the function internally
+    ## adds tables that might be needed for the join.
+    Query <- joinQueryOnTables2(x, tab = c(names(columns.bytable), startWith),
+                                join = join,
+                                startWith = startWith)
     return(Query)
 }
 
@@ -219,9 +395,13 @@ joinQueryOnTables <- function(x, tab){
 ## layout is pretty simple.
 ## The tables are:
 ##
+##      uniprot -(protein_id=protein_id)-+-(protein_id=protein_id)- protein_domain
+##                                       |
+##                                    protein -(tx_id=tx_id)-+
+##                                                           |
 ##  exon -(exon_id=t2e_exon_id)- tx2exon -(t2e_tx_id=tx_id)- tx -(gene_id=gene_id)- gene
 ##                                                                                   |
-##                                                   chromosome -(seq_name=seq_name)-´
+##                                                   chromosome -(seq_name=seq_name)-+
 addRequiredTables <- function(x, tab){
     ## dash it, as long as I can't find a way to get connected objects in a
     ## graph I'll do it manually...
@@ -237,6 +417,16 @@ addRequiredTables <- function(x, tab){
     if((any(tab=="exon") | (any(tab=="tx2exon"))) & any(tab=="gene")){
         tab <- unique(c(tab, "tx"))
     }
+    if (hasProteinData(x)) {
+        ## Resolve the proteins: need tx to map between proteome and genome
+        if (any(tab %in% c("uniprot", "protein_domain", "protein")) &
+            any(tab %in% c("exon", "tx2exon", "gene", "chromosome")))
+            tab <- unique(c(tab, "tx"))
+        ## Need protein.
+        if (any(tab %in% c("uniprot", "protein_domain")) &
+            any(tab %in% c("exon", "tx2exon", "tx", "gene", "chromosome")))
+            tab <- unique(c(tab, "protein"))
+    }
     return(tablesByDegree(x, tab))
 }
 
@@ -247,9 +437,11 @@ addRequiredTables <- function(x, tab){
 ## The "backbone" function that builds the SQL query based on the specified
 ## columns, the provided filters etc.
 ## x an EnsDb object
+## startWith: optional table from which the join should start.
 .buildQuery <- function(x, columns, filter = list(), order.by = "",
                         order.type = "asc", group.by, skip.order.check=FALSE,
-                        return.all.columns = TRUE) {
+                        return.all.columns = TRUE, join = "suggested",
+                        startWith = NULL) {
     resultcolumns <- columns    ## just to remember what we really want to give back
     ## 1) get all column names from the filters also removing the prefix.
     if (class(filter)!="list")
@@ -279,7 +471,8 @@ addRequiredTables <- function(x, tab){
     ##
     ## Now we can begin to build the query parts!
     ## a) the query part that joins all required tables.
-    joinquery <- joinQueryOnColumns(x, columns=columns)
+    joinquery <- joinQueryOnColumns2(x, columns=columns, join = join,
+                                     startWith = startWith)
     ## b) the filter part of the query
     if (length(filter) > 0) {
         filterquery <- paste(" where",
@@ -292,9 +485,6 @@ addRequiredTables <- function(x, tab){
     ## c) the order part of the query
     if (any(order.by != "")) {
         if (!skip.order.check) {
-            ## order.by <- paste(unlist(prefixColumns(x=x, columns=order.by,
-            ##                                        with.tables=need.tables),
-            ##                          use.names=FALSE), collapse=",")
             order.by <- paste(prefixColumnsKeepOrder(x = x, columns = order.by,
                                                      with.tables = need.tables),
                               collapse=",")
@@ -308,10 +498,6 @@ addRequiredTables <- function(x, tab){
         resultcolumns <- columns
     }
     finalquery <- paste0("select distinct ",
-                         ## paste(unlist(prefixColumns(x,
-                         ##                            resultcolumns,
-                         ##                            with.tables=need.tables),
-                         ##              use.names=FALSE), collapse=","),
                          paste(prefixColumnsKeepOrder(x,
                                                       resultcolumns,
                                                       with.tables = need.tables),
@@ -334,19 +520,24 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 }
 
 
-## just to add another layer; basically just calls buildQuery and executes the query
+## just to add another layer; basically just calls buildQuery and executes the
+## query
+## join: what type of join should be performed.
+## startWith: the name of the table from which the query should be started.
 .getWhat <- function(x, columns, filter = list(), order.by = "",
                      order.type = "asc", group.by = NULL,
-                     skip.order.check = FALSE) {
+                     skip.order.check = FALSE, join = "suggested",
+                     startWith = NULL) {
     ## That's nasty stuff; for now we support the column tx_name, which we however
     ## don't have in the database. Thus, we are querying everything except that
     ## column and filling it later with the values from tx_id.
     fetchColumns <- columns
     if(any(columns == "tx_name"))
-        fetchColumns <- unique(c("tx_id", fetchColumns[fetchColumns != "tx_name"]))
+        fetchColumns <- unique(c("tx_id",
+                                 fetchColumns[fetchColumns != "tx_name"]))
     if (class(filter) != "list")
         stop("parameter filter has to be a list of BasicFilter classes!")
-    ## If any of the filter is a SymbolFilter, add "symbol" to the return columns.
+    ## If any filter is a SymbolFilter, add "symbol" to the return columns.
     if (length(filter) > 0) {
         if (any(unlist(lapply(filter, function(z) {
             return(is(z, "SymbolFilter"))
@@ -363,7 +554,8 @@ removePrefix <- function(x, split=".", fixed=TRUE){
         Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
                          order.by = "", order.type = order.type,
                          group.by = group.by,
-                         skip.order.check = skip.order.check)
+                         skip.order.check = skip.order.check, join = join,
+                         startWith = startWith)
         ## Get the data
         Res <- dbGetQuery(dbconn(x), Q)
         ## Note: we can only order by the columns that we did get back from the
@@ -375,7 +567,8 @@ removePrefix <- function(x, split=".", fixed=TRUE){
         Q <- .buildQuery(x = x, columns = fetchColumns, filter = filter,
                          order.by = order.by, order.type = order.type,
                          group.by = group.by,
-                         skip.order.check = skip.order.check)
+                         skip.order.check = skip.order.check, join = join,
+                         startWith = startWith)
         ## Get the data
         Res <- dbGetQuery(dbconn(x), Q)
     }
@@ -435,14 +628,24 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                       exon = c("exon_id", "exon_seq_start", "exon_seq_end"),
                       chromosome = c("seq_name", "seq_length", "is_circular"),
                       metadata = c("name", "value"))
-dbHasRequiredTables <- function(con, returnError = TRUE) {
+.ENSDB_PROTEIN_TABLES <- list(protein = c("tx_id", "protein_id",
+                                          "protein_sequence"),
+                              uniprot = c("protein_id", "uniprot_id"),
+                              protein_domain = c("protein_id",
+                                                 "protein_domain_id",
+                                                 "protein_domain_source",
+                                                 "interpro_accession",
+                                                 "prot_dom_start",
+                                                 "prot_dom_end"))
+dbHasRequiredTables <- function(con, returnError = TRUE,
+                                tables = .ENSDB_TABLES) {
     tabs <- dbListTables(con)
     if (length(tabs) == 0) {
         if (returnError)
             return("Database does not have any tables!")
         return(FALSE)
     }
-    not_there <- names(.ENSDB_TABLES)[!(names(.ENSDB_TABLES) %in% tabs)]
+    not_there <- names(tables)[!(names(tables) %in% tabs)]
     if (length(not_there) > 0) {
         if (returnError)
             return(paste0("Required tables ", paste(not_there, collapse = ", "),
@@ -451,9 +654,10 @@ dbHasRequiredTables <- function(con, returnError = TRUE) {
     }
     return(TRUE)
 }
-dbHasValidTables <- function(con, returnError = TRUE) {
-    for (tab in names(.ENSDB_TABLES)) {
-        cols <- .ENSDB_TABLES[[tab]]
+dbHasValidTables <- function(con, returnError = TRUE,
+                             tables = .ENSDB_TABLES) {
+    for (tab in names(tables)) {
+        cols <- tables[[tab]]
         from_db <- colnames(dbGetQuery(con, paste0("select * from ", tab,
                                                    " limit 1")))
         not_there <- cols[!(cols %in% from_db)]
@@ -505,26 +709,27 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     return(TRUE)
 }
 ## Small helper function to cfeate all the indices.
-.createEnsDbIndices <- function(con, indexLength = "") {
-    dbGetQuery(con, paste0("create index seq_name_idx on chromosome (seq_name",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index gene_gene_id_idx on gene (gene_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index gene_gene_name_idx on gene (gene_name",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index gene_seq_name_idx on gene (seq_name",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index tx_tx_id_idx on tx (tx_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index tx_gene_id_idx on tx (gene_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index exon_exon_id_idx on exon (exon_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index t2e_tx_id_idx on tx2exon (tx_id",
-                           indexLength, ");"))
-    dbGetQuery(con, paste0("create index t2e_exon_id_idx on tx2exon (exon_id",
-                           indexLength, ");"))
-    dbGetQuery(con, "create index t2e_exon_idx_idx on tx2exon (exon_idx);")
+.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) {
+    indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
+                   gene = "seq_name", tx = "tx_id", tx = "gene_id",
+                   exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
+    if (proteins) {
+        indexCols <- c(indexCols,
+                       protein = "tx_id",
+                       protein = "protein_id",
+                       uniprot = "protein_id",
+                       uniprot = "uniprot_id",
+                       protein_domain = "protein_domain_id",
+                       protein_domain = "protein_id")
+    }
+    for (i in 1:length(indexCols)) {
+        tabname <- names(indexCols)[i]
+        colname <- indexCols[i]
+        dbGetQuery(con, paste0("create index ", tabname, "_", colname, "_idx ",
+                                "on ", tabname, " (",colname, indexLength,")"))
+    }
+    ## Add the one on the numeric index:
+    dbGetQuery(con, "create index tx2exon_exon_idx_idx on tx2exon (exon_idx);")
 }
 
 ############################################################
