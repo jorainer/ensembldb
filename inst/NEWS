@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.99.1
+-------------------------
+
+BUG FIXES:
+    o No protein table indices were created when inserting an EnsDb with protein
+      data to MySQL.
+
+
 CHANGES IN VERSION 1.99.0
 -------------------------
 
