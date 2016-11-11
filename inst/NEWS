@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.99.2
+-------------------------
+
+BUG FIXES:
+    o Perl script is no longer failing if no chromosome info is available.
+
+
 CHANGES IN VERSION 1.99.1
 -------------------------
 
