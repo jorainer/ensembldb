@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 #####################################
+## version 0.2.2: * Transform gene coordinates always to toplevel instead of
+##                  try-and-error transformation to chromosome.
 ## version 0.2.1: * Get protein IDs and (eventually) Uniprot IDs.
 ## version 0.0.2: * get also gene_seq_start, gene_seq_end, tx_seq_start and tx_seq_end from the database!
 ##                * did rename chrom_start to seq_start.
@@ -15,7 +17,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.2.0";
+my $script_version = "0.2.2";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -149,7 +151,11 @@ foreach my $gene_id (@gene_ids){
   $orig_gene = $gene_adaptor->fetch_by_stable_id($gene_id);
   if(defined $orig_gene){
     my $do_transform=1;
-    my $gene  = $orig_gene->transform("chromosome");
+    ## Instead of transforming to chromosome we transform to 'toplevel',
+    ## for genes encoded on chromosome this should be the chromosome, for others
+    ## the most "top" level sequence.
+    ## my $gene  = $orig_gene->transform("chromosome");
+    my $gene  = $orig_gene->transform("toplevel");
     if(!defined $gene){
       ## gene is not on known defined chromosomes!
       $gene = $orig_gene;
@@ -169,19 +175,13 @@ foreach my $gene_id (@gene_ids){
       my $length = $chr_slice->length;
       my $is_circular = $chr_slice->is_circular;
       print CHR "$name\t$length\t$is_circular\n";
-      my $chr_slice_again = $slice_adaptor->fetch_by_region('chromosome', $chrom);
-      if(defined($chr_slice_again)){
-	$coord_system_version = $chr_slice_again->coord_system()->version();
+      my $tmp_version = $chr_slice->coord_system()->version();
+      if (defined $tmp_version and length $tmp_version) {
+	$coord_system_version = $tmp_version;
       }
-      # if(defined $chr_slice){
-      # 	my $name = $chr_slice->seq_region_name;
-      # 	my $length = $chr_slice->length;
-      # 	my $is_circular = $chr_slice->is_circular;
-      # 	$coord_system_version = $chr_slice->coord_system()->version();
-      # 	print CHR "$name\t$length\t$is_circular\n";
-      # }else{
-      # 	my $length = $gene->slice->seq_region_length();
-      # 	print CHR "$chrom\t0\t0\n";
+      # my $chr_slice_again = $slice_adaptor->fetch_by_region('chromosome', $chrom);
+      # if(defined($chr_slice_again)){
+      # 	$coord_system_version = $chr_slice_again->coord_system()->version();
       # }
     }
 
@@ -212,7 +212,8 @@ foreach my $gene_id (@gene_ids){
     foreach my $transcript (@transcripts){
       if($do_transform==1){
 	## just to be shure that we have the transcript in chromosomal coordinations.
-	$transcript = $transcript->transform("chromosome");
+	## $transcript = $transcript->transform("chromosome");
+	$transcript = $transcript->transform("toplevel");
       }
       ##my $tx_start = $transcript->start;
       ##my $tx_end = $transcript->end;
@@ -267,7 +268,8 @@ foreach my $gene_id (@gene_ids){
       my $current_exon_idx = 1;
       foreach my $exon (@exons){
 	if($do_transform==1){
-	  $exon->transform("chromosome");
+	  ## $exon->transform("chromosome");
+	  $exon->transform("toplevel");
 	}
 	my $exon_start = $exon->start;
 	my $exon_end = $exon->end;
