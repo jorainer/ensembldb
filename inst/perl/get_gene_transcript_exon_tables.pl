@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 #####################################
+## version 0.2.3: * Add additional columns to the uniprot table:
+##                  o uniprot_db: the Uniprot database name.
+##                  o uniprot_mapping_type: method by which the Uniprot ID was
+##                    mapped to the Ensembl protein ID.
 ## version 0.2.2: * Transform gene coordinates always to toplevel instead of
 ##                  try-and-error transformation to chromosome.
 ## version 0.2.1: * Get protein IDs and (eventually) Uniprot IDs.
@@ -17,7 +21,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.2.2";
+my $script_version = "0.2.3";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -127,7 +131,7 @@ open(PROTEIN, ">ens_protein.txt");
 print PROTEIN "tx_id\tprotein_id\tprotein_sequence\n";
 
 open(UNIPROT, ">ens_uniprot.txt");
-print UNIPROT "protein_id\tuniprot_id\n";
+print UNIPROT "protein_id\tuniprot_id\tuniprot_db\tuniprot_mapping_type\n";
 
 open(PROTDOM, ">ens_protein_domain.txt");
 print PROTDOM "protein_id\tprotein_domain_id\tprotein_domain_source\tinterpro_accession\tprot_dom_start\tprot_dom_end\n";
@@ -245,7 +249,10 @@ foreach my $gene_id (@gene_ids){
 	if (scalar(@unip) > 0) {
 	  foreach my $uniprot (@unip) {
 	    my $unip_id = $uniprot->display_id();
-	    print UNIPROT "$transl_id\t$unip_id\n";
+	    my $dbn = $uniprot->dbname();
+	    $dbn =~ s/Uniprot\///g;
+	    my $maptype = $uniprot->info_type();
+	    print UNIPROT "$transl_id\t$unip_id\t$dbn\t$maptype\n";
 	    ## print PROTEIN "$tx_id\t$transl_id\t$unip_id\t$prot_seq\n";
 	  }
 	} else {
