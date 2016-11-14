@@ -408,7 +408,8 @@ OnlyCodingTx <- function() {
 #' @description These filters allow to query specific information from an
 #' \code{\linkS4class{EnsDb}} database. Filters should be created using the
 #' dedicated constructor functions \code{ProteinidFilter},
-#' \code{ProtdomidFilter} and \code{UniprotidFilter}. Protein annotation-based
+#' \code{ProtdomidFilter}, \code{UniprotidFilter}, \code{UniprotdbFilter} or
+#' \code{UniprotmappingtypeFilter}. Protein annotation-based
 #' filters are:
 #'
 #' @slot condition The condition to be used in the filter.
@@ -420,6 +421,9 @@ OnlyCodingTx <- function() {
 #' returned by the queries.
 #' @name ProteinFilters
 #' @seealso \link{RNA-DNA-filters} for filters using RNA/DNA annotations.
+#' \code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
+#' list all Uniprot database names respectively mapping method types from the
+#' database.
 #' @author Johannes Rainer
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
@@ -457,6 +461,7 @@ OnlyCodingTx <- function() {
 #' if (hasProteinData(edb)) {
 #'     transcripts(edb, filter = pdf, columns = "protein_id")
 #' }
+#'
 NULL
 #> NULL
 

@@ -19,18 +19,30 @@
 \alias{column,ProteinidFilter,EnsDb,character-method}
 \alias{column,ProteinidFilter,EnsDb,missing-method}
 \alias{column,ProteinidFilter,missing,missing-method}
+\alias{column,UniprotdbFilter,EnsDb,character-method}
+\alias{column,UniprotdbFilter,EnsDb,missing-method}
+\alias{column,UniprotdbFilter,missing,missing-method}
 \alias{column,UniprotidFilter,EnsDb,character-method}
 \alias{column,UniprotidFilter,EnsDb,missing-method}
 \alias{column,UniprotidFilter,missing,missing-method}
+\alias{column,UniprotmappingtypeFilter,EnsDb,character-method}
+\alias{column,UniprotmappingtypeFilter,EnsDb,missing-method}
+\alias{column,UniprotmappingtypeFilter,missing,missing-method}
 \alias{where,ProtdomidFilter,EnsDb,character-method}
 \alias{where,ProtdomidFilter,EnsDb,missing-method}
 \alias{where,ProtdomidFilter,missing,missing-method}
 \alias{where,ProteinidFilter,EnsDb,character-method}
 \alias{where,ProteinidFilter,EnsDb,missing-method}
 \alias{where,ProteinidFilter,missing,missing-method}
+\alias{where,UniprotdbFilter,EnsDb,character-method}
+\alias{where,UniprotdbFilter,EnsDb,missing-method}
+\alias{where,UniprotdbFilter,missing,missing-method}
 \alias{where,UniprotidFilter,EnsDb,character-method}
 \alias{where,UniprotidFilter,EnsDb,missing-method}
 \alias{where,UniprotidFilter,missing,missing-method}
+\alias{where,UniprotmappingtypeFilter,EnsDb,character-method}
+\alias{where,UniprotmappingtypeFilter,EnsDb,missing-method}
+\alias{where,UniprotmappingtypeFilter,missing,missing-method}
 \title{Protein annotation related filters}
 \usage{
 ProteinidFilter(value, condition = "=")
@@ -54,6 +66,16 @@ UniprotmappingtypeFilter(value, condition = "=")
 \S4method{where}{ProtdomidFilter,missing,missing}(object, db, with.tables, ...)
 
 \S4method{column}{ProtdomidFilter,missing,missing}(object, db, with.tables, ...)
+
+\S4method{where}{UniprotdbFilter,missing,missing}(object, db, with.tables, ...)
+
+\S4method{column}{UniprotdbFilter,missing,missing}(object, db, with.tables, ...)
+
+\S4method{where}{UniprotmappingtypeFilter,missing,missing}(object, db,
+  with.tables, ...)
+
+\S4method{column}{UniprotmappingtypeFilter,missing,missing}(object, db,
+  with.tables, ...)
 }
 \arguments{
 \item{value}{A character vector of length 1 or larger with the value(s)
@@ -95,7 +117,8 @@ on which the filter will be applied.
 These filters allow to query specific information from an
 \code{\linkS4class{EnsDb}} database. Filters should be created using the
 dedicated constructor functions \code{ProteinidFilter},
-\code{ProtdomidFilter} and \code{UniprotidFilter}. Protein annotation-based
+\code{ProtdomidFilter}, \code{UniprotidFilter}, \code{UniprotdbFilter} or
+\code{UniprotmappingtypeFilter}. Protein annotation-based
 filters are:
 
 The \code{ProteinidFilter} allows to filter based on the
@@ -169,11 +192,15 @@ pdf <- ProtdomidFilter("PF00335")
 if (hasProteinData(edb)) {
     transcripts(edb, filter = pdf, columns = "protein_id")
 }
+
 }
 \author{
 Johannes Rainer
 }
 \seealso{
 \link{RNA-DNA-filters} for filters using RNA/DNA annotations.
+\code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
+list all Uniprot database names respectively mapping method types from the
+database.
 }
 
