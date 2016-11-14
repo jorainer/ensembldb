@@ -98,12 +98,14 @@ if (hasProteinData(edb))
 
 ## List the names of all Uniprot databases from which Uniprot IDs are
 ## available in the EnsDb
-listUniprotDbs(edb)
+if (hasProteinData(edb))
+    listUniprotDbs(edb)
 
 
 ## List the type of all methods that were used to map Uniprot IDs to Ensembl
 ## protein IDs
-listUniprotMappingTypes(edb)
+if (hasProteinData(edb))
+    listUniprotMappingTypes(edb)
 
 }
 \author{
