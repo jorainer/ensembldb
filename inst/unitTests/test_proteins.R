@@ -257,6 +257,53 @@ test_ProtdomidFilter <- function() {
     checkException(ProtdomidFilter("B", condition = ">"))
 }
 
+test_UniprotdbFilter <- function() {
+    pf <- UniprotdbFilter("ABC")
+    checkEquals(value(pf), "ABC")
+    checkEquals(column(pf), "uniprot_db")
+    checkEquals(where(pf), "uniprot_db = 'ABC'")
+    if (hasProteinData(edb)) {
+        checkEquals(column(pf, edb), "uniprot.uniprot_db")
+        checkEquals(column(pf, edb, with.tables = "uniprot"),
+                    "uniprot.uniprot_db")
+        checkEquals(where(pf, edb), "uniprot.uniprot_db = 'ABC'")
+        checkEquals(where(pf, edb, with.tables = "uniprot"),
+                    "uniprot.uniprot_db = 'ABC'")
+    } else {
+        checkException(column(pf, edb))
+        checkException(where(pf, edb))
+        checkException(column(pf, edb, with.tables = "uniprot"))
+        checkException(where(pf, edb, with.tables = "uniprot"))
+    }
+    pf <- UniprotdbFilter(c("A", "B"))
+    checkEquals(where(pf), "uniprot_db in ('A','B')")
+    checkException(UniprotdbFilter("B", condition = ">"))
+}
+
+test_UniprotmappingtypeFilter <- function() {
+    pf <- UniprotmappingtypeFilter("ABC")
+    checkEquals(value(pf), "ABC")
+    checkEquals(column(pf), "uniprot_mapping_type")
+    checkEquals(where(pf), "uniprot_mapping_type = 'ABC'")
+    if (hasProteinData(edb)) {
+        checkEquals(column(pf, edb), "uniprot.uniprot_mapping_type")
+        checkEquals(column(pf, edb, with.tables = "uniprot"),
+                    "uniprot.uniprot_mapping_type")
+        checkEquals(where(pf, edb), "uniprot.uniprot_mapping_type = 'ABC'")
+        checkEquals(where(pf, edb, with.tables = "uniprot"),
+                    "uniprot.uniprot_mapping_type = 'ABC'")
+    } else {
+        checkException(column(pf, edb))
+        checkException(where(pf, edb))
+        checkException(column(pf, edb, with.tables = "uniprot"))
+        checkException(where(pf, edb, with.tables = "uniprot"))
+    }
+    pf <- UniprotmappingtypeFilter(c("A", "B"))
+    checkEquals(where(pf), "uniprot_mapping_type in ('A','B')")
+    checkException(UniprotmappingtypeFilter("B", condition = ">"))
+}
+
+
 
 ############################################################
 ## The dedicated methods to fetch protein data.
@@ -308,6 +355,8 @@ test_isProteinFilter <- function() {
     checkTrue(ensembldb:::isProteinFilter(ProteinidFilter("a")))
     checkTrue(ensembldb:::isProteinFilter(UniprotidFilter("a")))
     checkTrue(ensembldb:::isProteinFilter(ProtdomidFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(UniprotdbFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(UniprotmappingtypeFilter("a")))
     ## FALSE
     checkTrue(!ensembldb:::isProteinFilter(GeneidFilter("a")))
     checkTrue(!ensembldb:::isProteinFilter(SymbolFilter("a")))

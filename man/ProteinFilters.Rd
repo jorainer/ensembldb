@@ -7,8 +7,12 @@
 \alias{ProteinFilters}
 \alias{ProteinidFilter}
 \alias{ProteinidFilter-class}
+\alias{UniprotdbFilter}
+\alias{UniprotdbFilter-class}
 \alias{UniprotidFilter}
 \alias{UniprotidFilter-class}
+\alias{UniprotmappingtypeFilter}
+\alias{UniprotmappingtypeFilter-class}
 \alias{column,ProtdomidFilter,EnsDb,character-method}
 \alias{column,ProtdomidFilter,EnsDb,missing-method}
 \alias{column,ProtdomidFilter,missing,missing-method}
@@ -34,6 +38,10 @@ ProteinidFilter(value, condition = "=")
 UniprotidFilter(value, condition = "=")
 
 ProtdomidFilter(value, condition = "=")
+
+UniprotdbFilter(value, condition = "=")
+
+UniprotmappingtypeFilter(value, condition = "=")
 
 \S4method{where}{ProteinidFilter,missing,missing}(object, db, with.tables, ...)
 
@@ -72,6 +80,11 @@ For \code{UniprotidFilter}: A \code{UniprotidFilter} object.
 
 For \code{ProtdomidFilter}: A \code{ProtdomidFilter} object.
 
+For \code{UniprotdbFilter}: A \code{UniprotdbFilter} object.
+
+For \code{UniprotmappingtypeFilter}: A
+\code{UniprotmappingtypeFilter} object.
+
 For \code{where}: A character with the \emph{where} condition of
 the SQL query to be executed in the database.
 
@@ -95,6 +108,13 @@ protein.
 The \code{ProtdomidFilter} allows to retrieve entries from
 the database matching the provided filter criteria based on their protein
 domain ID (\emph{protein_domain_id}).
+
+The \code{UniprotdbFilter} allows to filter results based on
+the specified Uniprot database names.
+
+The \code{UniprotmappingtypeFilter} allows to filter results
+based on the mapping method/type that was used to assign Uniprot IDs to
+Ensembl protein IDs.
 }
 \section{Slots}{
 
