@@ -7,7 +7,7 @@ NEW FEATURES:
 USER VISIBLE CHANGES:
     o Fetching Uniprot database and the type of mapping method for
       Uniprot IDs to Ensembl protein IDs: database columns uniprot_db and
-       uniprot_mapping_type.
+      uniprot_mapping_type.
 
 
 CHANGES IN VERSION 1.99.2
