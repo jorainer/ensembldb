@@ -1977,7 +1977,8 @@ setMethod("proteins", "EnsDb", function(object,
 ##'
 ##' ## List the names of all Uniprot databases from which Uniprot IDs are
 ##' ## available in the EnsDb
-##' listUniprotDbs(edb)
+##' if (hasProteinData(edb))
+##'     listUniprotDbs(edb)
 ##'
 ##' @rdname ProteinFunctionality
 setMethod("listUniprotDbs", "EnsDb", function(object) {
@@ -1997,7 +1998,8 @@ setMethod("listUniprotDbs", "EnsDb", function(object) {
 ##'
 ##' ## List the type of all methods that were used to map Uniprot IDs to Ensembl
 ##' ## protein IDs
-##' listUniprotMappingTypes(edb)
+##' if (hasProteinData(edb))
+##'     listUniprotMappingTypes(edb)
 ##'
 ##' @rdname ProteinFunctionality
 setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
