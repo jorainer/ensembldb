@@ -9,6 +9,9 @@ test_listProteinColumns <- function() {
         checkTrue(any(res == "protein_id"))
         checkTrue(any(res == "uniprot_id"))
         checkTrue(any(res == "protein_domain_id"))
+        ## That's new columns fetched for Uniprot:
+        checkTrue(any(res == "uniprot_db"))
+        checkTrue(any(res == "uniprot_mapping_type"))
     } else {
         checkException(listProteinColumns(edb))
     }

@@ -255,8 +255,6 @@ foreach my $gene_id (@gene_ids){
 	    print UNIPROT "$transl_id\t$unip_id\t$dbn\t$maptype\n";
 	    ## print PROTEIN "$tx_id\t$transl_id\t$unip_id\t$prot_seq\n";
 	  }
-	} else {
-	  ## print PROTEIN "$tx_id\t$transl_id\t\t$prot_seq\n";
 	}
 	print PROTEIN "$tx_id\t$transl_id\t$prot_seq\n";
 	my $prot_doms = $transl->get_all_DomainFeatures;

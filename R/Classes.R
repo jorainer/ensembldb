@@ -547,3 +547,60 @@ ProtdomidFilter <- function(value, condition = "=") {
     return(new("ProtdomidFilter", condition = condition,
                value = as.character(value)))
 }
+
+############################################################
+## UniprotdbFilter
+##' @description The \code{UniprotdbFilter} allows to filter results based on
+##' the specified Uniprot database names.
+##' @rdname ProteinFilters
+setClass("UniprotdbFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             values = "",
+             .valueIsCharacter = TRUE
+         ))
+##' @return For \code{UniprotdbFilter}: A \code{UniprotdbFilter} object.
+##' @rdname ProteinFilters
+UniprotdbFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("UniprotdbFilter", condition = condition,
+               value = as.character(value)))
+}
+
+############################################################
+## UniprotmappingtypeFilter
+##' @description The \code{UniprotmappingtypeFilter} allows to filter results
+##' based on the mapping method/type that was used to assign Uniprot IDs to
+##' Ensembl protein IDs.
+##' @rdname ProteinFilters
+setClass("UniprotmappingtypeFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             values = "",
+             .valueIsCharacter = TRUE
+         ))
+##' @return For \code{UniprotmappingtypeFilter}: A
+##' \code{UniprotmappingtypeFilter} object.
+##' @rdname ProteinFilters
+UniprotmappingtypeFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("UniprotmappingtypeFilter", condition = condition,
+               value = as.character(value)))
+}
+
