@@ -350,6 +350,12 @@ test_proteins <- function() {
     }
 }
 
+## Testing protein to uniprot mappings.
+test_proteins_uniprot <- function() {
+    ## ZBTB16 and the mapping of 1 protein to two Uniprot IDs, one with DIRECT
+    ## mapping type.
+}
+
 test_isProteinFilter <- function() {
     ## TRUE
     checkTrue(ensembldb:::isProteinFilter(ProteinidFilter("a")))
@@ -363,7 +369,6 @@ test_isProteinFilter <- function() {
     checkTrue(!ensembldb:::isProteinFilter(3))
     checkTrue(!ensembldb:::isProteinFilter("dfdf"))
 }
-
 
 notrun_test_protein_domains <- function() {
     res <- ensembldb:::getWhat(edb, columns = c("protein_id", "tx_id", "gene_id",
