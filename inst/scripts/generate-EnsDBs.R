@@ -192,6 +192,30 @@ installEnsemblDb <- function(dir, host = "localhost", dbname, user, pass,
     tmp <- system(cmd)
 }
 
+##' @description Creates EnsDb packages from all sqlite database files found in
+##' the directory specified with parameter \code{dir}.
+##' @param dir The path to the directory where the SQLite files can be found.
+##' @param author The author of the package.
+##' @param maintainer The maintainer of the package.
+##' @param version The version of the package.
+##' @noRd
+createPackagesFromSQLite <- function(dir = ".", author, maintainer, version) {
+    if (missing(author) | missing(maintainer) | missing(version))
+        stop("Parameter 'author', 'maintainer' and 'version' are required!")
+    edbs <- dir(dir, full.names = TRUE, pattern = ".sqlite")
+    if (length(edbs) == 0)
+        stop("Found no SQLite database files in the specified directory!")
+    message("Processing ", length(edbs), " packages.")
+    for (i in 1:length(edbs)) {
+        message("Processing ", basename(edbs[i]), " (", i, " of ",
+                length(edbs), ")", appendLF = FALSE)
+        makeEnsembldbPackage(ensdb = edbs[i], version = version,
+                             author = author, maintainer = maintainer)
+        message("OK")
+    }
+}
+
+
 ## ftpf <- paste0("ftp://ftp.ensembl.org/pub/release-86/mysql/",
 ##                "anas_platyrhynchos_core_86_1")
 ## local_dir <- tempdir()
