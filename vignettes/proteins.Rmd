@@ -14,7 +14,7 @@ vignette: >
 
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
-**Modified**: 14 October, 2016<br />
+**Modified**: 14 November, 2016<br />
 **Compiled**: `r date()`
 
 From Bioconductor release 3.5 on, `EnsDb` databases/packages created by the
@@ -23,11 +23,16 @@ between transcripts and proteins. Thus, in addition to the RNA/DNA-based
 features also the following protein related information is available:
 
 -   `protein_id`: the Ensembl protein ID. This is the primary ID for the proteins
-    defined in Ensembl.
--   `uniprot_id`: the Uniprot ID for a protein. Note that not every Ensembl
-    `protein_id` has a Uniprot ID, and each `protein_id` might be mapped to several
-    `uniprot_id`.
+    defined in Ensembl and each (protein coding) Ensembl transcript has one
+    protein ID assigned to it.
 -   `protein_sequence`: the amino acid sequence of a protein.
+-   `uniprot_id`: the Uniprot ID for a protein. Note that not every Ensembl
+    `protein_id` has an Uniprot ID, and each `protein_id` might be mapped to several
+    `uniprot_id`. Also, the same Uniprot ID might be mapped to different `protein_id`.
+-   `uniprot_db`: the name of the Uniprot database in which the feature is
+    annotated. Can be either *SPTREMBL* or *SWISSPROT*.
+-   `uniprot_mapping_type`: the type of the mapping method that was used to assign
+    the Uniprot ID to the Ensembl protein ID.
 -   `protein_domain_id`: the ID of the protein domain according to the
     source/analysis in/by which is was defined.
 -   `protein_domain_source`: the source of the protein domain information, one of
@@ -68,6 +73,7 @@ annotation data and 3) map proteins to the genome.
 ## Use this to conditionally disable eval on following chunks
 haveProt <- hasProteinData(edb)
 ```
+
 
 # Fetch protein annotation for genes and transcripts
 
@@ -129,6 +135,7 @@ So, in total we got 152 genes with that protein domain. In addition to the
 query the database for entries matching conditions on their protein ID or
 Uniprot ID.
 
+
 # Use methods from the `AnnotationDbi` package to query protein annotation
 
 The `select`, `keys` and `mapIds` methods from the `AnnotationDbi` package can also be
@@ -163,6 +170,7 @@ select(edb, keys = GenenameFilter("ZBTB16"),
 ```
 
 Note also that we passed this time a `GenenameFilter` with the `keys` parameter.
+
 
 # Retrieve proteins from the database
 
@@ -224,7 +232,9 @@ end coordinates within the amino acid sequence being reported in columns
 `prot_dom_start` and `prot_dom_end`. Also, not all Ensembl protein IDs, like
 `protein_id` *ENSP00000445047* are mapped to an Uniprot ID or have protein domains.
 
+
 # Map proteins to the genome
 
 Protein mapping functionality is provided by the `Pbase` Bioconductor package.
 To map proteins to the genome, the `cdsBy` method can be used.
+
