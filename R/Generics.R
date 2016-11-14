@@ -74,6 +74,10 @@ setGeneric("listTables", function(x, ...)
     standardGeneric("listTables"))
 setGeneric("listTxbiotypes", function(x, ...)
     standardGeneric("listTxbiotypes"))
+setGeneric("listUniprotDbs", function(object, ...)
+    standardGeneric("listUniprotDbs"))
+setGeneric("listUniprotMappingTypes", function(object, ...)
+    standardGeneric("listUniprotMappingTypes"))
 
 ## M
 

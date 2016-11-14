@@ -1338,9 +1338,10 @@ compareProteins <- function(x, y){
                ") only in y.\n"))
     X <- X[X$protein_id %in% inboth, ]
     Y <- Y[Y$protein_id %in% inboth, ]
-    rownames(X) <- X$protein_id
-    rownames(Y) <- Y$protein_id
-    Y <- Y[rownames(X), ]
+    ## sorting both by protein_id should be enough.
+    X <- X[order(X$protein_id), ]
+    Y <- Y[order(Y$protein_id), ]
+
     ## tx_id
     same <- length(which(X$tx_id == Y$tx_id))
     different <- length(inboth) - same
@@ -1665,3 +1666,4 @@ elementFromEnsemblFilename <- function(x, which=1){
     colnames(tmp) <- colnames
     return(tmp)
 }
+

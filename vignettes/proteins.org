@@ -5,7 +5,7 @@
 #+PROPERTY: exports code
 #+PROPERTY: session *R_prot*
 
-#+BEGIN_html
+#+BEGIN_EXPORT html
 ---
 title: "Querying protein features"
 graphics: yes
@@ -19,27 +19,32 @@ vignette: >
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
-#+END_html
+#+END_EXPORT
 
 # #+BEGIN_EXPORT html
 
-#+BEGIN_html
+#+BEGIN_EXPORT html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
-**Modified**: 14 October, 2016<br />
+**Modified**: 14 November, 2016<br />
 **Compiled**: `r date()`
-#+END_html
+#+END_EXPORT
 
 From Bioconductor release 3.5 on, =EnsDb= databases/packages created by the
 =ensembldb= package contain also, for transcripts with a coding regions, mappings
 between transcripts and proteins. Thus, in addition to the RNA/DNA-based
 features also the following protein related information is available:
 + =protein_id=: the Ensembl protein ID. This is the primary ID for the proteins
-  defined in Ensembl.
-+ =uniprot_id=: the Uniprot ID for a protein. Note that not every Ensembl
-  =protein_id= has a Uniprot ID, and each =protein_id= might be mapped to several
-  =uniprot_id=.
+  defined in Ensembl and each (protein coding) Ensembl transcript has one
+  protein ID assigned to it.
 + =protein_sequence=: the amino acid sequence of a protein.
++ =uniprot_id=: the Uniprot ID for a protein. Note that not every Ensembl
+  =protein_id= has an Uniprot ID, and each =protein_id= might be mapped to several
+  =uniprot_id=. Also, the same Uniprot ID might be mapped to different =protein_id=.
++ =uniprot_db=: the name of the Uniprot database in which the feature is
+  annotated. Can be either /SPTREMBL/ or /SWISSPROT/.
++ =uniprot_mapping_type=: the type of the mapping method that was used to assign
+  the Uniprot ID to the Ensembl protein ID.
 + =protein_domain_id=: the ID of the protein domain according to the
   source/analysis in/by which is was defined.
 + =protein_domain_source=: the source of the protein domain information, one of
@@ -86,8 +91,6 @@ annotation data and 3) map proteins to the genome.
   haveProt <- hasProteinData(edb)
 #+END_SRC
 
-#+RESULTS:
-: TRUE
 
 * Fetch protein annotation for genes and transcripts
 
@@ -351,6 +354,14 @@ with an incomplete 5' sequence (e.g. lacking the start codon), or transcripts
 without stop codon. We could select the transcript which CDS length is equal to
 the length of the (AA + 1) * 3; + 1 because the stop codon, which is part of the
 CDS is not encoded.
+
+
+** TODO Add additional Uniprot columns [0/4]
+
++ [ ] Adapt perl script.
++ [ ] Add methods.
++ [ ] Add Unit tests.
++ [ ] Add documentation.
 
 * Experimental perl code and docs				   :noexport:
 

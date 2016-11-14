@@ -106,7 +106,9 @@ exportClasses("BasicFilter",
               "SymbolFilter",
               "TxidFilter",
               "TxbiotypeFilter",
-              "UniprotidFilter"
+              "UniprotidFilter",
+              "UniprotdbFilter",
+              "UniprotmappingtypeFilter"
               )
 ## Methods for EnsFilter
 exportMethods("column",
@@ -156,7 +158,9 @@ exportMethods("cdsBy",
               "useMySQL")
 ## Protein data related stuff
 exportMethods("hasProteinData",
-              "proteins")
+              "proteins",
+              "listUniprotDbs",
+              "listUniprotMappingTypes")
 export("listProteinColumns")
 ## Methods for AnnotationDbi
 exportMethods("columns",
@@ -188,7 +192,9 @@ export("EnsDb",
        "SymbolFilter",
        "TxidFilter",
        "TxbiotypeFilter",
-       "UniprotidFilter"
+       "UniprotidFilter",
+       "UniprotdbFilter",
+       "UniprotmappingtypeFilter"
        )
 
 

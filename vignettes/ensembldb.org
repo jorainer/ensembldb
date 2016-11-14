@@ -5,8 +5,8 @@
 #+KEYWORDS:
 #+LANGUAGE:  en
 #+OPTIONS: ^:{} toc:nil
-#+PROPERTY: exports code
-#+PROPERTY: session *R*
+#+PROPERTY: header-args :exports code
+#+PROPERTY: header-args:R :session *R*
 
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
@@ -18,7 +18,7 @@
 #+latex: %\VignetteEngine{knitr::rmarkdown}
 
 
-#+BEGIN_html
+#+BEGIN_EXPORT html
 ---
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
@@ -32,16 +32,16 @@ vignette: >
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
-#+END_html
+#+END_EXPORT
 
 # #+BEGIN_EXPORT html
 
-#+BEGIN_html
+#+BEGIN_EXPORT html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
 **Modified**: 03 October, 2016<br />
 **Compiled**: `r date()`
-#+END_html
+#+END_EXPORT
 
 
 
@@ -1046,7 +1046,7 @@ The database layout: as already described above, protein related annotations
 
 * Installing the Ensembl database locally and building new packages :noexport:
 :PROPERTIES:
-:eval: never
+:header-args: :eval never
 :END:
 
 This section covers the local installation of a new Ensembl database on my
