@@ -1288,3 +1288,112 @@ setMethod("column", signature(object = "ProtdomidFilter", db = "EnsDb",
                                           with.tables = with.tables),
                             use.names = FALSE))
           })
+
+##***********************************************************************
+##
+##     Methods for UniprotdbFilter classes.
+##
+##***********************************************************************
+##' @aliases where,UniprotdbFilter,EnsDb,missing-method
+##' where,UniprotdbFilter,EnsDb,character-method
+##' column,UniprotdbFilter,EnsDb,missing-method
+##' column,UniprotdbFilter,EnsDb,character-method
+##' @rdname ProteinFilters
+setMethod("where", signature(object = "UniprotdbFilter", db = "missing",
+                             with.tables = "missing"),
+          function(object, db, with.tables, ...){
+              return(paste(column(object), callNextMethod()))
+          })
+##' @rdname ProteinFilters
+setMethod("column", signature(object = "UniprotdbFilter", db = "missing",
+                              with.tables = "missing"),
+          function(object, db, with.tables, ...){
+              return("uniprot_db")
+          })
+setMethod("where", signature(object = "UniprotdbFilter", db = "EnsDb",
+                             with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+              return(where(object, db, with.tables = names(listTables(db))))
+          })
+setMethod("column", signature(object = "UniprotdbFilter", db = "EnsDb",
+                              with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+              return(column(object, db, with.tables = names(listTables(db))))
+          })
+setMethod("where", signature(object = "UniprotdbFilter", db = "EnsDb",
+                             with.tables = "character"),
+          function(object, db, with.tables, ...){
+              if (!hasProteinData(db))
+                  stop("The 'EnsDb' database used does not provide",
+                       " protein annotations! A 'UniprotdbFilter' can not",
+                       " be used.")
+              return(paste(column(object, db, with.tables = with.tables),
+                           callNextMethod()))
+          })
+setMethod("column", signature(object = "UniprotdbFilter", db = "EnsDb",
+                              with.tables = "character"),
+          function(object, db, with.tables, ...) {
+              if (!hasProteinData(db))
+                  stop("The 'EnsDb' database used does not provide",
+                       " protein annotations! A 'UniprotdbFilter' can not",
+                       " be used.")
+              return(unlist(prefixColumns(db, column(object),
+                                          with.tables = with.tables),
+                            use.names = FALSE))
+          })
+
+##***********************************************************************
+##
+##     Methods for UniprotmappingtypeFilter classes.
+##
+##***********************************************************************
+##' @aliases where,UniprotmappingtypeFilter,EnsDb,missing-method
+##' where,UniprotmappingtypeFilter,EnsDb,character-method
+##' column,UniprotmappingtypeFilter,EnsDb,missing-method
+##' column,UniprotmappingtypeFilter,EnsDb,character-method
+##' @rdname ProteinFilters
+setMethod("where", signature(object = "UniprotmappingtypeFilter",
+                             db = "missing",
+                             with.tables = "missing"),
+          function(object, db, with.tables, ...){
+              return(paste(column(object), callNextMethod()))
+          })
+##' @rdname ProteinFilters
+setMethod("column", signature(object = "UniprotmappingtypeFilter",
+                              db = "missing",
+                              with.tables = "missing"),
+          function(object, db, with.tables, ...){
+              return("uniprot_mapping_type")
+          })
+setMethod("where", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+                             with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+              return(where(object, db, with.tables = names(listTables(db))))
+          })
+setMethod("column", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+                              with.tables = "missing"),
+          function(object, db, with.tables, ...) {
+              return(column(object, db, with.tables = names(listTables(db))))
+          })
+setMethod("where", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+                             with.tables = "character"),
+          function(object, db, with.tables, ...){
+              if (!hasProteinData(db))
+                  stop("The 'EnsDb' database used does not provide",
+                       " protein annotations! A 'UniprotmappingtypeFilter' ",
+                       "can not be used.")
+              return(paste(column(object, db, with.tables = with.tables),
+                           callNextMethod()))
+          })
+setMethod("column", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+                              with.tables = "character"),
+          function(object, db, with.tables, ...) {
+              if (!hasProteinData(db))
+                  stop("The 'EnsDb' database used does not provide",
+                       " protein annotations! A 'UniprotmappingtypeFilter' ",
+                       "can not be used.")
+              return(unlist(prefixColumns(db, column(object),
+                                          with.tables = with.tables),
+                            use.names = FALSE))
+          })
+
