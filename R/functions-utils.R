@@ -192,5 +192,6 @@ listProteinColumns <- function(object) {
 ##' @noRd
 isProteinFilter <- function(x) {
     return(is(x, "ProteinidFilter") | is(x, "UniprotidFilter") |
-           is(x, "ProtdomidFilter"))
+           is(x, "ProtdomidFilter") | is(x, "UniprotdbFilter") |
+           is(x, "UniprotmappingtypeFilter"))
 }

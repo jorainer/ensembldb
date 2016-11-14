@@ -1968,3 +1968,44 @@ setMethod("proteins", "EnsDb", function(object,
     return(NULL)
 })
 
+############################################################
+## listUniprotDbs
+##' @aliases listUniprotDbs
+##' @description The \code{listUniprotDbs} method lists all Uniprot database
+##' names in the \code{EnsDb}.
+##' @examples
+##'
+##' ## List the names of all Uniprot databases from which Uniprot IDs are
+##' ## available in the EnsDb
+##' if (hasProteinData(edb))
+##'     listUniprotDbs(edb)
+##'
+##' @rdname ProteinFunctionality
+setMethod("listUniprotDbs", "EnsDb", function(object) {
+    if (!hasProteinData(object))
+        stop("The provided EnsDb database does not provide protein annotations!")
+    res <- dbGetQuery(dbconn(object), "select distinct uniprot_db from uniprot")
+    return(res$uniprot_db)
+})
+
+############################################################
+## listUniprotMappingTypes
+##' @aliases listUniprotMappingTypes
+##' @description The \code{listUniprotMappingTypes} method lists all methods
+##' that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
+##'
+##' @examples
+##'
+##' ## List the type of all methods that were used to map Uniprot IDs to Ensembl
+##' ## protein IDs
+##' if (hasProteinData(edb))
+##'     listUniprotMappingTypes(edb)
+##'
+##' @rdname ProteinFunctionality
+setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
+    if (!hasProteinData(object))
+        stop("The provided EnsDb database does not provide protein annotations!")
+    res <- dbGetQuery(dbconn(object),
+                      "select distinct uniprot_mapping_type from uniprot")
+    return(res$uniprot_mapping_type)
+})

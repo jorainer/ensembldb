@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 #####################################
+## version 0.2.3: * Add additional columns to the uniprot table:
+##                  o uniprot_db: the Uniprot database name.
+##                  o uniprot_mapping_type: method by which the Uniprot ID was
+##                    mapped to the Ensembl protein ID.
+## version 0.2.2: * Transform gene coordinates always to toplevel instead of
+##                  try-and-error transformation to chromosome.
 ## version 0.2.1: * Get protein IDs and (eventually) Uniprot IDs.
 ## version 0.0.2: * get also gene_seq_start, gene_seq_end, tx_seq_start and tx_seq_end from the database!
 ##                * did rename chrom_start to seq_start.
@@ -15,7 +21,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.2.0";
+my $script_version = "0.2.3";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -125,7 +131,7 @@ open(PROTEIN, ">ens_protein.txt");
 print PROTEIN "tx_id\tprotein_id\tprotein_sequence\n";
 
 open(UNIPROT, ">ens_uniprot.txt");
-print UNIPROT "protein_id\tuniprot_id\n";
+print UNIPROT "protein_id\tuniprot_id\tuniprot_db\tuniprot_mapping_type\n";
 
 open(PROTDOM, ">ens_protein_domain.txt");
 print PROTDOM "protein_id\tprotein_domain_id\tprotein_domain_source\tinterpro_accession\tprot_dom_start\tprot_dom_end\n";
@@ -149,7 +155,11 @@ foreach my $gene_id (@gene_ids){
   $orig_gene = $gene_adaptor->fetch_by_stable_id($gene_id);
   if(defined $orig_gene){
     my $do_transform=1;
-    my $gene  = $orig_gene->transform("chromosome");
+    ## Instead of transforming to chromosome we transform to 'toplevel',
+    ## for genes encoded on chromosome this should be the chromosome, for others
+    ## the most "top" level sequence.
+    ## my $gene  = $orig_gene->transform("chromosome");
+    my $gene  = $orig_gene->transform("toplevel");
     if(!defined $gene){
       ## gene is not on known defined chromosomes!
       $gene = $orig_gene;
@@ -169,19 +179,13 @@ foreach my $gene_id (@gene_ids){
       my $length = $chr_slice->length;
       my $is_circular = $chr_slice->is_circular;
       print CHR "$name\t$length\t$is_circular\n";
-      my $chr_slice_again = $slice_adaptor->fetch_by_region('chromosome', $chrom);
-      if(defined($chr_slice_again)){
-	$coord_system_version = $chr_slice_again->coord_system()->version();
+      my $tmp_version = $chr_slice->coord_system()->version();
+      if (defined $tmp_version and length $tmp_version) {
+	$coord_system_version = $tmp_version;
       }
-      # if(defined $chr_slice){
-      # 	my $name = $chr_slice->seq_region_name;
-      # 	my $length = $chr_slice->length;
-      # 	my $is_circular = $chr_slice->is_circular;
-      # 	$coord_system_version = $chr_slice->coord_system()->version();
-      # 	print CHR "$name\t$length\t$is_circular\n";
-      # }else{
-      # 	my $length = $gene->slice->seq_region_length();
-      # 	print CHR "$chrom\t0\t0\n";
+      # my $chr_slice_again = $slice_adaptor->fetch_by_region('chromosome', $chrom);
+      # if(defined($chr_slice_again)){
+      # 	$coord_system_version = $chr_slice_again->coord_system()->version();
       # }
     }
 
@@ -212,7 +216,8 @@ foreach my $gene_id (@gene_ids){
     foreach my $transcript (@transcripts){
       if($do_transform==1){
 	## just to be shure that we have the transcript in chromosomal coordinations.
-	$transcript = $transcript->transform("chromosome");
+	## $transcript = $transcript->transform("chromosome");
+	$transcript = $transcript->transform("toplevel");
       }
       ##my $tx_start = $transcript->start;
       ##my $tx_end = $transcript->end;
@@ -244,11 +249,12 @@ foreach my $gene_id (@gene_ids){
 	if (scalar(@unip) > 0) {
 	  foreach my $uniprot (@unip) {
 	    my $unip_id = $uniprot->display_id();
-	    print UNIPROT "$transl_id\t$unip_id\n";
+	    my $dbn = $uniprot->dbname();
+	    $dbn =~ s/Uniprot\///g;
+	    my $maptype = $uniprot->info_type();
+	    print UNIPROT "$transl_id\t$unip_id\t$dbn\t$maptype\n";
 	    ## print PROTEIN "$tx_id\t$transl_id\t$unip_id\t$prot_seq\n";
 	  }
-	} else {
-	  ## print PROTEIN "$tx_id\t$transl_id\t\t$prot_seq\n";
 	}
 	print PROTEIN "$tx_id\t$transl_id\t$prot_seq\n";
 	my $prot_doms = $transl->get_all_DomainFeatures;
@@ -267,7 +273,8 @@ foreach my $gene_id (@gene_ids){
       my $current_exon_idx = 1;
       foreach my $exon (@exons){
 	if($do_transform==1){
-	  $exon->transform("chromosome");
+	  ## $exon->transform("chromosome");
+	  $exon->transform("toplevel");
 	}
 	my $exon_start = $exon->start;
 	my $exon_end = $exon->end;

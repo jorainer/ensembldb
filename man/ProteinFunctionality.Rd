@@ -3,6 +3,10 @@
 \docType{methods}
 \name{listProteinColumns}
 \alias{listProteinColumns}
+\alias{listUniprotDbs}
+\alias{listUniprotDbs,EnsDb-method}
+\alias{listUniprotMappingTypes}
+\alias{listUniprotMappingTypes,EnsDb-method}
 \alias{proteins}
 \alias{proteins,EnsDb-method}
 \title{Protein related functionality}
@@ -11,6 +15,10 @@ listProteinColumns(object)
 
 \S4method{proteins}{EnsDb}(object, columns = listColumns(object, "protein"),
   filter, order.by = "", order.type = "asc", return.type = "DataFrame")
+
+\S4method{listUniprotDbs}{EnsDb}(object)
+
+\S4method{listUniprotMappingTypes}{EnsDb}(object)
 }
 \arguments{
 \item{object}{The \code{\linkS4class{EnsDb}} object.}
@@ -42,7 +50,10 @@ if no such annotations are available.
 
 The \code{proteins} method returns protein related annotations from
 an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
-allowing to define the type of the returned object.
+allowing to define the type of the returned object. Note that if
+\code{return.type = "AAStringSet"} additional annotation columns are stored
+in a \code{DataFrame} that can be accessed with the \code{mcols} method on
+the returned object.
 }
 \description{
 The \code{listProteinColumns} function allows to conveniently
@@ -54,6 +65,12 @@ functionality related to protein annotations in \code{ensembldb}.
 
 The \code{proteins} method retrieves protein related annotations from
 an \code{\linkS4class{EnsDb}} database.
+
+The \code{listUniprotDbs} method lists all Uniprot database
+names in the \code{EnsDb}.
+
+The \code{listUniprotMappingTypes} method lists all methods
+that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
 }
 \details{
 The \code{proteins} method performs the query starting from the
@@ -78,6 +95,18 @@ edb <- EnsDb.Hsapiens.v75
 ## annotations are available
 if (hasProteinData(edb))
     proteins(edb, filter = GenenameFilter("ZBTB16"))
+
+## List the names of all Uniprot databases from which Uniprot IDs are
+## available in the EnsDb
+if (hasProteinData(edb))
+    listUniprotDbs(edb)
+
+
+## List the type of all methods that were used to map Uniprot IDs to Ensembl
+## protein IDs
+if (hasProteinData(edb))
+    listUniprotMappingTypes(edb)
+
 }
 \author{
 Johannes Rainer

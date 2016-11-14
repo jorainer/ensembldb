@@ -112,7 +112,7 @@ shinyServer(function(input, output) {
         ## if(!checkSelectedPackage(input))
         ##     return()
         if(length(input$package) == 0)
-            return
+            return(NULL)
         if(!is.na(input$geneName) & length(input$geneName) > 0 & input$geneName!=""){
             edb <- selectedPackage()
             res <- genes(edb, filter=TheFilter(input),
@@ -123,7 +123,7 @@ shinyServer(function(input, output) {
     })
     output$Transcripts <- renderDataTable({
         if(length(input$package) == 0)
-            return
+            return(NULL)
         if(!is.na(input$geneName) & length(input$geneName) > 0 & input$geneName!=""){
             edb <- selectedPackage()
             res <- transcripts(edb, filter=TheFilter(input),
@@ -134,7 +134,7 @@ shinyServer(function(input, output) {
     })
     output$Exons <- renderDataTable({
         if(length(input$package) == 0)
-            return
+            return(NULL)
         if(!is.na(input$geneName) & length(input$geneName) > 0 & input$geneName!=""){
             edb <- selectedPackage()
             res <- exons(edb, filter=TheFilter(input),

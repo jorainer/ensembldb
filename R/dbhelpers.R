@@ -703,7 +703,8 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     ## Create the indices.
     if (verbose)
         message("Creating indices...", appendLF = FALSE)
-    .createEnsDbIndices(mysql, indexLength = "(20)")
+    .createEnsDbIndices(mysql, indexLength = "(20)",
+                        proteins = hasProteinData(x))
     if (verbose)
         message("OK")
     return(TRUE)

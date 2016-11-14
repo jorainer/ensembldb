@@ -17,6 +17,7 @@ vignette: >
 **Modified**: 03 October, 2016<br />
 **Compiled**: `r date()`
 
+
 # Introduction
 
 The `ensembldb` package provides functions to create and use transcript centric
@@ -28,7 +29,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#orgtarget1) for the database layout and an overview of
+(see Section [11](#orgec77bc9) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -56,6 +57,7 @@ edb
 ## for what organism was the database generated?
 organism(edb)
 ```
+
 
 # Using `ensembldb` annotation packages to retrieve specific annotations
 
@@ -88,13 +90,13 @@ alphabetical order):
     exons are used for the filter. For methods `exonsBy`, `cdsBy` and `txBy` the
     coordinates of `by` are used.
 -   `SeqendFilter`: filter based on the chromosomal end coordinate of the exons,
-    transcripts or genes (correspondingly set =feature = "exon"=, =feature = "tx"= or
-    =feature = "gene"=).
+    transcripts or genes (correspondingly set `feature = "exon"`, `feature = "tx"` or
+    `feature = "gene"`).
 -   `SeqnameFilter`: filter by the name of the chromosomes the genes are encoded
     on.
 -   `SeqstartFilter`: filter based on the chromosomal start coordinates of the
-    exons, transcripts or genes (correspondingly set =feature = "exon"=,
-    =feature = "tx"= or =feature = "gene"=).
+    exons, transcripts or genes (correspondingly set `feature = "exon"`,
+    `feature = "tx"` or `feature = "gene"`).
 -   `SeqstrandFilter`: filter for the chromosome strand on which the genes are
     encoded.
 -   `TxbiotypeFilter`: filter on the transcript biotype defined in Ensembl; use
@@ -114,8 +116,8 @@ Each of the filter classes can take a single value or a vector of values (with
 the exception of the `SeqendFilter` and `SeqstartFilter`) for comparison. In
 addition, it is possible to specify the *condition* for the filter,
 e.g. setting `condition` to = to retrieve all entries matching the filter value,
-to != to negate the filter or setting `condition = "like"= to allow
-partial matching. The =condition` parameter for `SeqendFilter` and
+to != to negate the filter or setting `condition = "like"` to allow
+partial matching. The `condition` parameter for `SeqendFilter` and
 `SeqendFilter` can take the values = , >, >=, < and <= (since these
 filters base on numeric values).
 
@@ -299,6 +301,7 @@ exons(edb, columns = c("tx_id", "exon_idx"),
 		    ExonrankFilter(3, condition = "<")))
 ```
 
+
 # Extracting gene/transcript/exon models for RNASeq feature counting
 
 For the feature counting step of an RNAseq experiment, the gene or transcript
@@ -368,6 +371,7 @@ DJE <- disjointExons(edb,
 				   GeneidFilter("ENSG%", "like")))
 ```
 
+
 # Retrieving sequences for gene/transcript/exon models
 
 The methods to retrieve exons, transcripts and genes (i.e. `exons`, `transcripts`
@@ -433,6 +437,7 @@ extractTranscriptSeqs(Dna, cdsY)
 
 Note: in the next section we describe how transcript sequences can be retrieved
 from a `BSgenome` package that is based on UCSC, not Ensembl.
+
 
 # Integrating annotations from Ensembl based  `EnsDb` packages with UCSC based annotations
 
@@ -511,11 +516,12 @@ yTxCds <- extractTranscriptSeqs(bsg, cdsBy(edb, "tx", filter = SeqnameFilter("ch
 yTxCds
 ```
 
-At last changing the seqname style to the default value ="Ensembl"=.
+At last changing the seqname style to the default value `"Ensembl"`.
 
 ```{r }
 seqlevelsStyle(edb) <- "Ensembl"
 ```
+
 
 # Interactive annotation lookup using the `shiny` web app
 
@@ -524,6 +530,7 @@ search interactively for gene/transcript/exon annotations using the internal,
 `shiny` based, web application. The application can be started with the
 `runEnsDbApp()` function. The search results from this app can also be returned
 to the R workspace either as a `data.frame` or `GRanges` object.
+
 
 # Plotting gene/transcript features using `ensembldb` and `Gviz`
 
@@ -601,6 +608,7 @@ plotTracks(list(gat, GeneRegionTrack(protCod, name = "protein coding"),
 seqlevelsStyle <- "Ensembl"
 ```
 
+
 # Using `EnsDb` objects in the `AnnotationDbi` framework
 
 Most of the methods defined for objects extending the basic annotation package
@@ -676,6 +684,7 @@ mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
 Note that, if the filters are used, the ordering of the result does no longer
 match the ordering of the genes.
 
+
 # Important notes
 
 These notes might explain eventually unexpected results (and, more importantly,
@@ -699,6 +708,7 @@ help avoiding them):
 -   At present, `EnsDb` support only genes/transcripts for which all of their
     exons are encoded on the same chromosome and the same strand.
 
+
 # Building an transcript-centric database package based on Ensembl annotation
 
 The code in this section is not supposed to be automatically executed when the
@@ -706,6 +716,7 @@ vignette is built, as this would require a working installation of the Ensembl
 Perl API, which is not expected to be available on each system. Also, building
 `EnsDb` from alternative sources, like GFF or GTF files takes some time and
 thus also these examples are not directly executed when the vignette is build.
+
 
 ## Requirements
 
@@ -723,6 +734,7 @@ provided within GTF or GFF files. Also note that protein annotations are usually
 not available in GTF or GFF files, thus, such annotations will not be included
 in the generated `EnsDb` database - protein annotations are only available in
 `EnsDb` databases created with the Ensembl Perl API.
+
 
 ## Building annotation packages
 
@@ -850,10 +862,11 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 		     author = "J Rainer")
 ```
 
-# Database layout<a id="orgtarget1"></a>
+
+# Database layout<a id="orgec77bc9"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [134](#orgparagraph1)). Note that the protein-specific annotations
+shown in Figure [134](#org536e445)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
@@ -934,27 +947,22 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
         possible to use it in the `columns` parameter. This column is *symlinked* to the
         `gene_name` column.
     -   `tx_name`: similar to the `symbol` column, this column is *symlinked* to the `tx_id`
-            column.
+        column.
 
 The database layout: as already described above, protein related annotations
 (green) might not be available in each `EnsDb` database.
 
 ![img](images/dblayout.png "Database layout.")
 
-<div id="footnotes">
-<h2 class="footnotes">Footnotes: </h2>
-<div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1">1</a></sup> <div class="footpara"><http://www.ensembl.org></div></div>
+# Footnotes
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2">2</a></sup> <div class="footpara"><http://www.lrg-sequence.org></div></div>
+<sup><a id="fn.1" href="#fnr.1">1</a></sup> <http://www.ensembl.org>
 
-<div class="footdef"><sup><a id="fn.3" class="footnum" href="#fnr.3">3</a></sup> <div class="footpara"><http://www.ncbi.nlm.nih.gov/pubmed/23950696></div></div>
+<sup><a id="fn.2" href="#fnr.2">2</a></sup> <http://www.lrg-sequence.org>
 
-<div class="footdef"><sup><a id="fn.4" class="footnum" href="#fnr.4">4</a></sup> <div class="footpara"><http://www.ncbi.nlm.nih.gov/pubmed/24227677></div></div>
+<sup><a id="fn.3" href="#fnr.3">3</a></sup> <http://www.ncbi.nlm.nih.gov/pubmed/23950696>
 
-<div class="footdef"><sup><a id="fn.5" class="footnum" href="#fnr.5">5</a></sup> <div class="footpara"><http://www.ensembl.org/info/docs/api/api_installation.html></div></div>
+<sup><a id="fn.4" href="#fnr.4">4</a></sup> <http://www.ncbi.nlm.nih.gov/pubmed/24227677>
 
-
-</div>
-</div>
+<sup><a id="fn.5" href="#fnr.5">5</a></sup> <http://www.ensembl.org/info/docs/api/api_installation.html>

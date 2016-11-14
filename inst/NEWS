@@ -1,3 +1,30 @@
+CHANGES IN VERSION 1.99.3
+-------------------------
+
+NEW FEATURES:
+    o UniprotdbFilter and UniprotmappingtypeFilter.
+
+USER VISIBLE CHANGES:
+    o Fetching Uniprot database and the type of mapping method for
+      Uniprot IDs to Ensembl protein IDs: database columns uniprot_db and
+      uniprot_mapping_type.
+
+
+CHANGES IN VERSION 1.99.2
+-------------------------
+
+BUG FIXES:
+    o Perl script is no longer failing if no chromosome info is available.
+
+
+CHANGES IN VERSION 1.99.1
+-------------------------
+
+BUG FIXES:
+    o No protein table indices were created when inserting an EnsDb with protein
+      data to MySQL.
+
+
 CHANGES IN VERSION 1.99.0
 -------------------------
 

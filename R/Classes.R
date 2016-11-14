@@ -408,7 +408,8 @@ OnlyCodingTx <- function() {
 #' @description These filters allow to query specific information from an
 #' \code{\linkS4class{EnsDb}} database. Filters should be created using the
 #' dedicated constructor functions \code{ProteinidFilter},
-#' \code{ProtdomidFilter} and \code{UniprotidFilter}. Protein annotation-based
+#' \code{ProtdomidFilter}, \code{UniprotidFilter}, \code{UniprotdbFilter} or
+#' \code{UniprotmappingtypeFilter}. Protein annotation-based
 #' filters are:
 #'
 #' @slot condition The condition to be used in the filter.
@@ -420,6 +421,9 @@ OnlyCodingTx <- function() {
 #' returned by the queries.
 #' @name ProteinFilters
 #' @seealso \link{RNA-DNA-filters} for filters using RNA/DNA annotations.
+#' \code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
+#' list all Uniprot database names respectively mapping method types from the
+#' database.
 #' @author Johannes Rainer
 #' @examples
 #' library(EnsDb.Hsapiens.v75)
@@ -457,6 +461,7 @@ OnlyCodingTx <- function() {
 #' if (hasProteinData(edb)) {
 #'     transcripts(edb, filter = pdf, columns = "protein_id")
 #' }
+#'
 NULL
 #> NULL
 
@@ -547,3 +552,60 @@ ProtdomidFilter <- function(value, condition = "=") {
     return(new("ProtdomidFilter", condition = condition,
                value = as.character(value)))
 }
+
+############################################################
+## UniprotdbFilter
+##' @description The \code{UniprotdbFilter} allows to filter results based on
+##' the specified Uniprot database names.
+##' @rdname ProteinFilters
+setClass("UniprotdbFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             values = "",
+             .valueIsCharacter = TRUE
+         ))
+##' @return For \code{UniprotdbFilter}: A \code{UniprotdbFilter} object.
+##' @rdname ProteinFilters
+UniprotdbFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("UniprotdbFilter", condition = condition,
+               value = as.character(value)))
+}
+
+############################################################
+## UniprotmappingtypeFilter
+##' @description The \code{UniprotmappingtypeFilter} allows to filter results
+##' based on the mapping method/type that was used to assign Uniprot IDs to
+##' Ensembl protein IDs.
+##' @rdname ProteinFilters
+setClass("UniprotmappingtypeFilter", contains = "BasicFilter",
+         prototype = list(
+             condition = "=",
+             values = "",
+             .valueIsCharacter = TRUE
+         ))
+##' @return For \code{UniprotmappingtypeFilter}: A
+##' \code{UniprotmappingtypeFilter} object.
+##' @rdname ProteinFilters
+UniprotmappingtypeFilter <- function(value, condition = "=") {
+    if (missing(value)) {
+        stop("A filter without a value makes no sense!")
+    }
+    if (length(value) > 1) {
+        if(condition == "=")
+            condition = "in"
+        if(condition == "!=")
+            condition = "not in"
+    }
+    return(new("UniprotmappingtypeFilter", condition = condition,
+               value = as.character(value)))
+}
+
