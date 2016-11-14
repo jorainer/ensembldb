@@ -1,9 +1,12 @@
 CHANGES IN VERSION 1.99.3
 -------------------------
 
+NEW FEATURES:
+    o UniprotdbFilter and UniprotmappingtypeFilter.
+
 USER VISIBLE CHANGES:
-     o Fetching Uniprot database and the type of mapping method for
-       Uniprot IDs to Ensembl protein IDs: database columns uniprot_db and
+    o Fetching Uniprot database and the type of mapping method for
+      Uniprot IDs to Ensembl protein IDs: database columns uniprot_db and
        uniprot_mapping_type.
 
 
