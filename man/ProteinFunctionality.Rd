@@ -95,6 +95,16 @@ edb <- EnsDb.Hsapiens.v75
 ## annotations are available
 if (hasProteinData(edb))
     proteins(edb, filter = GenenameFilter("ZBTB16"))
+
+## List the names of all Uniprot databases from which Uniprot IDs are
+## available in the EnsDb
+listUniprotDbs(edb)
+
+
+## List the type of all methods that were used to map Uniprot IDs to Ensembl
+## protein IDs
+listUniprotMappingTypes(edb)
+
 }
 \author{
 Johannes Rainer
