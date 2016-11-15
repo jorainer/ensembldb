@@ -44,29 +44,28 @@ createEnsDbForSpecies <- function(base_url = "ftp://ftp.ensembl.org/pub",
         stop("No directories found!")
     if (missing(species))
         species <- res[, "organism"]
+    rownames(res) <- res[, "organism"]
     ##     Check if we've got the species available
-    got_specs <- species %in% res[, "organism"]
+    got_specs <- species %in% rownames(res)
     if (!all(got_specs))
         warning("No core database for species ",
                 paste0(species[!got_specs], collapse = ", "), " found.")
     species <- species[got_specs]
-    res <- res[res[, "organism"] %in% species, , drop = FALSE]
-    ## re-order res to match species
-    res <- res[match(res[, "organism"], species), , drop = FALSE]
+    res <- res[species, , drop = FALSE]
     if (length(species) == 0)
         stop("No database for any provided species found!")
     ## (2) Process each species
-    message("Going to process ", length(species), " species.")
-    for (i in 1:length(species)) {
-        message("Processing species: ", species[i], " (", i, " of ",
-                length(species), ")")
+    message("Going to process ", nrow(res), " species.")
+    for (i in 1:nrow(res)) {
+        message("Processing species: ", res[i, "organism"], " (", i, " of ",
+                nrow(res), ")")
         processOneSpecies(ftp_folder = paste0(base_url, res[i, "folder"]),
                           version = version,
                           species = species[i], user = user, host = host,
                           pass = pass, port = port, local_tmp = local_tmp,
                           dropDb = dropDb)
-        message("Done with species: ", species[i], ", ", length(species) - i,
-                " left.")
+        message("Done with species: ", res[i, "organism"], ", ",
+                nrow(res) - i, " left.")
     }
 }
 

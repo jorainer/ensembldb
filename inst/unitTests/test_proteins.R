@@ -354,6 +354,31 @@ test_proteins <- function() {
 test_proteins_uniprot <- function() {
     ## ZBTB16 and the mapping of 1 protein to two Uniprot IDs, one with DIRECT
     ## mapping type.
+    if (hasProteinData(edb)) {
+        prts <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+                         columns = c("uniprot_id", "uniprot_db",
+                                     "uniprot_mapping_type"),
+                         return.type = "DataFrame")
+        ## NOTE: this is true for Ensembl 86, but might not be the case for 75!
+        ## Here we have the n:m mapping:
+        ## Q05516 is assigned to ENSP00000338157 and ENSP00000376721,
+        ## Each of the two proteins is however also annotated to a second
+        ## Uniprot ID: A0A024R3C6
+        ## If we use the UniprotmappingtypeFilter with only DIRECT mapping
+        ## we expect to reduce it to the 1:n mapping between Uniprot and Ensembl
+        prts <- proteins(edb, filter = list(GenenameFilter("ZBTB16"),
+                                            UniprotmappingtypeFilter("DIRECT")),
+                         columns = c("uniprot_id", "uniprot_db",
+                                     "uniprot_mapping_type"),
+                         return.type = "DataFrame")
+        checkTrue(all(prts$uniprot_mapping_type == "DIRECT"))
+        ## Check the UniprotdbFilter
+        prts <- proteins(edb, filter = list(GenenameFilter("ZBTB16"),
+                                            UniprotdbFilter("SPTREMBL")),
+                         columns = c("uniprot_id", "uniprot_db", "protein_id"),
+                         return.type = "DataFrame")
+        checkTrue(all(prts$uniprot_db == "SPTREMBL"))
+    }
 }
 
 test_isProteinFilter <- function() {
