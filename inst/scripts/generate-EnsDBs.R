@@ -50,7 +50,9 @@ createEnsDbForSpecies <- function(base_url = "ftp://ftp.ensembl.org/pub",
         warning("No core database for species ",
                 paste0(species[!got_specs], collapse = ", "), " found.")
     species <- species[got_specs]
-    res <- res[res[, "organism"] %in% species, ]
+    res <- res[res[, "organism"] %in% species, , drop = FALSE]
+    ## re-order res to match species
+    res <- res[match(res[, "organism"], species), , drop = FALSE]
     if (length(species) == 0)
         stop("No database for any provided species found!")
     ## (2) Process each species
