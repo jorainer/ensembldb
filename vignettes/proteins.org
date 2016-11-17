@@ -148,15 +148,22 @@ below we restrict the result to Uniprot IDs with the mapping type /DIRECT/.
   ## and Uniprot IDs, restricting to protein_id to uniprot_id mappings based
   ## on "DIRECT" mapping methods.
   txs <- transcripts(edb, filter = list(GenenameFilter("ZBTB16"),
-					Uniprotmappingtype("DIRECT")),
+					UniprotmappingtypeFilter("DIRECT")),
                      columns = c("protein_id", "uniprot_id", "uniprot_db"))
   mcols(txs)
 #+END_SRC
 
-Protein annotations can be added in a similar fashion as /metadata columns/ to the
+For this example the use of the =UniprotmappingtypeFilter= resolved the multiple
+mapping of Uniprot IDs to Ensembl protein IDs, but the Uniprot ID /Q05516/ is
+still assigned to the two Ensembl protein IDs /ENSP00000338157/ and
+/ENSP00000376721/.
+
+
+All protein annotations can also be added as /metadata columns/ to the
 results of the =genes=, =exons=, =exonsBy=, =transcriptsBy=, =cdsBy=, =fiveUTRsByTranscript=
-and =threeUTRsByTranscript= methods. These methods report for non-coding
-transcripts an =NA= in the protein annotation columns.
+and =threeUTRsByTranscript= methods by specifying the desired column names with
+the =columns= parameter. For non coding transcripts =NA= will be reported in the
+protein annotation columns.
 
 In addition to retrieve protein annotations from the database, we can also use
 protein data to filter the results. In the example below we fetch for example

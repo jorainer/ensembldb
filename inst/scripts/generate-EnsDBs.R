@@ -4,8 +4,6 @@ library(RCurl)
 library(RMySQL)
 library(ensembldb)
 
-setwd("/Users/jo/tmp/86")
-
 ##' @description Creates an EnsDb for the specified species by first downloading
 ##' the corresponding MySQL database from Ensembl, installing it and
 ##' subsequently creating the EnsDb database from it.
