@@ -17,6 +17,14 @@ BUG FIXES:
 CHANGES IN VERSION 1.99.3
 -------------------------
 
+BUG FIXES:
+   o Add two additional uniprot table columns to internal variable and fix
+     failing unit test.
+
+
+CHANGES IN VERSION 1.99.3
+-------------------------
+
 NEW FEATURES:
     o UniprotdbFilter and UniprotmappingtypeFilter.
 
