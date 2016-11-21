@@ -630,7 +630,8 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                       metadata = c("name", "value"))
 .ENSDB_PROTEIN_TABLES <- list(protein = c("tx_id", "protein_id",
                                           "protein_sequence"),
-                              uniprot = c("protein_id", "uniprot_id"),
+                              uniprot = c("protein_id", "uniprot_id",
+                                          "uniprot_db", "uniprot_mapping_type"),
                               protein_domain = c("protein_id",
                                                  "protein_domain_id",
                                                  "protein_domain_source",
