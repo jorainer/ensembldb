@@ -4,12 +4,33 @@ library(RCurl)
 library(RMySQL)
 library(ensembldb)
 
+##' @description Get core database names from the specified folder.
+##' @param ftp_folder The ftp url to the per-species mysql folders.
+##' @author Johannes Rainer
+##' @noRd
+listCoreDbsInFolder <- function(ftp_folder) {
+    if (missing(ftp_folder))
+        stop("Argument 'ftp_folder' missing!")
+    folders <- unlist(strsplit(getURL(ftp_folder,
+                                      dirlistonly = TRUE), split = "\n"))
+    res <- t(sapply(folders, function(z) {
+        tmp <- unlist(strsplit(z, split = "_"))
+        return(c(folder = z,
+                 organism = paste0(tmp[1:2], collapse = "_"),
+                 type = tmp[3],
+                 version = paste0(tmp[4:length(tmp)], collapse = "_")))
+    }))
+    return(res[which(res[, "type"] == "core"), ])
+}
+
 ##' @description Creates an EnsDb for the specified species by first downloading
 ##' the corresponding MySQL database from Ensembl, installing it and
 ##' subsequently creating the EnsDb database from it.
 ##'
-##' @param base_url The base ftp url.
-##' @param version The Ensembl version.
+##' @param ftp_folder The ftp url to the per-species mysql folders. If not
+##' provided it will use the default Ensembl ftp:
+##' \code{ftp://ftp.ensembl.org/pub/relases-<ens_version>/mysql/}.
+##' @param ens_version The Ensembl version (version of the Ensembl Perl API).
 ##' @param species The name of the species (e.g. "homo_sapiens").
 ##' @param user The user name for the MySQL database (write access).
 ##' @param host The host on which the MySQL database is running.
@@ -21,14 +42,24 @@ library(ensembldb)
 ##' EnsDb has been created.
 ##'
 ##' @author Johannes Rainer
+##' @examples
+##'
+##' ## For Ensemblgenomes:
+##' ftp_folder <- "ftp://ftp.ensemblgenomes.org/pub/release-33/fungi/mysql/"
 ##' @noRd
-createEnsDbForSpecies <- function(base_url = "ftp://ftp.ensembl.org/pub",
-                                  version = 86, species, user, host, pass,
+createEnsDbForSpecies <- function(ftp_folder,
+                                  ens_version = 86, species, user, host, pass,
                                   port = 3306, local_tmp = tempdir(),
+                                  sub_dir = "",
                                   dropDb = TRUE) {
+    ## if ftp_folder is missing use the default one:
+    base_url = "ftp://ftp.ensembl.org/pub"
     ## (1) Get all directories from Ensembl
-    base_url <- paste0(base_url, "/release-", version, "/mysql/")
-    folders <- unlist(strsplit(getURL(base_url,
+    if (missing(ftp_folder))
+        ftp_folder <- paste0(base_url, "/release-", ens_version, "/mysql/")
+    res <- listCoreDbsInFolder(ftp_url)
+
+    folders <- unlist(strsplit(getURL(ftp_folder,
                                       dirlistonly = TRUE), split = "\n"))
     res <- t(sapply(folders, function(z) {
         tmp <- unlist(strsplit(z, split = "_"))
@@ -57,8 +88,8 @@ createEnsDbForSpecies <- function(base_url = "ftp://ftp.ensembl.org/pub",
     for (i in 1:nrow(res)) {
         message("Processing species: ", res[i, "organism"], " (", i, " of ",
                 nrow(res), ")")
-        processOneSpecies(ftp_folder = paste0(base_url, res[i, "folder"]),
-                          version = version,
+        processOneSpecies(ftp_folder = paste0(ftp_folder, res[i, "folder"]),
+                          ens_version = ens_version,
                           species = species[i], user = user, host = host,
                           pass = pass, port = port, local_tmp = local_tmp,
                           dropDb = dropDb)
@@ -77,7 +108,7 @@ createEnsDbForSpecies <- function(base_url = "ftp://ftp.ensembl.org/pub",
 ##'
 ##' @param ftp_folder The folder on Ensembl's ftp server containing the mysql
 ##' database files. Has to be the full path to these files.
-##' @param version The Ensembl version.
+##' @param ens_version The Ensembl version (version of the Ensembl Perl API).
 ##' @param species The name of the species (e.g. "homo_sapiens").
 ##' @param user The user name for the MySQL database (write access).
 ##' @param host The host on which the MySQL database is running.
@@ -90,7 +121,7 @@ createEnsDbForSpecies <- function(base_url = "ftp://ftp.ensembl.org/pub",
 ##'
 ##' @author Johannes Rainer
 ##' @noRd
-processOneSpecies <- function(ftp_folder, version = 86, species, user,
+processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
                               host = "localhost",
                               pass, port = 3306, local_tmp = tempdir(),
                               dropDb = TRUE) {
@@ -111,7 +142,7 @@ processOneSpecies <- function(ftp_folder, version = 86, species, user,
     res <- sapply(fls, unlink)
     ## (4) Create the EnsDb (requires the correct Ensembl API)
     ##     They are created in the local directory.
-    fetchTablesFromEnsembl(version, species = species, user = user,
+    fetchTablesFromEnsembl(ens_version, species = species, user = user,
                            host = host, pass = pass, port = port)
     DBFile <- makeEnsemblSQLiteFromTables()
     unlink("*.txt")
