@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.99.5
+-------------------------
+
+NEW FEATURES:
+    o OnlyCodingTxFilter is now exported. This filter allows to query for
+    protein coding genes.
+
+
 CHANGES IN VERSION 1.99.3
 -------------------------
 

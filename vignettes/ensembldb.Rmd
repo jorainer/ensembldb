@@ -14,7 +14,7 @@ vignette: >
 
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 03 October, 2016<br />
+**Modified**: `r file.info("ensembldb.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
 
@@ -29,7 +29,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#orgec77bc9) for the database layout and an overview of
+(see Section [11](#orgceefdbb) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -102,6 +102,9 @@ alphabetical order):
 -   `TxbiotypeFilter`: filter on the transcript biotype defined in Ensembl; use
     the `listTxbiotypes` method to list all available biotypes.
 -   `TxidFilter`: filter on the Ensembl transcript identifiers.
+-   `OnlyCodingTxFilter`: special type of filter that takes no input and allows to
+    query for all transcripts with a defined coding sequence (hence being protein
+    coding).
 
 In addition to the above *DNA-RNA-based* filters, the following *protein-specific*
 filters are available (Note however that these can only be used on `EnsDb`
@@ -863,10 +866,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="orgec77bc9"></a>
+# Database layout<a id="orgceefdbb"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [134](#org536e445)). Note that the protein-specific annotations
+shown in Figure [135](#orgeacf282)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 

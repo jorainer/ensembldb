@@ -16,6 +16,7 @@
 \alias{SeqendFilter-class}
 \alias{GRangesFilter-class}
 \alias{ExonrankFilter-class}
+\alias{OnlyCodingTxFilter-class}
 \alias{column,EntrezidFilter,missing,missing-method}
 \alias{column,GeneidFilter,missing,missing-method}
 \alias{column,GenenameFilter,missing,missing-method}
@@ -29,6 +30,7 @@
 \alias{column,SeqstartFilter,missing,missing-method}
 \alias{column,SeqendFilter,missing,missing-method}
 \alias{column,GRangesFilter,missing,missing-method}
+\alias{column,OnlyCodingTxFilter,missing,missing-method}
 \alias{where,EntrezidFilter,missing,missing-method}
 \alias{where,GeneidFilter,missing,missing-method}
 \alias{where,GenenameFilter,missing,missing-method}
@@ -42,6 +44,7 @@
 \alias{where,SeqstartFilter,missing,missing-method}
 \alias{where,SeqendFilter,missing,missing-method}
 \alias{where,GRangesFilter,missing,missing-method}
+\alias{where,OnlyCodingTxFilter,missing,missing-method}
 % EnsDb, missing
 \alias{column,EntrezidFilter,EnsDb,missing-method}
 \alias{column,GeneidFilter,EnsDb,missing-method}
@@ -56,7 +59,7 @@
 \alias{column,SeqstartFilter,EnsDb,missing-method}
 \alias{column,SeqendFilter,EnsDb,missing-method}
 \alias{column,GRangesFilter,EnsDb,missing-method}
-\alias{column,OnlyCodingTx,EnsDb,missing-method}
+\alias{column,OnlyCodingTxFilter,EnsDb,missing-method}
 \alias{where,EntrezidFilter,EnsDb,missing-method}
 \alias{where,GeneidFilter,EnsDb,missing-method}
 \alias{where,GenenameFilter,EnsDb,missing-method}
@@ -70,7 +73,7 @@
 \alias{where,SeqstartFilter,EnsDb,missing-method}
 \alias{where,SeqendFilter,EnsDb,missing-method}
 \alias{where,GRangesFilter,EnsDb,missing-method}
-\alias{where,OnlyCodingTx,EnsDb,missing-method}
+\alias{where,OnlyCodingTxFilter,EnsDb,missing-method}
 % EnsDb, character
 \alias{column,EntrezidFilter,EnsDb,character-method}
 \alias{column,GeneidFilter,EnsDb,character-method}
@@ -85,7 +88,7 @@
 \alias{column,SeqstartFilter,EnsDb,character-method}
 \alias{column,SeqendFilter,EnsDb,character-method}
 \alias{column,GRangesFilter,EnsDb,character-method}
-\alias{column,OnlyCodingTx,EnsDb,character-method}
+\alias{column,OnlyCodingTxFilter,EnsDb,character-method}
 \alias{where,EntrezidFilter,EnsDb,character-method}
 \alias{where,GeneidFilter,EnsDb,character-method}
 \alias{where,GenenameFilter,EnsDb,character-method}
@@ -99,7 +102,7 @@
 \alias{where,SeqstartFilter,EnsDb,character-method}
 \alias{where,SeqendFilter,EnsDb,character-method}
 \alias{where,GRangesFilter,EnsDb,character-method}
-\alias{where,OnlyCodingTx,EnsDb,character-method}
+\alias{where,OnlyCodingTxFilter,EnsDb,character-method}
 %
 \alias{condition,BasicFilter-method}
 \alias{condition<-,BasicFilter-method}
@@ -159,7 +162,8 @@
   \code{\link{TxidFilter}}, \code{\link{TxbiotypeFilter}},
   \code{\link{ExonidFilter}}, \code{\link{ExonrankFilter}},
   \code{\link{SeqnameFilter}}, \code{\link{SeqstrandFilter}},
-  \code{\link{SeqstartFilter}} and \code{\link{SeqendFilter}}.
+  \code{\link{SeqstartFilter}}, \code{\link{SeqendFilter}} and
+  \code{\link{OnlyCodingTxFilter}}.
 
   See examples below for usage.
 }
@@ -365,6 +369,11 @@
 
     \item{\code{TxidFilter}}{
       Filter on the Ensembl transcript identifiers.
+    }
+
+    \item{\code{OnlyCodingTxFilter}}{
+      This is a special case filter allowing to query only for protein
+      coding transcripts, i.e. transcripts with a defined coding sequence.
     }
   }
 }
