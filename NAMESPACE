@@ -108,7 +108,8 @@ exportClasses("BasicFilter",
               "TxbiotypeFilter",
               "UniprotidFilter",
               "UniprotdbFilter",
-              "UniprotmappingtypeFilter"
+              "UniprotmappingtypeFilter",
+              "OnlyCodingTxFilter"
               )
 ## Methods for EnsFilter
 exportMethods("column",
@@ -194,7 +195,8 @@ export("EnsDb",
        "TxbiotypeFilter",
        "UniprotidFilter",
        "UniprotdbFilter",
-       "UniprotmappingtypeFilter"
+       "UniprotmappingtypeFilter",
+       "OnlyCodingTxFilter"
        )
 
 
