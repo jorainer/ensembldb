@@ -13,6 +13,7 @@
 \alias{SeqendFilter}
 \alias{GRangesFilter}
 \alias{SymbolFilter}
+\alias{OnlyCodingTxFilter}
 \title{
   Constructor functions for filter objects
 }
@@ -48,6 +49,8 @@ SeqstartFilter(value, condition = "=", feature = "gene")
 SeqendFilter(value, condition = "=", feature = "gene")
 
 SymbolFilter(value, condition = "=")
+
+OnlyCodingTxFilter()
 
 }
 %- maybe also 'usage' for other objects documented here.
@@ -155,6 +158,10 @@ SymbolFilter(value, condition = "=")
       gene name instead (which in many cases corresponds to the official
       gene name).
     }
+    \item{OnlyCodingTxFilter}{
+      Allows to query only for protein coding transcripts, i.e. such
+      transcripts that have a defined coding sequence.
+    }
   }
 }
 \value{
@@ -172,7 +179,8 @@ SymbolFilter(value, condition = "=")
   \code{\linkS4class{SeqstrandFilter}},
   \code{\linkS4class{SeqstartFilter}},
   \code{\linkS4class{SeqendFilter}},
-  \code{\linkS4class{SymbolFilter}}
+  \code{\linkS4class{SymbolFilter}},
+  \code{\linkS4class{OnlyCodingTxFilter}}
 }
 \author{
   Johannes Rainer
@@ -191,7 +199,8 @@ SymbolFilter(value, condition = "=")
   \code{\linkS4class{SeqstrandFilter}},
   \code{\linkS4class{SeqstartFilter}},
   \code{\linkS4class{SeqendFilter}},
-  \code{\linkS4class{SymbolFilter}}
+  \code{\linkS4class{SymbolFilter}},
+  \code{\linkS4class{OnlyCodingTxFilter}}
 }
 \examples{
 

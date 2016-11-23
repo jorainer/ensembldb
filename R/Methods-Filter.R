@@ -1022,28 +1022,28 @@ setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
 
 ##***********************************************************************
 ##
-##     Methods for OnlyCodingTx classes.
+##     Methods for OnlyCodingTxFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object = "OnlyCodingTx", db = "EnsDb",
+setMethod("where", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
                              with.tables = "missing"),
           function(object, db, with.tables, ...) {
     tn <- names(listTables(db))
     return(where(object, db, with.tables = tn))
 })
-setMethod("column", signature(object = "OnlyCodingTx", db = "EnsDb",
+setMethod("column", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
                               with.tables = "missing"),
           function(object, db, with.tables, ...) {
     tn <- names(listTables(db))
     return(column(object, db, with.tables = tn))
 })
-setMethod("where", signature(object = "OnlyCodingTx", db = "EnsDb",
+setMethod("where", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
                              with.tables="character"),
           function(object, db, with.tables = "character", ...) {
               ## Hard coded.
               return("tx.tx_cds_seq_start is not null")
 })
-setMethod("column", signature(object = "OnlyCodingTx", db = "EnsDb",
+setMethod("column", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
                               with.tables = "character"),
           function(object, db, with.tables, ...) {
               return("tx.tx_cds_seq_start")
