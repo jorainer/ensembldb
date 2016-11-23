@@ -39,7 +39,7 @@ vignette: >
 #+BEGIN_EXPORT html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 03 October, 2016<br />
+**Modified**: `r file.info("ensembldb.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 #+END_EXPORT
 
@@ -150,6 +150,9 @@ alphabetical order):
 + =TxbiotypeFilter=: filter on the transcript biotype defined in Ensembl; use
   the =listTxbiotypes= method to list all available biotypes.
 + =TxidFilter=: filter on the Ensembl transcript identifiers.
++ =OnlyCodingTxFilter=: special type of filter that takes no input and allows to
+  query for all transcripts with a defined coding sequence (hence being protein
+  coding).
 
 In addition to the above /DNA-RNA-based/ filters, the following /protein-specific/
 filters are available (Note however that these can only be used on =EnsDb=

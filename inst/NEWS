@@ -1,3 +1,19 @@
+CHANGES IN VERSION 1.99.5
+-------------------------
+
+NEW FEATURES:
+    o OnlyCodingTxFilter is now exported. This filter allows to query for
+    protein coding genes.
+
+
+CHANGES IN VERSION 1.99.3
+-------------------------
+
+BUG FIXES:
+   o Add two additional uniprot table columns to internal variable and fix
+     failing unit test.
+
+
 CHANGES IN VERSION 1.99.3
 -------------------------
 
