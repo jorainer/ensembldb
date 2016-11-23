@@ -1013,7 +1013,7 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
     ## Add a filter ensuring that only coding transcripts are queried.
-    filter <- c(list(OnlyCodingTx()), filter)
+    filter <- c(list(OnlyCodingTxFilter()), filter)
     bySuff <- "_id"
     if (by == "tx") {
         ## adding exon_id, exon_idx to the columns.
@@ -1132,7 +1132,7 @@ getUTRsByTranscript <- function(x, what, columns = NULL, filter) {
     columns <- addFilterColumns(columns, filter, x)
     columns <- unique(c(columns, "exon_id", "exon_idx"))
     ## Add the filter for coding tx only.
-    filter <- c(list(OnlyCodingTx()), filter)
+    filter <- c(list(OnlyCodingTxFilter()), filter)
     ## what do we need: tx_cds_seq_start, tx_cds_seq_end and exon_idx
     fetchCols <- unique(c("tx_id", columns, "tx_cds_seq_start",
                           "tx_cds_seq_end", "seq_name", "seq_strand",

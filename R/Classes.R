@@ -389,18 +389,18 @@ SymbolFilter <- function(value, condition = "=") {
 }
 
 ############################################################
-## OnlyCodingTx
+## OnlyCodingTxFilter
 ##
 ## That's a special case filter that just returns transcripts
 ## that have tx_cds_seq_start defined (i.e. not NULL).
-setClass("OnlyCodingTx", contains = "BasicFilter",
+setClass("OnlyCodingTxFilter", contains = "BasicFilter",
          prototype = list(
              condition = "=",
              value = "",
              .valueIsCharacter = TRUE
          ))
-OnlyCodingTx <- function() {
-    return(new("OnlyCodingTx"))
+OnlyCodingTxFilter <- function() {
+    return(new("OnlyCodingTxFilter"))
 }
 
 #' Protein annotation related filters
