@@ -1792,9 +1792,11 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
                          port = port)
         ## Check if database is available.
         dbs <- dbGetQuery(con, "show databases;")
-        sqliteName <- sub(basename(dbfile(dbconn(x))),
-                          pattern = ".sqlite", replacement = "",
-                          fixed = TRUE)
+        ## sqliteName should be in the format EnsDb.Hsapiens.v75!
+        sqliteName <- .makePackageName(dbconn(x))
+        ## sqliteName <- sub(basename(dbfile(dbconn(x))),
+        ##                   pattern = ".sqlite", replacement = "",
+        ##                   fixed = TRUE)
         mysqlName <- SQLiteName2MySQL(sqliteName)
         if (nrow(dbs) == 0 | !any(dbs$Database == mysqlName)) {
             message("Database not available, trying to create it...",
