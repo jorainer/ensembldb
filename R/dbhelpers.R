@@ -704,7 +704,11 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     ## Create the indices.
     if (verbose)
         message("Creating indices...", appendLF = FALSE)
-    .createEnsDbIndices(mysql, indexLength = "(20)",
+    ## Guess index length on the maximal number of characters of an ID.
+    indexLength <- max(nchar(
+        dbGetQuery(sqlite_con, "select distinct gene_id from gene")$gene_id
+    ))
+    .createEnsDbIndices(mysql, indexLength = paste0("(", indexLength, ")"),
                         proteins = hasProteinData(x))
     if (verbose)
         message("OK")
@@ -727,8 +731,20 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     for (i in 1:length(indexCols)) {
         tabname <- names(indexCols)[i]
         colname <- indexCols[i]
-        dbGetQuery(con, paste0("create index ", tabname, "_", colname, "_idx ",
-                                "on ", tabname, " (",colname, indexLength,")"))
+        ## Check if we've got any values at all. if not we're not creating the
+        ## index.
+        ids <- dbGetQuery(con, paste0("select distinct ", colname,
+                                      " from ", tabname))[, colname]
+        if (length(ids) == 0 | all(is.na(ids))) {
+            ## No need to make an index here!
+        } else {
+            if (indexLength != "")
+                idxL <- paste0("(", min(c(max(nchar(ids)), 20)), ")")
+            else
+                idxL <- ""
+            dbGetQuery(con, paste0("create index ", tabname, "_", colname, "_idx ",
+                                   "on ", tabname, " (",colname, idxL,")"))
+        }
     }
     ## Add the one on the numeric index:
     dbGetQuery(con, "create index tx2exon_exon_idx_idx on tx2exon (exon_idx);")

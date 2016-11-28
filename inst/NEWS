@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.99.6
+-------------------------
+
+BUG FIXES:
+    o MySQL database name for useMySQL was not created as expected for GTF/GFF
+      based EnsDbs.
+
+
 CHANGES IN VERSION 1.99.5
 -------------------------
 
