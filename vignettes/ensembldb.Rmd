@@ -2,7 +2,8 @@
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
 output:
-  BiocStyle::html_document2
+  BiocStyle::html_document:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,6 +12,10 @@ vignette: >
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
+
+```{r echo=FALSE, results='asis', message = FALSE}
+BiocStyle::markdown()
+```
 
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: `r packageDescription("ensembldb")$Author`<br />
@@ -29,7 +34,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#orgceefdbb) for the database layout and an overview of
+(see Section [11](#org66f1087) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -866,10 +871,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="orgceefdbb"></a>
+# Database layout<a id="org66f1087"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [135](#orgeacf282)). Note that the protein-specific annotations
+shown in Figure [137](#org761e26a)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
@@ -927,6 +932,9 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
     might be mapped to multiple Uniprot IDs.
     -   `protein_id`: the Ensembl protein ID.
     -   `uniprot_id`: the Uniprot ID.
+    -   `uniprot_db`: the Uniprot database in which the ID is defined.
+    -   `uniprot_mapping_type`: the type of the mapping method that was used to assign
+        the Uniprot ID to an Ensembl protein ID.
 
 -   **protein\_domain**: provides protein domain annotations and mapping to proteins.
     -   `protein_id`: the Ensembl protein ID on which the protein domain is present.

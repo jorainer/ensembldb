@@ -2,15 +2,16 @@
 #+AUTHOR:    Johannes Rainer
 #+EMAIL:     johannes.rainer@eurac.edu
 #+OPTIONS: ^:{} toc:nil
-#+PROPERTY: exports code
-#+PROPERTY: session *R*
+#+PROPERTY: header-args :exports code
+#+PROPERTY: header-args :session *R*
 
-#+BEGIN_html
+#+BEGIN_EXPORT html
 ---
 title: "Using a MySQL server backend"
 graphics: yes
 output:
-  BiocStyle::html_document2
+  BiocStyle::html_document:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Using a MySQL server backend}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,16 +20,18 @@ vignette: >
   %\VignettePackage{ensembldb}
   %\VignetteKeywords{annotation,database}
 ---
-#+END_html
+#+END_EXPORT
 
-# #+BEGIN_EXPORT html
+#+BEGIN_SRC R :results silent :exports code :ravel echo=FALSE, results='asis', message = FALSE
+  BiocStyle::markdown()
+#+END_SRC
 
-#+BEGIN_html
+#+BEGIN_EXPORT html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 20 September, 2016<br />
+**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
+**Modified**: `r file.info("MySQL-backend.Rmd")$mtime`<br />
 **Compiled**: `r date()`
-#+END_html
+#+END_EXPORT
 
 ** Introduction
 
@@ -49,7 +52,7 @@ this would require access to a MySQL server.
 Installation of =EnsDb= databases in a MySQL server is straight forward - given
 that the user has write access to the server:
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel eval = FALSE
   library(ensembldb)
   ## Load the EnsDb package that should be installed on the MySQL server
   library(EnsDb.Hsapiens.v75)
@@ -68,7 +71,7 @@ R-package, the connection to the database can be passed to the =EnsDb= construct
 function. With the resulting =EnsDb= object annotations can be retrieved from the
 MySQL database.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel eval = FALSE
   library(ensembldb)
   library(RMySQL)
 

@@ -2,7 +2,8 @@
 title: "Using a MySQL server backend"
 graphics: yes
 output:
-  BiocStyle::html_document2
+  BiocStyle::html_document:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Using a MySQL server backend}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,10 +13,15 @@ vignette: >
   %\VignetteKeywords{annotation,database}
 ---
 
+```{r echo=FALSE, results='asis', message = FALSE}
+BiocStyle::markdown()
+```
+
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: 20 September, 2016<br />
+**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
+**Modified**: `r file.info("MySQL-backend.Rmd")$mtime`<br />
 **Compiled**: `r date()`
+
 
 # Introduction
 
@@ -31,12 +37,13 @@ the individual clients.
 **Note** the code in this document is not executed during vignette generation as
 this would require access to a MySQL server.
 
+
 # Using `ensembldb` with a MySQL server
 
 Installation of `EnsDb` databases in a MySQL server is straight forward - given
 that the user has write access to the server:
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 library(ensembldb)
 ## Load the EnsDb package that should be installed on the MySQL server
 library(EnsDb.Hsapiens.v75)
@@ -55,7 +62,7 @@ R-package, the connection to the database can be passed to the `EnsDb` construct
 function. With the resulting `EnsDb` object annotations can be retrieved from the
 MySQL database.
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 library(ensembldb)
 library(RMySQL)
 
@@ -72,3 +79,4 @@ dbcon <- dbConnect(MySQL(), host = "localhost", user = "readonly",
 edb <- EnsDb(dbcon)
 edb
 ```
+
