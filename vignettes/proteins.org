@@ -2,8 +2,8 @@
 #+AUTHOR: Johannes Rainer
 #+EMAIL:  johannes.rainer@eurac.edu
 #+OPTIONS: ^:{} toc:nil
-#+PROPERTY: exports code
-#+PROPERTY: session *R_prot*
+#+PROPERTY: header-args :exports code
+#+PROPERTY: header-args :session *R_prot*
 
 #+BEGIN_EXPORT html
 ---
@@ -27,7 +27,7 @@ vignette: >
 #+END_SRC
 
 #+BEGIN_EXPORT html
-**Package:**: `r BiocStyle::Biocpkg("ensembldb")`<br />
+**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
 **Modified**: `r file.info("proteins.Rmd")$mtime`<br />
 **Compiled**: `r date()`

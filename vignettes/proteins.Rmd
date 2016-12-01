@@ -2,7 +2,8 @@
 title: "Querying protein features"
 graphics: yes
 output:
-  BiocStyle::html_document2
+  BiocStyle::html_document:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Querying protein features}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,9 +13,13 @@ vignette: >
   %\VignetteKeywords{annotation,database}
 ---
 
+```{r echo=FALSE, results='asis', message = FALSE}
+BiocStyle::markdown()
+```
+
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
 **Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
-**Modified**: 14 November, 2016<br />
+**Modified**: `r file.info("proteins.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
 From Bioconductor release 3.5 on, `EnsDb` databases/packages created by the
@@ -46,9 +51,9 @@ features also the following protein related information is available:
 
 Thus, for protein coding transcripts, these annotations can be fetched from the
 database too, given that protein annotations are available. Note that only `EnsDb`
-databases created through the Ensembl Perl API contain protein annotation,
+databases created through the Ensembl Perl API contain protein annotation, while
 databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
-`ensDbFromGtf` don't contain such information.
+`ensDbFromGtf` don't.
 
 ```{r loadlib, messages = FALSE}
 library(ensembldb)
@@ -90,8 +95,8 @@ txs
 
 The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the
 protein ID for the coding- and `NA` for the non-coding transcripts. Note also that
-we have a transcript targeted for nonsense mediated mRNA-decay, that however has
-also a protein ID associated with it, but no Uniprot ID.
+we have a transcript targeted for nonsense mediated mRNA-decay with a protein ID
+associated with it, but no Uniprot ID.
 
 ```{r a_transcripts_coding_noncoding, eval = haveProt}
 ## Subset to transcripts with tx_biotype other than protein_coding.
@@ -100,10 +105,12 @@ txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
 ```
 
 While the mapping from a protein coding transcript to a Ensembl protein ID
-(column `protein_id`) is 1:1, the mapping can be 1:n (including 1:0) from
-`protein_id` to Uniprot ID(s) (column `uniprot_id`). This should be kept in mind if
-transcripts are fetched from the database including Uniprot IDs or even protein
-domain IDs, as in such cases a redundant list of transcripts is returned.
+(column `protein_id`) is 1:1, the mapping between `protein_id` and `uniprot_id` can be
+n:m, i.e. each Ensembl protein ID can be mapped to 1 or more Uniprot IDs and
+each Uniprot ID can be mapped to more than one `protein_id` (and hence
+`tx_id`). This should be kept in mind if querying transcripts from the database
+fetching Uniprot related additional columns or even protein ID features, as in
+such cases a redundant list of transcripts is returned.
 
 ```{r a_transcripts_coding, eval = haveProt}
 ## List the protein IDs and uniprot IDs for the coding transcripts
@@ -111,10 +118,36 @@ mcols(txs[txs$tx_biotype == "protein_coding",
 	  c("tx_id", "protein_id", "uniprot_id")])
 ```
 
-Protein annotations can be added in a similar fashion as *metadata columns* to the
+Some of the n:m mappings for Uniprot IDs can be resolved by restricting either
+to entries from one Uniprot database (*SPTREMBL* or *SWISSPROT*) or to mappings of a
+certain type of mapping method. The corresponding filters are the
+`UniprotdbFilter` and the `UniprotmappingtypeFilter` (using the `uniprot_db` and
+`uniprot_mapping_type` columns of the `uniprot` database table). In the example
+below we restrict the result to Uniprot IDs with the mapping type *DIRECT*.
+
+```{r a_transcripts_coding_up, eval = haveProt}
+## List all uniprot mapping types in the database.
+listUniprotMappingTypes(edb)
+
+## Get all protein_coding transcripts of ZBTB16 along with their protein_id
+## and Uniprot IDs, restricting to protein_id to uniprot_id mappings based
+## on "DIRECT" mapping methods.
+txs <- transcripts(edb, filter = list(GenenameFilter("ZBTB16"),
+				      UniprotmappingtypeFilter("DIRECT")),
+		   columns = c("protein_id", "uniprot_id", "uniprot_db"))
+mcols(txs)
+```
+
+For this example the use of the `UniprotmappingtypeFilter` resolved the multiple
+mapping of Uniprot IDs to Ensembl protein IDs, but the Uniprot ID *Q05516* is
+still assigned to the two Ensembl protein IDs *ENSP00000338157* and
+*ENSP00000376721*.
+
+All protein annotations can also be added as *metadata columns* to the
 results of the `genes`, `exons`, `exonsBy`, `transcriptsBy`, `cdsBy`, `fiveUTRsByTranscript`
-and `threeUTRsByTranscript` methods. These methods report for non-coding
-transcripts an `NA` in the protein annotation columns.
+and `threeUTRsByTranscript` methods by specifying the desired column names with
+the `columns` parameter. For non coding transcripts `NA` will be reported in the
+protein annotation columns.
 
 In addition to retrieve protein annotations from the database, we can also use
 protein data to filter the results. In the example below we fetch for example
@@ -233,8 +266,11 @@ end coordinates within the amino acid sequence being reported in columns
 `protein_id` *ENSP00000445047* are mapped to an Uniprot ID or have protein domains.
 
 
-# Map proteins to the genome
+# Map peptide features within proteins to the genome
 
-Protein mapping functionality is provided by the `Pbase` Bioconductor package.
-To map proteins to the genome, the `cdsBy` method can be used.
+Functionality to map peptide features (i.e. ranges within the amino acid
+sequence of the protein) to genomic coordinates are provided by the `Pbase`
+Bioconductor package. These rely in part on the protein annotations provided by
+`EnsDb` databases. See the corresponding vignette *Pbase-with-ensembldb* in that
+package.
 
