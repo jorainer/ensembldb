@@ -23,7 +23,8 @@
 title: "Generating an using Ensembl based annotation packages"
 graphics: yes
 output:
-  BiocStyle::html_document2
+  BiocStyle::html_document:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
@@ -34,7 +35,9 @@ vignette: >
 ---
 #+END_EXPORT
 
-# #+BEGIN_EXPORT html
+#+BEGIN_SRC R :results silent :exports code :ravel echo=FALSE, results='asis', message = FALSE
+  BiocStyle::markdown()
+#+END_SRC
 
 #+BEGIN_EXPORT html
 **Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
@@ -997,6 +1000,9 @@ might not be available in all =EnsDB= databases (e.g. such ones created with
   might be mapped to multiple Uniprot IDs.
   - =protein_id=: the Ensembl protein ID.
   - =uniprot_id=: the Uniprot ID.
+  - =uniprot_db=: the Uniprot database in which the ID is defined.
+  - =uniprot_mapping_type=: the type of the mapping method that was used to assign
+    the Uniprot ID to an Ensembl protein ID.
 
 + *protein_domain*: provides protein domain annotations and mapping to proteins.
   - =protein_id=: the Ensembl protein ID on which the protein domain is present.
@@ -1014,7 +1020,6 @@ might not be available in all =EnsDB= databases (e.g. such ones created with
   version etc).
   - =name=
   - =value=
-
 
 
 + /virtual/ columns:
