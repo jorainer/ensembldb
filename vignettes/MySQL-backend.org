@@ -8,29 +8,17 @@
 #+BEGIN_EXPORT html
 ---
 title: "Using a MySQL server backend"
-graphics: yes
+author: "Johannes Rainer"
+package: ensembldb
 output:
-  BiocStyle::html_document:
-    toc: true
+  BiocStyle::html_document2:
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{Using a MySQL server backend}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
-  %\VignettePackage{ensembldb}
-  %\VignetteKeywords{annotation,database}
 ---
-#+END_EXPORT
-
-#+BEGIN_SRC R :results silent :exports code :ravel echo=FALSE, results='asis', message = FALSE
-  BiocStyle::markdown()
-#+END_SRC
-
-#+BEGIN_EXPORT html
-**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
-**Modified**: `r file.info("MySQL-backend.Rmd")$mtime`<br />
-**Compiled**: `r date()`
 #+END_EXPORT
 
 ** Introduction

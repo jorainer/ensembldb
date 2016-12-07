@@ -1,26 +1,17 @@
 ---
 title: "Querying protein features"
+author: "Johannes Rainer"
 graphics: yes
+package: ensembldb
 output:
-  BiocStyle::html_document:
-    toc: true
+  BiocStyle::html_document2:
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{Querying protein features}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
-  %\VignettePackage{ensembldb}
-  %\VignetteKeywords{annotation,database}
 ---
-
-```{r echo=FALSE, results='asis', message = FALSE}
-BiocStyle::markdown()
-```
-
-**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: Johannes Rainer <johannes.rainer@eurac.edu><br />
-**Modified**: `r file.info("proteins.Rmd")$mtime`<br />
-**Compiled**: `r date()`
 
 From Bioconductor release 3.5 on, `EnsDb` databases/packages created by the
 `ensembldb` package contain also, for transcripts with a coding regions, mappings

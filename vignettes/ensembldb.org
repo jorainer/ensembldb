@@ -11,41 +11,22 @@
 #+EXPORT_SELECT_TAGS: export
 #+EXPORT_EXCLUDE_TAGS: noexport
 
-#+latex: %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
-#+latex: %\VignetteKeywords{annotation, database}
-#+latex: %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BSgenome.Hsapiens.UCSC.hg19}
-#+latex: %\VignettePackage{ensembldb}
-#+latex: %\VignetteEngine{knitr::rmarkdown}
-
-
 #+BEGIN_EXPORT html
 ---
 title: "Generating an using Ensembl based annotation packages"
+author: "Johannes Rainer"
 graphics: yes
+package: ensembldb
 output:
-  BiocStyle::html_document:
-    toc: true
+  BiocStyle::html_document2:
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz,BiocStyle}
-  %\VignettePackage{ensembldb}
-  %\VignetteKeywords{annotation,database}
 ---
 #+END_EXPORT
-
-#+BEGIN_SRC R :results silent :exports code :ravel echo=FALSE, results='asis', message = FALSE
-  BiocStyle::markdown()
-#+END_SRC
-
-#+BEGIN_EXPORT html
-**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: `r file.info("ensembldb.Rmd")$mtime`<br />
-**Compiled**: `r date()`
-#+END_EXPORT
-
 
 
 * How to export this to a =Rnw= vignette			   :noexport:
