@@ -1,26 +1,17 @@
 ---
 title: "Generating an using Ensembl based annotation packages"
+author: "Johannes Rainer"
 graphics: yes
+package: ensembldb
 output:
-  BiocStyle::html_document:
-    toc: true
+  BiocStyle::html_document2:
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,Gviz,BiocStyle}
-  %\VignettePackage{ensembldb}
-  %\VignetteKeywords{annotation,database}
 ---
-
-```{r echo=FALSE, results='asis', message = FALSE}
-BiocStyle::markdown()
-```
-
-**Package**: `r BiocStyle::Biocpkg("ensembldb")`<br />
-**Authors**: `r packageDescription("ensembldb")$Author`<br />
-**Modified**: `r file.info("ensembldb.Rmd")$mtime`<br />
-**Compiled**: `r date()`
 
 
 # Introduction
@@ -34,7 +25,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org66f1087) for the database layout and an overview of
+(see Section [11](#org71054dd) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -871,10 +862,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org66f1087"></a>
+# Database layout<a id="org71054dd"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [137](#org761e26a)). Note that the protein-specific annotations
+shown in Figure [137](#org1010ec3)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
