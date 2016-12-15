@@ -3,6 +3,7 @@
 \docType{class}
 \alias{RNA-DNA-filters}
 \alias{BasicFilter-class}
+\alias{BasicFilter}
 \alias{EntrezidFilter-class}
 \alias{GeneidFilter-class}
 \alias{GenebiotypeFilter-class}
