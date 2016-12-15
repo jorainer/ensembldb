@@ -57,7 +57,7 @@ createEnsDbForSpecies <- function(ftp_folder,
     ## (1) Get all directories from Ensembl
     if (missing(ftp_folder))
         ftp_folder <- paste0(base_url, "/release-", ens_version, "/mysql/")
-    res <- listCoreDbsInFolder(ftp_url)
+    res <- listCoreDbsInFolder(ftp_folder)
 
     folders <- unlist(strsplit(getURL(ftp_folder,
                                       dirlistonly = TRUE), split = "\n"))
