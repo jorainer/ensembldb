@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.99.10
+--------------------------
+
+BUG FIXES:
+    o Fix problem on Windows systems failing to download files from Ensembl
+      servers.
+
 CHANGES IN VERSION 1.99.6
 -------------------------
 
