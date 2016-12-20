@@ -1520,10 +1520,13 @@ elementFromEnsemblFilename <- function(x, which=1){
     if (type == "ensembl") {
         my_url <- paste0(.ENSEMBL_URL, "release-", ensembl, "/mysql/")
         db_name <- .guessDatabaseName(organism, ensembl)
-        ## List folders
+        ## List folders; GenomicFeatures does it without 'dirlistonly',
+        ## eventually that's what breaks on Windows?
         res <- getURL(my_url, dirlistonly = TRUE)
         if (length(res) > 0) {
             dirs <- unlist(strsplit(res, split = "\n"))
+            ## Remove the \r on Windows.
+            dirs <- sub(dirs, pattern = "\r", replacement = "", fixed = TRUE)
             idx <- grep(dirs, pattern = db_name)
             if (length(idx) > 1)
                 stop("Found more than one database matching '", db_name,
@@ -1545,6 +1548,8 @@ elementFromEnsemblFilename <- function(x, which=1){
             res <- getURL(my_url, dirlistonly = TRUE)
             if (length(res) > 0) {
                 dirs <- unlist(strsplit(res, split = "\n"))
+                ## Remove the \r on Windows.
+                dirs <- sub(dirs, pattern = "\r", replacement = "", fixed = TRUE)
                 idx <- grep(dirs, pattern = db_name)
                 if (length(idx) == 1)
                     return(paste0(my_url, dirs[idx]))
