@@ -1,5 +1,5 @@
 ---
-title: "Generating an using Ensembl based annotation packages"
+title: "Generating an using Ensembl-based annotation packages"
 author: "Johannes Rainer"
 graphics: yes
 package: ensembldb
