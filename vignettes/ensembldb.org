@@ -1,4 +1,4 @@
-#+TITLE: Generating and using Ensembl based annotation packages
+#+TITLE: Generating and using Ensembl-based annotation packages
 #+AUTHOR:    Johannes Rainer
 #+EMAIL:     johannes.rainer@eurac.edu
 #+DESCRIPTION:
