@@ -1,6 +1,14 @@
 CHANGES IN VERSION 1.99.10
 --------------------------
 
+NEW FEATURES
+    o Retrieving also the taxonomy ID from the Ensembl databases and storing this
+      information into the metadata table.
+
+
+CHANGES IN VERSION 1.99.10
+--------------------------
+
 BUG FIXES:
     o Fix problem on Windows systems failing to download files from Ensembl
       servers.

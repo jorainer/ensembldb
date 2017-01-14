@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.2.4: * Extract taxonomy ID and add that to  metadata table.
 ## version 0.2.3: * Add additional columns to the uniprot table:
 ##                  o uniprot_db: the Uniprot database name.
 ##                  o uniprot_mapping_type: method by which the Uniprot ID was
@@ -21,7 +22,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.2.3";
+my $script_version = "0.2.4";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -101,10 +102,14 @@ $registry->load_registry_from_db(-host => $host, -user => $user,
 				 -pass => $pass, -port => $port);
 my $gene_adaptor = $registry->get_adaptor($species, $ensembl_database, "gene");
 my $slice_adaptor = $registry->get_adaptor($species, $ensembl_database, "slice");
-
+my $meta_container = $registry->get_adaptor($species, $ensembl_database,
+					    'MetaContainer' );
 ## determine the species:
 my $species_id = $gene_adaptor->db->species_id;
 my $species_ens = $gene_adaptor->db->species;
+## Determine the taxonomy ID:
+my $taxonomy_id = 0;
+$taxonomy_id = $meta_container->get_taxonomy_id();
 
 my $infostring = "# get_gene_transcript_exon_tables.pl version $script_version:\nRetrieve gene models for Ensembl version $ensembl_version, species $species from Ensembl database at host: $host\n";
 
@@ -311,6 +316,7 @@ print INFO "Creation time\t".localtime()."\n";
 print INFO "ensembl_version\t$ensembl_version\n";
 print INFO "ensembl_host\t$host\n";
 print INFO "Organism\t$species_ens\n";
+print INFO "taxonomy_id\t$taxonomy_id\n";
 print INFO "genome_build\t$coord_system_version\n";
 print INFO "DBSCHEMAVERSION\t1.0\n";
 
