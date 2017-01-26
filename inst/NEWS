@@ -1,4 +1,12 @@
-CHANGES IN VERSION 1.99.10
+CHANGES IN VERSION 1.99.11
+--------------------------
+
+BUG FIXES:
+    o ensDbFromGtf failed to fetch sequence length for some ensemblgenomes
+      versions.
+    
+
+CHANGES IN VERSION 1.99.11
 --------------------------
 
 NEW FEATURES
