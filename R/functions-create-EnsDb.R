@@ -1545,7 +1545,10 @@ elementFromEnsemblFilename <- function(x, which=1){
         for (fold in sub_folders) {
             my_url <- paste0(.ENSEMBLGENOMES_URL, "release-", ensembl, "/",
                              fold, "/mysql/")
-            res <- getURL(my_url, dirlistonly = TRUE)
+            ## Catch eventual errors
+            res <- try(getURL(my_url, dirlistonly = TRUE), silent = TRUE)
+            if (is(res, "try-error") | length(res) == 0)
+                next
             if (length(res) > 0) {
                 dirs <- unlist(strsplit(res, split = "\n"))
                 ## Remove the \r on Windows.
