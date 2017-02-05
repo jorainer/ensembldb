@@ -1058,6 +1058,28 @@ Start the server using =mysql.server start=.
 
 
 
+* Integration with =Organism.dplyr=
+
+To integrate =ensembldb= with =Organism.dplyr= we export database tables in an
+/un-normalized/ form so that it can be stored into a SQLite database for =dplyr=.
+
+* Use =filters= as they are used in =Organism.dplyr=
+
+i.e. dynamically create filters. Check if we could do that.
+
+#+BEGIN_SRC R
+  library(Organism.dplyr)
+  ## library(ensembldb)
+
+  Tx_idFilter(value = 3, condition = "==")
+  Tx_nameFilter(value = c("dfda", "sdfsd"))
+#+END_SRC
+
+Now, their filters are created /dynamically/, the first part of the name being the
+attribute (field) name followed by /Filter/. How could I use these? Problem comes
+since my attributes are not unique, i.e. present in one table only.
+
+
 * TODOs								   :noexport:
 
 ** DONE Fix the =ensembldb:::EnsDb= call in /zzz.R/ of the package template!
