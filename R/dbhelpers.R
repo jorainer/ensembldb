@@ -445,11 +445,11 @@ addRequiredTables <- function(x, tab){
     resultcolumns <- columns    ## just to remember what we really want to give back
     ## 1) get all column names from the filters also removing the prefix.
     if (class(filter)!="list")
-        stop("parameter filter has to be a list of BasicFilter classes!")
+        stop("parameter filter has to be a list of AnnotationFilter classes!")
     if (length(filter) > 0) {
         ## check filter!
         ## add the columns needed for the filter
-        filtercolumns <- unlist(lapply(filter, column, x))
+        filtercolumns <- unlist(lapply(filter, ensDbColumn, x))
         ## remove the prefix (column name for these)
         filtercolumns <- sapply(filtercolumns, removePrefix, USE.NAMES = FALSE)
         columns <- unique(c(columns, filtercolumns))
@@ -476,7 +476,7 @@ addRequiredTables <- function(x, tab){
     ## b) the filter part of the query
     if (length(filter) > 0) {
         filterquery <- paste(" where",
-                             paste(unlist(lapply(filter, where, x,
+                             paste(unlist(lapply(filter, ensDbQuery, x,
                                                  with.tables = need.tables)),
                                    collapse=" and "))
     } else {
@@ -536,7 +536,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
         fetchColumns <- unique(c("tx_id",
                                  fetchColumns[fetchColumns != "tx_name"]))
     if (class(filter) != "list")
-        stop("parameter filter has to be a list of BasicFilter classes!")
+        stop("parameter filter has to be a list of AnnotationFilter classes!")
     ## If any filter is a SymbolFilter, add "symbol" to the return columns.
     if (length(filter) > 0) {
         if (any(unlist(lapply(filter, function(z) {

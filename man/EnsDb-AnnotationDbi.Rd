@@ -46,7 +46,7 @@
   \item{keys}{
     The keys/ids for which data should be retrieved from the
     database. This can be either a character vector of keys/IDs, a
-    single filter object extending \code{\linkS4class{BasicFilter}} or a
+    single filter object extending \code{AnnotationFilter} or a
     list of such objects.
   }
 
@@ -54,14 +54,14 @@
     For \code{mapIds} and \code{select}: the type (column) that matches
     the provided keys. This argument does not have to be specified if
     argument \code{keys} is a filter object extending
-    \code{\linkS4class{BasicFilter}} or a \code{list} of such objects.
+    \code{AnnotationFilter} or a \code{list} of such objects.
 
     For \code{keys}: which keys should be returned from the database.
   }
 
   \item{filter}{
     For \code{keys}: either a single object extending
-    \code{\linkS4class{BasicFilter}} or a list of such object to
+    \code{AnnotationFilter} or a list of such object to
     retrieve only specific keys from the database.
   }
 
@@ -114,7 +114,7 @@
       Retrieve the mapped ids for a set of keys that are of a particular
       keytype. Argument \code{keys} can be either a character vector of
       keys/IDs, a single filter object extending
-      \code{\linkS4class{BasicFilter}} or a list of such objects. For
+      \code{AnnotationFilter} or a list of such objects. For
       the latter, the argument \code{keytype} does not have to be
       specified. Importantly however, if the filtering system is used,
       the ordering of the results might not represent the ordering of
@@ -132,7 +132,7 @@
       arguments. Multiple matches of the keys are returned in one row
       for each possible match. Argument \code{keys} can be either a
       character vector of keys/IDs, a single filter object extending
-      \code{\linkS4class{BasicFilter}} or a list of such objects. For
+      \code{AnnotationFilter} or a list of such objects. For
       the latter, the argument \code{keytype} does not have to be
       specified.
 
@@ -161,7 +161,6 @@
   Johannes Rainer
 }
 \seealso{
-  \code{\linkS4class{BasicFilter}}
   \code{\link{listColumns}}
   \code{\link{transcripts}}
 }

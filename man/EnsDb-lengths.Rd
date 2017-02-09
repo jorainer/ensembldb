@@ -22,7 +22,7 @@
   (In alphabetic order)
 
   \item{filter}{
-    list of \code{\linkS4class{BasicFilter}} instance(s) to
+    list of \code{AnnotationFilter} instance(s) to
     select specific entries from the database (see examples below).
   }
 
