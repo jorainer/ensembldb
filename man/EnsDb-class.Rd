@@ -98,7 +98,7 @@
   }
 
   \item{filter}{
-    list of \code{\linkS4class{BasicFilter}} instance(s) to
+    list of \code{Filter} instance(s) to
     select specific entries from the database (see examples below).
   }
 
@@ -299,7 +299,7 @@
 }
 \seealso{
   \code{\link{EnsDb}},
-  \code{\link{makeEnsembldbPackage}}, \code{\linkS4class{BasicFilter}},
+  \code{\link{makeEnsembldbPackage}},
       \code{\link{exonsBy}}, \code{\link{genes}},
       \code{\link{transcripts}},
       \code{\link{makeEnsemblSQLiteFromTables}}

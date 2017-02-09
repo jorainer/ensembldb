@@ -127,7 +127,7 @@
   }
 
   \item{filter}{
-    A filter object extending \code{\linkS4class{BasicFilter}} or a list
+    A filter object extending \code{AnnotationFilter} or a list
     of such object(s) to select specific entries from the database (see
     examples below).
   }
@@ -429,7 +429,7 @@
   Johannes Rainer, Tim Triche
 }
 \seealso{
-  \code{\link{makeEnsembldbPackage}}, \code{\linkS4class{BasicFilter}},
+  \code{\link{makeEnsembldbPackage}},
       \code{\link{listColumns}}, \code{\link{lengthOf}}
 }
 \examples{

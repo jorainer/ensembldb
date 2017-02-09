@@ -2,8 +2,6 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{RNA-DNA-filters}
-\alias{BasicFilter-class}
-\alias{BasicFilter}
 \alias{EntrezidFilter-class}
 \alias{GeneidFilter-class}
 \alias{GenebiotypeFilter-class}
@@ -105,25 +103,15 @@
 \alias{where,GRangesFilter,EnsDb,character-method}
 \alias{where,OnlyCodingTxFilter,EnsDb,character-method}
 %
-\alias{condition,BasicFilter-method}
-\alias{condition<-,BasicFilter-method}
 \alias{condition<-}
 \alias{condition,GRangesFilter-method}
 \alias{condition<-,GRangesFilter-method}
-\alias{show,BasicFilter-method}
 \alias{show,GRangesFilter-method}
-\alias{print,BasicFilter-method}
-\alias{where,BasicFilter,missing,missing-method}
-\alias{where,BasicFilter,EnsDb,missing-method}
-\alias{where,BasicFilter,EnsDb,character-method}
 \alias{where,list,EnsDb,character-method}
 \alias{where,list,EnsDb,missing-method}
 \alias{where,list,missing,missing-method}
-\alias{value,BasicFilter,missing-method}
 \alias{value<-}
-\alias{value<-,BasicFilter-method}
 \alias{value<-,ExonrankFilter-method}
-\alias{value,BasicFilter,EnsDb-method}
 \alias{value,GRangesFilter,missing-method}
 \alias{value,GRangesFilter,EnsDb-method}
 \alias{value,SeqnameFilter,EnsDb-method}
@@ -188,12 +176,10 @@
   }
 }
 \section{Extends}{
-  Class \code{\linkS4class{BasicFilter}}, directly.
+  Class \code{AnnotationFilter}, directly.
 }
-\section{Methods for all \code{BasicFilter} objects}{
+\section{Methods for all objects extending \code{AnnotationFilter}}{
   \describe{
-    Note: these methods are applicable to all classes extending the
-    \code{BasicFilter} class.
 
     \item{column}{\code{signature(object = "GeneidFilter", db = "EnsDb",
 	with.tables = "character")}:
@@ -219,16 +205,12 @@
       filtering.
     }
 
-    \item{condition}{\code{signature(x = "BasicFilter")}: returns
+    \item{condition}{\code{signature(x = "AnnotationFilter")}: returns
       the value for the \code{condition} slot.
     }
 
     \item{condition<-}{
       setter method for condition.
-    }
-
-    \item{value}{\code{signature(x = "BasicFilter", db = "EnsDb")}:
-      returns the value of the \code{value} slot of the filter object.
     }
 
     \item{value<-}{

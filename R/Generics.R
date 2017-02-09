@@ -12,12 +12,12 @@ setGeneric("buildQuery", function(x, ...)
 ## C
 setGeneric("cleanColumns", function(x, columns, ...)
     starndardGeneric("cleanColumns"))
-setGeneric("column", function(object, db, with.tables, ...)
-    standardGeneric("column"))
-setGeneric("condition", function(x, ...)
-    standardGeneric("condition"))
-setGeneric("condition<-", function(x, value)
-    standardGeneric("condition<-"))
+## setGeneric("column", function(object, db, with.tables, ...)
+##     standardGeneric("column"))
+## setGeneric("condition", function(x, ...)
+##     standardGeneric("condition"))
+## setGeneric("condition<-", function(x, value)
+##     standardGeneric("condition<-"))
 
 ## D
 setGeneric("dbSeqlevelsStyle", function(x, ...)
@@ -26,6 +26,10 @@ setGeneric("dbSeqlevelsStyle", function(x, ...)
 ## E
 setGeneric("ensemblVersion", function(x)
     standardGeneric("ensemblVersion"))
+setGeneric("ensDbColumn", function(object, ...)
+    standardGeneric("ensDbColumn"))
+setGeneric("ensDbQuery", function(object, ...)
+    standardGeneric("ensDbQuery"))
 ## setGeneric("exons", function(x, ...)
 ##     standardGeneric("exons"))
 ## setGeneric("exonsBy", function(x, ...)
@@ -138,12 +142,12 @@ setGeneric("useMySQL", function(x, host = "localhost", port = 3306, user, pass)
     standardGeneric("useMySQL"))
 
 ## V
-setGeneric("value", function(x, db, ...)
-    standardGeneric("value"))
-setGeneric("value<-", function(x, value)
-    standardGeneric("value<-"))
+## setGeneric("value", function(x, db, ...)
+##     standardGeneric("value"))
+## setGeneric("value<-", function(x, value)
+##     standardGeneric("value<-"))
 
 ## W
-setGeneric("where", function(object, db, with.tables, ...)
-    standardGeneric("where"))
+## setGeneric("where", function(object, db, with.tables, ...)
+##     standardGeneric("where"))
 

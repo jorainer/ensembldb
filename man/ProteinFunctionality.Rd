@@ -28,7 +28,7 @@ be extracted from the database. Can be any column(s) listed by the
 \code{\link{listColumns}} method.}
 
 \item{filter}{For \code{proteins}: A filter object extending
-\code{\linkS4class{BasicFilter}} or a list of such objects to select
+\code{\linkS4class{Filter}} or a list of such objects to select
 specific entries from the database. See \code{\link{RNA-DNA-filters}} and
 \code{\link{ProteinFilters}} for the full list of supported filters.}
 

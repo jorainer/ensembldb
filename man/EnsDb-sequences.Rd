@@ -88,7 +88,6 @@
   Johannes Rainer
 }
 \seealso{
-  \code{\linkS4class{BasicFilter}}
   \code{\link{transcripts}}
   \code{\link{exonsBy}}
 }
