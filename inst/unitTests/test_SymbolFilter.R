@@ -34,7 +34,6 @@ test_sf_on_tx <- function(){
     returnFilterColumns(edb) <- TRUE
     tx_sf <- transcripts(edb, filter=sf, columns=c("gene_name"))
     checkEquals(tx_sf$gene_name, tx_sf$symbol)
-
 }
 
 

@@ -69,8 +69,8 @@ addFilterColumns <- function(cols, filter = list(), edb) {
     symFilts <- c("SymbolFilter")
     addC <- unlist(lapply(filter, function(z) {
         if(class(z) %in% symFilts)
-            return(column(z))
-        return(column(z))
+            return(z@field)
+        return(ensDbColumn(z))
     }))
     return(unique(c(cols, addC)))
 }
@@ -191,7 +191,7 @@ listProteinColumns <- function(object) {
 ##' FALSE otherwise.
 ##' @noRd
 isProteinFilter <- function(x) {
-    return(is(x, "ProteinidFilter") | is(x, "UniprotidFilter") |
-           is(x, "ProtdomidFilter") | is(x, "UniprotdbFilter") |
-           is(x, "UniprotmappingtypeFilter"))
+    return(is(x, "ProteinIdFilter") | is(x, "UniprotFilter") |
+           is(x, "ProtDomIdFilter") | is(x, "UniprotDbFilter") |
+           is(x, "UniprotMappingTypeFilter"))
 }

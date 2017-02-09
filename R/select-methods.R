@@ -77,22 +77,22 @@ setMethod("keytypes", "EnsDb",
 }
 ## returns a vector mapping keytypes (names of vector) to filter names (elements).
 .keytype2FilterMapping <- function(withProteins = FALSE){
-    filters <- c(ENTREZID = "EntrezidFilter",
-                 GENEID = "GeneidFilter",
-                 GENEBIOTYPE = "GenebiotypeFilter",
+    filters <- c(ENTREZID = "EntrezFilter",
+                 GENEID = "GeneIdFilter",
+                 GENEBIOTYPE = "GeneBiotypeFilter",
                  GENENAME = "GenenameFilter",
-                 TXID = "TxidFilter",
-                 TXBIOTYPE = "TxbiotypeFilter",
-                 EXONID = "ExonidFilter",
-                 SEQNAME = "SeqnameFilter",
-                 SEQSTRAND = "SeqstrandFilter",
-                 TXNAME = "TxidFilter",
+                 TXID = "TxIdFilter",
+                 TXBIOTYPE = "TxBiotypeFilter",
+                 EXONID = "ExonIdFilter",
+                 SEQNAME = "SeqNameFilter",
+                 SEQSTRAND = "SeqStrandFilter",
+                 TXNAME = "TxIdFilter",
                  SYMBOL = "SymbolFilter")
     if (withProteins) {
         filters <- c(filters,
-                     PROTEINID = "ProteinidFilter",
-                     UNIPROTID = "UniprotidFilter",
-                     PROTEINDOMAINID = "ProtdomidFilter")
+                     PROTEINID = "ProteinIdFilter",
+                     UNIPROTID = "UniprotFilter",
+                     PROTEINDOMAINID = "ProtDomIdFilter")
     }
     return(filters)
 }
@@ -125,7 +125,7 @@ setMethod("keys", "EnsDb",
                   keytype <- "GENEID"
               if(missing(filter))
                   filter <- list()
-              if(is(filter, "BasicFilter"))
+              if(is(filter, "AnnotationFilter"))
                   filter <- list(filter)
               keyt <- keytypes(x)
               if (length(keytype) > 1) {
@@ -191,16 +191,17 @@ setMethod("select", "EnsDb",
         ## Get everything from the database...
         keys <- list()
     } else {
-        if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
+        if (!(is(keys, "character") | is(keys, "list") |
+              is(keys, "AnnotationFilter")))
             stop("Argument keys should be a character vector, an object",
-                 " extending BasicFilter",
-                 " or a list of objects extending BasicFilter.")
+                 " extending AnnotationFilter",
+                 " or a list of objects extending AnnotationFilter.")
         if (is(keys, "list")) {
-            if (!all(vapply(keys, is, logical(1L), "BasicFilter")))
+            if (!all(vapply(keys, is, logical(1L), "AnnotationFilter")))
                 stop("If keys is a list it should be a list of objects",
-                     " extending BasicFilter!")
+                     " extending AnnotationFilter!")
         }
-        if (is(keys, "BasicFilter")) {
+        if (is(keys, "AnnotationFilter")) {
             keys <- list(keys)
         }
         if (is(keys, "character")) {
@@ -214,7 +215,8 @@ setMethod("select", "EnsDb",
                      " Use keytypes method to list all available keytypes.")
             ## Generate a filter object for the filters.
             keyFilter <- filterForKeytype(keytype, x)
-            value(keyFilter) <- keys
+            ## value(keyFilter) <- keys
+            keyFilter@value <- keys
             keys <- list(keyFilter)
             ## Add also the keytype itself to the columns.
             if (!any(columns == keytype))
@@ -232,9 +234,9 @@ setMethod("select", "EnsDb",
     ## select one of tables "protein", "uniprot", "protein_domain" in that order
     if (all(unlist(lapply(keys, isProteinFilter)))) {
         startWith <- "protein_domain"
-        if (any(unlist(lapply(keys, function(z) is(z, "UniprotidFilter")))))
+        if (any(unlist(lapply(keys, function(z) is(z, "UniprotFilter")))))
             startWith <- "uniprot"
-        if (any(unlist(lapply(keys, function(z) is(z, "ProteinidFilter")))))
+        if (any(unlist(lapply(keys, function(z) is(z, "ProteinIdFilter")))))
             startWith <- "protein"
     } else {
         startWith <- NULL
@@ -244,17 +246,17 @@ setMethod("select", "EnsDb",
     ## Order results if length of filters is 1.
     if (length(keys) == 1) {
         ## Define the filters on which we could sort.
-        sortFilts <- c("GenenameFilter", "GeneidFilter", "EntrezidFilter",
-                       "GenebiotypeFilter", "SymbolFilter", "TxidFilter",
-                       "TxbiotypeFilter", "ExonidFilter", "ExonrankFilter",
-                       "SeqnameFilter")
+        sortFilts <- c("GenenameFilter", "GeneIdFilter", "EntrezFilter",
+                       "GeneBiotypeFilter", "SymbolFilter", "TxIdFilter",
+                       "TxBiotypeFilter", "ExonIdFilter", "ExonRankFilter",
+                       "SeqNameFilter")
         if (class(keys[[1]]) %in% sortFilts) {
             keyvals <- value(keys[[1]])
             ## Handle symlink Filter differently:
             if (is(keys[[1]], "SymbolFilter")) {
-                sortCol <- column(keys[[1]])
+                sortCol <- ensDbColumn(keys[[1]])
             } else {
-                sortCol <- removePrefix(column(keys[[1]], x))
+                sortCol <- removePrefix(ensDbColumn(keys[[1]], x))
             }
             res <- res[order(match(res[, sortCol], keyvals)), ]
         }
@@ -294,9 +296,10 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                     multiVals = NULL) {
     if (is.null(keys))
         stop("Argument keys has to be provided!")
-    if (!(is(keys, "character") | is(keys, "list") | is(keys, "BasicFilter")))
+    if (!(is(keys, "character") | is(keys, "list") |
+          is(keys, "AnnotationFilter")))
         stop("Argument keys should be a character vector, an object extending",
-             " BasicFilter or a list of objects extending BasicFilter.")
+             " AnnotationFilter or a list of objects extending AnnotationFilter.")
     if (is.null(column))
         column <- "GENEID"
     ## Have to specify the columns argument. Has to be keytype and column.
@@ -305,7 +308,7 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
             stop("Argument keytype is mandatory if keys is a character vector!")
         columns <- c(keytype, column)
     }
-    if(is(keys, "list") | is(keys, "BasicFilter")){
+    if(is(keys, "list") | is(keys, "AnnotationFilter")){
         if(is(keys, "list")){
             if(length(keys) > 1)
                 warning("Got ", length(keys), " filter objects.",

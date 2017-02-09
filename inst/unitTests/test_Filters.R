@@ -1,36 +1,36 @@
 library("EnsDb.Hsapiens.v75")
 edb <- EnsDb.Hsapiens.v75
 
-test_validateConditionFilter <- function() {
-    GF <- GeneidFilter("ENSG0000001")
-    GF@condition = "*"
-    checkTrue(is.character(ensembldb:::validateConditionFilter(GF)))
-    F <- SeqstartFilter(14)
-    F@condition = "*"
-    checkTrue(is.character(ensembldb:::validateConditionFilter(F)))
-    F@condition = ">"
-    F@value = "a"
-    checkTrue(is.character(ensembldb:::validateConditionFilter(F)))
-}
+## test_validateConditionFilter <- function() {
+##     GF <- GeneidFilter("ENSG0000001")
+##     GF@condition = "*"
+##     checkTrue(is.character(ensembldb:::validateConditionFilter(GF)))
+##     F <- SeqstartFilter(14)
+##     F@condition = "*"
+##     checkTrue(is.character(ensembldb:::validateConditionFilter(F)))
+##     F@condition = ">"
+##     F@value = "a"
+##     checkTrue(is.character(ensembldb:::validateConditionFilter(F)))
+## }
 
-test_dotWhere <- function() {
-    GF <- GeneidFilter("ENSG0000001")
-    checkEquals(ensembldb:::.where(GF), "= 'ENSG0000001'")
-}
+## test_dotWhere <- function() {
+##     GF <- GeneidFilter("ENSG0000001")
+##     checkEquals(ensembldb:::.where(GF), "= 'ENSG0000001'")
+## }
 
-test_condition <- function() {
-    GF <- GeneidFilter("ENSG0000001")
-    checkException(condition(GF) <- "*")
-    checkEquals(condition(GF), "=")
-}
+## test_condition <- function() {
+##     GF <- GeneidFilter("ENSG0000001")
+##     checkException(condition(GF) <- "*")
+##     checkEquals(condition(GF), "=")
+## }
 
-test_value <- function() {
-    GF <- GeneidFilter("ENSG0000001")
-    value(GF) <- "a"
-    checkEquals(value(GF), "a")
-    F <- SeqstartFilter(14)
-    checkException(value(F) <- "a")
-}
+## test_value <- function() {
+##     GF <- GeneidFilter("ENSG0000001")
+##     value(GF) <- "a"
+##     checkEquals(value(GF), "a")
+##     F <- SeqstartFilter(14)
+##     checkException(value(F) <- "a")
+## }
 
 test_where_list <- function() {
     filts <- list(GenenameFilter("BCL2L11"), GenenameFilter("BCL2"))

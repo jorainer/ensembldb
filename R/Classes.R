@@ -38,290 +38,146 @@ setClass("EnsDb",
 ##     alternative: GRangesFilter. See below.
 ##
 ##***********************************************************************
-setClass("BasicFilter",
-         representation(
-             "VIRTUAL",
-             condition="character",
-             value="character",
-             .valueIsCharacter="logical"
-            ),
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
+## setClass("BasicFilter",
+##          representation(
+##              "VIRTUAL",
+##              condition="character",
+##              value="character",
+##              .valueIsCharacter="logical"
+##             ),
+##          prototype=list(
+##              condition="=",
+##              value="",
+##              .valueIsCharacter=TRUE
+##             )
+##         )
 
 ## Table gene
 ## filter for gene_id
-setClass("GeneidFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-GeneidFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("GeneidFilter", condition=condition, value=as.character(value)))
-}
-## filter for gene_biotype
-setClass("GenebiotypeFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-GenebiotypeFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("GenebiotypeFilter", condition=condition, value=as.character(value)))
-}
+## setClass("GeneidFilter", contains="AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = character(),
+##              .valueIsCharacter = TRUE
+##          )
+##          )
+## ## filter for gene_biotype
+## setClass("GenebiotypeFilter", contains="AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##          )
+##          )
 ## filter for gene_name
-setClass("GenenameFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-GenenameFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("GenenameFilter", condition=condition, value=as.character(value)))
-}
+## setClass("GenenameFilter", contains = "AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##          )
+##          )
+## GenenameFilter <- function(value, condition = "=="){
+##     if(missing(value))
+##         stop("A filter without a value makes no sense!")
+##     return(new("GenenameFilter", condition = condition,
+##                value = as.character(value)))
+## }
 ## filter for entrezid
-setClass("EntrezidFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-EntrezidFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("EntrezidFilter", condition=condition, value=as.character(value)))
-}
+## setClass("EntrezidFilter", contains = "AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##             )
+##         )
 
 
 ## Table transcript
 ## filter for tx_id
-setClass("TxidFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-TxidFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("TxidFilter", condition=condition, value=as.character(value)))
-}
-## filter for gene_biotype
-setClass("TxbiotypeFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-TxbiotypeFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("TxbiotypeFilter", condition=condition, value=as.character(value)))
-}
+## setClass("TxidFilter", contains="AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##          )
+##          )
+## ## filter for gene_biotype
+## setClass("TxbiotypeFilter", contains="AnnotationFilter",
+##          prototype=list(
+##              condition="==",
+##              value="",
+##              .valueIsCharacter=TRUE
+##             )
+##         )
 
 ## Table exon
 ## filter for exon_id
-setClass("ExonidFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
-ExonidFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("ExonidFilter", condition=condition, value=as.character(value)))
-}
+## setClass("ExonidFilter", contains="AnnotationFilter",
+##          prototype=list(
+##              condition="==",
+##              value="",
+##              .valueIsCharacter=TRUE
+##             )
+##         )
 
 ## Table tx2exon
 ## filter for exon_idx
-setClass("ExonrankFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=FALSE
-            )
-        )
-ExonrankFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(any(is.na(as.numeric(value))))
-        stop("Argument 'value' has to be numeric!")
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("ExonrankFilter", condition=condition, value=as.character(value)))
-}
+## setClass("ExonrankFilter", contains="AnnotationFilter",
+##          prototype=list(
+##              condition="==",
+##              value=integer(),
+##              .valueIsCharacter=FALSE
+##             )
+##         )
 
 
 ## chromosome positions
 ## basic chromosome/seqname filter.
-setClass("SeqnameFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=TRUE
-            )
-        )
+## setClass("SeqnameFilter", contains="AnnotationFilter",
+##          prototype=list(
+##              condition="==",
+##              value="",
+##              .valueIsCharacter=TRUE
+##             )
+##         )
 ## builder...
-SeqnameFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        if(condition=="=")
-            condition="in"
-        if(condition=="!=")
-            condition="not in"
-    }
-    return(new("SeqnameFilter", condition=condition, value=as.character(value)))
-}
 
-## basic chromosome strand filter.
-setClass("SeqstrandFilter", contains="BasicFilter",
-         prototype=list(
-             condition="=",
-             value="",
-             .valueIsCharacter=FALSE
-            )
-        )
+## ## basic chromosome strand filter.
+## setClass("SeqstrandFilter", contains="AnnotationFilter",
+##          prototype=list(
+##              condition="==",
+##              value=1L,
+##              .valueIsCharacter=FALSE
+##             )
+##         )
 ## builder...
-SeqstrandFilter <- function(value, condition="="){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    ## checking value: should be +, -, will however be translated to -1, 1
-    if(class(value)=="character"){
-        value <- match.arg(value, c("1", "-1", "+1", "-", "+"))
-        if(value=="-")
-            value <- "-1"
-        if(value=="+")
-            value <- "+1"
-        ## OK, now transforming to number
-        value <- as.numeric(value)
-    }
-    if(!(value==1 | value==-1))
-        stop("The strand has to be either 1 or -1 (or \"+\" or \"-\")")
-    return(new("SeqstrandFilter", condition=condition, value=as.character(value)))
-}
 
-## chromstart filter
-setClass("SeqstartFilter", contains="BasicFilter",
-         representation(
-             feature="character"
-            ),
-         prototype=list(
-             condition=">",
-             value="",
-             .valueIsCharacter=FALSE,
-             feature="gene"
-            )
-        )
-SeqstartFilter <- function(value, condition="=", feature="gene"){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        value <- value[ 1 ]
-        warning("Multiple values provided, but only the first (", value,") will be considered")
-    }
-    return(new("SeqstartFilter", condition=condition, value=as.character(value),
-                feature=feature))
-}
+## ## chromstart filter
+## setClass("SeqstartFilter", contains="AnnotationFilter",
+##          representation(
+##              feature="character"
+##             ),
+##          prototype=list(
+##              condition=">",
+##              value=0L,
+##              .valueIsCharacter=FALSE,
+##              feature="gene"
+##             )
+##         )
 
-## chromend filter
-setClass("SeqendFilter", contains="BasicFilter",
-         representation(
-             feature="character"
-            ),
-         prototype=list(
-             condition="<",
-             value="",
-             .valueIsCharacter=FALSE,
-             feature="gene"
-            )
-        )
-SeqendFilter <- function(value, condition="=", feature="gene"){
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1){
-        value <- value[ 1 ]
-        warning("Multiple values provided, but only the first (", value,") will be considered")
-    }
-    return(new("SeqendFilter", condition=condition, value=as.character(value),
-                feature=feature))
-}
+## ## chromend filter
+## setClass("SeqendFilter", contains="AnnotationFilter",
+##          representation(
+##              feature="character"
+##             ),
+##          prototype=list(
+##              condition="<",
+##              value=0L,
+##              .valueIsCharacter=FALSE,
+##              feature="gene"
+##             )
+##         )
 
 
 ###============================================================
@@ -331,7 +187,7 @@ SeqendFilter <- function(value, condition="=", feature="gene"){
 ##  + grange <- value
 ##  + location <- condition
 ###------------------------------------------------------------
-setClass("GRangesFilter", contains="BasicFilter",
+setClass("GRangesFilter", contains="AnnotationFilter",
          representation(grange="GRanges",
                         feature="character",
                         location="character"),
@@ -367,36 +223,36 @@ GRangesFilter <- function(value, condition="within", feature="gene"){
 ###============================================================
 ##  SymbolFilter
 ###------------------------------------------------------------
-setClass("SymbolFilter", contains = "BasicFilter",
-         prototype = list(
-             condition = "=",
-             value = "",
-             .valueIsCharacter = TRUE
-         )
-         )
-SymbolFilter <- function(value, condition = "=") {
-    if(missing(value)){
-        stop("A filter without a value makes no sense!")
-    }
-    if(length(value) > 1) {
-        if(condition == "=")
-            condition = "in"
-        if(condition == "!=")
-            condition = "not in"
-    }
-    return(new("SymbolFilter", condition = condition,
-               value = as.character(value)))
-}
+## setClass("SymbolFilter", contains = "BasicFilter",
+##          prototype = list(
+##              condition = "=",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##          )
+##          )
+## SymbolFilter <- function(value, condition = "=") {
+##     if(missing(value)){
+##         stop("A filter without a value makes no sense!")
+##     }
+##     if(length(value) > 1) {
+##         if(condition == "=")
+##             condition = "in"
+##         if(condition == "!=")
+##             condition = "not in"
+##     }
+##     return(new("SymbolFilter", condition = condition,
+##                value = as.character(value)))
+## }
 
 ############################################################
 ## OnlyCodingTxFilter
 ##
 ## That's a special case filter that just returns transcripts
 ## that have tx_cds_seq_start defined (i.e. not NULL).
-setClass("OnlyCodingTxFilter", contains = "BasicFilter",
+setClass("OnlyCodingTxFilter", contains = "AnnotationFilter",
          prototype = list(
              condition = "=",
-             value = "",
+             value = character(),
              .valueIsCharacter = TRUE
          ))
 OnlyCodingTxFilter <- function() {
@@ -465,147 +321,109 @@ OnlyCodingTxFilter <- function() {
 NULL
 #> NULL
 
-############################################################
-## ProteinidFilter
-##' @description The \code{ProteinidFilter} allows to filter based on the
-##' (Ensembl) protein ID of the (coding) transcripts' proteins.
-##' @rdname ProteinFilters
-setClass("ProteinidFilter", contains = "BasicFilter",
-         prototype = list(
-             condition = "=",
-             value = "",
-             .valueIsCharacter = TRUE
-         ))
-##' @param value A character vector of length 1 or larger with the value(s)
-##' for the filter.
-##' @param condition A character of length 1 specifying the condition of the
-##' filter. Can be one of \code{"="}, \code{"!="}, \code{"like"}, or, for
-##' \code{value} of length larger 1 \code{"in"} and \code{"not in"}.
-##' @return For \code{ProteinidFilter}: A \code{ProteinidFilter} object.
-##' @rdname ProteinFilters
-ProteinidFilter <- function(value, condition = "=") {
-    if (missing(value)) {
-        stop("A filter without a value makes no sense!")
-    }
-    if (length(value) > 1) {
-        if(condition == "=")
-            condition = "in"
-        if(condition == "!=")
-            condition = "not in"
-    }
-    return(new("ProteinidFilter", condition = condition,
-               value = as.character(value)))
-}
+## ############################################################
+## ## ProteinidFilter
+## ##' @description The \code{ProteinidFilter} allows to filter based on the
+## ##' (Ensembl) protein ID of the (coding) transcripts' proteins.
+## ##' @rdname ProteinFilters
+## setClass("ProteinidFilter", contains = "AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##          ))
 
-############################################################
-## UniprotFilter
-##' @description The \code{UniprotidFilter} allows to retrieve annotations
-##' filtering by the provided Uniprot ID associated with the transcript's
-##' protein.
-##' @rdname ProteinFilters
-setClass("UniprotidFilter", contains = "BasicFilter",
-         prototype = list(
-             condition = "=",
-             value = "",
-             .valueIsCharacter = TRUE
-         ))
-##' @return For \code{UniprotidFilter}: A \code{UniprotidFilter} object.
-##' @rdname ProteinFilters
-UniprotidFilter <- function(value, condition = "=") {
-    if (missing(value)) {
-        stop("A filter without a value makes no sense!")
-    }
-    if (length(value) > 1) {
-        if(condition == "=")
-            condition = "in"
-        if(condition == "!=")
-            condition = "not in"
-    }
-    return(new("UniprotidFilter", condition = condition,
-               value = as.character(value)))
-}
+## ##' @param value A character vector of length 1 or larger with the value(s)
+## ##' for the filter.
+## ##' @param condition A character of length 1 specifying the condition of the
+## ##' filter. Can be one of \code{"="}, \code{"!="}, \code{"like"}, or, for
+## ##' \code{value} of length larger 1 \code{"in"} and \code{"not in"}.
+## ##' @return For \code{ProteinidFilter}: A \code{ProteinidFilter} object.
+## ##' @rdname ProteinFilters
+## ProteinidFilter <- function(value, condition = "==") {
+##     .Deprecated("ProteinIdFilter")
+##     if (missing(value))
+##         stop("A filter without a value makes no sense!")
+##     return(new("ProteinIdFilter", condition = condition,
+##                value = as.character(value)))
+## }
+
+## ############################################################
+## ## UniprotFilter
+## ##' @description The \code{UniprotidFilter} allows to retrieve annotations
+## ##' filtering by the provided Uniprot ID associated with the transcript's
+## ##' protein.
+## ##' @rdname ProteinFilters
+## setClass("UniprotidFilter", contains = "AnnotationFilter",
+##          prototype = list(
+##              condition = "==",
+##              value = "",
+##              .valueIsCharacter = TRUE
+##          ))
+## ##' @return For \code{UniprotidFilter}: A \code{UniprotidFilter} object.
+## ##' @rdname ProteinFilters
+## UniprotidFilter <- function(value, condition = "==") {
+##     .Deprecated("UniprotFilter")
+##     if (missing(value))
+##         stop("A filter without a value makes no sense!")
+##     return(new("UniprotFilter", condition = condition,
+##                value = as.character(value)))
+## }
 
 ############################################################
 ## ProtdomidFilter
-##' @description The \code{ProtdomidFilter} allows to retrieve entries from
+##' @description The \code{ProtDomIdFilter} allows to retrieve entries from
 ##' the database matching the provided filter criteria based on their protein
 ##' domain ID (\emph{protein_domain_id}).
 ##' @rdname ProteinFilters
-setClass("ProtdomidFilter", contains = "BasicFilter",
+setClass("ProtDomIdFilter", contains = "AnnotationFilter",
          prototype = list(
-             condition = "=",
+             condition = "==",
              value = "",
              .valueIsCharacter = TRUE
          ))
-##' @return For \code{ProtdomidFilter}: A \code{ProtdomidFilter} object.
+##' @return For \code{ProtDomIdFilter}: A \code{ProtDomIdFilter} object.
 ##' @rdname ProteinFilters
-ProtdomidFilter <- function(value, condition = "=") {
-    if (missing(value)) {
-        stop("A filter without a value makes no sense!")
-    }
-    if (length(value) > 1) {
-        if(condition == "=")
-            condition = "in"
-        if(condition == "!=")
-            condition = "not in"
-    }
-    return(new("ProtdomidFilter", condition = condition,
+ProtDomIdFilter <- function(value, condition = "==") {
+    return(new("ProtDomIdFilter", condition = condition,
                value = as.character(value)))
 }
 
 ############################################################
 ## UniprotdbFilter
-##' @description The \code{UniprotdbFilter} allows to filter results based on
+##' @description The \code{UniprotDbFilter} allows to filter results based on
 ##' the specified Uniprot database names.
 ##' @rdname ProteinFilters
-setClass("UniprotdbFilter", contains = "BasicFilter",
+setClass("UniprotDbFilter", contains = "AnnotationFilter",
          prototype = list(
-             condition = "=",
+             condition = "==",
              values = "",
              .valueIsCharacter = TRUE
          ))
-##' @return For \code{UniprotdbFilter}: A \code{UniprotdbFilter} object.
+##' @return For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
 ##' @rdname ProteinFilters
-UniprotdbFilter <- function(value, condition = "=") {
-    if (missing(value)) {
-        stop("A filter without a value makes no sense!")
-    }
-    if (length(value) > 1) {
-        if(condition == "=")
-            condition = "in"
-        if(condition == "!=")
-            condition = "not in"
-    }
-    return(new("UniprotdbFilter", condition = condition,
+UniprotDbFilter <- function(value, condition = "==") {
+    return(new("UniprotDbFilter", condition = condition,
                value = as.character(value)))
 }
 
 ############################################################
 ## UniprotmappingtypeFilter
-##' @description The \code{UniprotmappingtypeFilter} allows to filter results
+##' @description The \code{UniprotMappingTypeFilter} allows to filter results
 ##' based on the mapping method/type that was used to assign Uniprot IDs to
 ##' Ensembl protein IDs.
 ##' @rdname ProteinFilters
-setClass("UniprotmappingtypeFilter", contains = "BasicFilter",
+setClass("UniprotMappingTypeFilter", contains = "AnnotationFilter",
          prototype = list(
-             condition = "=",
+             condition = "==",
              values = "",
              .valueIsCharacter = TRUE
          ))
-##' @return For \code{UniprotmappingtypeFilter}: A
-##' \code{UniprotmappingtypeFilter} object.
+##' @return For \code{UniprotMappingTypeFilter}: A
+##' \code{UniprotMappingTypeFilter} object.
 ##' @rdname ProteinFilters
-UniprotmappingtypeFilter <- function(value, condition = "=") {
-    if (missing(value)) {
-        stop("A filter without a value makes no sense!")
-    }
-    if (length(value) > 1) {
-        if(condition == "=")
-            condition = "in"
-        if(condition == "!=")
-            condition = "not in"
-    }
-    return(new("UniprotmappingtypeFilter", condition = condition,
+UniprotMappingTypeFilter <- function(value, condition = "==") {
+    return(new("UniprotMappingTypeFilter", condition = condition,
                value = as.character(value)))
 }
 

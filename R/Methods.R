@@ -1402,11 +1402,11 @@ checkFilter <- function(x){
             return(x)
         ## check if all elements are Filter classes.
         if(!all(unlist(lapply(x, function(z){
-            return(is(z, "BasicFilter"))
+            return(is(z, "AnnotationFilter"))
         }), use.names = FALSE)))
             stop("One of more elements in 'filter' are not filter objects!")
     }else{
-        if(is(x, "BasicFilter")){
+        if(is(x, "AnnotationFilter")){
             x <- list(x)
         }else{
             stop("'filter' has to be a filter object or a list of",
@@ -1865,7 +1865,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##' be extracted from the database. Can be any column(s) listed by the
 ##' \code{\link{listColumns}} method.
 ##' @param filter For \code{proteins}: A filter object extending
-##' \code{\linkS4class{BasicFilter}} or a list of such objects to select
+##' \code{AnnotationFilter} or a list of such objects to select
 ##' specific entries from the database. See \code{\link{RNA-DNA-filters}} and
 ##' \code{\link{ProteinFilters}} for the full list of supported filters.
 ##' @param order.by For \code{proteins}: a character vector specifying the

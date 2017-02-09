@@ -37,7 +37,7 @@
   }
 
   \item{filter}{
-    A filter object extending \code{\linkS4class{BasicFilter}} or a list
+    A filter object extending \code{AnnotationFilter} or a list
     of such object(s) to select specific entries from the database (see
     examples below).
   }
@@ -89,7 +89,6 @@
   Johannes Rainer
 }
 \seealso{
-  \code{\linkS4class{BasicFilter}}
   \code{\link{transcripts}}
 }
 \examples{

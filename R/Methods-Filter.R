@@ -3,218 +3,248 @@
 ##     Methods for BasicFilter classes.
 ##
 ##***********************************************************************
-validateConditionFilter <- function(object){
-    if(object@.valueIsCharacter){
-        ## condition has to be either = or in
-        if(!any(c("=", "in", "not in", "like", "!=")==object@condition)){
-            return(paste("only \"=\", \"!=\", \"in\" , \"not in\" and \"like\"",
-                         "allowed for condition",
-                         ", I've got", object@condition))
-        }
-    }else{
-        ## condition has to be = < > >= <=
-        if(!any(c("=", ">", "<", ">=", "<=", "in", "not in") ==
-                object@condition)){
-            return(paste0("only \"=\", \">\", \"<\", \">=\", \"<=\" , \"in\"",
-                          " and \"not in\" are allowed for condition, ",
-                          "I've got \"", object@condition, "\""))
-        }
-    }
-    if(length(object@value) > 1){
-        if(any(!object@condition %in% c("in", "not in")))
-            return(paste("only \"in\" and \"not in\" are allowed if value",
-                         "is a vector with more than one value!"))
-    }
-    if(!object@.valueIsCharacter){
-        vals <- object@value
-        if(length(vals) == 1){
-            if(vals == ""){
-                vals <- "0"
-            }
-        }
-        ## value has to be numeric!!!
-        suppressWarnings(
-            if(any(is.na(as.numeric(vals))))
-                return("value has to be numeric!!!")
-        )
-    }
-    return(TRUE)
-}
-setValidity("BasicFilter", validateConditionFilter)
-setMethod("initialize", "BasicFilter", function(.Object, ...){
-    OK <- validateConditionFilter(.Object)
-    if(class(OK)=="character"){
-        stop(OK)
-    }
-    callNextMethod(.Object, ...)
-})
+## validateConditionFilter <- function(object){
+##     if(object@.valueIsCharacter){
+##         ## condition has to be either = or in
+##         if(!any(c("=", "in", "not in", "like", "!=")==object@condition)){
+##             return(paste("only \"=\", \"!=\", \"in\" , \"not in\" and \"like\"",
+##                          "allowed for condition",
+##                          ", I've got", object@condition))
+##         }
+##     }else{
+##         ## condition has to be = < > >= <=
+##         if(!any(c("=", ">", "<", ">=", "<=", "in", "not in") ==
+##                 object@condition)){
+##             return(paste0("only \"=\", \">\", \"<\", \">=\", \"<=\" , \"in\"",
+##                           " and \"not in\" are allowed for condition, ",
+##                           "I've got \"", object@condition, "\""))
+##         }
+##     }
+##     if(length(object@value) > 1){
+##         if(any(!object@condition %in% c("in", "not in")))
+##             return(paste("only \"in\" and \"not in\" are allowed if value",
+##                          "is a vector with more than one value!"))
+##     }
+##     if(!object@.valueIsCharacter){
+##         vals <- object@value
+##         if(length(vals) == 1){
+##             if(vals == ""){
+##                 vals <- "0"
+##             }
+##         }
+##         ## value has to be numeric!!!
+##         suppressWarnings(
+##             if(any(is.na(as.numeric(vals))))
+##                 return("value has to be numeric!!!")
+##         )
+##     }
+##     return(TRUE)
+## }
+## setValidity("BasicFilter", validateConditionFilter)
+## setMethod("initialize", "BasicFilter", function(.Object, ...){
+##     OK <- validateConditionFilter(.Object)
+##     if(class(OK)=="character"){
+##         stop(OK)
+##     }
+##     callNextMethod(.Object, ...)
+## })
 
-.where <- function(object, db=NULL){
-    if(is.null(db)){
-        Vals <- value(object)
-    }else{
-        Vals <- value(object, db)
-    }
-    ## if not a number we have to single quote!
-    if(object@.valueIsCharacter){
-        Vals <- sQuote(gsub(unique(Vals),pattern="'",replacement="''"))
-    }else{
-        Vals <- unique(Vals)
-    }
-    ## check, if there are more than one, concatenate in that case on put () aroung
-    if(length(Vals) > 1){
-        Vals <- paste0("(", paste(Vals, collapse=",") ,")")
-    }
-    return(paste(condition(object), Vals))
-}
-setMethod("where", signature(object="BasicFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-    return(.where(object))
-})
-setMethod("where", signature(object="BasicFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-    return(.where(object, db=db))
-})
-setMethod("where", signature(object="BasicFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-    return(.where(object, db=db))
-})
-setMethod("condition", "BasicFilter", function(x, ...){
-    if(length(unique(value(x))) > 1){
-        if(x@condition=="in" | x@condition=="not in")
-            return(x@condition)
-        if(x@condition=="!="){
-            return("not in")
-        }else if(x@condition=="="){
-            return("in")
-        }else{
-            stop("With more than 1 value only conditions \"=\" and",
-                 " \"!=\" are allowed!")
-        }
-    }else{
-        ## check first if we do have "in" or "not in" and if
-        ## cast it to a = and != respectively
-        if(x@condition=="in")
-            return("=")
-        if(x@condition=="not in")
-            return("!=")
-        return(x@condition)
-    }
-})
-setReplaceMethod("condition", "BasicFilter", function(x, value){
-    if(x@.valueIsCharacter){
-        allowed <- c("=", "!=", "in", "not in", "like")
-        if(!any(allowed == value)){
-            stop("Only ", paste(allowed, collapse=", "),
-                 " are allowed if the value from",
-                 " the filter is of type character!")
-        }
-        if(value == "=" & length(x@value) > 1)
-            value <- "in"
-        if(value == "!=" & length(x@value) > 1)
-            value <- "not in"
-        if(value == "in" & length(x@value) == 1)
-            value <- "="
-        if(value == "not in" & length(x@value) == 1)
-            value <- "!="
-    }else{
-        allowed <- c("=", ">", "<", ">=", "<=")
-        if(!any(allowed == value)){
-            stop("Only ", paste(allowed, collapse=", "),
-                 " are allowed if the value from",
-                 " the filter is numeric!")
-        }
-    }
-    x@condition <- value
-    validObject(x)
-    return(x)
-})
-setMethod("value", signature(x="BasicFilter", db="missing"),
-          function(x, db, ...){
-              return(x@value)
+## .where <- function(object, db=NULL){
+##     if(is.null(db)){
+##         Vals <- value(object)
+##     }else{
+##         Vals <- value(object, db)
+##     }
+##     ## if not a number we have to single quote!
+##     if(object@.valueIsCharacter){
+##         Vals <- sQuote(gsub(unique(Vals),pattern="'",replacement="''"))
+##     }else{
+##         Vals <- unique(Vals)
+##     }
+##     ## check, if there are more than one, concatenate in that case on put () aroung
+##     if(length(Vals) > 1){
+##         Vals <- paste0("(", paste(Vals, collapse=",") ,")")
+##     }
+##     return(paste(condition(object), Vals))
+## }
+## setMethod("where", signature(object="AnnotationFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##     return(.queryForEnsDb(object))
+## })
+## setMethod("where", signature(object="AnnotationFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##     return(.queryForEnsDb(object))
+## })
+## setMethod("where", signature(object="AnnotationFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##     return(.queryForEnsDb(object))
+##           })
+
+
+## Does also prefix the database column with the table name, e.g. gene_id ->
+## gene.gene_id
+setMethod("ensDbColumn", "AnnotationFilter",
+          function(object, db, with.tables = character()) {
+              clmn <- .fieldInEnsDb(object@field)
+              if (missing(db))
+                  return(clmn)
+              if (length(with.tables) == 0)
+                  with.tables <- names(listTables(db))
+              return(unlist(prefixColumns(db, clmn, with.tables = with.tables),
+                             use.names = FALSE))
           })
-setMethod("value", signature(x="BasicFilter", db="EnsDb"),
-          function(x, db, ...){
-              return(x@value)
+setMethod("ensDbQuery", "AnnotationFilter",
+          function(object, db, with.tables = character()) {
+              return(.queryForEnsDbWithTables(object, db, with.tables))
           })
-setReplaceMethod("value", "BasicFilter", function(x, value){
-    ## Check if the value is what we expect it is!
-    if (x@.valueIsCharacter) {
-        value <- as.character(value)
-    } else {
-        if (!is.numeric(value)) {
-            if (is.character(value)) {
-                suppressWarnings(
-                    vals <- as.numeric(value)
-                )
-                if (any(is.na(vals)))
-                    stop("'value' is supposed to be a numeric value!")
-            } else
-                stop("'value' is supposed to be a numeric value!")
-        }
-    }
-    ## if(is.numeric(value)){
-    ##     x@.valueIsCharacter <- FALSE
-    ## }else{
-    ##     x@.valueIsCharacter <- TRUE
-    ## }
-    x@value <- as.character(value)
-    ## Checking if condition matches the value.
-    if(length(value) > 1){
-        if(x@condition == "=")
-            x@condition <- "in"
-        if(x@condition == "!=")
-            x@condition <- "not in"
-    }else{
-        if(x@condition == "in")
-            x@condition <- "="
-        if(x@condition == "not in")
-            x@condition <- "!="
-    }
-    ## Test validity
-    validObject(x)
-    return(x)
-})
+
+
+## setMethod("condition", "BasicFilter", function(x, ...){
+##     if(length(unique(value(x))) > 1){
+##         if(x@condition=="in" | x@condition=="not in")
+##             return(x@condition)
+##         if(x@condition=="!="){
+##             return("not in")
+##         }else if(x@condition=="="){
+##             return("in")
+##         }else{
+##             stop("With more than 1 value only conditions \"=\" and",
+##                  " \"!=\" are allowed!")
+##         }
+##     }else{
+##         ## check first if we do have "in" or "not in" and if
+##         ## cast it to a = and != respectively
+##         if(x@condition=="in")
+##             return("=")
+##         if(x@condition=="not in")
+##             return("!=")
+##         return(x@condition)
+##     }
+## })
+## setReplaceMethod("condition", "BasicFilter", function(x, value){
+##     if(x@.valueIsCharacter){
+##         allowed <- c("=", "!=", "in", "not in", "like")
+##         if(!any(allowed == value)){
+##             stop("Only ", paste(allowed, collapse=", "),
+##                  " are allowed if the value from",
+##                  " the filter is of type character!")
+##         }
+##         if(value == "=" & length(x@value) > 1)
+##             value <- "in"
+##         if(value == "!=" & length(x@value) > 1)
+##             value <- "not in"
+##         if(value == "in" & length(x@value) == 1)
+##             value <- "="
+##         if(value == "not in" & length(x@value) == 1)
+##             value <- "!="
+##     }else{
+##         allowed <- c("=", ">", "<", ">=", "<=")
+##         if(!any(allowed == value)){
+##             stop("Only ", paste(allowed, collapse=", "),
+##                  " are allowed if the value from",
+##                  " the filter is numeric!")
+##         }
+##     }
+##     x@condition <- value
+##     validObject(x)
+##     return(x)
+## })
+## setMethod("value", signature(x="BasicFilter", db="missing"),
+##           function(x, db, ...){
+##               return(x@value)
+##           })
+## setMethod("value", signature(x="BasicFilter", db="EnsDb"),
+##           function(x, db, ...){
+##               return(x@value)
+##           })
+## setReplaceMethod("value", "BasicFilter", function(x, value){
+##     ## Check if the value is what we expect it is!
+##     if (x@.valueIsCharacter) {
+##         value <- as.character(value)
+##     } else {
+##         if (!is.numeric(value)) {
+##             if (is.character(value)) {
+##                 suppressWarnings(
+##                     vals <- as.numeric(value)
+##                 )
+##                 if (any(is.na(vals)))
+##                     stop("'value' is supposed to be a numeric value!")
+##             } else
+##                 stop("'value' is supposed to be a numeric value!")
+##         }
+##     }
+##     ## if(is.numeric(value)){
+##     ##     x@.valueIsCharacter <- FALSE
+##     ## }else{
+##     ##     x@.valueIsCharacter <- TRUE
+##     ## }
+##     x@value <- as.character(value)
+##     ## Checking if condition matches the value.
+##     if(length(value) > 1){
+##         if(x@condition == "=")
+##             x@condition <- "in"
+##         if(x@condition == "!=")
+##             x@condition <- "not in"
+##     }else{
+##         if(x@condition == "in")
+##             x@condition <- "="
+##         if(x@condition == "not in")
+##             x@condition <- "!="
+##     }
+##     ## Test validity
+##     validObject(x)
+##     return(x)
+## })
 ## setMethod("requireTable", "EnsFilter", function(object, ...){
 ##     return(object@required.table)
 ## })
-setMethod("print", "BasicFilter", function(x, ...){
-    show(x)
-})
-setMethod("show", "BasicFilter", function(object){
-    cat("| Object of class:", class(object), "\n")
-    cat("| condition:", object@condition, "\n")
-    cat("| value:", value(object), "\n")
-})
+## setMethod("print", "BasicFilter", function(x, ...){
+##     show(x)
+## })
+## setMethod("show", "BasicFilter", function(object){
+##     cat("| Object of class:", class(object), "\n")
+##     cat("| condition:", object@condition, "\n")
+##     cat("| value:", value(object), "\n")
+## })
 
 ##***********************************************************************
 ##
 ##     where for a list.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="list",db="missing", with.tables="missing"),
-          function(object, db, with.tables, ...){
-              wherequery <- paste(" where", paste(unlist(lapply(object, where)),
-                                                  collapse=" and "))
-              return(wherequery)
-          })
-setMethod("where", signature(object="list",db="EnsDb", with.tables="missing"),
-          function(object, db, with.tables, ...){
-              wherequery <- paste(" where",
-                                  paste(unlist(lapply(object, where, db)),
-                                                  collapse=" and "))
-              return(wherequery)
-          })
-setMethod("where", signature(object="list",db="EnsDb", with.tables="character"),
-          function(object, db, with.tables, ...){
-              wherequery <- paste(" where",
-                                  paste(unlist(lapply(object, where, db,
-                                                      with.tables=with.tables)),
-                                                  collapse=" and "))
-              return(wherequery)
+## setMethod("where", signature(object="list",db="missing", with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               wherequery <- paste(" where", paste(unlist(lapply(object, where)),
+##                                                   collapse=" and "))
+##               return(wherequery)
+##           })
+## setMethod("where", signature(object="list",db="EnsDb", with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               wherequery <- paste(" where",
+##                                   paste(unlist(lapply(object, where, db)),
+##                                                   collapse=" and "))
+##               return(wherequery)
+##           })
+## setMethod("where", signature(object="list",db="EnsDb", with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               wherequery <- paste(" where",
+##                                   paste(unlist(lapply(object, where, db,
+##                                                       with.tables=with.tables)),
+##                                                   collapse=" and "))
+##               return(wherequery)
+##           })
+
+setMethod("ensDbQuery", "list",
+          function(object, db, with.tables = character()) {
+              wq <- paste0(" where ",
+                           paste(unlist(lapply(object, ensDbQuery, db,
+                                               with.tables = with.tables),
+                                        use.names = FALSE),
+                                 collapse = " and "))
+              return(wq)
           })
 
 
@@ -224,42 +254,42 @@ setMethod("where", signature(object="list",db="EnsDb", with.tables="character"),
 ##     Methods for GeneidFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="GeneidFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="GeneidFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("gene_id")
-          })
-setMethod("where", signature(object="GeneidFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="GeneidFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="GeneidFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables), suff))
-          })
-setMethod("column", signature("GeneidFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="GeneidFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="GeneidFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("gene_id")
+##           })
+## setMethod("where", signature(object="GeneidFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="GeneidFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="GeneidFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables), suff))
+##           })
+## setMethod("column", signature("GeneidFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -268,42 +298,43 @@ setMethod("column", signature("GeneidFilter", db="EnsDb",
 ##     Methods for EntrezidFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="EntrezidFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="EntrezidFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("entrezid")
-          })
-setMethod("where", signature(object="EntrezidFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="EntrezidFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="EntrezidFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature("EntrezidFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="EntrezidFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="EntrezidFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("entrezid")
+##           })
+## setMethod("where", signature(object="EntrezidFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="EntrezidFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="EntrezidFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables),
+##                            suff))
+##           })
+## setMethod("column", signature("EntrezidFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 ##***********************************************************************
@@ -311,42 +342,43 @@ setMethod("column", signature("EntrezidFilter", db="EnsDb",
 ##     Methods for GenebiotypeFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="GenebiotypeFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="GenebiotypeFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("gene_biotype")
-          })
-setMethod("where", signature(object="GenebiotypeFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="GenebiotypeFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="GenebiotypeFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="GenebiotypeFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="GenebiotypeFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="GenebiotypeFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("gene_biotype")
+##           })
+## setMethod("where", signature(object="GenebiotypeFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="GenebiotypeFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="GenebiotypeFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables),
+##                            suff))
+##           })
+## setMethod("column", signature(object="GenebiotypeFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -355,42 +387,42 @@ setMethod("column", signature(object="GenebiotypeFilter", db="EnsDb",
 ##     Methods for GenenameFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="GenenameFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="GenenameFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("gene_name")
-          })
-setMethod("where", signature(object="GenenameFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="GenenameFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="GenenameFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables="character", ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="GenenameFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="GenenameFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="GenenameFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("gene_name")
+##           })
+## setMethod("where", signature(object="GenenameFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="GenenameFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="GenenameFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables="character", ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables), suff))
+##           })
+## setMethod("column", signature(object="GenenameFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -400,42 +432,43 @@ setMethod("column", signature(object="GenenameFilter", db="EnsDb",
 ##     Methods for TxidFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="TxidFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="TxidFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("tx_id")
-          })
-setMethod("where", signature(object="TxidFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="TxidFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="TxidFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="TxidFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="TxidFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="TxidFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("tx_id")
+##           })
+## setMethod("where", signature(object="TxidFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="TxidFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="TxidFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables),
+##                            suff))
+##           })
+## setMethod("column", signature(object="TxidFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -445,42 +478,43 @@ setMethod("column", signature(object="TxidFilter", db="EnsDb",
 ##     Methods for TxbiotypeFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="TxbiotypeFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="TxbiotypeFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables...){
-              return("tx_biotype")
-          })
-setMethod("where", signature(object="TxbiotypeFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="TxbiotypeFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="TxbiotypeFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="TxbiotypeFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="TxbiotypeFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="TxbiotypeFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables...){
+##               return("tx_biotype")
+##           })
+## setMethod("where", signature(object="TxbiotypeFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="TxbiotypeFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="TxbiotypeFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables),
+##                            suff))
+##           })
+## setMethod("column", signature(object="TxbiotypeFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -490,42 +524,43 @@ setMethod("column", signature(object="TxbiotypeFilter", db="EnsDb",
 ##     Methods for ExonidFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="ExonidFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="ExonidFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("exon_id")
-          })
-setMethod("where", signature(object="ExonidFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="ExonidFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="ExonidFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="ExonidFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="ExonidFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="ExonidFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("exon_id")
+##           })
+## setMethod("where", signature(object="ExonidFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="ExonidFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="ExonidFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables),
+##                            suff))
+##           })
+## setMethod("column", signature(object="ExonidFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 ##***********************************************************************
@@ -533,49 +568,49 @@ setMethod("column", signature(object="ExonidFilter", db="EnsDb",
 ##     Methods for ExonrankFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="ExonrankFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="ExonrankFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("exon_idx")
-          })
-setMethod("where", signature(object="ExonrankFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="ExonrankFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="ExonrankFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="ExonrankFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
-setReplaceMethod("value", "ExonrankFilter", function(x, value){
-    if(any(is.na(as.numeric(value))))
-        stop("Argument 'value' has to be numeric!")
-    x@value <- value
-    validObject(x)
-    return(x)
-})
+## setMethod("where", signature(object="ExonrankFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="ExonrankFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("exon_idx")
+##           })
+## setMethod("where", signature(object="ExonrankFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="ExonrankFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="ExonrankFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables), suff))
+##           })
+## setMethod("column", signature(object="ExonrankFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
+## setReplaceMethod("value", "ExonrankFilter", function(object, value){
+##     if(any(is.na(as.numeric(value))))
+##         stop("Argument 'value' has to be numeric!")
+##     object@value <- value
+##     validObject(object)
+##     return(object)
+## })
 
 
 ##***********************************************************************
@@ -583,47 +618,56 @@ setReplaceMethod("value", "ExonrankFilter", function(x, value){
 ##     Methods for SeqnameFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="SeqnameFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="SeqnameFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("seq_name")
-          })
-setMethod("where", signature(object="SeqnameFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="SeqnameFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="SeqnameFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="SeqnameFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="SeqnameFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="SeqnameFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("seq_name")
+##           })
+## setMethod("where", signature(object="SeqnameFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="SeqnameFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="SeqnameFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object, db, with.tables=with.tables), suff))
+##           })
+## setMethod("column", signature(object="SeqnameFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 ## Overwriting the value method allows us to fix chromosome names (e.g. with prefix chr)
 ## to be usable for EnsDb and Ensembl based chromosome names (i.e. without chr).
-setMethod("value", signature(x="SeqnameFilter", db="EnsDb"),
-          function(x, db, ...){
-              val <- formatSeqnamesForQuery(db, value(x))
+## setMethod("value", signature(x="SeqnameFilter", db="EnsDb"),
+##           function(x, db, ...){
+##               val <- formatSeqnamesForQuery(db, value(x))
+##               if(any(is.na(val))){
+##                   stop("A value of <NA> is not allowed for a SeqnameFilter!")
+##               }
+##               return(val)
+##               ##return(ucscToEns(value(x)))
+##           })
+setMethod("value", "SeqNameFilter",
+          function(object, db){
+              val <- formatSeqnamesForQuery(db, value(object))
               if(any(is.na(val))){
                   stop("A value of <NA> is not allowed for a SeqnameFilter!")
               }
@@ -637,42 +681,43 @@ setMethod("value", signature(x="SeqnameFilter", db="EnsDb"),
 ##     Methods for SeqstrandFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="SeqstrandFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="SeqstrandFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              return("seq_strand")
-          })
-setMethod("where", signature(object="SeqstrandFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="SeqstrandFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="SeqstrandFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="SeqstrandFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="SeqstrandFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="SeqstrandFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               return("seq_strand")
+##           })
+## setMethod("where", signature(object="SeqstrandFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="SeqstrandFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="SeqstrandFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables),
+##                            suff))
+##           })
+## setMethod("column", signature(object="SeqstrandFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -681,48 +726,48 @@ setMethod("column", signature(object="SeqstrandFilter", db="EnsDb",
 ##     Methods for SeqstartFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="SeqstartFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="SeqstartFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              ## assuming that we follow the naming convention:
-              ## <feature>_seq_end for the naming of the database columns.
-              feature <- object@feature
-              feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
-              if(object@feature=="transcript")
-                  feature <- "tx"
-              return(paste0(feature, "_seq_start"))
-          })
-setMethod("where", signature(object="SeqstartFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="SeqstartFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="SeqstartFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="SeqstartFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="SeqstartFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="SeqstartFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               ## assuming that we follow the naming convention:
+##               ## <feature>_seq_end for the naming of the database columns.
+##               feature <- object@feature
+##               feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
+##               if(object@feature=="transcript")
+##                   feature <- "tx"
+##               return(paste0(feature, "_seq_start"))
+##           })
+## setMethod("where", signature(object="SeqstartFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="SeqstartFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="SeqstartFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables), suff))
+##           })
+## setMethod("column", signature(object="SeqstartFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 
@@ -731,48 +776,48 @@ setMethod("column", signature(object="SeqstartFilter", db="EnsDb",
 ##     Methods for SeqendFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object="SeqendFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object), suff))
-          })
-setMethod("column", signature(object="SeqendFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              ## assuming that we follow the naming convention:
-              ## <feature>_seq_end for the naming of the database columns.
-              feature <- object@feature
-              feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
-              if(object@feature=="transcript")
-                  feature <- "tx"
-              return(paste0(feature, "_seq_end"))
-          })
-setMethod("where", signature(object="SeqendFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("column", signature(object="SeqendFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="SeqendFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              suff <- callNextMethod()
-              return(paste(column(object, db, with.tables=with.tables), suff))
-          })
-setMethod("column", signature(object="SeqendFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables=with.tables),
-                            use.names=FALSE))
-          })
+## setMethod("where", signature(object="SeqendFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(column(object), suff))
+##           })
+## setMethod("column", signature(object="SeqendFilter", db="missing",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               ## assuming that we follow the naming convention:
+##               ## <feature>_seq_end for the naming of the database columns.
+##               feature <- object@feature
+##               feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
+##               if(object@feature=="transcript")
+##                   feature <- "tx"
+##               return(paste0(feature, "_seq_end"))
+##           })
+## setMethod("where", signature(object="SeqendFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("column", signature(object="SeqendFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="SeqendFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               suff <- callNextMethod()
+##               return(paste(ensDbColumn(object, db, with.tables=with.tables), suff))
+##           })
+## setMethod("column", signature(object="SeqendFilter", db="EnsDb",
+##                               with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               return(unlist(prefixColumns(db, column(object),
+##                                           with.tables=with.tables),
+##                             use.names=FALSE))
+##           })
 
 
 ###============================================================
@@ -812,23 +857,23 @@ setMethod("show", "GRangesFilter", function(object){
     cat("| + strand: ", paste0(strand(object), collapse=", "), "\n")
     cat("| condition:", condition(object), "\n")
 })
-setMethod("condition", "GRangesFilter", function(x, ...){
-    return(x@location)
+setMethod("condition", "GRangesFilter", function(object){
+    return(object@location)
 })
-setReplaceMethod("condition", "GRangesFilter", function(x, value){
-    value <- match.arg(value, c("within", "overlapping"))
-    x@location <- value
-    validObject(x)
-    return(x)
-})
-setMethod("value", signature(x="GRangesFilter", db="missing"),
-          function(x, db, ...){
-              return(x@grange)
+## setReplaceMethod("condition", "GRangesFilter", function(object, value){
+##     value <- match.arg(value, c("within", "overlapping"))
+##     object@location <- value
+##     validObject(object)
+##     return(object)
+## })
+setMethod("value", "GRangesFilter",
+          function(object){
+              return(object@grange)
           })
-setMethod("value", signature(x="GRangesFilter", db="EnsDb"),
-          function(x, db, ...){
-              return(x@grange)
-          })
+## setMethod("value", signature(x="GRangesFilter", db="EnsDb"),
+##           function(x, db, ...){
+##               return(x@grange)
+##           })
 setMethod("start", signature(x="GRangesFilter"),
           function(x, ...){
               return(start(value(x)))
@@ -853,13 +898,34 @@ setMethod("seqlevels", signature(x="GRangesFilter"),
 ## The column method for GRangesFilter returns all columns required for the query,
 ## the _seq_start, _seq_end for the feature, seq_name and seq_strand.
 ## Note: this method has to return a named vector!
-setMethod("column", signature(object="GRangesFilter", db="missing",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              ## assuming that we follow the naming convention:
-              ## <feature>_seq_end for the naming of the database columns.
+## setMethod("ensDbColumn", signature(object="GRangesFilter", db="missing"),
+##           function(object, db, with.tables = character(), ...){
+##               if (length(with.tables) == 0)
+##                   with.tables <- names(listTables(db))
+##               ## assuming that we follow the naming convention:
+##               ## <feature>_seq_end for the naming of the database columns.
+##               feature <- object@feature
+##               feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
+##               if(object@feature=="transcript")
+##                   feature <- "tx"
+##               cols <- c(start=paste0(feature, "_seq_start"),
+##                         end=paste0(feature, "_seq_end"),
+##                         seqname="seq_name",
+##                         strand="seq_strand")
+##               return(cols)
+##           })
+## setMethod("column", signature(object="GRangesFilter", db="EnsDb",
+##                               with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(column(object, db, with.tables=tn))
+##           })
+## Providing also the columns.
+setMethod("ensDbColumn", "GRangesFilter",
+          function(object, db, with.tables = character(), ...){
               feature <- object@feature
-              feature <- match.arg(feature, c("gene", "transcript", "exon", "tx"))
+              feature <- match.arg(feature, c("gene", "transcript", "exon",
+                                              "tx"))
               if(object@feature=="transcript")
                   feature <- "tx"
               cols <- c(start=paste0(feature, "_seq_start"),
@@ -867,49 +933,49 @@ setMethod("column", signature(object="GRangesFilter", db="missing",
                         seqname="seq_name",
                         strand="seq_strand")
               return(cols)
-          })
-setMethod("column", signature(object="GRangesFilter", db="EnsDb",
-                              with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(column(object, db, with.tables=tn))
-          })
-## Providing also the columns.
-setMethod("column", signature(object="GRangesFilter", db="EnsDb",
-                              with.tables="character"),
-          function(object, db, with.tables, ...){
-              cols <- unlist(prefixColumns(db, column(object),
-                                           with.tables=with.tables),
-                             use.names=FALSE)
-              ## We have to give the vector the required names!
-              names(cols) <- 1:length(cols)
-              names(cols)[grep(cols, pattern="seq_name")] <- "seqname"
-              names(cols)[grep(cols, pattern="seq_strand")] <- "strand"
-              names(cols)[grep(cols, pattern="seq_start")] <- "start"
-              names(cols)[grep(cols, pattern="seq_end")] <- "end"
+              if (!missing(db)) {
+                  if (length(with.tables) == 0)
+                      with.tables <- names(listTables(db))
+                  cols <- unlist(prefixColumns(db, cols,
+                                               with.tables=with.tables),
+                                 use.names=FALSE)
+                  ## We have to give the vector the required names!
+                  names(cols) <- 1:length(cols)
+                  names(cols)[grep(cols, pattern="seq_name")] <- "seqname"
+                  names(cols)[grep(cols, pattern="seq_strand")] <- "strand"
+                  names(cols)[grep(cols, pattern="seq_start")] <- "start"
+                  names(cols)[grep(cols, pattern="seq_end")] <- "end"
+              }
               return(cols[c("start", "end", "seqname", "strand")])
           })
 ## Where for GRangesFilter only.
-setMethod("where", signature(object="GRangesFilter", db="missing",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              ## Get the names of the columns we're going to query.
-              cols <- column(object)
-              query <- buildWhereForGRanges(object, cols)
-              return(query)
-          })
-setMethod("where", signature(object="GRangesFilter", db="EnsDb",
-                             with.tables="missing"),
-          function(object, db, with.tables, ...){
-              tn <- names(listTables(db))
-              return(where(object, db, with.tables=tn))
-          })
-setMethod("where", signature(object="GRangesFilter", db="EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables, ...){
-              cols <- column(object, db, with.tables)
-              query <- buildWhereForGRanges(object, cols, db=db)
-              return(query)
+## setMethod("where", signature(object="GRangesFilter", db="missing",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               ## Get the names of the columns we're going to query.
+##               cols <- column(object)
+##               query <- buildWhereForGRanges(object, cols)
+##               return(query)
+##           })
+## setMethod("where", signature(object="GRangesFilter", db="EnsDb",
+##                              with.tables="missing"),
+##           function(object, db, with.tables, ...){
+##               tn <- names(listTables(db))
+##               return(where(object, db, with.tables=tn))
+##           })
+## setMethod("where", signature(object="GRangesFilter", db="EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables, ...){
+##               cols <- ensDbColumn(object, db, with.tables)
+##               query <- buildWhereForGRanges(object, cols, db=db)
+##               return(query)
+##           })
+setMethod("ensDbQuery", "GRangesFilter",
+          function(object, db, with.tables = character()) {
+              cols <- ensDbColumn(object, db, with.tables)
+              if (missing(db))
+                  db <- NULL
+              return(buildWhereForGRanges(object, cols, db = db))
           })
 
 
@@ -983,139 +1049,75 @@ num2strand <- function(x){
 ##     Methods for SymbolFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object = "SymbolFilter", db = "missing",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-    suff <- callNextMethod()
-    return(paste(column(object), suff))
-})
-setMethod("column", signature(object = "SymbolFilter", db = "missing",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-    return("symbol")
-})
-setMethod("where", signature(object = "SymbolFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-    tn <- names(listTables(db))
-    return(where(object, db, with.tables = tn))
-})
-setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-    tn <- names(listTables(db))
-    return(column(object, db, with.tables = tn))
-})
-setMethod("where", signature(object = "SymbolFilter", db = "EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables = "character", ...) {
-    suff <- callNextMethod()
-    return(paste(column(object, db, with.tables = with.tables), suff))
-})
-setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
-    return(unlist(prefixColumns(db, "gene_name",
-                                with.tables = with.tables),
-                  use.names = FALSE))
-})
+## setMethod("where", signature(object = "SymbolFilter", db = "missing",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##     suff <- callNextMethod()
+##     return(paste(column(object), suff))
+## })
+## setMethod("column", signature(object = "SymbolFilter", db = "missing",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##     return("symbol")
+## })
+## setMethod("where", signature(object = "SymbolFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##     tn <- names(listTables(db))
+##     return(where(object, db, with.tables = tn))
+## })
+## setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##     tn <- names(listTables(db))
+##     return(column(object, db, with.tables = tn))
+## })
+## setMethod("where", signature(object = "SymbolFilter", db = "EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables = "character", ...) {
+##     suff <- callNextMethod()
+##     return(paste(ensDbColumn(object, db, with.tables = with.tables), suff))
+## })
+## setMethod("column", signature(object = "SymbolFilter", db = "EnsDb",
+##                               with.tables = "character"),
+##           function(object, db, with.tables, ...) {
+##     return(unlist(prefixColumns(db, "gene_name",
+##                                 with.tables = with.tables),
+##                   use.names = FALSE))
+## })
 
 ##***********************************************************************
 ##
 ##     Methods for OnlyCodingTxFilter classes.
 ##
 ##***********************************************************************
-setMethod("where", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-    tn <- names(listTables(db))
-    return(where(object, db, with.tables = tn))
-})
-setMethod("column", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-    tn <- names(listTables(db))
-    return(column(object, db, with.tables = tn))
-})
-setMethod("where", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
-                             with.tables="character"),
-          function(object, db, with.tables = "character", ...) {
-              ## Hard coded.
-              return("tx.tx_cds_seq_start is not null")
-})
-setMethod("column", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
+## setMethod("where", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##     tn <- names(listTables(db))
+##     return(where(object, db, with.tables = tn))
+## })
+## setMethod("column", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##     tn <- names(listTables(db))
+##     return(column(object, db, with.tables = tn))
+## })
+## setMethod("where", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
+##                              with.tables="character"),
+##           function(object, db, with.tables = "character", ...) {
+##               ## Hard coded.
+##               return("tx.tx_cds_seq_start is not null")
+## })
+setMethod("ensDbColumn", signature(object = "OnlyCodingTxFilter"),
+          function(object, db, ...) {
               return("tx.tx_cds_seq_start")
 })
+setMethod("ensDbQuery", "OnlyCodingTxFilter",
+          function(object, db, with.tables = character()) {
+              return("tx.tx_cds_seq_start is not null")
+          })
 
-
-############################################################
-## requireTable
-## .requireTable <- function(db, attr){
-##     return(names(prefixColumns(db, columns=attr)))
-## }
-## ## these function determine which tables we need for the submitted filters.
-## setMethod("requireTable", signature(x="GeneidFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="gene_id"))
-##           })
-## setMethod("requireTable", signature(x="EntrezidFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="entrezid"))
-##           })
-## setMethod("requireTable", signature(x="GenebiotypeFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="gene_biotype"))
-##           })
-## setMethod("requireTable", signature(x="GenenameFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="gene_name"))
-##           })
-## setMethod("requireTable", signature(x="TxidFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="tx_id"))
-##           })
-## setMethod("requireTable", signature(x="TxbiotypeFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="tx_biotype"))
-##           })
-## setMethod("requireTable", signature(x="ExonidFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="exon_id"))
-##           })
-## setMethod("requireTable", signature(x="SeqnameFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="seq_name"))
-##           })
-## setMethod("requireTable", signature(x="SeqstrandFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               return(.requireTable(db=db, attr="seq_name"))
-##           })
-## setMethod("requireTable", signature(x="SeqstartFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               if(x@feature=="gene")
-##                   return(.requireTable(db=db, attr="gene_seq_start"))
-##               if(x@feature=="transcript" | x@feature=="tx")
-##                   return(.requireTable(db=db, attr="tx_seq_start"))
-##               if(x@feature=="exon")
-##                   return(.requireTable(db=db, attr="exon_seq_start"))
-##               return(NA)
-##           })
-## setMethod("requireTable", signature(x="SeqendFilter", db="EnsDb"),
-##           function(x, db, ...){
-##               if(x@feature=="gene")
-##                   return(.requireTable(db=db, attr="gene_seq_end"))
-##               if(x@feature=="transcript" | x@feature=="tx")
-##                   return(.requireTable(db=db, attr="tx_seq_end"))
-##               if(x@feature=="exon")
-##                   return(.requireTable(db=db, attr="exon_seq_end"))
-##               return(NA)
-##           })
-## setMethod("requireTable", signature(x = "SymbolFilter", db = "EnsDb"),
-##           function(x, db, ...) {
-##     return(.requireTable(db = db, attr = "gene_name"))
-## })
 
 
 ##***********************************************************************
@@ -1140,47 +1142,60 @@ setMethod("column", signature(object = "OnlyCodingTxFilter", db = "EnsDb",
 ##' @return For \code{column}: A character specifying the database column name
 ##' on which the filter will be applied.
 ##' @rdname ProteinFilters
-setMethod("where", signature(object = "ProteinidFilter", db = "missing",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return(paste(column(object), callNextMethod()))
-          })
-##' @rdname ProteinFilters
-setMethod("column", signature(object = "ProteinidFilter", db = "missing",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return("protein_id")
-          })
-setMethod("where", signature(object = "ProteinidFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(where(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("column", signature(object = "ProteinidFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(column(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("where", signature(object = "ProteinidFilter", db = "EnsDb",
-                             with.tables = "character"),
-          function(object, db, with.tables, ...){
+## setMethod("where", signature(object = "ProteinidFilter", db = "missing",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return(paste(column(object), callNextMethod()))
+##           })
+## ##' @rdname ProteinFilters
+## setMethod("column", signature(object = "ProteinidFilter", db = "missing",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return("protein_id")
+##           })
+## setMethod("where", signature(object = "ProteinidFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(where(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("column", signature(object = "ProteinidFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(column(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("where", signature(object = "ProteinidFilter", db = "EnsDb",
+##                              with.tables = "character"),
+##           function(object, db, with.tables, ...){
+##               if (!hasProteinData(db))
+##                   stop("The 'EnsDb' database used does not provide",
+##                        " protein annotations! A 'ProteinidFilter' can not",
+##                        " be used.")
+##               return(paste(ensDbColumn(object, db, with.tables = with.tables),
+##                            callNextMethod()))
+##           })
+setMethod("ensDbColumn", "ProteinIdFilter",
+          function(object, db, with.tables = character(), ...) {
+              if (missing(db)) {
+                  return(callNextMethod())
+              }
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'ProteinidFilter' can not",
                        " be used.")
-              return(paste(column(object, db, with.tables = with.tables),
-                           callNextMethod()))
+              callNextMethod()
+              ## return(unlist(prefixColumns(db, column(object),
+              ##                             with.tables = with.tables),
+              ##               use.names = FALSE))
           })
-setMethod("column", signature(object = "ProteinidFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
+setMethod("ensDbQuery", "ProteinIdFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'ProteinidFilter' can not",
                        " be used.")
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables = with.tables),
-                            use.names = FALSE))
+              return(.queryForEnsDbWithTables(object, db, with.tables))
           })
 
 ##***********************************************************************
@@ -1193,47 +1208,59 @@ setMethod("column", signature(object = "ProteinidFilter", db = "EnsDb",
 ##' column,UniprotidFilter,EnsDb,missing-method
 ##' column,UniprotidFilter,EnsDb,character-method
 ##' @rdname ProteinFilters
-setMethod("where", signature(object = "UniprotidFilter", db = "missing",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return(paste(column(object), callNextMethod()))
-          })
-##' @rdname ProteinFilters
-setMethod("column", signature(object = "UniprotidFilter", db = "missing",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return("uniprot_id")
-          })
-setMethod("where", signature(object = "UniprotidFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(where(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("column", signature(object = "UniprotidFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(column(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("where", signature(object = "UniprotidFilter", db = "EnsDb",
-                             with.tables = "character"),
-          function(object, db, with.tables, ...){
+## setMethod("where", signature(object = "UniprotidFilter", db = "missing",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return(paste(column(object), callNextMethod()))
+##           })
+## ##' @rdname ProteinFilters
+## setMethod("column", signature(object = "UniprotidFilter", db = "missing",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return("uniprot_id")
+##           })
+## setMethod("where", signature(object = "UniprotidFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(where(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("column", signature(object = "UniprotidFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(column(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("where", signature(object = "UniprotidFilter", db = "EnsDb",
+##                              with.tables = "character"),
+##           function(object, db, with.tables, ...){
+##               if (!hasProteinData(db))
+##                   stop("The 'EnsDb' database used does not provide",
+##                        " protein annotations! A 'UniprotidFilter' can not",
+##                        " be used.")
+##               return(paste(ensDbColumn(object, db, with.tables = with.tables),
+##                            callNextMethod()))
+##           })
+setMethod("ensDbColumn", "UniprotFilter",
+          function(object, db, with.tables = character(), ...) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'UniprotidFilter' can not",
+                       " protein annotations! A 'UniprotFilter' can not",
                        " be used.")
-              return(paste(column(object, db, with.tables = with.tables),
-                           callNextMethod()))
+              callNextMethod()
+              ## return(unlist(prefixColumns(db, column(object),
+              ##                             with.tables = with.tables),
+              ##               use.names = FALSE))
           })
-setMethod("column", signature(object = "UniprotidFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
+setMethod("ensDbQuery", "UniprotFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'UniprotidFilter' can not",
+                       " protein annotations! A 'UniprotFilter' can not",
                        " be used.")
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables = with.tables),
-                            use.names = FALSE))
+              return(.queryForEnsDbWithTables(object, db, with.tables))
           })
 
 ##***********************************************************************
@@ -1246,47 +1273,59 @@ setMethod("column", signature(object = "UniprotidFilter", db = "EnsDb",
 ##' column,ProtdomidFilter,EnsDb,missing-method
 ##' column,ProtdomidFilter,EnsDb,character-method
 ##' @rdname ProteinFilters
-setMethod("where", signature(object = "ProtdomidFilter", db = "missing",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return(paste(column(object), callNextMethod()))
-          })
-##' @rdname ProteinFilters
-setMethod("column", signature(object = "ProtdomidFilter", db = "missing",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return("protein_domain_id")
-          })
-setMethod("where", signature(object = "ProtdomidFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(where(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("column", signature(object = "ProtdomidFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(column(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("where", signature(object = "ProtdomidFilter", db = "EnsDb",
-                             with.tables = "character"),
-          function(object, db, with.tables, ...){
+## setMethod("where", signature(object = "ProtdomidFilter", db = "missing",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return(paste(column(object), callNextMethod()))
+##           })
+## ##' @rdname ProteinFilters
+## setMethod("column", signature(object = "ProtdomidFilter", db = "missing",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return("protein_domain_id")
+##           })
+## setMethod("where", signature(object = "ProtdomidFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(where(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("column", signature(object = "ProtdomidFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(column(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("where", signature(object = "ProtdomidFilter", db = "EnsDb",
+##                              with.tables = "character"),
+##           function(object, db, with.tables, ...){
+##               if (!hasProteinData(db))
+##                   stop("The 'EnsDb' database used does not provide",
+##                        " protein annotations! A 'ProtdomidFilter' can not",
+##                        " be used.")
+##               return(paste(ensDbColumn(object, db, with.tables = with.tables),
+##                            callNextMethod()))
+##           })
+setMethod("ensDbColumn", "ProtDomIdFilter",
+          function(object, db, with.tables = character(), ...) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'ProtdomidFilter' can not",
+                       " protein annotations! A 'ProtDomIdFilter' can not",
                        " be used.")
-              return(paste(column(object, db, with.tables = with.tables),
-                           callNextMethod()))
+              callNextMethod()
+              ## return(unlist(prefixColumns(db, column(object),
+              ##                             with.tables = with.tables),
+              ##               use.names = FALSE))
           })
-setMethod("column", signature(object = "ProtdomidFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
+setMethod("ensDbQuery", "ProtDomIdFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'ProtdomidFilter' can not",
+                       " protein annotations! A 'ProtDomIdFilter' can not",
                        " be used.")
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables = with.tables),
-                            use.names = FALSE))
+              return(.queryForEnsDbWithTables(object, db, with.tables))
           })
 
 ##***********************************************************************
@@ -1299,47 +1338,59 @@ setMethod("column", signature(object = "ProtdomidFilter", db = "EnsDb",
 ##' column,UniprotdbFilter,EnsDb,missing-method
 ##' column,UniprotdbFilter,EnsDb,character-method
 ##' @rdname ProteinFilters
-setMethod("where", signature(object = "UniprotdbFilter", db = "missing",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return(paste(column(object), callNextMethod()))
-          })
-##' @rdname ProteinFilters
-setMethod("column", signature(object = "UniprotdbFilter", db = "missing",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return("uniprot_db")
-          })
-setMethod("where", signature(object = "UniprotdbFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(where(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("column", signature(object = "UniprotdbFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(column(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("where", signature(object = "UniprotdbFilter", db = "EnsDb",
-                             with.tables = "character"),
-          function(object, db, with.tables, ...){
+## setMethod("where", signature(object = "UniprotdbFilter", db = "missing",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return(paste(column(object), callNextMethod()))
+##           })
+## ##' @rdname ProteinFilters
+## setMethod("column", signature(object = "UniprotdbFilter", db = "missing",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return("uniprot_db")
+##           })
+## setMethod("where", signature(object = "UniprotdbFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(where(object, db, with.tables = names(listTables(db))))
+##           })
+## setmethod("column", signature(object = "UniprotdbFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(column(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("where", signature(object = "UniprotdbFilter", db = "EnsDb",
+##                              with.tables = "character"),
+##           function(object, db, with.tables, ...){
+##               if (!hasProteinData(db))
+##                   stop("The 'EnsDb' database used does not provide",
+##                        " protein annotations! A 'UniprotdbFilter' can not",
+##                        " be used.")
+##               return(paste(ensDbColumn(object, db, with.tables = with.tables),
+##                            callNextMethod()))
+##           })
+setMethod("ensDbColumn", "UniprotDbFilter",
+          function(object, db, with.tables = character(), ...) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'UniprotdbFilter' can not",
                        " be used.")
-              return(paste(column(object, db, with.tables = with.tables),
-                           callNextMethod()))
+              callNextMethod()
+              ## return(unlist(prefixColumns(db, column(object),
+              ##                             with.tables = with.tables),
+              ##               use.names = FALSE))
           })
-setMethod("column", signature(object = "UniprotdbFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
+setMethod("ensDbQuery", "UniprotDbFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'UniprotdbFilter' can not",
+                       " protein annotations! A 'ProteinidFilter' can not",
                        " be used.")
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables = with.tables),
-                            use.names = FALSE))
+              return(.queryForEnsDbWithTables(object, db, with.tables))
           })
 
 ##***********************************************************************
@@ -1352,48 +1403,59 @@ setMethod("column", signature(object = "UniprotdbFilter", db = "EnsDb",
 ##' column,UniprotmappingtypeFilter,EnsDb,missing-method
 ##' column,UniprotmappingtypeFilter,EnsDb,character-method
 ##' @rdname ProteinFilters
-setMethod("where", signature(object = "UniprotmappingtypeFilter",
-                             db = "missing",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return(paste(column(object), callNextMethod()))
-          })
-##' @rdname ProteinFilters
-setMethod("column", signature(object = "UniprotmappingtypeFilter",
-                              db = "missing",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...){
-              return("uniprot_mapping_type")
-          })
-setMethod("where", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
-                             with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(where(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("column", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
-                              with.tables = "missing"),
-          function(object, db, with.tables, ...) {
-              return(column(object, db, with.tables = names(listTables(db))))
-          })
-setMethod("where", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
-                             with.tables = "character"),
-          function(object, db, with.tables, ...){
+## setMethod("where", signature(object = "UniprotmappingtypeFilter",
+##                              db = "missing",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return(paste(column(object), callNextMethod()))
+##           })
+## ##' @rdname ProteinFilters
+## setMethod("column", signature(object = "UniprotmappingtypeFilter",
+##                               db = "missing",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...){
+##               return("uniprot_mapping_type")
+##           })
+## setMethod("where", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+##                              with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(where(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("column", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+##                               with.tables = "missing"),
+##           function(object, db, with.tables, ...) {
+##               return(column(object, db, with.tables = names(listTables(db))))
+##           })
+## setMethod("where", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
+##                              with.tables = "character"),
+##           function(object, db, with.tables, ...){
+##               if (!hasProteinData(db))
+##                   stop("The 'EnsDb' database used does not provide",
+##                        " protein annotations! A 'UniprotmappingtypeFilter' ",
+##                        "can not be used.")
+##               return(paste(ensDbColumn(object, db, with.tables = with.tables),
+##                            callNextMethod()))
+##           })
+setMethod("ensDbColumn", "UniprotMappingTypeFilter",
+          function(object, db, with.tables = character(), ...) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'UniprotmappingtypeFilter' ",
+                       " protein annotations! A 'UniprotMappingTypeFilter' ",
                        "can not be used.")
-              return(paste(column(object, db, with.tables = with.tables),
-                           callNextMethod()))
+              callNextMethod()
+              ## return(unlist(prefixColumns(db, column(object),
+              ##                             with.tables = with.tables),
+              ##               use.names = FALSE))
           })
-setMethod("column", signature(object = "UniprotmappingtypeFilter", db = "EnsDb",
-                              with.tables = "character"),
-          function(object, db, with.tables, ...) {
+setMethod("ensDbQuery", "UniprotMappingTypeFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  return(callNextMethod())
               if (!hasProteinData(db))
                   stop("The 'EnsDb' database used does not provide",
-                       " protein annotations! A 'UniprotmappingtypeFilter' ",
-                       "can not be used.")
-              return(unlist(prefixColumns(db, column(object),
-                                          with.tables = with.tables),
-                            use.names = FALSE))
+                       " protein annotations! A 'UniprotMappingTypeFilter' can not",
+                       " be used.")
+              return(.queryForEnsDbWithTables(object, db, with.tables))
           })
-
