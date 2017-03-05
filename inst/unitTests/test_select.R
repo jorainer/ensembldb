@@ -1,4 +1,4 @@
-####============================================================
+###============================================================
 ##  test cases for AnnotationDbi methods.
 ##
 ####------------------------------------------------------------
@@ -22,8 +22,9 @@ test_mapper <- function(){
 
     Test <- ensembldb:::ensDbColumnForColumn(edb, c("GENEID", "TXID"))
     checkEquals(unname(Test), c("gene_id", "tx_id"))
-
-    Test <- ensembldb:::ensDbColumnForColumn(edb, c("GENEID", "TXID", "bla"))
+    suppressWarnings(
+        Test <- ensembldb:::ensDbColumnForColumn(edb, c("GENEID", "TXID", "bla"))
+    )
     checkEquals(unname(Test), c("gene_id", "tx_id"))
 }
 
@@ -32,11 +33,13 @@ test_keys <- function(){
     system.time(
         ids <- keys(edb, "GENEID")
     )
+    checkTrue(length(ids) > 0)
     checkEquals(length(ids), length(unique(ids)))
     ## get all tx ids
     system.time(
         ids <- keys(edb, "TXID")
     )
+    checkTrue(length(ids) > 0)
     ## Get the TXNAME...
     nms <- keys(edb, "TXNAME")
     checkEquals(nms, ids)
@@ -45,21 +48,25 @@ test_keys <- function(){
     system.time(
         ids <- keys(edb, "GENENAME")
     )
+    checkTrue(length(ids) > 0)
     checkEquals(length(ids), length(unique(ids)))
     ## get all seq names
     system.time(
         ids <- keys(edb, "SEQNAME")
     )
+    checkTrue(length(ids) > 0)
     checkEquals(length(ids), length(unique(ids)))
     ## get all seq strands
     system.time(
         ids <- keys(edb, "SEQSTRAND")
     )
+    checkTrue(length(ids) > 0)
     checkEquals(length(ids), length(unique(ids)))
     ## get all gene biotypes
     system.time(
         ids <- keys(edb, "GENEBIOTYPE")
     )
+    checkTrue(length(ids) > 0)
     checkEquals(ids, listGenebiotypes(edb))
     ## Now with protein data.
     if (hasProteinData(edb)) {
@@ -107,8 +114,8 @@ test_select <- function() {
     tmp <- select(edb, keys = GenenameFilter("BCL6"))
     .comprehensiveCheckForGene(tmp)
 
-    ## Provide list of GenenameFilter and TxbiotypeFilter.
-    Test2 <- select(edb, keys=list(gf, TxbiotypeFilter("protein_coding")))
+    ## Provide list of GenenameFilter and TxBiotypeFilter.
+    Test2 <- select(edb, keys=list(gf, TxBiotypeFilter("protein_coding")))
     checkEquals(Test$EXONID[Test$TXBIOTYPE == "protein_coding"], Test2$EXONID)
     ## Choose selected columns.
     Test3 <- select(edb, keys=gf, columns=c("GENEID", "GENENAME", "SEQNAME"))
@@ -128,14 +135,14 @@ test_select <- function() {
     Test <- select(edb, keys="lincRNA", columns=c("GENEID", "GENEBIOTYPE",
                                                   "GENENAME"),
                    keytype="GENEBIOTYPE")
-    Test2 <- select(edb, keys=GenebiotypeFilter("lincRNA"),
+    Test2 <- select(edb, keys=GeneBiotypeFilter("lincRNA"),
                     columns=c("GENEID", "GENEBIOTYPE", "GENENAME"))
     checkEquals(Test[, colnames(Test2)], Test2)
     ## All on chromosome 21
     Test <- select(edb, keys="21", columns=c("GENEID", "GENEBIOTYPE",
                                              "GENENAME"),
                    keytype="SEQNAME")
-    Test2 <- select(edb, keys=SeqnameFilter("21"),
+    Test2 <- select(edb, keys=SeqNameFilter("21"),
                     columns=c("GENEID", "GENEBIOTYPE", "GENENAME"))
     checkEquals(Test[, colnames(Test2)], Test2)
     ## What if we can't find it?
@@ -148,7 +155,7 @@ test_select <- function() {
                    keytype="TXNAME")
     checkEquals(Test$TXNAME, "ENST00000000233")
     ## Check what happens if we just add TXNAME and also TXID.
-    Test2 <- select(edb, keys=list(gf, TxbiotypeFilter("protein_coding")),
+    Test2 <- select(edb, keys=list(gf, TxBiotypeFilter("protein_coding")),
                     columns=c("TXID", "TXNAME", "GENENAME", "GENEID"))
     checkEquals(colnames(Test2), c("TXID", "TXNAME", "GENENAME", "GENEID",
                                    "TXBIOTYPE"))
@@ -164,7 +171,7 @@ test_select <- function() {
                       columns = c("TXID", "TXCDSSEQSTART", "TXBIOTYPE",
                                   "PROTEINID", "UNIPROTID", "PROTEINDOMAINID"))
         checkEquals(sort(pids), sort(unique(res$PROTEINID)))
-        res_2 <- select(edb, keys = ProteinidFilter(pids),
+        res_2 <- select(edb, keys = ProteinIdFilter(pids),
                       columns = c("TXID", "TXCDSSEQSTART", "TXBIOTYPE",
                                   "PROTEINID", "UNIPROTID", "PROTEINDOMAINID"))
         checkEquals(sort(pids), sort(unique(res_2$PROTEINID)))
@@ -296,12 +303,12 @@ test_mapIds <- function(){
                    column="TXID")
 
     ## Submit Filter:
-    Test <- mapIds(edb, keys=SeqnameFilter("Y"), column="GENEID",
+    Test <- mapIds(edb, keys=SeqNameFilter("Y"), column="GENEID",
                    multiVals="list")
     TestS <- select(edb, keys=Test[[1]], columns="SEQNAME", keytype="GENEID")
     checkEquals(unique(TestS$SEQNAME), "Y")
     ## Submit 2 filter.
-    Test <- mapIds(edb, keys=list(SeqnameFilter("Y"), SeqstrandFilter("-")),
+    Test <- mapIds(edb, keys=list(SeqNameFilter("Y"), SeqStrandFilter("-")),
                    multiVals="list",
                    column="GENEID")
     TestS <- select(edb, keys=Test[[1]], keytype="GENEID",
@@ -336,7 +343,7 @@ test_mapIds <- function(){
         res <- split(res$uniprot_id, res$protein_id)
         checkEquals(mapd, res[names(mapd)])
         ## Just to ensure:
-        tmp <- proteins(edb, filter = ProteinidFilter(pids),
+        tmp <- proteins(edb, filter = ProteinIdFilter(pids),
                         columns = c("uniprot_id", "protein_id"))
         upids <- tmp$uniprot[!is.na(tmp$uniprot)]
         checkTrue(all(res$uniprot_id %in% upids))
@@ -358,7 +365,7 @@ test_select_sorted <- function() {
 
     ## Using two filters;
     res <- select(edb, keys = list(GenenameFilter(ks),
-                                   TxbiotypeFilter("nonsense_mediated_decay")))
+                                   TxBiotypeFilter("nonsense_mediated_decay")))
     ## We don't expect same sorting here!
     checkTrue(!all(unique(res$GENENAME) == ks[ks %in% unique(res$GENENAME)]))
 
@@ -371,7 +378,7 @@ test_select_sorted <- function() {
     res <- select(edb, keys = ks, keytype = "TXBIOTYPE",
                   columns = c("GENENAME", "TXBIOTYPE"))
     checkEquals(unique(res$TXBIOTYPE), ks)
-    res <- select(edb, keys = TxbiotypeFilter(ks),
+    res <- select(edb, keys = TxBiotypeFilter(ks),
                   keytype = "TXBIOTYPE", columns = c("GENENAME", "TXBIOTYPE"))
     checkEquals(unique(res$TXBIOTYPE), ks)
 }
@@ -393,8 +400,8 @@ test_select_symbol <- function() {
     checkEquals(res$SYMBOL, ks)
 
     ## Can I ask for SYMBOL?
-    res <- select(edb, keys = list(SeqnameFilter("Y"),
-                                   GenebiotypeFilter("lincRNA")),
+    res <- select(edb, keys = list(SeqNameFilter("Y"),
+                                   GeneBiotypeFilter("lincRNA")),
                   columns = c("GENEID", "SYMBOL"))
     checkEquals(colnames(res), c("GENEID", "SYMBOL", "SEQNAME", "GENEBIOTYPE"))
 }
@@ -450,8 +457,8 @@ test_filterForKeytype <- function() {
     checkTrue(is(res, "SymbolFilter"))
     if (hasProteinData(edb)) {
         res <- ensembldb:::filterForKeytype("PROTEINDOMAINID", edb)
-        checkTrue(is(res, "ProtdomidFilter"))
+        checkTrue(is(res, "ProtDomIdFilter"))
     }
     res <- ensembldb:::filterForKeytype("TXID")
-    checkTrue(is(res, "TxidFilter"))
+    checkTrue(is(res, "TxIdFilter"))
 }

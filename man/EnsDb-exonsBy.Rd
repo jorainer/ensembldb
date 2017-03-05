@@ -360,7 +360,7 @@
   Ensembl defines genes not only on standard chromosomes, but also on
   patched chromosomes and chromosome variants. Thus it might be
   advisable to restrict the queries to just those chromosomes of
-  interest (e.g. by specifying a \code{SeqnameFilter(c(1:22, "X", "Y"))}).
+  interest (e.g. by specifying a \code{SeqNameFilter(c(1:22, "X", "Y"))}).
   In addition, also so called LRG genes (Locus Reference Genomic) are defined in
   Ensembl. Their gene id starts with LRG instead of ENS for Ensembl
   genes, thus, a filter can be applied to specifically select those
@@ -440,12 +440,12 @@ edb <- EnsDb.Hsapiens.v75
 ######   genes
 ##
 ## get all genes endcoded on chromosome Y
-AllY <- genes(edb, filter=SeqnameFilter("Y"))
+AllY <- genes(edb, filter=SeqNameFilter("Y"))
 AllY
 
 ## return result as DataFrame.
 AllY.granges <- genes(edb,
-                      filter=SeqnameFilter("Y"),
+                      filter=SeqNameFilter("Y"),
                       return.type="DataFrame")
 AllY.granges
 
@@ -453,7 +453,7 @@ AllY.granges
 ## coordinates, sort by chrom start of transcripts and return as
 ## GRanges.
 AllY.granges.tx <- genes(edb,
-                         filter=SeqnameFilter("Y"),
+                         filter=SeqNameFilter("Y"),
                          columns=c("gene_id", "seq_name",
                              "seq_strand", "tx_id", "tx_biotype",
                              "tx_seq_start", "tx_seq_end"),
@@ -466,14 +466,14 @@ AllY.granges.tx
 ##
 ## get all transcripts of a gene
 Tx <- transcripts(edb,
-                  filter=GeneidFilter("ENSG00000184895"),
+                  filter=GeneIdFilter("ENSG00000184895"),
                   order.by="tx_seq_start")
 Tx
 
 ## get all transcripts of two genes along with some information on the
 ## gene and transcript
 Tx <- transcripts(edb,
-                  filter=GeneidFilter(c("ENSG00000184895",
+                  filter=GeneIdFilter(c("ENSG00000184895",
                       "ENSG00000092377")),
                       columns=c("gene_id", "gene_seq_start",
                           "gene_seq_end", "gene_biotype", "tx_biotype"))
@@ -482,14 +482,14 @@ Tx
 ######   promoters
 ##
 ## get the bona-fide promoters (2k up- to 200nt downstream of TSS)
-promoters(edb, filter=GeneidFilter(c("ENSG00000184895",
+promoters(edb, filter=GeneIdFilter(c("ENSG00000184895",
                                      "ENSG00000092377")))
 
 ######   exons
 ##
 ## get all exons of the provided genes
 Exon <- exons(edb,
-              filter=GeneidFilter(c("ENSG00000184895",
+              filter=GeneIdFilter(c("ENSG00000184895",
                   "ENSG00000092377")),
               order.by="exon_seq_start",
               columns=c( "gene_id", "gene_seq_start",
@@ -502,26 +502,26 @@ Exon
 ##
 ## get all exons for transcripts encoded on chromosomes X and Y.
 ETx <- exonsBy(edb, by="tx",
-               filter=SeqnameFilter(c("X", "Y")))
+               filter=SeqNameFilter(c("X", "Y")))
 ETx
 ## get all exons for genes encoded on chromosome 1 to 22, X and Y and
 ## include additional annotation columns in the result
 EGenes <- exonsBy(edb, by="gene",
-                  filter=SeqnameFilter(c("X", "Y")),
+                  filter=SeqNameFilter(c("X", "Y")),
                   columns=c("gene_biotype", "gene_name"))
 EGenes
 
 ## Note that this might also contain "LRG" genes.
 length(grep(names(EGenes), pattern="LRG"))
 
-## to fetch just Ensemblgenes, use an GeneidFilter with value
+## to fetch just Ensemblgenes, use an GeneIdFilter with value
 ## "ENS%" and condition "like"
 
 
 #####    transcriptsBy
 ##
 TGenes <- transcriptsBy(edb, by="gene",
-                        filter=SeqnameFilter(c("X", "Y")))
+                        filter=SeqNameFilter(c("X", "Y")))
 TGenes
 
 ## convert this to a SAF formatted data.frame that can be used by the
@@ -549,14 +549,14 @@ txs
 ## Get the coding region for all transcripts on chromosome Y.
 ## Specifying also additional annotation columns (in addition to the default
 ## exon_id and exon_rank).
-cds <- cdsBy(edb, by="tx", filter=SeqnameFilter("Y"),
+cds <- cdsBy(edb, by="tx", filter=SeqNameFilter("Y"),
              columns=c("tx_biotype", "gene_name"))
 
 ####    the 5' untranslated regions:
-fUTRs <- fiveUTRsByTranscript(edb, filter=SeqnameFilter("Y"))
+fUTRs <- fiveUTRsByTranscript(edb, filter=SeqNameFilter("Y"))
 
 ####    the 3' untranslated regions with additional column gene_name.
-tUTRs <- threeUTRsByTranscript(edb, filter=SeqnameFilter("Y"),
+tUTRs <- threeUTRsByTranscript(edb, filter=SeqNameFilter("Y"),
                                columns="gene_name")
 
 

@@ -88,8 +88,8 @@ notrun_test_ensdbFromGFF <- function(){
     ## theGff <- import(gff, format="gff3")
 
 
-    ## transcripts(egtf, filter=TxidFilter(diffs[1]))
-    ## transcripts(egff, filter=TxidFilter(diffs[1]))
+    ## transcripts(egtf, filter=TxIdFilter(diffs[1]))
+    ## transcripts(egff, filter=TxIdFilter(diffs[1]))
 
 
     ## VERSION 81

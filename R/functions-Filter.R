@@ -32,6 +32,20 @@
     prot_dom_id = "protein_domain_id"
 )
 
+.supportedFilters <- function(x) {
+    flts <- c(
+        "EntrezFilter", "GeneBiotypeFilter", "GeneIdFilter", "GenenameFilter",
+        "SymbolFilter", "SeqNameFilter", "SeqStrandFilter", "GeneStartFilter",
+        "GeneEndFilter", "TxIdFilter", "TxBiotypeFilter", "TxNameFilter",
+        "TxStartFilter", "TxEndFilter", "ExonIdFilter", "ExonRankFilter",
+        "ExonStartFilter", "ExonEndFilter", "GRangesFilter"
+    )
+    if (hasProteinData(x))
+        flts <- c(flts, "ProteinIdFilter", "UniprotFilter", "UniprotDbFilter",
+                  "UniprotMappingTypeFilter", "ProtDomIdFilter")
+    return(sort(flts))
+}
+
 #' Utility function to map from the default AnnotationFilters fields to the
 #' database columns used in ensembldb.
 #'
@@ -39,6 +53,8 @@
 #' @return The column name in the EnsDb database.
 #' @noRd
 .fieldInEnsDb <- function(x) {
+    if (length(x) == 0 || missing(x))
+        stop("Error in .fieldInEnsDb: got empty input argument!")
     cn <- .ENSDB_FIELDS[x]
     if (is.na(cn))
         stop("Unable to map field '", x, "'!")
@@ -68,7 +84,6 @@
     return(cond)
 }
 
-#' Or do I just have to 
 #' Single quote character values, paste multiple values and enclose in quotes.
 #'
 #' @param x An \code{AnnotationFilter} object.
@@ -98,6 +113,7 @@
 
 #' This is a slightly more sophisticated function that does also prefix the
 #' columns.
+#' @noRd
 .queryForEnsDbWithTables <- function(x, db, tables = character()) {
     clmn <- .fieldInEnsDb(x@field)
     if (!missing(db)) {

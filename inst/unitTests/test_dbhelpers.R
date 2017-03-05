@@ -319,11 +319,11 @@ test_joinQueryOnTables2_joinQueryOnColumns2 <- function() {
 ## protein_domain that we don't miss any values.
 test_query_validity <- function() {
     ## Check RNA/DNA tables; shouldn't be a problem there, though.
-    Ygns <- genes(edb, filter = SeqnameFilter("Y"), return.type = "data.frame")
-    Ytxs <- transcripts(edb, filter = SeqnameFilter("Y"),
+    Ygns <- genes(edb, filter = SeqNameFilter("Y"), return.type = "data.frame")
+    Ytxs <- transcripts(edb, filter = SeqNameFilter("Y"),
                         return.type = "data.frame",
                         columns = c("gene_id", "tx_id", "tx_biotype"))
-    Yexns <- exons(edb, filter = SeqnameFilter("Y"), return.type = "data.frame",
+    Yexns <- exons(edb, filter = SeqNameFilter("Y"), return.type = "data.frame",
                    columns = c("exon_id", "gene_id"))
     checkTrue(all(unique(Ygns$gene_id) %in% unique(Yexns$gene_id)))
     checkTrue(all(unique(Ygns$gene_id) %in% unique(Ytxs$gene_id)))
@@ -343,7 +343,7 @@ test_query_validity <- function() {
         checkTrue(all(unique(Ytxs[Ytxs$tx_biotype == "protein_coding", "tx_id"])
                       %in% unique(gns_f$tx_id)))
         ## Now test the "real" query:
-        Ygns_2 <- genes(edb, filter = SeqnameFilter("Y"),
+        Ygns_2 <- genes(edb, filter = SeqNameFilter("Y"),
                         return.type = "data.frame",
                         columns = c("gene_id", "tx_id", "tx_biotype",
                                     "protein_id"))

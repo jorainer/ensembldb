@@ -98,18 +98,18 @@ which entries should be fetched from the database. The complete list of filters,
 which can be used individually or can be combined, is shown below (in
 alphabetical order):
 
-+ =ExonidFilter=: allows to filter the result based on the (Ensembl) exon
++ =ExonIdFilter=: allows to filter the result based on the (Ensembl) exon
   identifiers.
-+ =ExonrankFilter=: filter results on the rank (index) of an exon within the
++ =ExonRankFilter=: filter results on the rank (index) of an exon within the
   transcript model. Exons are always numbered from 5' to 3' end of the
   transcript, thus, also on the reverse strand, the exon 1 is the most 5' exon
   of the transcript.
-+ =EntrezidFilter=: allows to filter results based on NCBI Entrezgene
++ =EntrezFilter=: allows to filter results based on NCBI Entrezgene
   identifiers of the genes.
-+ =GenebiotypeFilter=: allows to filter for the gene biotypes defined in the
++ =GeneBiotypeFilter=: allows to filter for the gene biotypes defined in the
   Ensembl database; use the =listGenebiotypes= method to list all available
   biotypes.
-+ =GeneidFilter=: allows to filter based on the Ensembl gene IDs.
++ =GeneIdFilter=: allows to filter based on the Ensembl gene IDs.
 + =GenenameFilter=: allows to filter based on the names (symbols) of the genes.
 + =SymbolFilter=: allows to filter on gene symbols; note that no database columns
   /symbol/ is available in an =EnsDb= database and hence the gene name is used for
@@ -121,19 +121,19 @@ alphabetical order):
   or =exons=) the start and end coordinates of either the genes, transcripts or
   exons are used for the filter. For methods =exonsBy=, =cdsBy= and =txBy= the
   coordinates of =by= are used.
-+ =SeqendFilter=: filter based on the chromosomal end coordinate of the exons,
++ =SeqEndFilter=: filter based on the chromosomal end coordinate of the exons,
   transcripts or genes (correspondingly set =feature = "exon"=, =feature = "tx"= or
   =feature = "gene"=).
-+ =SeqnameFilter=: filter by the name of the chromosomes the genes are encoded
++ =SeqNameFilter=: filter by the name of the chromosomes the genes are encoded
   on.
-+ =SeqstartFilter=: filter based on the chromosomal start coordinates of the
++ =SeqStartFilter=: filter based on the chromosomal start coordinates of the
   exons, transcripts or genes (correspondingly set =feature = "exon"=,
   =feature = "tx"= or =feature = "gene"=).
-+ =SeqstrandFilter=: filter for the chromosome strand on which the genes are
++ =SeqStrandFilter=: filter for the chromosome strand on which the genes are
   encoded.
-+ =TxbiotypeFilter=: filter on the transcript biotype defined in Ensembl; use
++ =TxBiotypeFilter=: filter on the transcript biotype defined in Ensembl; use
   the =listTxbiotypes= method to list all available biotypes.
-+ =TxidFilter=: filter on the Ensembl transcript identifiers.
++ =TxIdFilter=: filter on the Ensembl transcript identifiers.
 + =OnlyCodingTxFilter=: special type of filter that takes no input and allows to
   query for all transcripts with a defined coding sequence (hence being protein
   coding).
@@ -143,20 +143,20 @@ filters are available (Note however that these can only be used on =EnsDb=
 databases that provide such annotations, i.e. for which a call to =hasProteinData=
 returns =TRUE=):
 
-+ =ProteinidFilter=: filter by Ensembl protein ID filters.
-+ =UniprotidFilter=: filter by the Uniprot ID.
++ =ProteinIdFilter=: filter by Ensembl protein ID filters.
++ =UniprotFilter=: filter by the Uniprot ID.
 + =ProtdomidFilter=: filter by the protein domain ID.
 
 Each of the filter classes can take a single value or a vector of values (with
-the exception of the =SeqendFilter= and =SeqstartFilter=) for comparison. In
+the exception of the =SeqEndFilter= and =SeqStartFilter=) for comparison. In
 addition, it is possible to specify the /condition/ for the filter,
 e.g. setting =condition= to = to retrieve all entries matching the filter value,
 to != to negate the filter or setting =condition = "like"= to allow
-partial matching. The =condition= parameter for =SeqendFilter= and
-=SeqendFilter= can take the values = , >, >=, < and <= (since these
+partial matching. The =condition= parameter for =SeqEndFilter= and
+=SeqEndFilter= can take the values = , >, >=, < and <= (since these
 filters base on numeric values).
 
-# The =SeqnameFilter= and =GRangesFilter= support both UCSC and Ensembl chromosome
+# The =SeqNameFilter= and =GRangesFilter= support both UCSC and Ensembl chromosome
 # names (e.g. ="chrX"= for UCSC and ="X"= for Ensembl), internally, UCSC
 # chromosome names are mapped to Ensembl names. By default, all functions to
 # retrieve data from the database return Ensembl chromosome names, but by setting
@@ -217,7 +217,7 @@ results instead of the default =GRanges=.
 #+BEGIN_SRC R
   Tx <- transcripts(edb,
                     columns = c(listColumns(edb , "tx"), "gene_name"),
-                    filter = TxbiotypeFilter("nonsense_mediated_decay"),
+                    filter = TxBiotypeFilter("nonsense_mediated_decay"),
                     return.type = "DataFrame")
   nrow(Tx)
   Tx
@@ -228,7 +228,7 @@ region. In the example below we extract the CDS for all transcripts encoded on
 chromosome Y.
 
 #+BEGIN_SRC R
-  yCds <- cdsBy(edb, filter = SeqnameFilter("Y"))
+  yCds <- cdsBy(edb, filter = SeqNameFilter("Y"))
   yCds
 #+END_SRC
 
@@ -287,7 +287,7 @@ To get an overview of allowed/available gene and transcript biotype the
 functions =listGenebiotypes= and =listTxbiotypes= can be used.
 
 #+BEGIN_SRC R
-  ## Get all gene biotypes from the database. The GenebiotypeFilter
+  ## Get all gene biotypes from the database. The GeneBiotypeFilter
   ## allows to filter on these values.
   listGenebiotypes(edb)
 
@@ -321,14 +321,14 @@ these chromosomes.
   ## determine the average length of snRNA, snoRNA and rRNA genes encoded on
   ## chromosomes X and Y.
   mean(lengthOf(edb, of = "tx",
-                filter = list(GenebiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
-                              SeqnameFilter(c("X", "Y")))))
+                filter = list(GeneBiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
+                              SeqNameFilter(c("X", "Y")))))
 
   ## determine the average length of protein coding genes encoded on the same
   ## chromosomes.
   mean(lengthOf(edb, of = "tx",
-                filter = list(GenebiotypeFilter("protein_coding"),
-                              SeqnameFilter(c("X", "Y")))))
+                filter = list(GeneBiotypeFilter("protein_coding"),
+                              SeqNameFilter(c("X", "Y")))))
 #+END_SRC
 
 Not unexpectedly, transcripts of protein coding genes are longer than those of
@@ -341,8 +341,8 @@ database.
   ## Extract all exons 1 and (if present) 2 for all genes encoded on the
   ## Y chromosome
   exons(edb, columns = c("tx_id", "exon_idx"),
-        filter = list(SeqnameFilter("Y"),
-                      ExonrankFilter(3, condition = "<")))
+        filter = list(SeqNameFilter("Y"),
+                      ExonRankFilter(3, condition = "<")))
 #+END_SRC
 
 * Extracting gene/transcript/exon models for RNASeq feature counting
@@ -363,7 +363,7 @@ the database.
 
 #+BEGIN_SRC R
   TxByGns <- transcriptsBy(edb, by = "gene",
-                           filter = list(SeqnameFilter(c("X", "Y")))
+                           filter = list(SeqNameFilter(c("X", "Y")))
                            )
   TxByGns
 #+END_SRC
@@ -373,7 +373,7 @@ Since Ensembl contains also definitions of genes that are on chromosome variants
 gene models should be returned.
 
 In a real use case, we might thus want to retrieve all genes encoded on the
-/standard/ chromosomes. In addition it is advisable to use a =GeneidFilter= to
+/standard/ chromosomes. In addition it is advisable to use a =GeneIdFilter= to
 restrict to Ensembl genes only, as also /LRG/ (Locus Reference Genomic)
 genes[fn:3] are defined in the database, which are partially redundant with
 Ensembl genes.
@@ -382,8 +382,8 @@ Ensembl genes.
   ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
   ## Note: want to get rid of the "LRG" genes!!!
   EnsGenes <- exonsBy(edb, by = "gene",
-                      filter = list(SeqnameFilter(c(1:22, "X", "Y")),
-                                    GeneidFilter("ENSG%", "like")))
+                      filter = list(SeqNameFilter(c(1:22, "X", "Y")),
+                                    GeneIdFilter("ENSG%", "like")))
 #+END_SRC
 
 The code above returns a =GRangesList= that can be used directly as an input for
@@ -411,8 +411,8 @@ parts which can be used in the =DEXSeq= package.
 #+BEGIN_SRC R :ravel eval=FALSE
   ## Create a GRanges of non-overlapping exon parts.
   DJE <- disjointExons(edb,
-                       filter = list(SeqnameFilter(c(1:22, "X", "Y")),
-                                     GeneidFilter("ENSG%", "like")))
+                       filter = list(SeqNameFilter(c(1:22, "X", "Y")),
+                                     GeneIdFilter("ENSG%", "like")))
 
 #+END_SRC
 
@@ -467,7 +467,7 @@ the =EnsDb= object, eventually using a filter to restrict the query.
 
 #+BEGIN_SRC R :ravel eval=FALSE
   ## get all exons of all transcripts encoded on chromosome Y
-  yTx <- exonsBy(edb, filter = SeqnameFilter("Y"))
+  yTx <- exonsBy(edb, filter = SeqNameFilter("Y"))
 
   ## Retrieve the sequences for these transcripts from the FaFile.
   library(GenomicFeatures)
@@ -475,11 +475,11 @@ the =EnsDb= object, eventually using a filter to restrict the query.
   yTxSeqs
 
   ## Extract the sequences of all transcripts encoded on chromosome Y.
-  yTx <- extractTranscriptSeqs(Dna, edb, filter = SeqnameFilter("Y"))
+  yTx <- extractTranscriptSeqs(Dna, edb, filter = SeqNameFilter("Y"))
 
   ## Along these lines, we could use the method also to retrieve the coding sequence
   ## of all transcripts on the Y chromosome.
-  cdsY <- cdsBy(edb, filter = SeqnameFilter("Y"))
+  cdsY <- cdsBy(edb, filter = SeqNameFilter("Y"))
   extractTranscriptSeqs(Dna, cdsY)
 
 #+END_SRC
@@ -505,8 +505,8 @@ In the example below we change the seqnames style to UCSC.
   ## Change the seqlevels style form Ensembl (default) to UCSC:
   seqlevelsStyle(edb) <- "UCSC"
 
-  ## Now we can use UCSC style seqnames in SeqnameFilters or GRangesFilter:
-  genesY <- genes(edb, filter = SeqnameFilter("chrY"))
+  ## Now we can use UCSC style seqnames in SeqNameFilters or GRangesFilter:
+  genesY <- genes(edb, filter = SeqNameFilter("chrY"))
   ## The seqlevels of the returned GRanges are also in UCSC style
   seqlevels(genesY)
 #+END_SRC
@@ -555,13 +555,13 @@ of the genome release.
   ## Although differently named, both represent genome build GRCh37.
 
   ## Extract the full transcript sequences.
-  yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx", filter = SeqnameFilter("chrY")))
+  yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx", filter = SeqNameFilter("chrY")))
 
   yTxSeqs
 
   ## Extract just the CDS
-  Test <- cdsBy(edb, "tx", filter = SeqnameFilter("chrY"))
-  yTxCds <- extractTranscriptSeqs(bsg, cdsBy(edb, "tx", filter = SeqnameFilter("chrY")))
+  Test <- cdsBy(edb, "tx", filter = SeqNameFilter("chrY"))
+  yTxCds <- extractTranscriptSeqs(bsg, cdsBy(edb, "tx", filter = SeqNameFilter("chrY")))
   yTxCds
 
 #+END_SRC
@@ -625,7 +625,7 @@ depending on that, maps Ensembl chromosome names to UCSC chromosome names.
 Above we had to change the option =ucscChromosomeNames= to =FALSE= in order to
 use it with non-UCSC chromosome names. Alternatively, we could however also
 change the =seqnamesStyle= of the =EnsDb= object to =UCSC=. Note that we have to
-use now also chromosome names in the /UCSC style/ in the =SeqnameFilter=
+use now also chromosome names in the /UCSC style/ in the =SeqNameFilter=
 (i.e. "chrY" instead of =Y=).
 
 #+BEGIN_SRC R :ravel message=FALSE
@@ -647,10 +647,10 @@ different gene region tracks, one for protein coding genes and one for lincRNAs.
 #+BEGIN_SRC R :ravel gviz-separate-tracks, message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
   protCod <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
                                        start = 20400000, end = 21400000,
-                                       filter = GenebiotypeFilter("protein_coding"))
+                                       filter = GeneBiotypeFilter("protein_coding"))
   lincs <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
                                      start = 20400000, end = 21400000,
-                                     filter = GenebiotypeFilter("lincRNA"))
+                                     filter = GeneBiotypeFilter("lincRNA"))
 
   plotTracks(list(gat, GeneRegionTrack(protCod, name = "protein coding"),
                   GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
@@ -694,7 +694,7 @@ X.
   length(gids)
 
   ## Get all gene names for genes encoded on chromosome Y.
-  gnames <- keys(edb, keytype = "GENENAME", filter = SeqnameFilter("Y"))
+  gnames <- keys(edb, keytype = "GENENAME", filter = SeqNameFilter("Y"))
   head(gnames)
 #+END_SRC
 
@@ -711,7 +711,7 @@ only the protein coding transcripts for these genes.
 
   ## Use the filtering system of ensembldb
   select(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
-                          TxbiotypeFilter("protein_coding")),
+                          TxBiotypeFilter("protein_coding")),
          columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
 #+END_SRC
 
@@ -729,7 +729,7 @@ example above.
 
   ## And, just like before, we can use filters to map only to protein coding transcripts.
   mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
-                          TxbiotypeFilter("protein_coding")), column = "TXID",
+                          TxBiotypeFilter("protein_coding")), column = "TXID",
          multiVals = "list")
 #+END_SRC
 
@@ -858,7 +858,7 @@ last we retrieve the sequences of all exons using the =getSeq= method.
   Dna <- getGenomeFaFile(edb)
   library(Rsamtools)
   ## We next retrieve the sequence of all exons on chromosome Y.
-  exons <- exons(edb, filter = SeqnameFilter("Y"))
+  exons <- exons(edb, filter = SeqNameFilter("Y"))
   exonSeq <- getSeq(Dna, exons)
 
   ## Alternatively, look up and retrieve the toplevel DNA sequence manually.
@@ -1058,27 +1058,6 @@ Start the server using =mysql.server start=.
 
 
 
-* Integration with =Organism.dplyr=
-
-To integrate =ensembldb= with =Organism.dplyr= we export database tables in an
-/un-normalized/ form so that it can be stored into a SQLite database for =dplyr=.
-
-* Use =filters= as they are used in =Organism.dplyr=
-
-i.e. dynamically create filters. Check if we could do that.
-
-#+BEGIN_SRC R
-  library(Organism.dplyr)
-  ## library(ensembldb)
-
-  Tx_idFilter(value = 3, condition = "==")
-  Tx_nameFilter(value = c("dfda", "sdfsd"))
-#+END_SRC
-
-Now, their filters are created /dynamically/, the first part of the name being the
-attribute (field) name followed by /Filter/. How could I use these? Problem comes
-since my attributes are not unique, i.e. present in one table only.
-
 
 * TODOs								   :noexport:
 
@@ -1180,7 +1159,7 @@ to the chromosome names. That way, =EnsDb= databases could directly work with
 
 + If something is queried from the database, the ="chr"= has to be stripped
   off. Here we have to deal with the filters:
-+ [X] =SeqnameFilter=: this now always returns stripped chr names, if =EnsDb= is
++ [X] =SeqNameFilter=: this now always returns stripped chr names, if =EnsDb= is
   also submitted.
 + [X] =GRangesFilter=
   and eventually using their =value= method:
@@ -1310,7 +1289,7 @@ Specifically, use =mapSeqlevels=
   - [X] =genes= uses =getWhat= and =seqinfo= (restricting to used seqnames).
   - [X] =transcripts= uses =getWhat= and =seqinfo= (restricting to used seqnames).
   - [X] =transcriptsBy= uses =getWhat= and =seqinfo= (restricting to used seqnames).
-  - [X] =SeqnameFilter=: always calling =formatSeqnamesForQuery=, does *not*
+  - [X] =SeqNameFilter=: always calling =formatSeqnamesForQuery=, does *not*
     allow =NA= values, thus doesn't work if the seqname can not be changed to
     Ensembl style.
   - [X] =GRangesFilter=: always calls =formatSeqnamesForQuery=.
@@ -1350,7 +1329,7 @@ Support multiple regions for a =GRangesFilter=.
   ## Convert variant coordinates to genomic coordinates
   tx <- "ENST00000070846"
   ## Get the cds
-  txCds <- cdsBy(edb, by="tx", filter=TxidFilter(tx))
+  txCds <- cdsBy(edb, by="tx", filter=TxIdFilter(tx))
 
   ## ENST00000070846:c.1643delG
   varPos <- 1643
@@ -1420,3 +1399,212 @@ I have to check that; eventually do that based on an user option, or even better
 on an internal property, which can be set by =returnFilterCols(edb) <- TRUE/FALSE=.
 
 Done in issue #6.
+
+** CANCELED Integration with =Organism.dplyr=
+   CLOSED: [2017-02-10 Fri 15:22]
+
+   - State "CANCELED"   from "TODO"       [2017-02-10 Fri 15:22] \\
+     No need to perform this - we have now a dedicated =AnnotationFilters= package for
+     this.
+ To integrate =ensembldb= with =Organism.dplyr= we export database tables in an
+ /un-normalized/ form so that it can be stored into a SQLite database for =dplyr=.
+** TODO Use =filters= as they are used in =Organism.dplyr=
+
+i.e. dynamically create filters. Check if we could do that.
+
+#+BEGIN_SRC R
+  library(Organism.dplyr)
+  ## library(ensembldb)
+
+  Tx_idFilter(value = 3, condition = "==")
+  Tx_nameFilter(value = c("dfda", "sdfsd"))
+#+END_SRC
+
+Now, their filters are created /dynamically/, the first part of the name being the
+attribute (field) name followed by /Filter/. How could I use these? Problem comes
+since my attributes are not unique, i.e. present in one table only.
+
+** TODO Implement a different type of filtering
+
+Implement a filtering that does allow calls like
+
+#+BEGIN_EXAMPLE
+  genes(filter(edb, GeneidFilter("a")))
+#+END_EXAMPLE
+
+This should also enable
+
+#+BEGIN_EXAMPLE
+  filter(edb, GeneidFilter(""a)) %>% genes()
+#+END_EXAMPLE
+
+** TODO Interpret R logical conditions
+
+That would be the coolest thing ever, if we could use filters like
+
+#+BEGIN_EXAMPLE
+  genes(edb, filter = gene_id == "BCL2")
+#+END_EXAMPLE
+
+For simple things that would work, but it would be quite tricky to use
+combinations, especially if they are enclosed in brackets!
+
+I could basically
++ split by =&= and =|=.
++ split each of the resulting elements by the supported conditions.
+
+Actually it would be better to replace first all =&= by =@&@=.
+
+#+BEGIN_SRC R
+  res <- quote(gene_id == "abc" & seq_name == "X")
+  class(res)
+
+  eval(res)
+
+  as.character(res)
+  ## Oh, interesting!
+
+  myCall <- quote((gene_id == "a" | gene_id == "b") & seq_name == "Y")
+
+  all.names(myCall)
+
+  res <- as.character(myCall)
+  res[1]
+  res[2]
+  res[3]
+  ## hm, further split the second?
+  as.character(parse(text = res[2]))  ## nope
+
+  as.character(substitute(res[2]))
+  class(substitute(gene_id == "a")) ## hm, similar to quote...
+
+  deparse(res[[2]])
+  res[2]
+  parse(text = res[2]) ## OK, have an expression now.
+
+  library(pryr)
+  as.character(ast(gene_id == "abc"))
+
+  as.symbol(res[2])
+
+  c2 <- quote(gene_id %in% c(2, 3, 5))
+
+  eval(parse(text = c2[3])) ## would have to eval c( and :
+
+  c3 <- quote(gene_id %in% c(2, 3, 5) & (bbla > 5 | g < 5) & ggg == 3)
+  res <- as.character(c3)
+
+  quote(eval(parse(text = res[2])))
+  parse(text = res[2])  ## It's an expression, need a call.
+  (parse(text = res[2]))
+
+  myE <- new.env()
+  library(AnnotationFilters)
+  myE$gene_id <- GeneIdFilter
+
+  eval(3 == 3, envir = myE)
+  myE$`==` <- function(x) {cat(x)}
+
+  ## START HERE
+  myL <- list()
+  myL$`==` <- function(x, y) cat(as.character(quote(x)), " - ", y, "\n")
+
+  myL$`&` <- function(a, b) {
+      cat("----- & ----\n")
+      cat("a: ", class(a), " ", a, "\n")
+      cat("b: ", class(b), " ", b, "\n")
+      cat("----- & DONE ----\n")
+  }
+
+  eval(quote(gene_id == 4), envir = myL)
+  eval(quote(4 & 2), envir = myL)
+
+  eval(quote(gene_id == 4 & 2), envir = myL)
+
+  eval(quote(gene_id == 4 & other_id == 3), envir = myL)
+
+  res <- quote(gene_id == "abc" & seq_name == "X")
+  eval(res, envir = myL)
+
+  secL <- list()
+  secL$`==` <- function(x, y) cat(as.character(quote(x)), "==", eval(y))
+  secL$`&` <- function(a, b) cat(a, "and", b)
+
+  eval(res, envir = secL)
+
+  thiL <- list()
+  thiL$`==` <- function(x, y) paste0(as.character(quote(x)), " == ", eval(y))
+  thiL$`==` <- function(x, y) {
+      ## xName <- substitute(x)
+      ## cat(length(xName))
+      ## cat(class(xName))
+      ## cat(xName)
+      ## if (!is.null(fun <- get0(x, inherits = FALSE)))
+      ##     cat("x", x , "found")
+      ## else
+      ##     cat("x", as.character(x), "not found")
+      ## if (exists(x))
+      do.call(x, list(y, "=="))
+      ## cond <- " == "
+      ## y <- paste0("'", eval(y), "'")
+      ## if (length(y) > 1) {
+      ##     y <- paste0("(", paste0(y, collapse = ","), ")")
+      ##     cond <- " in "
+      ## }
+      ## paste0(as.character(quote(x)), cond, y)
+  }
+  thiL$gene_id <- function(val, cond) {
+      val <- paste0("'", val, "'")
+      if (length(val) > 1) {
+          if (cond == "==")
+              cond <- "in"
+          val <- paste0("(", paste0(val, collapse = ","), ")")
+      }
+      return(paste("gene_id", cond, val))
+  }
+  thiL$seq_name <- function(val, cond) {
+      val <- paste0("'", val, "'")
+      if (length(val) > 1) {
+          if (cond == "==")
+              cond <- "in"
+          val <- paste0("(", paste0(val, collapse = ","), ")")
+      }
+      return(paste("seq_name", cond, val))
+  }
+  thiL$`&` <- function(a, b) paste0(a, " and ", b)
+  thiL$`>` <- function(a, b) {
+      ## That's the only way I can check that this exists and is valid! not that
+      ## we've got a variable defined somewhere.
+      tryCatch(
+          cat(is.function(a))
+	, error = function(e) {
+            stop("Nono, -", deparse(substitute(a)), "-", e)
+	})
+  }
+  ## Have to extract the stuff from the error string!!!
+
+  eval(quote(gene_id == "abc"), envir = thiL)
+
+  eval(quote(gene_id == "abc" & seq_name == 1:3), envir = thiL)
+
+  ## That's the point - how to catch if the key can not be found???
+  eval(quote(bla_id == "adf"), envir = thiL)
+  eval(quote(bla_id > 2), envir = thiL)
+  eval(quote(gene_id > 2), envir = thiL)
+
+  blu <- 3
+  eval(quote(blu > 2), envir = thiL)
+
+  tt <- function(a, b) {
+      cat(as.character(a))
+  }
+
+  tt(quote(gene_id), 4)
+#+END_SRC
+
+OK, it /should/ work: bind a function to e.g. =gene_id= that is supposed to return
+the result. Bind also a function to /==/, /&/ and all other possible operators, /&/
+and /|/ just concatenating the elements, but /==/ calling the function bound to the
+first passed argument. I can check for an existing column using the
+=exists("gene_id")= function.
+

@@ -17,11 +17,11 @@ dontrun_test_MySQL_vs_SQLite <- function() {
     library(microbenchmark)
     ## genes
     microbenchmark(genes(edb), genes(edb_mysql), times = 5)
-    microbenchmark(genes(edb, filter = GenebiotypeFilter("lincRNA")),
-                   genes(edb_mysql, filter = GenebiotypeFilter("lincRNA")),
+    microbenchmark(genes(edb, filter = GeneBiotypeFilter("lincRNA")),
+                   genes(edb_mysql, filter = GeneBiotypeFilter("lincRNA")),
                    times = 5)
-    microbenchmark(genes(edb, filter = SeqnameFilter(20:23)),
-                   genes(edb_mysql, filter = SeqnameFilter(20:23)),
+    microbenchmark(genes(edb, filter = SeqNameFilter(20:23)),
+                   genes(edb_mysql, filter = SeqNameFilter(20:23)),
                    times = 5)
     microbenchmark(genes(edb, columns = "tx_id"),
                    genes(edb_mysql, columns = "tx_id"),
@@ -47,15 +47,15 @@ dontrun_test_MySQL_vs_SQLite <- function() {
     microbenchmark(exonsBy(edb),
                    exonsBy(edb_mysql),
                    times = 5)
-    microbenchmark(exonsBy(edb, filter = SeqnameFilter("Y")),
-                   exonsBy(edb_mysql, filter = SeqnameFilter("Y")),
+    microbenchmark(exonsBy(edb, filter = SeqNameFilter("Y")),
+                   exonsBy(edb_mysql, filter = SeqNameFilter("Y")),
                    times = 5)
     ## cdsBy
     microbenchmark(cdsBy(edb), cdsBy(edb_mysql), times = 5)
     microbenchmark(cdsBy(edb, by = "gene"), cdsBy(edb_mysql, by = "gene"),
                    times = 5)
-    microbenchmark(cdsBy(edb, filter = SeqstrandFilter("-")),
-                   cdsBy(edb_mysql, filter = SeqstrandFilter("-")),
+    microbenchmark(cdsBy(edb, filter = SeqStrandFilter("-")),
+                   cdsBy(edb_mysql, filter = SeqStrandFilter("-")),
                    times = 5)
 
 }
