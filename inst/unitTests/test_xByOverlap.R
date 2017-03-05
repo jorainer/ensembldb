@@ -24,7 +24,7 @@ test_transcriptsByOverlaps <- function(){
 
     ## Combine with filter...
     gr2 <- GRanges(rep("Y", length(ir2)), ir2)
-    Test3 <- transcriptsByOverlaps(edb, gr2, filter=SeqstrandFilter("-"))
+    Test3 <- transcriptsByOverlaps(edb, gr2, filter=SeqStrandFilter("-"))
     checkEquals(names(Test), names(Test3))
 }
 
@@ -47,7 +47,7 @@ test_exonsByOverlaps <- function(){
 
     ## Combine with filter...
     gr2 <- GRanges(rep("Y", length(ir2)), ir2)
-    Test3 <- exonsByOverlaps(edb, gr2, filter=SeqstrandFilter("-"))
+    Test3 <- exonsByOverlaps(edb, gr2, filter=SeqStrandFilter("-"))
     checkEquals(names(Test), names(Test3))
 }
 
@@ -58,12 +58,13 @@ testing_txByOverlap <- function(){
                          condition="overlapping")
     grf2 <- GRangesFilter(GRanges(seqname="Y", IRanges(start=28740998, end=28741998)),
                           condition="overlapping")
-    transcripts(edb, filter=list(SeqnameFilter("Y"), GenebiotypeFilter("protein_coding")))
-    where(grf)
+    transcripts(edb, filter=list(SeqNameFilter("Y"), GeneBiotypeFilter("protein_coding")))
+    ensembldb:::ensDbQuery(grf)
     con <- dbconn(edb)
     library(RSQLite)
-    q <- paste0("select * from gene where (", where(grf, edb),
-                ") or (", where(grf2), ")")
+    q <- paste0("select * from gene where (",
+                ensembldb:::ensDbQuery(grf), ") or (",
+                ensembldb:::ensDbQuery(grf2), ")")
     Test <- dbGetQuery(con, q)
 
     ## Here we go...
@@ -71,15 +72,17 @@ testing_txByOverlap <- function(){
                   end=c(143300, 231800, 27636200))
     gr <- GRanges(seqname=rep("Y", length(ir)), ir)
     grf <- GRangesFilter(gr, condition="overlapping")
-    where(grf)
-    where(grf, edb)
+    ensembldb:::ensDbQuery(grf)
+    ensembldb:::ensDbQuery(grf, edb)
     Test <- transcripts(edb, filter=grf)
     ## ?? Nothing ??
     ir2 <- IRanges(start=c(2654890, 2709520, 28111770),
                    end=c(2654900, 2709550, 28111790))
-    grf2 <- GRangesFilter(GRanges(rep("Y", length(ir2)), ir2), condition="overlapping")
+    grf2 <- GRangesFilter(GRanges(rep("Y", length(ir2)), ir2),
+                          condition="overlapping")
     Test <- transcripts(edb, filter=grf2)
-    checkEquals(names(Test), c("ENST00000383070", "ENST00000250784", "ENST00000598545"))
+    checkEquals(names(Test), c("ENST00000383070", "ENST00000250784",
+                               "ENST00000598545"))
     ## ## TxDb...
     ## library(TxDb.Hsapiens.UCSC.hg19.knownGene)
     ## txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene

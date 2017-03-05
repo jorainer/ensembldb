@@ -192,7 +192,7 @@ test_properties <- function(){
 test_checkFilter <- function() {
     checkException(ensembldb:::checkFilter("a"))
     checkException(ensembldb:::checkFilter(list("b", GenenameFilter("b"))))
-    flts <- list(GenenameFilter("a"), TxbiotypeFilter("b"))
+    flts <- list(GenenameFilter("a"), TxBiotypeFilter("b"))
     checkEquals(flts, ensembldb:::checkFilter(flts))
 }
 

@@ -8,10 +8,10 @@ notrun_test_getGenomeFaFile <- function(){
     ## We know that there is no Fasta file for that Ensembl release available.
     Fa <- getGenomeFaFile(edb)
     ## Got the one from Ensembl 81.
-    genes <- genes(edb, filter=SeqnameFilter("Y"))
+    genes <- genes(edb, filter=SeqNameFilter("Y"))
     geneSeqsFa <- getSeq(Fa, genes)
     ## Get the transcript sequences...
-    txSeqsFa <- extractTranscriptSeqs(Fa, edb, filter=SeqnameFilter("Y"))
+    txSeqsFa <- extractTranscriptSeqs(Fa, edb, filter=SeqNameFilter("Y"))
 
     ## Get the TwoBitFile.
     twob <- ensembldb:::getGenomeTwoBitFile(edb)

@@ -28,9 +28,10 @@ be extracted from the database. Can be any column(s) listed by the
 \code{\link{listColumns}} method.}
 
 \item{filter}{For \code{proteins}: A filter object extending
-\code{\linkS4class{Filter}} or a list of such objects to select
-specific entries from the database. See \code{\link{RNA-DNA-filters}} and
-\code{\link{ProteinFilters}} for the full list of supported filters.}
+\code{AnnotationFilter} or a list of such objects to select
+specific entries from the database. See \code{\link{Filter-classes}} for a
+documentation of available filters and use \code{\link{supportedFilters}} to
+get the full list of supported filters.}
 
 \item{order.by}{For \code{proteins}: a character vector specifying the
 column(s) by which the result should be ordered.}

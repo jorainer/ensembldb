@@ -23,13 +23,13 @@ test_ordering_genes <- function() {
     rownames(res_sql) <- NULL
     rownames(res_r) <- NULL
     checkIdentical(res_sql, res_r)
-    ## Join tx table and use an SeqnameFilter
+    ## Join tx table and use an SeqNameFilter
     ensembldb:::orderResultsInR(edb) <- FALSE
     res_sql <- genes(edb, columns = c("gene_id", "tx_id"),
-                     filter = SeqnameFilter("Y"))
+                     filter = SeqNameFilter("Y"))
     ensembldb:::orderResultsInR(edb) <- TRUE
     res_r <- genes(edb, columns = c("gene_id", "tx_id"),
-                   filter = SeqnameFilter("Y"))
+                   filter = SeqNameFilter("Y"))
     checkIdentical(res_sql, res_r)
 
     ensembldb:::orderResultsInR(edb) <- orig
@@ -65,9 +65,9 @@ dontrun_benchmark_ordering_genes <- function() {
                    .withSQL(edb, columns = c("gene_id", "tx_id")),
                    times = 10)  ## R slightly faster.
     microbenchmark(.withR(edb, columns = c("gene_id", "tx_id"),
-                          SeqnameFilter("Y")),
+                          SeqNameFilter("Y")),
                    .withSQL(edb, columns = c("gene_id", "tx_id"),
-                            SeqnameFilter("Y")),
+                            SeqNameFilter("Y")),
                    times = 10)  ## same.
 }
 
@@ -92,12 +92,12 @@ dontrun_test_ordering_cdsBy <- function() {
     if (dobench)
         microbenchmark(.withSQL(edb), .withR(edb),
                        times = 3)  ## R slightly faster.
-    res_sql <- .withSQL(edb, filter = SeqnameFilter("Y"))
-    res_r <- .withR(edb, filter = SeqnameFilter("Y"))
+    res_sql <- .withSQL(edb, filter = SeqNameFilter("Y"))
+    res_r <- .withR(edb, filter = SeqNameFilter("Y"))
     checkEquals(res_sql, res_r)
     if (dobench)
-        microbenchmark(.withSQL(edb, filter = SeqnameFilter("Y")),
-                       .withR(edb, filter = SeqnameFilter("Y")),
+        microbenchmark(.withSQL(edb, filter = SeqNameFilter("Y")),
+                       .withR(edb, filter = SeqNameFilter("Y")),
                        times = 10)  ## R 6x faster.
 }
 
@@ -119,13 +119,13 @@ dontrun_test_ordering_exonsBy <- function() {
     if (doBench)
         microbenchmark(.withSQL(edb), .withR(edb),
                        times = 3)  ## about the same; R slightly faster.
-    ## with using a SeqnameFilter in addition.
-    res_sql <- .withSQL(edb, filter = SeqnameFilter("Y"))
-    res_r <- .withR(edb, filter = SeqnameFilter("Y")) ## query takes longer.
+    ## with using a SeqNameFilter in addition.
+    res_sql <- .withSQL(edb, filter = SeqNameFilter("Y"))
+    res_r <- .withR(edb, filter = SeqNameFilter("Y")) ## query takes longer.
     checkEquals(res_sql, res_r)
     if (doBench)
-        microbenchmark(.withSQL(edb, filter = SeqnameFilter("Y")),
-                       .withR(edb, filter = SeqnameFilter("Y")),
+        microbenchmark(.withSQL(edb, filter = SeqNameFilter("Y")),
+                       .withR(edb, filter = SeqNameFilter("Y")),
                        times = 3)  ## SQL twice as fast.
     ## Now getting stuff by gene
     res_sql <- .withSQL(edb, by = "gene")
@@ -135,19 +135,19 @@ dontrun_test_ordering_exonsBy <- function() {
         microbenchmark(.withSQL(edb, by = "gene"),
                        .withR(edb, by = "gene"),
                        times = 3)  ## SQL faster; ???
-    ## Along with a SeqnameFilter
-    res_sql <- .withSQL(edb, by = "gene", filter = SeqnameFilter("Y"))
-    res_r <- .withR(edb, by = "gene", filter = SeqnameFilter("Y"))
+    ## Along with a SeqNameFilter
+    res_sql <- .withSQL(edb, by = "gene", filter = SeqNameFilter("Y"))
+    res_r <- .withR(edb, by = "gene", filter = SeqNameFilter("Y"))
     ## Why does the query take longer for R???
     ## checkEquals(res_sql, res_r) ## Differences due to ties
     if (doBench)
-        microbenchmark(.withSQL(edb, by = "gene", filter = SeqnameFilter("Y")),
-                       .withR(edb, by = "gene", filter = SeqnameFilter("Y")),
+        microbenchmark(.withSQL(edb, by = "gene", filter = SeqNameFilter("Y")),
+                       .withR(edb, by = "gene", filter = SeqNameFilter("Y")),
                        times = 3)  ## SQL faster.
-    ## Along with a GenebiotypeFilter
+    ## Along with a GeneBiotypeFilter
     if (doBench)
-        microbenchmark(.withSQL(edb, by = "gene", filter = GenebiotypeFilter("protein_coding"))
-                     , .withR(edb, by = "gene", filter = GenebiotypeFilter("protein_coding"))
+        microbenchmark(.withSQL(edb, by = "gene", filter = GeneBiotypeFilter("protein_coding"))
+                     , .withR(edb, by = "gene", filter = GeneBiotypeFilter("protein_coding"))
                      , times = 3)
 }
 
@@ -165,11 +165,11 @@ dontrun_test_ordering_transcriptsBy <- function() {
     checkEquals(res_sql, res_r)
     microbenchmark(.withSQL(edb), .withR(edb), times = 3) ## same speed
 
-    res_sql <- .withSQL(edb, filter = SeqnameFilter("Y"))
-    res_r <- .withR(edb, filter = SeqnameFilter("Y"))
+    res_sql <- .withSQL(edb, filter = SeqNameFilter("Y"))
+    res_r <- .withR(edb, filter = SeqNameFilter("Y"))
     checkEquals(res_sql, res_r)
-    microbenchmark(.withSQL(edb, filter = SeqnameFilter("Y")),
-                   .withR(edb, filter = SeqnameFilter("Y")),
+    microbenchmark(.withSQL(edb, filter = SeqNameFilter("Y")),
+                   .withR(edb, filter = SeqNameFilter("Y")),
                    times = 3) ## SQL slighly faster.
 }
 

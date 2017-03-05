@@ -106,7 +106,7 @@ AllY <- getGeneRegionTrackForGviz(edb, chromosome="Y", start=5000000,
 ## all lincRNA genes encoded in that region.
 lincsY <- getGeneRegionTrackForGviz(edb, chromosome="Y", start=5000000,
                                     end=7000000,
-                                    filter=GenebiotypeFilter("lincRNA"))
+                                    filter=GeneBiotypeFilter("lincRNA"))
 
 }
 \keyword{classes}

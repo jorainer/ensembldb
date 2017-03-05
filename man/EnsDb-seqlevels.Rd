@@ -136,8 +136,8 @@ unique(genome(edb))
 
 ## Extract the full transcript sequences of all lincRNAs encoded on chromsome Y.
 yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx",
-                                              filter=list(SeqnameFilter("chrY"),
-                                                          GenebiotypeFilter("lincRNA"))))
+                                              filter=list(SeqNameFilter("chrY"),
+                                                          GeneBiotypeFilter("lincRNA"))))
 yTxSeqs
 
 }

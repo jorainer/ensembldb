@@ -30,8 +30,8 @@ notrun_compareEnsDbs <- function() {
 ## Get the CDS sequence, translate that and compare to protein sequence.
 notrun_massive_cds_test <- function() {
     ## Get all CDS:
-    tx_cds <- cdsBy(edb, by = "tx", filter = SeqnameFilter(c(1:22, "X", "Y")))
-    prots <- proteins(edb, filter = TxidFilter(names(tx_cds)),
+    tx_cds <- cdsBy(edb, by = "tx", filter = SeqNameFilter(c(1:22, "X", "Y")))
+    prots <- proteins(edb, filter = TxIdFilter(names(tx_cds)),
                       return.type = "AAStringSet")
     checkTrue(all(names(tx_cds) %in% mcols(prots)$tx_id))
     tx_cds <- tx_cds[mcols(prots)$tx_id]
@@ -47,7 +47,7 @@ notrun_massive_cds_test <- function() {
     prots[diff_width][1]
     ## OK.
     ## Tx 2206bp:
-    exns <- exonsBy(edb, filter = TxidFilter(names(tx_1)))
+    exns <- exonsBy(edb, filter = TxIdFilter(names(tx_1)))
     sum(width(exns))
     ## OK.
     ## Now to the CDS:
@@ -101,16 +101,16 @@ notrun_massive_cds_test <- function() {
 
     ## Next assumption:
     ## If we don't have a 3' UTR the AA sequence corresponds to length(CDS)/3
-    tx_cds <- cdsBy(edb, by = "tx", filter = SeqnameFilter(c(1:22, "X", "Y")),
+    tx_cds <- cdsBy(edb, by = "tx", filter = SeqNameFilter(c(1:22, "X", "Y")),
                     columns = c("tx_seq_start", "tx_seq_end", "tx_cds_seq_start",
                                 "tx_cds_seq_end"))
-    prots <- proteins(edb, filter = TxidFilter(names(tx_cds)),
+    prots <- proteins(edb, filter = TxIdFilter(names(tx_cds)),
                       return.type = "AAStringSet")
     checkTrue(all(names(tx_cds) %in% mcols(prots)$tx_id))
     tx_cds <- tx_cds[mcols(prots)$tx_id]
     ## Calculate the CDS width.
     tx_cds_width <- sum(width(tx_cds))
-    txs <- transcripts(edb, filter = TxidFilter(names(tx_cds)))
+    txs <- transcripts(edb, filter = TxIdFilter(names(tx_cds)))
     txs <- txs[names(tx_cds)]
     ## Subtract 3 from the width if we've got an 3'UTR.
     to_subtract <- rep(3, length(tx_cds_width))

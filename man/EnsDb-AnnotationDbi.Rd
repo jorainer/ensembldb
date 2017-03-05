@@ -184,26 +184,26 @@ length(txids)
 head(txids)
 
 ## Retrieve all keys corresponding to gene names of genes encoded on chromosome X
-gids <- keys(edb, keytype="GENENAME", filter=SeqnameFilter("X"))
+gids <- keys(edb, keytype="GENENAME", filter=SeqNameFilter("X"))
 length(gids)
 head(gids)
 
 ## Get a mapping of the genes BCL2 and BCL2L11 to all of their
 ## transcript ids and return the result as list
-maps <- mapIds(edb, keys=c("BCL2", "BCL2L11"), column="TXID",
-               keytype="GENENAME", multiVals="list")
+maps <- mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID",
+               keytype = "GENENAME", multiVals = "list")
 maps
 
-## Perform the same query using a combination of a GenenameFilter and a TxbiotypeFilter
+## Perform the same query using a combination of a GenenameFilter and a TxBiotypeFilter
 ## to just retrieve protein coding transcripts for these two genes.
 mapIds(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
-                      TxbiotypeFilter("protein_coding")), column="TXID",
+                      TxBiotypeFilter("protein_coding")), column="TXID",
        multiVals="list")
 
 ## select:
 ## Retrieve all transcript and gene related information for the above example.
 select(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
-                      TxbiotypeFilter("protein_coding")),
+                      TxBiotypeFilter("protein_coding")),
        columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE", "TXSEQSTART", "TXSEQEND",
                  "SEQNAME", "SEQSTRAND"))
 
@@ -213,7 +213,7 @@ head(Y)
 nrow(Y)
 
 ## Get selected columns for all lincRNAs encoded on chromosome Y
-Y <- select(edb, keys=list(SeqnameFilter("Y"), GenebiotypeFilter("lincRNA")),
+Y <- select(edb, keys=list(SeqNameFilter("Y"), GeneBiotypeFilter("lincRNA")),
             columns=c("GENEID", "GENEBIOTYPE", "TXID", "GENENAME"))
 head(Y)
 nrow(Y)

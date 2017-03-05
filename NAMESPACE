@@ -98,32 +98,35 @@ importClassesFrom("AnnotationFilters",
                   "ProteinIdFilter",
                   "UniprotFilter",
                   "SeqNameFilter",
-                  "SeqStrandFilter"
+                  "SeqStrandFilter",
+                  "GRangesFilter"
                   )
 importMethodsFrom("AnnotationFilters",
                   "value",
-                  "condition")
+                  "condition",
+                  "supportedFilters")
 importFrom("AnnotationFilters",
-                  "ExonIdFilter",
-                  "ExonRankFilter",
-                  "ExonStartFilter",
-                  "ExonEndFilter",
-                  "GeneIdFilter",
-                  "GenenameFilter",
-                  "GeneBiotypeFilter",
-                  "GeneStartFilter",
-                  "GeneEndFilter",
-                  "EntrezFilter",
-                  "SymbolFilter",
-                  "TxIdFilter",
-                  "TxNameFilter",
-                  "TxBiotypeFilter",
-                  "TxStartFilter",
-                  "TxEndFilter",
-                  "ProteinIdFilter",
-                  "UniprotFilter",
-                  "SeqNameFilter",
-                  "SeqStrandFilter"
+           "ExonIdFilter",
+           "ExonRankFilter",
+           "ExonStartFilter",
+           "ExonEndFilter",
+           "GeneIdFilter",
+           "GenenameFilter",
+           "GeneBiotypeFilter",
+           "GeneStartFilter",
+           "GeneEndFilter",
+           "EntrezFilter",
+           "SymbolFilter",
+           "TxIdFilter",
+           "TxNameFilter",
+           "TxBiotypeFilter",
+           "TxStartFilter",
+           "TxEndFilter",
+           "ProteinIdFilter",
+           "UniprotFilter",
+           "SeqNameFilter",
+           "SeqStrandFilter",
+           "GRangesFilter"
            )
 
 ## Functions
@@ -144,7 +147,7 @@ exportClasses(
               ## "GenebiotypeFilter",
               ## "GeneidFilter",
               ## "GenenameFilter",
-              "GRangesFilter",
+              ## "GRangesFilter",
               ## "ExonidFilter",
               ## "ExonrankFilter",
               "ProtDomIdFilter",
@@ -207,7 +210,9 @@ exportMethods("cdsBy",
               "transcriptsBy",
               "transcriptsByOverlaps",
               "updateEnsDb",
-              "useMySQL")
+              "useMySQL",
+              "supportedFilters"
+              )
 ## Protein data related stuff
 exportMethods("hasProteinData",
               "proteins",
@@ -233,9 +238,7 @@ export(
     "ExonidFilter",
     "ExonrankFilter",
     "GeneidFilter",
-    "GenenameFilter",
     "GenebiotypeFilter",
-    "GRangesFilter",
     ## "ProtdomidFilter",
     ## "ProteinidFilter",
     "SeqnameFilter",
@@ -248,7 +251,8 @@ export(
     ## "UniprotFilter",
     "UniprotDbFilter",
     "UniprotMappingTypeFilter",
-    "OnlyCodingTxFilter"
+    "OnlyCodingTxFilter",
+    "ProtDomIdFilter"
 )
 
 
