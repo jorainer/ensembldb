@@ -96,7 +96,9 @@ setMethod("keytypes", "EnsDb",
     }
     return(filters)
 }
-filterForKeytype <- function(keytype, x){
+filterForKeytype <- function(keytype, x, vals){
+    if (missing(vals))
+        vals <- 1
     if (!missing(x)) {
         withProts <- hasProteinData(x)
     } else {
@@ -104,7 +106,8 @@ filterForKeytype <- function(keytype, x){
     }
     filters <- .keytype2FilterMapping(withProts)
     if(any(names(filters) == keytype)){
-        filt <- new(filters[keytype])
+        filt <- do.call(filters[keytype], args = list(value = vals))
+        ## filt <- new(filters[keytype])
         return(filt)
     }else{
         stop("No filter for that keytype!")
@@ -214,9 +217,9 @@ setMethod("select", "EnsDb",
                 stop("keytype ", keytype, " not available in the database.",
                      " Use keytypes method to list all available keytypes.")
             ## Generate a filter object for the filters.
-            keyFilter <- filterForKeytype(keytype, x)
+            keyFilter <- filterForKeytype(keytype, x, vals = keys)
             ## value(keyFilter) <- keys
-            keyFilter@value <- keys
+            ## keyFilter@value <- keys
             keys <- list(keyFilter)
             ## Add also the keytype itself to the columns.
             if (!any(columns == keytype))
@@ -254,9 +257,11 @@ setMethod("select", "EnsDb",
             keyvals <- value(keys[[1]])
             ## Handle symlink Filter differently:
             if (is(keys[[1]], "SymbolFilter")) {
-                sortCol <- ensDbColumn(keys[[1]])
+                ## sortCol <- ensDbColumn(keys[[1]])
+                sortCol <- keys[[1]]@field
             } else {
-                sortCol <- removePrefix(ensDbColumn(keys[[1]], x))
+                sortCol <- ensDbColumn(keys[[1]])
+                ## sortCol <- removePrefix(ensDbColumn(keys[[1]], x))
             }
             res <- res[order(match(res[, sortCol], keyvals)), ]
         }

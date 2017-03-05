@@ -10,309 +10,276 @@ setClass("EnsDb",
          prototype=list(ensdb=NULL, tables=list(), .properties=list())
         )
 
-
-##***********************************************************************
-##
-##     BasicFilter classes
-##
-##     Allow to filter the results fetched from the database.
-##
-##     gene:
-##     - GeneidFilter
-##     - GenebiotypeFilter
-##     - GenenameFilter
-##     - EntrezidFilter
-##
-##     transcript:
-##     - TxidFilter
-##     - TxbiotypeFilter
-##
-##     exon:
-##     - ExonidFilter
-##
-##     chrom position (using info from exon):
-##     - SeqnameFilter
-##     - SeqstartFilter
-##     - SeqendFilter
-##     - SeqstrandFilter
-##     alternative: GRangesFilter. See below.
-##
-##***********************************************************************
-## setClass("BasicFilter",
-##          representation(
-##              "VIRTUAL",
-##              condition="character",
-##              value="character",
-##              .valueIsCharacter="logical"
-##             ),
-##          prototype=list(
-##              condition="=",
-##              value="",
-##              .valueIsCharacter=TRUE
-##             )
-##         )
-
-## Table gene
-## filter for gene_id
-## setClass("GeneidFilter", contains="AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = character(),
-##              .valueIsCharacter = TRUE
-##          )
-##          )
-## ## filter for gene_biotype
-## setClass("GenebiotypeFilter", contains="AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##          )
-##          )
-## filter for gene_name
-## setClass("GenenameFilter", contains = "AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##          )
-##          )
-## GenenameFilter <- function(value, condition = "=="){
-##     if(missing(value))
-##         stop("A filter without a value makes no sense!")
-##     return(new("GenenameFilter", condition = condition,
-##                value = as.character(value)))
-## }
-## filter for entrezid
-## setClass("EntrezidFilter", contains = "AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##             )
-##         )
-
-
-## Table transcript
-## filter for tx_id
-## setClass("TxidFilter", contains="AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##          )
-##          )
-## ## filter for gene_biotype
-## setClass("TxbiotypeFilter", contains="AnnotationFilter",
-##          prototype=list(
-##              condition="==",
-##              value="",
-##              .valueIsCharacter=TRUE
-##             )
-##         )
-
-## Table exon
-## filter for exon_id
-## setClass("ExonidFilter", contains="AnnotationFilter",
-##          prototype=list(
-##              condition="==",
-##              value="",
-##              .valueIsCharacter=TRUE
-##             )
-##         )
-
-## Table tx2exon
-## filter for exon_idx
-## setClass("ExonrankFilter", contains="AnnotationFilter",
-##          prototype=list(
-##              condition="==",
-##              value=integer(),
-##              .valueIsCharacter=FALSE
-##             )
-##         )
-
-
-## chromosome positions
-## basic chromosome/seqname filter.
-## setClass("SeqnameFilter", contains="AnnotationFilter",
-##          prototype=list(
-##              condition="==",
-##              value="",
-##              .valueIsCharacter=TRUE
-##             )
-##         )
-## builder...
-
-## ## basic chromosome strand filter.
-## setClass("SeqstrandFilter", contains="AnnotationFilter",
-##          prototype=list(
-##              condition="==",
-##              value=1L,
-##              .valueIsCharacter=FALSE
-##             )
-##         )
-## builder...
-
-## ## chromstart filter
-## setClass("SeqstartFilter", contains="AnnotationFilter",
-##          representation(
-##              feature="character"
-##             ),
-##          prototype=list(
-##              condition=">",
-##              value=0L,
-##              .valueIsCharacter=FALSE,
-##              feature="gene"
-##             )
-##         )
-
-## ## chromend filter
-## setClass("SeqendFilter", contains="AnnotationFilter",
-##          representation(
-##              feature="character"
-##             ),
-##          prototype=list(
-##              condition="<",
-##              value=0L,
-##              .valueIsCharacter=FALSE,
-##              feature="gene"
-##             )
-##         )
-
-
-###============================================================
-##  GRangesFilter
-##  adding new arguments since we can not overwrite the data type
-##  of the BasicFilter class... unfortunately.
-##  + grange <- value
-##  + location <- condition
-###------------------------------------------------------------
-setClass("GRangesFilter", contains="AnnotationFilter",
-         representation(grange="GRanges",
-                        feature="character",
-                        location="character"),
-         prototype=list(
-             grange=GRanges(),
-             .valueIsCharacter=FALSE,
-             condition="=",
-             location="within",
-             feature="gene",
-             value=""
-         ))
-## Constructor
-GRangesFilter <- function(value, condition="within", feature="gene"){
-    if(missing(value))
-        stop("No value provided for the filter!")
-    if(!is(value, "GRanges"))
-        stop("'value' has to be a GRanges object!")
-    if(length(value) == 0)
-        stop("No value provided for the filter!")
-    ## if(length(value) > 1){
-    ##     warning(paste0("GRanges in 'value' has length ", length(value),
-    ##                    "! Using only the first element!"))
-    ##     value <- value[1]
-    ## }
-    grf <- new("GRangesFilter", grange=value, location=condition,
-               feature=feature)
-    ##validObject(grf)
-    return(grf)
-}
-###------------------------------------------------------------
-
-
-###============================================================
-##  SymbolFilter
-###------------------------------------------------------------
-## setClass("SymbolFilter", contains = "BasicFilter",
-##          prototype = list(
-##              condition = "=",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##          )
-##          )
-## SymbolFilter <- function(value, condition = "=") {
-##     if(missing(value)){
-##         stop("A filter without a value makes no sense!")
-##     }
-##     if(length(value) > 1) {
-##         if(condition == "=")
-##             condition = "in"
-##         if(condition == "!=")
-##             condition = "not in"
-##     }
-##     return(new("SymbolFilter", condition = condition,
-##                value = as.character(value)))
-## }
-
-############################################################
-## OnlyCodingTxFilter
-##
-## That's a special case filter that just returns transcripts
-## that have tx_cds_seq_start defined (i.e. not NULL).
-setClass("OnlyCodingTxFilter", contains = "AnnotationFilter",
-         prototype = list(
-             condition = "=",
-             value = character(),
-             .valueIsCharacter = TRUE
-         ))
-OnlyCodingTxFilter <- function() {
-    return(new("OnlyCodingTxFilter"))
-}
-
-#' Protein annotation related filters
+#' @title Filters supported by ensembldb
 #'
-#' @description These filters allow to query specific information from an
-#' \code{\linkS4class{EnsDb}} database. Filters should be created using the
-#' dedicated constructor functions \code{ProteinidFilter},
-#' \code{ProtdomidFilter}, \code{UniprotidFilter}, \code{UniprotdbFilter} or
-#' \code{UniprotmappingtypeFilter}. Protein annotation-based
-#' filters are:
+#' @description \code{ensembldb} supports most of the filters from the
+#' \code{AnnotationFilters} to retrieve specific content from
+#' \code{\linkS4class{EnsDb}} databases.
 #'
-#' @slot condition The condition to be used in the filter.
-#' @slot value The value(s) for the filter.
-#' @note These filters can only be used if the \code{\linkS4class{EnsDb}}
-#' database contains protein annotations, i.e. if \code{\link{hasProteinData}}
-#' is \code{TRUE}. Also, only protein coding transcripts will have protein
-#' annotations available, thus, non-coding transcripts/genes will not be
-#' returned by the queries.
-#' @name ProteinFilters
-#' @seealso \link{RNA-DNA-filters} for filters using RNA/DNA annotations.
+#' @details \code{ensembldb} supports the following filters from the
+#' \code{AnnotationFilters} package:
+#' 
+#' \describe{
+#' 
+#' \item{GeneIdFilter}{
+#' filter based on the Ensembl gene ID.
+#' }
+#'
+#' \item{GenenameFilter}{
+#' filter based on the name of the gene as provided by Ensembl. In most cases
+#' this will correspond to the official gene symbol.
+#' }
+#'
+#' \item{SymbolFilter}{
+#' filter based on the gene names. \code{\linkS4class{EnsDb}} objects don't have
+#' a dedicated \emph{symbol} column, the filtering is hence based on the
+#' gene names.
+#' }
+#'
+#' \item{GeneBiotype}{
+#' filter based on the biotype of genes (e.g. \code{"protein_coding"}).
+#' }
+#'
+#' \item{GeneStartFilter}{
+#' filter based on the genomic start coordinate of genes.
+#' }
+#' 
+#' \item{GeneEndFilter}{
+#' filter based on the genomic end coordinate of genes.
+#' }
+#' 
+#' \item{EntrezidFilter}{
+#' filter based on the genes' NCBI Entrezgene ID.
+#' }
+#' 
+#' \item{TxIdFilter}{
+#' filter based on the Ensembld transcript ID.
+#' }
+#' 
+#' \item{TxNameFilter}{
+#' filter based on the Ensembld transcript ID; no transcript names are provided
+#' in \code{\linkS4class{EnsDb}} databases.
+#' }
+#' 
+#' \item{TxBiotypeFilter}{
+#' filter based on the transcripts' biotype.
+#' }
+#' 
+#' \item{TxStartFilter}{
+#' filter based on the genomic start coordinate of the transcripts.
+#' }
+#' 
+#' \item{TxEndFilter}{
+#' filter based on the genonic end coordinates of the transcripts.
+#' }
+#' 
+#' \item{ExonIdFilter}{
+#' filter based on Ensembl exon IDs.
+#' }
+#'
+#' \item{ExonRankFilter}{
+#' filter based on the index/rank of the exon within the transcrips.
+#' }
+#'
+#' \item{ExonStartFilter}{
+#' filter based on the genomic start coordinates of the exons.
+#' }
+#' 
+#' \item{ExonEndFilter}{
+#' filter based on the genomic end coordinates of the exons.
+#' }
+#'
+#' \item{GRangesFilter}{
+#' Allows to fetch features within or overlapping specified genomic region(s)/
+#' range(s). This filter takes a \code{\link[GenomicRanges]{GRanges}} object
+#' as input and, if \code{condition = "overlapping"} (the default) will restrict
+#' results to features (genes, transcripts or exons) that are partially
+#' overlapping the region. Alternatively, by specifying
+#' \code{condition = "within"} it will return features located within the range.
+#' Note that the type of feature on which the filter works depends on the method
+#' that is called, i.e. \code{\link{genes}} will filter on the genomic
+#' coordinates of genes, \code{\link{transcripts}} on those of transcripts and
+#' \code{\link{exons}} on exon coordinates.
+#'
+#' Calls to the methods \code{\link{exonsBy}}, \code{\link{cdsBy}} and
+#' \code{\link{transcriptsBy}} use the start and end coordinates of the
+#' feature type specified with argument \code{by} (i.e. \code{"gene"},
+#' \code{"transcript"} or \code{"exon"}) for the filtering.
+#'
+#' Note: if the specified \code{GRanges} object defines multiple region, all
+#' features within (or overlapping) any of these regions are returned.
+#'
+#' Chromosome names/seqnames can be provided in UCSC format (e.g. \code{"chrX"})
+#' or Ensembl format (e.g. \code{"X"}); see \code{\link{seqlevelsStyle}}
+#' for more information.
+#' 
+#' }
+#'
+#' \item{SeqNameFilter}{
+#' filter based on chromosome names.
+#' }
+#'
+#' \item{SeqStrandFilter}{
+#' filter based on the chromosome strand. The strand can be specified with
+#' \code{value = "+"}, \code{value = "-"}, \code{value = -1} or \code{value = 1}.
+#' }
+#' 
+#' \item{ProteinIdFilter}{
+#' filter based on Ensembl protein IDs. This filter is only supported if the
+#' \code{\linkS4class{EnsDb}} provides protein annotations; use the
+#' \code{\link{hasProteinData}} method to evaluate.
+#' }
+#'
+#' \item{UniprotFilter}{
+#' filter based on Uniprot IDs. This filter is only supported if the
+#' \code{\linkS4class{EnsDb}} provides protein annotations; use the
+#' \code{\link{hasProteinData}} method to evaluate.
+#' }
+#'
+#' }
+#'
+#' In addition, the following filters are defined by \code{ensembldb}:
+#' \describe{
+#' 
+#' \item{UniprotDbFilter}{
+#' allows to filter results based on the specified Uniprot database name(s).
+#' }
+#' 
+#' \item{UniprotMappingTypeFilter}{
+#' allows to filter results based on the mapping method/type that was used to
+#' assign Uniprot IDs to Ensembl protein IDs.
+#' }
+#'
+#' \item{ProtDomIdFilter}{
+#' allows to retrieve entries from the database matching the provided filter
+#' criteria based on their protein  domain ID (\emph{protein_domain_id}).
+#' }
+#'
+#' \item{OnlyCodingTxFilter}{
+#' allows to retrieve entries only for protein coding transcripts, i.e.
+#' transcripts with a CDS. This filter does not take any input arguments.
+#' }
+#' 
+#' }
+#'
+#' @param condition \code{character(1)} specifying the \emph{condition} of the
+#' filter. For \code{character}-based filters (such as
+#' \code{\link[AnnotationFilters]{GeneIdFilter}}) \code{"=="}, \code{"!="},
+#' \code{"startsWith"} and \code{"endsWith"} are supported. Allowed values for
+#' \code{integer}-based filters (such as
+#' \code{\link[AnnotationFilters]{GeneStartFilter}}) are \code{"=="}, \code{"!="},
+#' \code{"<"}. \code{"<="}, \code{">"} and \code{">="}.
+#' The \code{\link[AnnotationFilters]{GRangesFilter}} supports conditions
+#' \code{"overlapping"} and \code{"within"}.
+#' 
+#' @param value The value(s) for the filter. For
+#' \code{\link[AnnotationFilters]{GRangesFilter}} it has to be a
+#' \code{\link[GenomicRanges]{GRanges}} object.
+#' 
+#' @note Protein annotation based filters can only be used if the
+#' \code{\linkS4class{EnsDb}} database contains protein annotations, i.e.
+#' if \code{\link{hasProteinData}} is \code{TRUE}. Also, only protein coding
+#' transcripts will have protein annotations available, thus, non-coding
+#' transcripts/genes will not be returned by the queries using protein annotation
+#' filters.
+#' 
+#' @name Filter-classes
+#' @seealso 
 #' \code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
 #' list all Uniprot database names respectively mapping method types from the
 #' database.
+#'
+#' \code{\link[AnnotationFilters]{GeneIdFilter}} for more details on the filter
+#' objects.
+#'
+#' \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
+#' \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.
+#' 
 #' @author Johannes Rainer
 #' @examples
+#'
+#' ## create a filter that could be used to retrieve all informations for
+#' ## the respective gene.
+#' Gif <- GeneIdFilter("ENSG00000012817")
+#' Gif
+#' 
+#' ## create a filter for a chromosomal end position of a gene
+#' Sef <- GeneEndFilter(10000, condition=">")
+#' Sef
+#' 
+#' ## for additional examples see the help page of "genes"
+#' 
+#' 
+#' ## Example for GRangesFilter:
+#' ## retrieve all genes overlapping the specified region
+#' grf <- GRangesFilter(GRanges("11", ranges=IRanges(114000000, 114000050),
+#'                              strand="+"), condition = "overlapping")
 #' library(EnsDb.Hsapiens.v75)
 #' edb <- EnsDb.Hsapiens.v75
-#' ## Create a ProteinidFilter:
-#' pf <- ProteinidFilter("ENSP00000362111")
+#' genes(edb, filter = grf)
+#' 
+#' ## Get also all transcripts overlapping that region
+#' transcripts(edb, filter = grf)
+#' 
+#' ## Retrieve all transcripts for the above gene
+#' gn <- genes(edb, filter = grf)
+#' txs <- transcripts(edb, filter = GenenameFilter(gn$gene_name))
+#' ## Next we simply plot their start and end coordinates.
+#' plot(3, 3, pch=NA, xlim=c(start(gn), end(gn)), ylim=c(0, length(txs)),
+#' yaxt="n", ylab="")
+#' ## Highlight the GRangesFilter region
+#' rect(xleft=start(grf), xright=end(grf), ybottom=0, ytop=length(txs),
+#' col="red", border="red")
+#' for(i in 1:length(txs)){
+#'     current <- txs[i]
+#'     rect(xleft=start(current), xright=end(current), ybottom=i-0.975, ytop=i-0.125, border="grey")
+#'     text(start(current), y=i-0.5,pos=4, cex=0.75, labels=current$tx_id)
+#' }
+#' ## Thus, we can see that only 4 transcripts of that gene are indeed
+#' ## overlapping the region.
+#' 
+#' 
+#' ## No exon is overlapping that region, thus we're not getting anything
+#' exons(edb, filter = grf)
+#' 
+#' 
+#' ## Example for ExonRankFilter
+#' ## Extract all exons 1 and (if present) 2 for all genes encoded on the
+#' ## Y chromosome
+#' exons(edb, columns=c("tx_id", "exon_idx"),
+#'       filter=list(SeqNameFilter("Y"),
+#'                   ExonRankFilter(3, condition="<")))
+#' 
+#' 
+#' ## Get all transcripts for the gene SKA2
+#' transcripts(edb, filter=GenenameFilter("SKA2"))
+#' 
+#' ## Which is the same as using a SymbolFilter
+#' transcripts(edb, filter=SymbolFilter("SKA2"))
+#' 
+#' 
+#' ## Create a ProteinIdFilter:
+#' pf <- ProteinIdFilter("ENSP00000362111")
 #' pf
-#' ## Using this filter would retrieve all database entries matching the
-#' ## condition:
-#' where(pf)
-#' ## i.e. all entries that are associated with a protein with the ID
-#' ## "ENSP00000362111"
+#' ## Using this filter would retrieve all database entries that are associated
+#' ## with a protein with the ID "ENSP00000362111"
 #' if (hasProteinData(edb)) {
 #'     res <- genes(edb, filter = pf)
 #'     res
 #' }
 #'
-#' ## To get all entries except those associated with that protein:
-#' condition(pf) <- "!="
-#' where(pf)
-#'
-#' ## UniprotidFilter:
-#' uf <- UniprotidFilter("O60762")
+#' ## UniprotFilter:
+#' uf <- UniprotFilter("O60762")
 #' ## Get the transcripts encoding that protein:
 #' if (hasProteinData(edb)) {
 #'     transcripts(edb, filter = uf)
 #'     ## The mapping Ensembl protein ID to Uniprot ID can however be 1:n:
-#'     transcripts(edb, filter = TxidFilter("ENST00000371588"),
+#'     transcripts(edb, filter = TxIdFilter("ENST00000371588"),
 #'         columns = c("protein_id", "uniprot_id"))
 #' }
 #'
-#' ## ProtdomidFilter:
-#' pdf <- ProtdomidFilter("PF00335")
+#' ## ProtDomIdFilter:
+#' pdf <- ProtDomIdFilter("PF00335")
 #' ## Also here we could get all transcripts related to that protein domain
 #' if (hasProteinData(edb)) {
 #'     transcripts(edb, filter = pdf, columns = "protein_id")
@@ -321,107 +288,71 @@ OnlyCodingTxFilter <- function() {
 NULL
 #> NULL
 
-## ############################################################
-## ## ProteinidFilter
-## ##' @description The \code{ProteinidFilter} allows to filter based on the
-## ##' (Ensembl) protein ID of the (coding) transcripts' proteins.
-## ##' @rdname ProteinFilters
-## setClass("ProteinidFilter", contains = "AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##          ))
-
-## ##' @param value A character vector of length 1 or larger with the value(s)
-## ##' for the filter.
-## ##' @param condition A character of length 1 specifying the condition of the
-## ##' filter. Can be one of \code{"="}, \code{"!="}, \code{"like"}, or, for
-## ##' \code{value} of length larger 1 \code{"in"} and \code{"not in"}.
-## ##' @return For \code{ProteinidFilter}: A \code{ProteinidFilter} object.
-## ##' @rdname ProteinFilters
-## ProteinidFilter <- function(value, condition = "==") {
-##     .Deprecated("ProteinIdFilter")
-##     if (missing(value))
-##         stop("A filter without a value makes no sense!")
-##     return(new("ProteinIdFilter", condition = condition,
-##                value = as.character(value)))
-## }
-
-## ############################################################
-## ## UniprotFilter
-## ##' @description The \code{UniprotidFilter} allows to retrieve annotations
-## ##' filtering by the provided Uniprot ID associated with the transcript's
-## ##' protein.
-## ##' @rdname ProteinFilters
-## setClass("UniprotidFilter", contains = "AnnotationFilter",
-##          prototype = list(
-##              condition = "==",
-##              value = "",
-##              .valueIsCharacter = TRUE
-##          ))
-## ##' @return For \code{UniprotidFilter}: A \code{UniprotidFilter} object.
-## ##' @rdname ProteinFilters
-## UniprotidFilter <- function(value, condition = "==") {
-##     .Deprecated("UniprotFilter")
-##     if (missing(value))
-##         stop("A filter without a value makes no sense!")
-##     return(new("UniprotFilter", condition = condition,
-##                value = as.character(value)))
-## }
+############################################################
+## OnlyCodingTxFilter
+##
+## That's a special case filter that just returns transcripts
+## that have tx_cds_seq_start defined (i.e. not NULL).
+#' @rdname Filter-classes
+setClass("OnlyCodingTxFilter", contains = "AnnotationFilter",
+         prototype = list(
+             condition = "=",
+             value = character(),
+             field = "empty",
+             .valueIsCharacter = TRUE
+         ))
+#' @rdname Filter-classes
+OnlyCodingTxFilter <- function() {
+    return(new("OnlyCodingTxFilter"))
+}
 
 ############################################################
-## ProtdomidFilter
-##' @description The \code{ProtDomIdFilter} allows to retrieve entries from
-##' the database matching the provided filter criteria based on their protein
-##' domain ID (\emph{protein_domain_id}).
-##' @rdname ProteinFilters
+## ProtDomIdFilter
+##' @rdname Filter-classes
 setClass("ProtDomIdFilter", contains = "AnnotationFilter",
          prototype = list(
              condition = "==",
              value = "",
+             field = "prot_dom_id",
              .valueIsCharacter = TRUE
          ))
 ##' @return For \code{ProtDomIdFilter}: A \code{ProtDomIdFilter} object.
-##' @rdname ProteinFilters
+##' @rdname Filter-classes
 ProtDomIdFilter <- function(value, condition = "==") {
     return(new("ProtDomIdFilter", condition = condition,
                value = as.character(value)))
 }
 
 ############################################################
-## UniprotdbFilter
-##' @description The \code{UniprotDbFilter} allows to filter results based on
-##' the specified Uniprot database names.
-##' @rdname ProteinFilters
+## UniprotDbFilter
+##' @rdname Filter-classes
 setClass("UniprotDbFilter", contains = "AnnotationFilter",
          prototype = list(
              condition = "==",
              values = "",
+             field = "uniprot_db",
              .valueIsCharacter = TRUE
          ))
 ##' @return For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
-##' @rdname ProteinFilters
+##' @rdname Filter-classes
 UniprotDbFilter <- function(value, condition = "==") {
     return(new("UniprotDbFilter", condition = condition,
                value = as.character(value)))
 }
 
 ############################################################
-## UniprotmappingtypeFilter
-##' @description The \code{UniprotMappingTypeFilter} allows to filter results
-##' based on the mapping method/type that was used to assign Uniprot IDs to
-##' Ensembl protein IDs.
-##' @rdname ProteinFilters
+## UniprotMappingTypeFilter
+##' @rdname Filter-classes
 setClass("UniprotMappingTypeFilter", contains = "AnnotationFilter",
          prototype = list(
              condition = "==",
              values = "",
+             field = "uniprot_mapping_type",
              .valueIsCharacter = TRUE
          ))
 ##' @return For \code{UniprotMappingTypeFilter}: A
 ##' \code{UniprotMappingTypeFilter} object.
-##' @rdname ProteinFilters
+##' @rdname Filter-classes
 UniprotMappingTypeFilter <- function(value, condition = "==") {
     return(new("UniprotMappingTypeFilter", condition = condition,
                value = as.character(value)))

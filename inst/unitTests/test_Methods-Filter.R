@@ -3,6 +3,14 @@ library(RUnit)
 library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
+test_supportedFilters <- function() {
+    res <- supportedFilters(edb)
+    if (!hasProteinData(edb))
+        expect_identical(length(res), 19)
+    else 
+        expect_identical(length(res), 24)
+}
+
 test_ensDbColumn <- function() {
     smb <- SymbolFilter("a")
     checkEquals(unname(ensembldb:::ensDbColumn(smb)), "gene_name")
@@ -13,6 +21,103 @@ test_ensDbColumn <- function() {
     ##
     fl <- OnlyCodingTxFilter()
     checkEquals(ensembldb:::ensDbColumn(fl), "tx.tx_cds_seq_start")
+    ## gene filters:
+    fl <- GeneIdFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "gene_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.gene_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb, "tx")), "tx.gene_id")
+    fl <- GenenameFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "gene_name")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.gene_name")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
+    fl <- GeneStartFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "gene_seq_start")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.gene_seq_start")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
+    fl <- GeneEndFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "gene_seq_end")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.gene_seq_end")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
+    fl <- EntrezFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "entrezid")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.entrezid")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
+    fl <- SeqNameFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "seq_name")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.seq_name")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
+    fl <- SeqStrandFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "seq_strand")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.seq_strand")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
+    ## tx filters:
+    fl <- TxIdFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "tx_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "tx.tx_id")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb, "protein")),
+                "protein.tx_id")
+    fl <- TxNameFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "tx_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "tx.tx_id")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- TxBiotypeFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "tx_biotype")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "tx.tx_biotype")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- TxStartFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "tx_seq_start")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "tx.tx_seq_start")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- TxEndFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "tx_seq_end")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "tx.tx_seq_end")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    ## exon filters:
+    fl <- ExonIdFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "exon_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "exon.exon_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb, "tx2exon")),
+                "tx2exon.exon_id")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- ExonEndFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "exon_seq_end")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "exon.exon_seq_end")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- ExonStartFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "exon_seq_start")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "exon.exon_seq_start")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- ExonRankFilter(123)
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "exon_idx")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "tx2exon.exon_idx")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    ## protein filters:
+    fl <- ProteinIdFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "protein_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "protein.protein_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb, "uniprot")),
+                "uniprot.protein_id")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- UniprotFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "uniprot_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)), "uniprot.uniprot_id")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- ProtDomIdFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "protein_domain_id")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)),
+                "protein_domain.protein_domain_id")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- UniprotDbFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "uniprot_db")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)),
+                "uniprot.uniprot_db")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
+    fl <- UniprotMappingTypeFilter("a")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl)), "uniprot_mapping_type")
+    checkEquals(unname(ensembldb:::ensDbColumn(fl, edb)),
+                "uniprot.uniprot_mapping_type")
+    checkException(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))    
 }
 
 test_ensDbQuery <- function() {
@@ -54,4 +159,135 @@ test_ensDbQuery <- function() {
     res <- ensembldb:::ensDbQuery(fL, edb)
     checkEquals(res, paste0(" where gene.gene_id = 'a' and tx.tx_biotype != ",
                             "'coding' and tx.tx_seq_start < 123"))
+    res <- ensembldb:::ensDbQuery(fL, edb, c("tx", "gene", "exon"))
+    checkEquals(res, paste0(" where tx.gene_id = 'a' and tx.tx_biotype != ",
+                            "'coding' and tx.tx_seq_start < 123"))
+    fl <- ProteinIdFilter("a")
+    checkEquals(unname(ensembldb:::ensDbQuery(fl)), "protein_id = 'a'")
+    checkEquals(unname(ensembldb:::ensDbQuery(fl, edb)),
+                "protein.protein_id = 'a'")
+    checkEquals(unname(ensembldb:::ensDbQuery(fl, edb, "uniprot")),
+                "uniprot.protein_id = 'a'")    
+    fl <- ProtDomIdFilter("a")
+    checkEquals(ensembldb:::ensDbQuery(fl), "protein_domain_id = 'a'")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb),
+                "protein_domain.protein_domain_id = 'a'")
+    fl <- UniprotDbFilter("a")
+    checkEquals(ensembldb:::ensDbQuery(fl), "uniprot_db = 'a'")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb),
+                "uniprot.uniprot_db = 'a'")
+    fl <- UniprotMappingTypeFilter("a")
+    checkEquals(ensembldb:::ensDbQuery(fl), "uniprot_mapping_type = 'a'")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb),
+                "uniprot.uniprot_mapping_type = 'a'")
+    ## Seq name and seq strand.
+    fl <- SeqNameFilter("3")
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_name = '3'")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_name = '3'")
+    fl <- SeqNameFilter("chr3")
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_name = 'chr3'")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_name = 'chr3'")
+    seqlevelsStyle(edb) <- "UCSC"
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_name = 'chr3'")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_name = '3'")
+    seqlevelsStyle(edb) <- "Ensembl"
+    fl <- SeqStrandFilter("+")
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_strand = 1")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_strand = 1")
+    fl <- SeqStrandFilter("+1")
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_strand = 1")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_strand = 1")
+    fl <- SeqStrandFilter("-")
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_strand = -1")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_strand = -1")
+    fl <- SeqStrandFilter("-1")
+    checkEquals(ensembldb:::ensDbQuery(fl), "seq_strand = -1")
+    checkEquals(ensembldb:::ensDbQuery(fl, edb), "gene.seq_strand = -1")
+}
+
+test_value_for_SeqNameFilter <- function() {
+    fl <- SeqNameFilter("3")
+    checkEquals(value(fl), "3")
+    checkEquals(value(fl, edb), "3")
+    fl <- SeqNameFilter("chr3")
+    checkEquals(value(fl), "chr3")
+    checkEquals(value(fl, edb), "chr3")
+    seqlevelsStyle(edb) <- "UCSC"
+    checkEquals(value(fl, edb), "3")
+    seqlevelsStyle(edb) <- "Ensembl"
+}
+
+test_strand2num <- function(x) {
+    checkEquals(ensembldb:::strand2num("+"), 1)
+    checkEquals(ensembldb:::strand2num("+1"), 1)
+    checkEquals(ensembldb:::strand2num("-"), -1)
+    checkEquals(ensembldb:::strand2num("-1"), -1)
+    checkEquals(ensembldb:::strand2num(1), 1)
+    checkEquals(ensembldb:::strand2num(5), 1)
+    checkEquals(ensembldb:::strand2num(-1), -1)
+    checkEquals(ensembldb:::strand2num(-5), -1)
+    checkException(ensembldb:::strand2num("a"))
+}
+
+test_num2strand <- function(x) {
+    checkEquals(ensembldb:::num2strand(1), "+")
+    checkEquals(ensembldb:::num2strand(-1), "-")
+}
+
+test_ensDb_for_GRangesFilter <- function() {
+    gr <- GRanges(seqnames = "a",
+                  ranges = IRanges(start = 1, end = 5))
+    F <- GRangesFilter(value = gr, condition = "within")
+    checkEquals(unname(ensembldb:::ensDbColumn(F)), c("gene_seq_start",
+                                                      "gene_seq_end",
+                                                      "seq_name",
+                                                      "seq_strand"))
+    checkEquals(unname(ensembldb:::ensDbColumn(F, edb)),
+                c("gene.gene_seq_start", "gene.gene_seq_end",
+                  "gene.seq_name", "gene.seq_strand"))
+
+    checkEquals(ensembldb:::ensDbQuery(F),
+                paste0("gene_seq_start >= 1 and gene_seq_end",
+                       " <= 5 and seq_name = 'a'"))
+    checkEquals(ensembldb:::ensDbQuery(F, edb),
+                paste0("gene.gene_seq_start >= 1 and gene.gene_seq_end",
+                       " <= 5 and gene.seq_name = 'a'"))
+    F <- GRangesFilter(value = gr, condition = "overlapping")
+    checkEquals(ensembldb:::ensDbQuery(F),
+                paste0("gene_seq_start <= 5 and gene_seq_end",
+                       " >= 1 and seq_name = 'a'"))
+    checkEquals(ensembldb:::ensDbQuery(F, edb),
+                paste0("gene.gene_seq_start <= 5 and gene.gene_seq_end",
+                       " >= 1 and gene.seq_name = 'a'"))
+    
+    ## tx
+    F <- GRangesFilter(value = gr, feature = "tx", condition = "within")
+    checkEquals(unname(ensembldb:::ensDbColumn(F)), c("tx_seq_start",
+                                                      "tx_seq_end",
+                                                      "seq_name",
+                                                      "seq_strand"))
+    checkEquals(unname(ensembldb:::ensDbColumn(F, edb)), c("tx.tx_seq_start",
+                                                           "tx.tx_seq_end",
+                                                           "gene.seq_name",
+                                                           "gene.seq_strand"))
+    ## exon
+    F <- GRangesFilter(value = gr, feature = "exon", condition = "within")
+    checkEquals(unname(ensembldb:::ensDbColumn(F)), c("exon_seq_start",
+                                                      "exon_seq_end",
+                                                      "seq_name",
+                                                      "seq_strand"))
+    checkEquals(unname(ensembldb:::ensDbColumn(F, edb)), c("exon.exon_seq_start",
+                                                           "exon.exon_seq_end",
+                                                           "gene.seq_name",
+                                                           "gene.seq_strand"))
+    ## Check the buildWhere
+    res <- ensembldb:::buildWhereForGRanges(F, columns = ensembldb:::ensDbColumn(F))
+    checkEquals(res,
+                "exon_seq_start >= 1 and exon_seq_end <= 5 and seq_name == 'a'")
+    res <- ensembldb:::ensDbQuery(F)
+    checkEquals(res,
+                "exon_seq_start >= 1 and exon_seq_end <= 5 and seq_name == 'a'")
+    res <- ensembldb:::ensDbQuery(F, edb)
+    checkEquals(res, paste0("exon.exon_seq_start >= 1 and exon.exon_seq_end",
+                            " <= 5 and gene.seq_name == 'a'"))
 }

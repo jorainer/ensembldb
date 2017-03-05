@@ -1402,11 +1402,11 @@ checkFilter <- function(x){
             return(x)
         ## check if all elements are Filter classes.
         if(!all(unlist(lapply(x, function(z){
-            return(is(z, "AnnotationFilter"))
+            return((is(z, "AnnotationFilter") | is(z, "GRangesFilter")))
         }), use.names = FALSE)))
             stop("One of more elements in 'filter' are not filter objects!")
     }else{
-        if(is(x, "AnnotationFilter")){
+        if(is(x, "AnnotationFilter") | is(x, "GRangesFilter")){
             x <- list(x)
         }else{
             stop("'filter' has to be a filter object or a list of",
@@ -1441,10 +1441,10 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
         start <- NULL
     if(missing(end))
         end <- NULL
-    ## If only chromosome is specified, create a SeqnameFilter and
+    ## If only chromosome is specified, create a SeqNameFilter and
     ## add it to the filter
     if(is.null(start) & is.null(end) & !is.null(chromosome)){
-        filter <- c(filter, list(SeqnameFilter(chromosome)))
+        filter <- c(filter, list(SeqNameFilter(chromosome)))
         chromosome <- NULL
     }
     if(any(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
@@ -1467,7 +1467,7 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
             if(length(tids) == 0)
                 stop("Did not find any transcript on chromosome ",
                      chromosome, " from ", start, " to ", end, "!")
-            filter <- c(filter, TxidFilter(tids))
+            filter <- c(filter, TxIdFilter(tids))
         }else{
             stop("Either all or none of arguments 'chromosome', 'start' and",
                  " 'end' have to be specified!")
@@ -1677,7 +1677,7 @@ setMethod("transcriptsByOverlaps", "EnsDb",
         filter <- checkFilter(filter)
     }
     SLs <- unique(as.character(seqnames(ranges)))
-    filter <- c(filter, SeqnameFilter(SLs))
+    filter <- c(filter, SeqNameFilter(SLs))
     columns <- cleanColumns(x, columns)
     return(subsetByOverlaps(transcripts(x, columns=columns, filter=filter),
            ranges, maxgap=maxgap, minoverlap=minoverlap, type=match.arg(type)))
@@ -1700,7 +1700,7 @@ setMethod("exonsByOverlaps", "EnsDb",
         filter <- checkFilter(filter)
     }
     SLs <- unique(as.character(seqnames(ranges)))
-    filter <- c(filter, SeqnameFilter(SLs))
+    filter <- c(filter, SeqNameFilter(SLs))
     columns <- cleanColumns(x, columns)
     return(subsetByOverlaps(exons(x, columns=columns, filter=filter),
            ranges, maxgap=maxgap, minoverlap=minoverlap, type=match.arg(type)))
@@ -1860,28 +1860,37 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##' protein coding transcripts, the \code{\link{genes}} or
 ##' \code{\link{transcripts}} methods have to be used to retrieve annotations
 ##' for non-coding transcripts.
+##' 
 ##' @param object The \code{\linkS4class{EnsDb}} object.
+##'
 ##' @param columns For \code{proteins}: character vector defining the columns to
 ##' be extracted from the database. Can be any column(s) listed by the
 ##' \code{\link{listColumns}} method.
+##'
 ##' @param filter For \code{proteins}: A filter object extending
 ##' \code{AnnotationFilter} or a list of such objects to select
-##' specific entries from the database. See \code{\link{RNA-DNA-filters}} and
-##' \code{\link{ProteinFilters}} for the full list of supported filters.
+##' specific entries from the database. See \code{\link{Filter-classes}} for a
+##' documentation of available filters and use \code{\link{supportedFilters}} to
+##' get the full list of supported filters.
+##'
 ##' @param order.by For \code{proteins}: a character vector specifying the
 ##' column(s) by which the result should be ordered.
+##'
 ##' @param order.type For \code{proteins}: if the results should be ordered
 ##' ascending (\code{order.type = "asc"}) or descending
 ##' (\code{order.type = "desc"})
+##'
 ##' @param return.type For \code{proteins}: character of lenght one specifying
 ##' the type of the returned object. Can be either \code{"DataFrame"},
 ##' \code{"data.frame"} or \code{"AAStringSet"}.
+##'
 ##' @return The \code{proteins} method returns protein related annotations from
 ##' an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
 ##' allowing to define the type of the returned object. Note that if
 ##' \code{return.type = "AAStringSet"} additional annotation columns are stored
 ##' in a \code{DataFrame} that can be accessed with the \code{mcols} method on
 ##' the returned object.
+##'
 ##' @rdname ProteinFunctionality
 ##' @author Johannes Rainer
 ##' @examples

@@ -76,29 +76,29 @@ edb <- EnsDb.Hsapiens.v75
 ##
 ## length of a specific gene.
 lengthOf(edb,
-         filter=list(GeneidFilter("ENSG00000000003")))
+         filter=list(GeneIdFilter("ENSG00000000003")))
 
 ## length of a transcript
 lengthOf(edb, of="tx",
-         filter=list(TxidFilter("ENST00000494424")))
+         filter=list(TxIdFilter("ENST00000494424")))
 
 ## average length of all protein coding genes encoded on chromosomes X
 ## and Y
 mean(lengthOf(edb, of="gene",
-              filter=list(GenebiotypeFilter("protein_coding"),
-                  SeqnameFilter(c("X", "Y")))))
+              filter=list(GeneBiotypeFilter("protein_coding"),
+                  SeqNameFilter(c("X", "Y")))))
 
 ## average length of all snoRNAs
 mean(lengthOf(edb, of="gene",
-              filter=list(GenebiotypeFilter("snoRNA"),
-                  SeqnameFilter(c("X", "Y")))))
+              filter=list(GeneBiotypeFilter("snoRNA"),
+                  SeqNameFilter(c("X", "Y")))))
 
 ##### transcriptLengths
 ##
 ## Calculate the length of transcripts encoded on chromosome Y, including
 ## length of the CDS, 5' and 3' UTR.
 ##len <- transcriptLengths(edb, with.cds_len=TRUE, with.utr5_len=TRUE,
-##                         with.utr3_len=TRUE, filter=SeqnameFilter("Y"))
+##                         with.utr3_len=TRUE, filter=SeqNameFilter("Y"))
 ##head(len)
 
 }

@@ -32,7 +32,7 @@ Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.23.21),
     GenomicFeatures (>= 1.23.18),
-    AnnotationFilters (>= 0.0.4)
+    AnnotationFilters (>= 0.0.8)
 Suggests:
     BiocStyle,
     knitr,

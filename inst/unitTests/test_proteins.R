@@ -55,7 +55,7 @@ test_transcripts_with_proteins <- function() {
     if (hasProteinData(edb)) {
         res <- transcripts(edb, columns = c("tx_biotype", "protein_id",
                                             "uniprot_id"),
-                           filter = TxidFilter("ENST00000335953"),
+                           filter = TxIdFilter("ENST00000335953"),
                            return.type = "data.frame")
         ## 1:1 mapping for tx_id <-> protein_id
         checkTrue(nrow(unique(res[, c("tx_id", "protein_id")])) == 1)
@@ -65,7 +65,7 @@ test_transcripts_with_proteins <- function() {
         res <- transcripts(edb, columns = c("tx_biotype", "protein_id",
                                             "uniprot_id",
                                             "protein_domain_id"),
-                           filter = TxidFilter("ENST00000335953"),
+                           filter = TxIdFilter("ENST00000335953"),
                            return.type = "data.frame")
         resL <- split(res, f = res$uniprot_id)
         ## All have the same protein domains:
@@ -160,22 +160,22 @@ test_fiveUTRsByTranscript_with_proteins <- function() {
 ############################################################
 ## Tests using protein filters
 test_genes_with_protein_filters <- function() {
-    ## o ProteinidFilter
-    pif <- ProteinidFilter("ENSP00000376721")
+    ## o ProteinIdFilter
+    pif <- ProteinIdFilter("ENSP00000376721")
     if (hasProteinData(edb)) {
         gns <- genes(edb, filter = pif, return.type = "data.frame")
         checkEquals(gns$gene_name, "ZBTB16")
     }
-    ## o UniprotidFilter
-    uif <- UniprotidFilter("Q71UL7_HUMAN")
+    ## o UniprotFilter
+    uif <- UniprotFilter("Q71UL7_HUMAN")
     if (hasProteinData(edb)) {
         gns <- genes(edb, filter = uif, return.type = "data.frame",
                      columns = c("protein_id", "gene_name", "tx_id"))
         checkTrue("ENSP00000376721" %in% gns$protein_id)
         checkTrue(nrow(gns) == 2)
     }
-    ## o ProtdomidFilter
-    pdif <- ProtdomidFilter("PF00096")
+    ## o ProtDomIdFilter
+    pdif <- ProtDomIdFilter("PF00096")
     if (hasProteinData(edb)) {
         gns <- genes(edb, filter = list(pdif, GenenameFilter("ZBTB%", "like")),
                      return.type = "data.frame",
@@ -186,8 +186,8 @@ test_genes_with_protein_filters <- function() {
 
 ############################################################
 ## Using protein data based filters.
-test_ProteinidFilter <- function() {
-    pf <- ProteinidFilter("ABC")
+test_ProteinIdFilter <- function() {
+    pf <- ProteinIdFilter("ABC")
     checkEquals(value(pf), "ABC")
     checkEquals(column(pf), "protein_id")
     checkEquals(where(pf), "protein_id = 'ABC'")
@@ -206,13 +206,13 @@ test_ProteinidFilter <- function() {
         checkException(column(pf, edb, with.tables = "uniprot"))
         checkException(where(pf, edb, with.tables = "uniprot"))
     }
-    pf <- ProteinidFilter(c("A", "B"))
+    pf <- ProteinIdFilter(c("A", "B"))
     checkEquals(where(pf), "protein_id in ('A','B')")
-    checkException(ProteinidFilter("B", condition = ">"))
+    checkException(ProteinIdFilter("B", condition = ">"))
 }
 
-test_UniprotidFilter <- function() {
-    pf <- UniprotidFilter("ABC")
+test_UniprotFilter <- function() {
+    pf <- UniprotFilter("ABC")
     checkEquals(value(pf), "ABC")
     checkEquals(column(pf), "uniprot_id")
     checkEquals(where(pf), "uniprot_id = 'ABC'")
@@ -229,13 +229,13 @@ test_UniprotidFilter <- function() {
         checkException(column(pf, edb, with.tables = "uniprot"))
         checkException(where(pf, edb, with.tables = "uniprot"))
     }
-    pf <- UniprotidFilter(c("A", "B"))
+    pf <- UniprotFilter(c("A", "B"))
     checkEquals(where(pf), "uniprot_id in ('A','B')")
-    checkException(UniprotidFilter("B", condition = ">"))
+    checkException(UniprotFilter("B", condition = ">"))
 }
 
-test_ProtdomidFilter <- function() {
-    pf <- ProtdomidFilter("ABC")
+test_ProtDomIdFilter <- function() {
+    pf <- ProtDomIdFilter("ABC")
     checkEquals(value(pf), "ABC")
     checkEquals(column(pf), "protein_domain_id")
     checkEquals(where(pf), "protein_domain_id = 'ABC'")
@@ -252,13 +252,13 @@ test_ProtdomidFilter <- function() {
         checkException(column(pf, edb, with.tables = "protein_domain"))
         checkException(where(pf, edb, with.tables = "protein_domain"))
     }
-    pf <- ProtdomidFilter(c("A", "B"))
+    pf <- ProtDomIdFilter(c("A", "B"))
     checkEquals(where(pf), "protein_domain_id in ('A','B')")
-    checkException(ProtdomidFilter("B", condition = ">"))
+    checkException(ProtDomIdFilter("B", condition = ">"))
 }
 
-test_UniprotdbFilter <- function() {
-    pf <- UniprotdbFilter("ABC")
+test_UniprotDbFilter <- function() {
+    pf <- UniprotDbFilter("ABC")
     checkEquals(value(pf), "ABC")
     checkEquals(column(pf), "uniprot_db")
     checkEquals(where(pf), "uniprot_db = 'ABC'")
@@ -275,13 +275,13 @@ test_UniprotdbFilter <- function() {
         checkException(column(pf, edb, with.tables = "uniprot"))
         checkException(where(pf, edb, with.tables = "uniprot"))
     }
-    pf <- UniprotdbFilter(c("A", "B"))
+    pf <- UniprotDbFilter(c("A", "B"))
     checkEquals(where(pf), "uniprot_db in ('A','B')")
-    checkException(UniprotdbFilter("B", condition = ">"))
+    checkException(UniprotDbFilter("B", condition = ">"))
 }
 
-test_UniprotmappingtypeFilter <- function() {
-    pf <- UniprotmappingtypeFilter("ABC")
+test_UniprotMappingTypeFilter <- function() {
+    pf <- UniprotMappingTypeFilter("ABC")
     checkEquals(value(pf), "ABC")
     checkEquals(column(pf), "uniprot_mapping_type")
     checkEquals(where(pf), "uniprot_mapping_type = 'ABC'")
@@ -298,9 +298,9 @@ test_UniprotmappingtypeFilter <- function() {
         checkException(column(pf, edb, with.tables = "uniprot"))
         checkException(where(pf, edb, with.tables = "uniprot"))
     }
-    pf <- UniprotmappingtypeFilter(c("A", "B"))
+    pf <- UniprotMappingTypeFilter(c("A", "B"))
     checkEquals(where(pf), "uniprot_mapping_type in ('A','B')")
-    checkException(UniprotmappingtypeFilter("B", condition = ">"))
+    checkException(UniprotMappingTypeFilter("B", condition = ">"))
 }
 
 
@@ -330,7 +330,7 @@ test_proteins <- function() {
         checkEquals(prts_df$protein_id, names(prts_aa))
 
         ## Add protein domain information to the proteins.
-        prts_df <- proteins(edb, filter = ProteinidFilter(c("ENSP00000338157",
+        prts_df <- proteins(edb, filter = ProteinIdFilter(c("ENSP00000338157",
                                                             "ENSP00000443013")),
                             columns = c("protein_id", "protein_domain_id",
                                         "uniprot_id"),
@@ -364,17 +364,17 @@ test_proteins_uniprot <- function() {
         ## Q05516 is assigned to ENSP00000338157 and ENSP00000376721,
         ## Each of the two proteins is however also annotated to a second
         ## Uniprot ID: A0A024R3C6
-        ## If we use the UniprotmappingtypeFilter with only DIRECT mapping
+        ## If we use the UniprotMappingTypeFilter with only DIRECT mapping
         ## we expect to reduce it to the 1:n mapping between Uniprot and Ensembl
         prts <- proteins(edb, filter = list(GenenameFilter("ZBTB16"),
-                                            UniprotmappingtypeFilter("DIRECT")),
+                                            UniprotMappingTypeFilter("DIRECT")),
                          columns = c("uniprot_id", "uniprot_db",
                                      "uniprot_mapping_type"),
                          return.type = "DataFrame")
         checkTrue(all(prts$uniprot_mapping_type == "DIRECT"))
-        ## Check the UniprotdbFilter
+        ## Check the UniprotDbFilter
         prts <- proteins(edb, filter = list(GenenameFilter("ZBTB16"),
-                                            UniprotdbFilter("SPTREMBL")),
+                                            UniprotDbFilter("SPTREMBL")),
                          columns = c("uniprot_id", "uniprot_db", "protein_id"),
                          return.type = "DataFrame")
         checkTrue(all(prts$uniprot_db == "SPTREMBL"))
@@ -383,13 +383,13 @@ test_proteins_uniprot <- function() {
 
 test_isProteinFilter <- function() {
     ## TRUE
-    checkTrue(ensembldb:::isProteinFilter(ProteinidFilter("a")))
-    checkTrue(ensembldb:::isProteinFilter(UniprotidFilter("a")))
-    checkTrue(ensembldb:::isProteinFilter(ProtdomidFilter("a")))
-    checkTrue(ensembldb:::isProteinFilter(UniprotdbFilter("a")))
-    checkTrue(ensembldb:::isProteinFilter(UniprotmappingtypeFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(ProteinIdFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(UniprotFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(ProtDomIdFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(UniprotDbFilter("a")))
+    checkTrue(ensembldb:::isProteinFilter(UniprotMappingTypeFilter("a")))
     ## FALSE
-    checkTrue(!ensembldb:::isProteinFilter(GeneidFilter("a")))
+    checkTrue(!ensembldb:::isProteinFilter(GeneIdFilter("a")))
     checkTrue(!ensembldb:::isProteinFilter(SymbolFilter("a")))
     checkTrue(!ensembldb:::isProteinFilter(3))
     checkTrue(!ensembldb:::isProteinFilter("dfdf"))
@@ -398,7 +398,7 @@ test_isProteinFilter <- function() {
 notrun_test_protein_domains <- function() {
     res <- ensembldb:::getWhat(edb, columns = c("protein_id", "tx_id", "gene_id",
                                                 "gene_name"),
-                               filter = list(ProtdomidFilter("PF00096")))
+                               filter = list(ProtDomIdFilter("PF00096")))
 }
 
 ## test_ProteinsFromDataframe <- function() {

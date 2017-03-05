@@ -11,7 +11,7 @@ edb <- EnsDb.Hsapiens.v75
 notyetrun_transcriptLengths <- function(){
 
     ## With filter.
-    daFilt <- SeqnameFilter("Y")
+    daFilt <- SeqNameFilter("Y")
     allTxY <- transcripts(edb, filter=daFilt)
     txLenY <- transcriptLengths(edb, filter=daFilt)
     checkEquals(names(allTxY), rownames(txLenY))

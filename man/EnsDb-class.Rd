@@ -334,7 +334,7 @@ buildQuery(EnsDb.Hsapiens.v75, columns=c("gene_id", "tx_id"))
 
 ## Get all exon_ids and transcript ids of genes encoded on chromosome Y.
 buildQuery(EnsDb.Hsapiens.v75, columns=c("exon_id", "tx_id"),
-           filter=list(SeqnameFilter( "Y")))
+           filter=list(SeqNameFilter( "Y")))
 
 ## List all available gene biotypes from the database:
 listGenebiotypes(EnsDb.Hsapiens.v75)
@@ -350,16 +350,16 @@ returnFilterColumns(EnsDb.Hsapiens.v75)
 
 ## Get protein coding genes on chromosome X, specifying to return
 ## only columns gene_name as additional column.
-genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("X"),
-                                      GenebiotypeFilter("protein_coding")),
+genes(EnsDb.Hsapiens.v75, filter=list(SeqNameFilter("X"),
+                                      GeneBiotypeFilter("protein_coding")),
       columns=c("gene_name"))
 ## By default we get also the gene_biotype column as the data was filtered
 ## on this column.
 
 ## This can be changed using the returnFilterColumns option
 returnFilterColumns(EnsDb.Hsapiens.v75) <- FALSE
-genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("X"),
-                                      GenebiotypeFilter("protein_coding")),
+genes(EnsDb.Hsapiens.v75, filter=list(SeqNameFilter("X"),
+                                      GeneBiotypeFilter("protein_coding")),
       columns=c("gene_name"))
 
 
