@@ -467,6 +467,8 @@ setMethod("genes", "EnsDb", function(x,
         columns <- unique(c(columns, c("gene_seq_start", "gene_seq_end",
                                        "seq_name", "seq_strand")))
     }
+    flt <- .processFilterParam(filter)
+
     if(missing(filter)){
         filter=list()
     }else{
@@ -1390,31 +1392,6 @@ setMethod("disjointExons", "EnsDb",
               return(exonicParts)
           }
          )
-
-############################################################
-## checkFilter:
-##
-## checks the filter argument and ensures that a list of Filter
-## object is returned
-checkFilter <- function(x){
-    if(is(x, "list")){
-        if(length(x) == 0)
-            return(x)
-        ## check if all elements are Filter classes.
-        if(!all(unlist(lapply(x, function(z){
-            return((is(z, "AnnotationFilter") | is(z, "GRangesFilter")))
-        }), use.names = FALSE)))
-            stop("One of more elements in 'filter' are not filter objects!")
-    }else{
-        if(is(x, "AnnotationFilter") | is(x, "GRangesFilter")){
-            x <- list(x)
-        }else{
-            stop("'filter' has to be a filter object or a list of",
-                 " filter objects!")
-        }
-    }
-    return(x)
-}
 
 ############################################################
 ## getGeneRegionTrackForGviz
