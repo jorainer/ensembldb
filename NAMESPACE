@@ -76,9 +76,11 @@ importFrom("Biostrings",
 importFrom("RCurl",
            "getURL")
 
-## AnnotationFilters
-importClassesFrom("AnnotationFilters",
+## AnnotationFilter
+importClassesFrom("AnnotationFilter",
                   "AnnotationFilter",
+                  "CharacterFilter",
+                  "IntegerFilter",
                   "ExonIdFilter",
                   "ExonRankFilter",
                   "ExonStartFilter",
@@ -101,11 +103,13 @@ importClassesFrom("AnnotationFilters",
                   "SeqStrandFilter",
                   "GRangesFilter"
                   )
-importMethodsFrom("AnnotationFilters",
+importMethodsFrom("AnnotationFilter",
+                  "field",
                   "value",
                   "condition",
+##                  "feature",
                   "supportedFilters")
-importFrom("AnnotationFilters",
+importFrom("AnnotationFilter",
            "ExonIdFilter",
            "ExonRankFilter",
            "ExonStartFilter",
@@ -126,7 +130,9 @@ importFrom("AnnotationFilters",
            "UniprotFilter",
            "SeqNameFilter",
            "SeqStrandFilter",
-           "GRangesFilter"
+           "GRangesFilter",
+           "feature",
+           "convertFilterExpression"
            )
 
 ## Functions

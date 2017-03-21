@@ -24,6 +24,8 @@ setMethod("ensDbQuery", "list",
               return(wq)
           })
 
+## TODO: ensDbQuery for AnnotationFilterList.
+
 ## setMethod("value", "SeqNameFilter",
 ##           function(object, db){
 ##               if (missing(db))
@@ -37,12 +39,16 @@ setMethod("ensDbQuery", "list",
 ##               return(val)
 ##               ##return(ucscToEns(value(x)))
 ##           })
+#' Need an ensDbQuery for SeqNameFilter to support different chromosome naming
+#' styles
+#' 
+#' @noRd
 setMethod("ensDbQuery", "SeqNameFilter",
           function(object, db, with.tables = character()) {
               ## val <- sQuote(value(object, db))
               ## Doing all the stuff in here:
-              vals <- object@value
-              clmn <- .fieldInEnsDb(object@field)
+              vals <- value(object)
+              clmn <- .fieldInEnsDb(field(object))
               if (!missing(db)) {
                   ## o Eventually rename the seqname based on the seqlevelsStyle.
                   vals <- formatSeqnamesForQuery(db, vals)
@@ -63,7 +69,7 @@ setMethod("ensDbQuery", "SeqStrandFilter",
           function(object, db, with.tables = character()) {
               ## We have to ensure that value is converted to +1, -1.
               val <- strand2num(value(object))
-              clmn <- .fieldInEnsDb(object@field)
+              clmn <- .fieldInEnsDb(field(object))
               if (!missing(db)) {
                   if (length(with.tables) == 0)
                       with.tables <- names(listTables(db))

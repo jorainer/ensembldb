@@ -110,3 +110,47 @@ test_queryForEnsDbWithTables <- function() {
     checkException(ensembldb:::.queryForEnsDbWithTables(fl, edb, "gene"),
                     "tx.tx_seq_start = 123")
 }
+
+test_processFilterParam <- function() {
+    library(ensembldb)
+    library(RUnit)
+    ## Check that the processFilterParam does what we expect. Check input and
+    ## return ALWAYS an AnnotationFilterList object.
+
+    ## - No input
+    ## res <- ensembldb:::.processFilterParam()
+    ## checkTrue(is(res, "AnnotationFilterList"))
+    ## checkTrue(length(res) == 0)
+    
+    ## - single filter
+    gif <- GeneIdFilter("BCL2", condition = "!=")
+    res <- ensembldb:::.processFilterParam(gif)
+    checkTrue(is(res, "AnnotationFilterList"))
+    checkEquals(res[[1]], gif)
+    
+    ## - list of filters
+    snf <- SeqNameFilter("X")
+    res <- ensembldb:::.processFilterParam(list(gif, snf))
+    checkTrue(is(res, "AnnotationFilterList"))
+    checkTrue(length(res) == 2)
+    checkEquals(res[[1]], gif)
+    checkEquals(res[[2]], snf)
+    checkEquals(res@logOp, "&")
+    
+    ## - AnnotationFilterList
+    afl <- AnnotationFilterList(gif, snf, logOp = "|")
+    res <- ensembldb:::.processFilterParam(afl)
+    checkTrue(is(res, "AnnotationFilterList"))
+    checkEquals(afl, res)
+    
+    ## - filter expression
+    res <- ensembldb:::.processFilterParam(gene_id != "BCL2" | seq_name == "X")
+    checkTrue(is(res, "AnnotationFilterList"))
+
+    ## - Errors
+    checkException(ensembldb:::.processFilterParam())
+    checkException(ensembldb:::.processFilterParam(4))
+    checkException(ensembldb:::.processFilterParam(list(afl, "a")))
+    checkException(ensembldb:::.processFilterParam("a"))
+    checkException(ensembldb:::.processFilterParam(gene_bla == "14"))
+}

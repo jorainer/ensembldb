@@ -294,12 +294,11 @@ NULL
 ## That's a special case filter that just returns transcripts
 ## that have tx_cds_seq_start defined (i.e. not NULL).
 #' @rdname Filter-classes
-setClass("OnlyCodingTxFilter", contains = "AnnotationFilter",
+setClass("OnlyCodingTxFilter", contains = "CharacterFilter",
          prototype = list(
-             condition = "=",
+             condition = "==",
              value = character(),
-             field = "empty",
-             .valueIsCharacter = TRUE
+             field = "empty"
          ))
 #' @rdname Filter-classes
 OnlyCodingTxFilter <- function() {
@@ -309,12 +308,11 @@ OnlyCodingTxFilter <- function() {
 ############################################################
 ## ProtDomIdFilter
 ##' @rdname Filter-classes
-setClass("ProtDomIdFilter", contains = "AnnotationFilter",
+setClass("ProtDomIdFilter", contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              value = "",
-             field = "prot_dom_id",
-             .valueIsCharacter = TRUE
+             field = "prot_dom_id"
          ))
 ##' @return For \code{ProtDomIdFilter}: A \code{ProtDomIdFilter} object.
 ##' @rdname Filter-classes
@@ -326,12 +324,11 @@ ProtDomIdFilter <- function(value, condition = "==") {
 ############################################################
 ## UniprotDbFilter
 ##' @rdname Filter-classes
-setClass("UniprotDbFilter", contains = "AnnotationFilter",
+setClass("UniprotDbFilter", contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              values = "",
-             field = "uniprot_db",
-             .valueIsCharacter = TRUE
+             field = "uniprot_db"
          ))
 ##' @return For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
 ##' @rdname Filter-classes
@@ -343,12 +340,11 @@ UniprotDbFilter <- function(value, condition = "==") {
 ############################################################
 ## UniprotMappingTypeFilter
 ##' @rdname Filter-classes
-setClass("UniprotMappingTypeFilter", contains = "AnnotationFilter",
+setClass("UniprotMappingTypeFilter", contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              values = "",
-             field = "uniprot_mapping_type",
-             .valueIsCharacter = TRUE
+             field = "uniprot_mapping_type"
          ))
 ##' @return For \code{UniprotMappingTypeFilter}: A
 ##' \code{UniprotMappingTypeFilter} object.
