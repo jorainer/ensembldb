@@ -55,10 +55,10 @@
 .fieldInEnsDb <- function(x) {
     if (length(x) == 0 || missing(x))
         stop("Error in .fieldInEnsDb: got empty input argument!")
-    cn <- .ENSDB_FIELDS[x]
-    if (is.na(cn))
+    if (is.na(.ENSDB_FIELDS[x]))
         stop("Unable to map field '", x, "'!")
-    return(cn)
+    else
+        .ENSDB_FIELDS[x]
 }
 
 
@@ -81,7 +81,7 @@
         cond <- "="
     if (cond %in% c("startsWith", "endsWith"))
         cond <- "like"
-    return(cond)
+    cond
 }
 
 #' Single quote character values, paste multiple values and enclose in quotes.
@@ -89,8 +89,8 @@
 #' @param x An \code{AnnotationFilter} object.
 #' @noRd
 .valueForEnsDb <- function(x) {
-    vals <- unique(x@value)
-    if (x@.valueIsCharacter) {
+    vals <- unique(value(x))
+    if (is(x, "CharacterFilter")) {
         vals <- sQuote(gsub(unique(vals), pattern = "'", replacement = "''"))
     }
     if (length(vals) > 1)
@@ -100,7 +100,7 @@
         vals <- paste0("'", unique(x@value), "%'")
     if (condition(x) == "endsWith")
         vals <- paste0("'%", unique(x@value), "'")
-    return(vals)
+    vals
 }
 
 #' That's to build the standard query from an AnnotationFilter for EnsDb.
@@ -108,14 +108,14 @@
 #' @param x An \code{AnnotationFilter}.
 #' @noRd
 .queryForEnsDb <- function(x) {
-    paste(.fieldInEnsDb(x@field), .conditionForEnsDb(x), .valueForEnsDb(x))
+    paste(.fieldInEnsDb(field(x)), .conditionForEnsDb(x), .valueForEnsDb(x))
 }
 
 #' This is a slightly more sophisticated function that does also prefix the
 #' columns.
 #' @noRd
 .queryForEnsDbWithTables <- function(x, db, tables = character()) {
-    clmn <- .fieldInEnsDb(x@field)
+    clmn <- .fieldInEnsDb(field(x))
     if (!missing(db)) {
         if (length(tables) == 0)
             tables <- names(listTables(db))
@@ -124,4 +124,44 @@
     res <- paste(clmn, .conditionForEnsDb(x), .valueForEnsDb(x))
     ## cat("  ", res, "\n")
     return(res)
+}
+
+#' Simple helper function to convert expressions to AnnotationFilter or
+#' AnnotationFilterList.
+#'
+#' @param ... Can be an \code{AnnotationFilter}, an \code{AnnotationFilterList},
+#' a \code{list} or a filter \code{expression}. This should NOT be empty!
+#' 
+#' @return Returns an \code{AnnotationFilterList} with all filters.
+#' 
+#' @noRd
+.processFilterParam <- function(...) {
+    cat(".processFilterParam:\n")
+    ## First converting expressions to filter
+    res <- convertFilterExpression(...)
+    ## If res is an AnnotationFilterList we're fine.
+    if (!is(res, "AnnotationFilterList")) {
+        if (is(res, "list")) {
+            if (length(res)) {
+                ## Check that all elements are AnnotationFilter objects!
+                if (!all(unlist(lapply(res, function(z) {
+                    is(z, "AnnotationFilter")
+                }), use.names = FALSE)))
+                    stop("One of more elements in 'filter' are not ",
+                         "'AnnotationFilter' objects!")
+                res <- as(res, "AnnotationFilterList")
+                res@logOp <- rep("&", (length(res) - 1))
+            } else {
+                res <- AnnotationFilterList()
+            }
+        } else {
+            if (is(res, "AnnotationFilter"))
+                res <- AnnotationFilterList(res)
+            else
+                stop("'filter' has to be an 'AnnotationFilter', a list of ",
+                     "'AnnotationFilter' object, an 'AnnotationFilterList' ",
+                     "or a filter expression!")
+        }
+    }
+    res
 }
