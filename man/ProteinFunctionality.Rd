@@ -3,12 +3,12 @@
 \docType{methods}
 \name{listProteinColumns}
 \alias{listProteinColumns}
-\alias{listUniprotDbs}
-\alias{listUniprotDbs,EnsDb-method}
-\alias{listUniprotMappingTypes}
-\alias{listUniprotMappingTypes,EnsDb-method}
-\alias{proteins}
 \alias{proteins,EnsDb-method}
+\alias{proteins}
+\alias{listUniprotDbs,EnsDb-method}
+\alias{listUniprotDbs}
+\alias{listUniprotMappingTypes,EnsDb-method}
+\alias{listUniprotMappingTypes}
 \title{Protein related functionality}
 \usage{
 listProteinColumns(object)
@@ -112,4 +112,3 @@ if (hasProteinData(edb))
 \author{
 Johannes Rainer
 }
-

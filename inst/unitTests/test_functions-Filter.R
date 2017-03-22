@@ -112,8 +112,6 @@ test_queryForEnsDbWithTables <- function() {
 }
 
 test_processFilterParam <- function() {
-    library(ensembldb)
-    library(RUnit)
     ## Check that the processFilterParam does what we expect. Check input and
     ## return ALWAYS an AnnotationFilterList object.
 

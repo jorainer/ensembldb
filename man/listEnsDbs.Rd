@@ -44,10 +44,9 @@ dbcon <- dbConnect(MySQL(), host = "localhost", user = my_user, pass = my_pass)
 listEnsDbs(dbcon)
 }
 }
-\author{
-Johannes Rainer
-}
 \seealso{
 \code{\link{useMySQL}}
 }
-
+\author{
+Johannes Rainer
+}
