@@ -291,3 +291,70 @@ test_ensDb_for_GRangesFilter <- function() {
     checkEquals(res, paste0("exon.exon_seq_start >= 1 and exon.exon_seq_end",
                             " <= 5 and gene.seq_name == 'a'"))
 }
+
+test_buildWhereForGRanges <- function() {
+    library(ensembldb)
+    library(RUnit)
+    library(EnsDb.Hsapiens.v75)
+    edb <- EnsDb.Hsapiens.v75
+    grng <- GRanges(seqname = "X", IRanges(start = 10, end = 100))
+    ## start
+    flt <- GRangesFilter(grng, type = "start")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_start=10 and seq_name='X'")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt, db = edb))
+    checkEquals(res, "gene.gene_seq_start=10 and gene.seq_name='X'")
+    ## end
+    flt <- GRangesFilter(grng, type = "end")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_end=100 and seq_name='X'")
+    ## equal
+    flt <- GRangesFilter(grng, type = "equal")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_start=10 and gene_seq_end=100 and seq_name='X'")
+    ## within
+    flt <- GRangesFilter(grng, type = "within")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_start>=10 and gene_seq_end<=100 and seq_name='X'")
+    ## any
+    flt <- GRangesFilter(grng, type = "any")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_start<=100 and gene_seq_end>=10 and seq_name='X'")
+
+    ## Same with a strand specified.
+    grng <- GRanges(seqname = "X", IRanges(start = 10, end = 100), strand = "-")
+    ## start
+    flt <- GRangesFilter(grng, type = "start")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_start=10 and seq_name='X' and seq_strand = -1")
+    ## end
+    flt <- GRangesFilter(grng, type = "end")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, "gene_seq_end=100 and seq_name='X' and seq_strand = -1")
+    ## equal
+    flt <- GRangesFilter(grng, type = "equal")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, paste0("gene_seq_start=10 and gene_seq_end=100 and ",
+                            "seq_name='X' and seq_strand = -1"))
+    ## within
+    flt <- GRangesFilter(grng, type = "within")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, paste0("gene_seq_start>=10 and gene_seq_end<=100 and ",
+                            "seq_name='X' and seq_strand = -1"))
+    ## any
+    flt <- GRangesFilter(grng, type = "any")
+    res <- ensembldb:::buildWhereForGRanges(
+                           flt, columns = ensembldb:::ensDbColumn(flt))
+    checkEquals(res, paste0("gene_seq_start<=100 and gene_seq_end>=10 and ",
+                            "seq_name='X' and seq_strand = -1"))
+}

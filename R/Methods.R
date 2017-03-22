@@ -467,13 +467,9 @@ setMethod("genes", "EnsDb", function(x,
         columns <- unique(c(columns, c("gene_seq_start", "gene_seq_end",
                                        "seq_name", "seq_strand")))
     }
-    flt <- .processFilterParam(filter)
-
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    if (missing(filter))
+        filter <- list()
+    filter <- .processFilterParam(filter)
     filter <- setFeatureInGRangesFilter(filter, "gene")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
@@ -540,11 +536,9 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                                        "seq_name",
                                        "seq_strand")))
     }
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    if (missing(filter))
+        filter <- list()
+    filter <- .processFilterParam(filter)
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
@@ -633,11 +627,9 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
                                        "seq_name",
                                        "seq_strand")))
     }
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    if (missing(filter))
+        filter <- list()
+    filter <- .processFilterParam(filter)
     filter <- setFeatureInGRangesFilter(filter, "exon")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
@@ -710,11 +702,9 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
             bySuff <- "_name"
         }
     }
-    if (missing(filter)) {
+    if (missing(filter))
         filter <- list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter)
     ## We're applying eventual GRangesFilter to either gene or tx.
     filter <- setFeatureInGRangesFilter(filter, by)
     ## Eventually add columns for the filters:
@@ -830,11 +820,9 @@ setMethod("transcriptsBy", "EnsDb", function(x, by = c("gene", "exon"),
                 " transcripts are fetched.")
     columns <- columns[!torem]
     ## Process filters
-    if (missing(filter)) {
+    if (missing(filter))
         filter <- list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter)
     ## GRanges filter should be based on either gene or exon coors.
     filter <- setFeatureInGRangesFilter(filter, by)
     ## Eventually add columns for the filters:
@@ -1005,11 +993,9 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
                                      columns = NULL, filter,
                                      use.names = FALSE){
     by <- match.arg(by, c("tx", "gene"))
-    if (missing(filter)) {
-        filter = list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    if (missing(filter))
+        filter <- list()
+    filter <- .processFilterParam(filter)
     filter <- setFeatureInGRangesFilter(filter, by)
     columns <- cleanColumns(x, columns)
     ## Eventually add columns for the filters:
@@ -1123,11 +1109,9 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
 ## getUTRsByTranscript
 ##
 getUTRsByTranscript <- function(x, what, columns = NULL, filter) {
-    if (missing(filter)) {
+    if (missing(filter))
         filter <- list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter)
     columns <- cleanColumns(x, columns)
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
@@ -1251,11 +1235,9 @@ getUTRsByTranscript <- function(x, what, columns = NULL, filter) {
 ## threeUTRsByTranscript
 ##
 setMethod("threeUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    if(missing(filter))
+        filter <- list()
+    filter <- .processFilterParam(filter)
     return(getUTRsByTranscript(x=x, what="three", columns=columns, filter=filter))
 })
 
@@ -1263,11 +1245,9 @@ setMethod("threeUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
 ## fiveUTRsByTranscript
 ##
 setMethod("fiveUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
-    if (missing(filter)) {
-        filter=list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    if (missing(filter))
+        filter <- list()
+    filter <- .processFilterParam(filter)
     return(getUTRsByTranscript(x=x, what="five", columns=columns, filter=filter))
 })
 
@@ -1344,11 +1324,9 @@ setMethod("getWhat", "EnsDb",
 setMethod("disjointExons", "EnsDb",
           function(x, aggregateGenes = FALSE, includeTranscripts = TRUE,
                    filter, ...){
-              if (missing(filter)) {
+              if (missing(filter))
                   filter <- list()
-              } else {
-                  filter <- checkFilter(filter)
-              }
+              filter <- .processFilterParam(filter)
 
               exonsByGene <- exonsBy(x, by = "gene", filter = filter)
               exonicParts <- disjoin(unlist(exonsByGene, use.names = FALSE))
@@ -1411,7 +1389,7 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
                                                          end=NULL,
                                                          featureIs="gene_biotype"){
     featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
-    filter <- checkFilter(filter)
+    filter <- .processFilterParam(filter)
     if(missing(chromosome))
         chromosome <- NULL
     if(missing(start))
@@ -1548,20 +1526,6 @@ setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
     return(GR)
 })
 
-############################################################
-## setFeatureInGRangesFilter
-##
-## Simple helper function to set the @feature in GRangesFilter
-## depending on the calling method.
-setFeatureInGRangesFilter <- function(x, feature){
-    for(i in seq(along.with=x)){
-        if(is(x[[i]], "GRangesFilter")){
-            x[[i]]@feature <- feature
-        }
-    }
-    return(x)
-}
-
 ####============================================================
 ##  properties
 ##
@@ -1646,13 +1610,11 @@ setMethod("transcriptsByOverlaps", "EnsDb",
                    type = c("any", "start", "end"),
                    columns=listColumns(x, "tx"),
                    filter) {
-    if(missing(ranges))
+    if (missing(ranges))
         stop("Parameter 'ranges' is missing!")
-    if(missing(filter)){
+    if (missing(filter))
         filter <- list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter)
     SLs <- unique(as.character(seqnames(ranges)))
     filter <- c(filter, SeqNameFilter(SLs))
     columns <- cleanColumns(x, columns)
@@ -1671,11 +1633,9 @@ setMethod("exonsByOverlaps", "EnsDb",
                    filter) {
     if(missing(ranges))
         stop("Parameter 'ranges' is missing!")
-    if(missing(filter)){
+    if (missing(filter))
         filter <- list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter)
     SLs <- unique(as.character(seqnames(ranges)))
     filter <- c(filter, SeqNameFilter(SLs))
     columns <- cleanColumns(x, columns)
@@ -1890,11 +1850,9 @@ setMethod("proteins", "EnsDb", function(object,
     return.type <- match.arg(return.type, c("DataFrame", "AAStringSet",
                                             "data.frame"))
     columns <- cleanColumns(object, unique(c(columns, "protein_id")))
-    if (missing(filter)) {
+    if (missing(filter))
         filter = list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter)
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, object)
