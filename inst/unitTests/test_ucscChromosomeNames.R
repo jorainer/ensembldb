@@ -144,7 +144,7 @@ test_transcripts_seqnames <- function(){
     orig <- getOption("ensembldb.seqnameNotFound")
     edb <- EnsDb.Hsapiens.v75
     seqlevelsStyle(edb) <- "Ensembl"
-    ens21Y <- transcripts(edb, filter=SeqNameFilter(c("Y", "21")))
+    ens21Y <- transcripts(edb, filter = SeqNameFilter(c("Y", "21")))
     checkEquals(sort(seqlevels(ens21Y)), c("21", "Y"))
     gr <- GRanges(seqnames="Y", ranges=IRanges(start=1, end=59373566), strand="+")
     ensY <- transcripts(edb, filter=GRangesFilter(gr))
@@ -158,7 +158,8 @@ test_transcripts_seqnames <- function(){
     checkEquals(sort(seqlevels(ucsc21Y)), c("chr21", "chrY"))
     checkEquals(sort(names(ens21Y)), sort(names(ucsc21Y)))
     ## GRangesFilter.
-    gr <- GRanges(seqnames="chrY", ranges=IRanges(start=1, end=59373566), strand="+")
+    gr <- GRanges(seqnames="chrY", ranges=IRanges(start=1, end=59373566),
+                  strand="+")
     ucscY <- transcripts(edb, filter=GRangesFilter(gr))
     checkEquals(seqlevels(ucscY), "chrY")
     checkEquals(unique(as.character(strand(ucscY))), "+")
