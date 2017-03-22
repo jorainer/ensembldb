@@ -2,18 +2,18 @@
 % Please edit documentation in R/Deprecated.R
 \name{Deprecated}
 \alias{Deprecated}
+\alias{ensembldb-deprecated}
+\alias{GeneidFilter}
+\alias{GenebiotypeFilter}
 \alias{EntrezidFilter}
+\alias{TxidFilter}
+\alias{TxbiotypeFilter}
 \alias{ExonidFilter}
 \alias{ExonrankFilter}
-\alias{GenebiotypeFilter}
-\alias{GeneidFilter}
-\alias{SeqendFilter}
 \alias{SeqnameFilter}
-\alias{SeqstartFilter}
 \alias{SeqstrandFilter}
-\alias{TxbiotypeFilter}
-\alias{TxidFilter}
-\alias{ensembldb-deprecated}
+\alias{SeqstartFilter}
+\alias{SeqendFilter}
 \title{Deprecated functionality}
 \usage{
 GeneidFilter(value, condition = "==")
@@ -90,4 +90,3 @@ parameter \code{feature}. Use \code{\link[AnnotationFilters]{GeneEndFilter}},
 \code{\link[AnnotationFilters]{TxEndFilter}} and
 \code{\link[AnnotationFilters]{ExonEndFilter}} instead.
 }
-

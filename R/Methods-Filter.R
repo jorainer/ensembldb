@@ -6,12 +6,12 @@ setMethod("ensDbColumn", "AnnotationFilter",
                   return(clmn)
               if (length(with.tables) == 0)
                   with.tables <- names(listTables(db))
-              return(unlist(prefixColumns(db, clmn, with.tables = with.tables),
-                             use.names = FALSE))
+              unlist(prefixColumns(db, clmn, with.tables = with.tables),
+                     use.names = FALSE)
           })
 setMethod("ensDbQuery", "AnnotationFilter",
           function(object, db, with.tables = character()) {
-              return(.queryForEnsDbWithTables(object, db, with.tables))
+              .queryForEnsDbWithTables(object, db, with.tables)
           })
 
 setMethod("ensDbQuery", "list",
@@ -21,7 +21,7 @@ setMethod("ensDbQuery", "list",
                                                with.tables = with.tables),
                                         use.names = FALSE),
                                  collapse = " and "))
-              return(wq)
+              wq
           })
 
 ## TODO: ensDbQuery for AnnotationFilterList.
@@ -61,8 +61,8 @@ setMethod("ensDbQuery", "SeqNameFilter",
               vals <- sQuote(vals)
               ## o Concatenate values.
               if (length(vals) > 1)
-                      vals <- paste0("(", paste0(vals, collapse = ","), ")")
-              return(paste(clmn, .conditionForEnsDb(object), vals))
+                  vals <- paste0("(", paste0(vals, collapse = ","), ")")
+              paste(clmn, .conditionForEnsDb(object), vals)
           })
 
 setMethod("ensDbQuery", "SeqStrandFilter",
@@ -76,22 +76,21 @@ setMethod("ensDbQuery", "SeqStrandFilter",
                   clmn <- unlist(prefixColumns(db, clmn,
                                                with.tables = with.tables))
               }
-              return(paste(clmn, .conditionForEnsDb(object), val))
+              paste(clmn, .conditionForEnsDb(object), val)
           })
 
 
 setMethod("start", signature(x="GRangesFilter"),
           function(x, ...){
-              return(start(value(x)))
+              start(value(x))
           })
 setMethod("end", signature(x="GRangesFilter"),
           function(x, ...){
-              return(end(value(x)))
+              end(value(x))
           })
 setMethod("strand", signature(x="GRangesFilter"),
           function(x, ...){
-              strnd <- as.character(strand(value(x)))
-              return(strnd)
+              as.character(strand(value(x)))
           })
 #' @description \code{seqnames}: accessor for the sequence names of the
 #' \code{GRanges} object within a \code{GRangesFilter}
@@ -100,7 +99,7 @@ setMethod("strand", signature(x="GRangesFilter"),
 #' @rdname Filter-classes
 setMethod("seqnames", signature(x="GRangesFilter"),
           function(x){
-              return(as.character(seqnames(value(x))))
+              as.character(seqnames(value(x)))
           })
 #' @description \code{seqnames}: accessor for the \code{seqlevels} of the
 #' \code{GRanges} object within a \code{GRangesFilter}
@@ -108,7 +107,7 @@ setMethod("seqnames", signature(x="GRangesFilter"),
 #' @rdname Filter-classes
 setMethod("seqlevels", signature(x="GRangesFilter"),
           function(x){
-              return(seqlevels(value(x)))
+              seqlevels(value(x))
           })
 setMethod("ensDbColumn", "GRangesFilter",
           function(object, db, with.tables = character(), ...){
@@ -121,6 +120,7 @@ setMethod("ensDbColumn", "GRangesFilter",
                         end = paste0(feature, "_seq_end"),
                         seqname = "seq_name",
                         strand = "seq_strand")
+
               if (!missing(db)) {
                   if (length(with.tables) == 0)
                       with.tables <- names(listTables(db))
@@ -134,49 +134,124 @@ setMethod("ensDbColumn", "GRangesFilter",
                   names(cols)[grep(cols, pattern = "seq_start")] <- "start"
                   names(cols)[grep(cols, pattern = "seq_end")] <- "end"
               }
-              return(cols[c("start", "end", "seqname", "strand")])
+              cols[c("start", "end", "seqname", "strand")]
           })
 setMethod("ensDbQuery", "GRangesFilter",
           function(object, db, with.tables = character()) {
               cols <- ensDbColumn(object, db, with.tables)
               if (missing(db))
                   db <- NULL
-              return(buildWhereForGRanges(object, cols, db = db))
+              buildWhereForGRanges(object, cols, db = db)
           })
 
 
 ## grf: GRangesFilter
-buildWhereForGRanges <- function(grf, columns, db=NULL){
+## buildWhereForGRanges_old <- function(grf, columns, db=NULL){
+##     condition <- condition(grf)
+##     if(!any(condition == c("within", "overlapping")))
+##         stop(paste0("'condition' for GRangesFilter should either be ",
+##                     "'within' or 'overlapping', got ", condition, "."))
+##     if(is.null(names(columns))){
+##         stop(paste0("The vector with the required column names for the",
+##                     " GRangesFilter query has to have names!"))
+##     }
+##     if(!all(c("start", "end", "seqname", "strand") %in% names(columns)))
+##         stop(paste0("'columns' has to be a named vector with names being ",
+##                     "'start', 'end', 'seqname', 'strand'!"))
+##     ## Build the query to fetch all features that are located within the range
+##     quers <- sapply(value(grf), function(z){
+##         if(!is.null(db)){
+##             seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
+##         }else{
+##             seqn <- as.character(seqnames(z))
+##         }
+##         if(condition == "within"){
+##             query <- paste0(columns["start"], " >= ", start(z), " and ",
+##                             columns["end"], " <= ", end(z), " and ",
+##                             columns["seqname"], " = '", seqn, "'")
+##         }
+##         ## Build the query to fetch all features (partially) overlapping
+##         ## the range. This includes also all features (genes or transcripts)
+##         ## that have an intron at that position.
+##         if(condition == "overlapping"){
+##             query <- paste0(columns["start"], " <= ", end(z), " and ",
+##                             columns["end"], " >= ", start(z), " and ",
+##                             columns["seqname"], " = '", seqn, "'")
+##         }
+##         ## Include the strand, if it's not "*"
+##         if(as.character(strand(z)) != "*"){
+##             query <- paste0(query, " and ", columns["strand"], " = ",
+##                             strand2num(as.character(strand(z))))
+##         }
+##         return(query)
+##     })
+##     if(length(quers) > 1)
+##         quers <- paste0("(", quers, ")")
+##     query <- paste0(quers, collapse=" or ")
+##     ## Collapse now the queries.
+##     query
+## }
+
+#' build the \emph{where} query for a \code{GRangedFilter}. Supported conditions
+#' are: \code{"start"}, \code{"end"}, \code{"equal"}, \code{"within"},
+#' \code{"any"}.
+#'
+#' @param grf \code{GRangesFilter}.
+#'
+#' @param columns named character vectors with the column names for start, end,
+#'     strand and seq_name.
+#'
+#' @param db An optional \code{EnsDb} instance. Used to \emph{translate}
+#'     seqnames depending on the specified seqlevels style.
+#'
+#' @return A character with the corresponding \emph{where} query.
+#' @noRd
+buildWhereForGRanges <- function(grf, columns, db = NULL){
     condition <- condition(grf)
-    if(!any(condition == c("within", "overlapping")))
-        stop(paste0("'condition' for GRangesFilter should either be ",
-                    "'within' or 'overlapping', got ", condition, "."))
-    if(is.null(names(columns))){
-        stop(paste0("The vector with the required column names for the",
-                    " GRangesFilter query has to have names!"))
-    }
-    if(!all(c("start", "end", "seqname", "strand") %in% names(columns)))
-        stop(paste0("'columns' has to be a named vector with names being ",
-                    "'start', 'end', 'seqname', 'strand'!"))
+    if (!(condition %in% c("start", "end", "within", "equal", "any")))
+        stop("'condition' ", condition, " not supported. Condition (type) can ",
+             "be one of 'any', 'start', 'end', 'equal', 'within'.")
+    if( is.null(names(columns)))
+        stop("The vector with the required column names for the",
+             " GRangesFilter query has to have names!")
+    if (!all(c("start", "end", "seqname", "strand") %in% names(columns)))
+        stop("'columns' has to be a named vector with names being ",
+             "'start', 'end', 'seqname', 'strand'!")
     ## Build the query to fetch all features that are located within the range
-    quers <- sapply(value(grf), function(z){
-        if(!is.null(db)){
+    quers <- sapply(value(grf), function(z) {
+        if (!is.null(db)) {
             seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
-        }else{
+        } else {
             seqn <- as.character(seqnames(z))
         }
-        if(condition == "within"){
-            query <- paste0(columns["start"], " >= ", start(z), " and ",
-                            columns["end"], " <= ", end(z), " and ",
-                            columns["seqname"], " = '", seqn, "'")
+        ## start: start, seqname and strand have to match.
+        if (condition == "start") {
+            query <- paste0(columns["start"], "=", start(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
         }
-        ## Build the query to fetch all features (partially) overlapping
-        ## the range. This includes also all features (genes or transcripts)
-        ## that have an intron at that position.
-        if(condition == "overlapping"){
-            query <- paste0(columns["start"], " <= ", end(z), " and ",
-                            columns["end"], " >= ", start(z), " and ",
-                            columns["seqname"], " = '", seqn, "'")
+        ## end: end, seqname and strand have to match.
+        if (condition == "end") {
+            query <- paste0(columns["end"], "=", end(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## equal: start, end, seqname and strand have to match.
+        if (condition == "equal") {
+            query <- paste0(columns["start"], "=", start(z), " and ",
+                            columns["end"], "=", end(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## within: start has to be >= start, end <= end, seqname and strand
+        ##         have to match.
+        if (condition == "within") {
+            query <- paste0(columns["start"], ">=", start(z), " and ",
+                            columns["end"], "<=", end(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## any: essentially the overlapping.
+        if (condition == "any") {
+            query <- paste0(columns["start"], "<=", end(z), " and ",
+                            columns["end"], ">=", start(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
         }
         ## Include the strand, if it's not "*"
         if(as.character(strand(z)) != "*"){
@@ -187,12 +262,10 @@ buildWhereForGRanges <- function(grf, columns, db=NULL){
     })
     if(length(quers) > 1)
         quers <- paste0("(", quers, ")")
-    query <- paste0(quers, collapse=" or ")
     ## Collapse now the queries.
-    return(query)
+    query <- paste0(quers, collapse=" or ")
+    query
 }
-
-
 
 ## map chromosome strand...
 strand2num <- function(x){
@@ -218,14 +291,13 @@ num2strand <- function(x){
 
 setMethod("ensDbColumn", signature(object = "OnlyCodingTxFilter"),
           function(object, db, ...) {
-              return("tx.tx_cds_seq_start")
-})
-setMethod("ensDbQuery", "OnlyCodingTxFilter",
-          function(object, db, with.tables = character()) {
-              return("tx.tx_cds_seq_start is not null")
+              "tx.tx_cds_seq_start"
           })
 
-
+setMethod("ensDbQuery", "OnlyCodingTxFilter",
+          function(object, db, with.tables = character()) {
+              "tx.tx_cds_seq_start is not null"
+          })
 
 setMethod("ensDbColumn", "ProteinIdFilter",
           function(object, db, with.tables = character(), ...) {
@@ -237,10 +309,8 @@ setMethod("ensDbColumn", "ProteinIdFilter",
                        " protein annotations! A 'ProteinIdFilter' can not",
                        " be used.")
               callNextMethod()
-              ## return(unlist(prefixColumns(db, column(object),
-              ##                             with.tables = with.tables),
-              ##               use.names = FALSE))
           })
+
 setMethod("ensDbQuery", "ProteinIdFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
@@ -249,7 +319,7 @@ setMethod("ensDbQuery", "ProteinIdFilter",
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'ProteinIdFilter' can not",
                        " be used.")
-              return(.queryForEnsDbWithTables(object, db, with.tables))
+              .queryForEnsDbWithTables(object, db, with.tables)
           })
 
 setMethod("ensDbColumn", "UniprotFilter",
@@ -261,10 +331,8 @@ setMethod("ensDbColumn", "UniprotFilter",
                        " protein annotations! A 'UniprotFilter' can not",
                        " be used.")
               callNextMethod()
-              ## return(unlist(prefixColumns(db, column(object),
-              ##                             with.tables = with.tables),
-              ##               use.names = FALSE))
           })
+
 setMethod("ensDbQuery", "UniprotFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
@@ -273,7 +341,7 @@ setMethod("ensDbQuery", "UniprotFilter",
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'UniprotFilter' can not",
                        " be used.")
-              return(.queryForEnsDbWithTables(object, db, with.tables))
+              .queryForEnsDbWithTables(object, db, with.tables)
           })
 
 setMethod("ensDbColumn", "ProtDomIdFilter",
@@ -285,10 +353,8 @@ setMethod("ensDbColumn", "ProtDomIdFilter",
                        " protein annotations! A 'ProtDomIdFilter' can not",
                        " be used.")
               callNextMethod()
-              ## return(unlist(prefixColumns(db, column(object),
-              ##                             with.tables = with.tables),
-              ##               use.names = FALSE))
           })
+
 setMethod("ensDbQuery", "ProtDomIdFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
@@ -297,7 +363,7 @@ setMethod("ensDbQuery", "ProtDomIdFilter",
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'ProtDomIdFilter' can not",
                        " be used.")
-              return(.queryForEnsDbWithTables(object, db, with.tables))
+              .queryForEnsDbWithTables(object, db, with.tables)
           })
 
 setMethod("ensDbColumn", "UniprotDbFilter",
@@ -309,10 +375,8 @@ setMethod("ensDbColumn", "UniprotDbFilter",
                        " protein annotations! A 'UniprotDbFilter' can not",
                        " be used.")
               callNextMethod()
-              ## return(unlist(prefixColumns(db, column(object),
-              ##                             with.tables = with.tables),
-              ##               use.names = FALSE))
           })
+
 setMethod("ensDbQuery", "UniprotDbFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
@@ -321,7 +385,7 @@ setMethod("ensDbQuery", "UniprotDbFilter",
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'ProteinIdFilter' can not",
                        " be used.")
-              return(.queryForEnsDbWithTables(object, db, with.tables))
+              .queryForEnsDbWithTables(object, db, with.tables)
           })
 
 setMethod("ensDbColumn", "UniprotMappingTypeFilter",
@@ -333,10 +397,8 @@ setMethod("ensDbColumn", "UniprotMappingTypeFilter",
                        " protein annotations! A 'UniprotMappingTypeFilter' ",
                        "can not be used.")
               callNextMethod()
-              ## return(unlist(prefixColumns(db, column(object),
-              ##                             with.tables = with.tables),
-              ##               use.names = FALSE))
           })
+
 setMethod("ensDbQuery", "UniprotMappingTypeFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
@@ -345,5 +407,5 @@ setMethod("ensDbQuery", "UniprotMappingTypeFilter",
                   stop("The 'EnsDb' database used does not provide",
                        " protein annotations! A 'UniprotMappingTypeFilter' can not",
                        " be used.")
-              return(.queryForEnsDbWithTables(object, db, with.tables))
+              .queryForEnsDbWithTables(object, db, with.tables)
           })

@@ -165,3 +165,55 @@
     }
     res
 }
+
+############################################################
+## setFeatureInGRangesFilter
+##
+## Simple helper function to set the @feature in GRangesFilter
+## depending on the calling method.
+setFeatureInGRangesFilter <- function(x, feature){
+    for (i in seq(along.with = x)){
+        if (is(x[[i]], "GRangesFilter")) {
+            x[[i]]@feature <- feature
+        }
+    }
+    return(x)
+}
+
+############################################################
+## isProteinFilter
+##' evaluates whether the filter is a protein annotation related filter.
+##' @param x The object that should be evaluated.
+##' @return Returns TRUE if 'x' is a filter for protein annotation tables and
+##' FALSE otherwise.
+##' @noRd
+isProteinFilter <- function(x) {
+    return(is(x, "ProteinIdFilter") | is(x, "UniprotFilter") |
+           is(x, "ProtDomIdFilter") | is(x, "UniprotDbFilter") |
+           is(x, "UniprotMappingTypeFilter"))
+}
+
+## ############################################################
+## ## checkFilter:
+## ##
+## ## checks the filter argument and ensures that a list of Filter
+## ## object is returned
+## checkFilter <- function(x){
+##     if(is(x, "list")){
+##         if(length(x) == 0)
+##             return(x)
+##         ## check if all elements are Filter classes.
+##         if(!all(unlist(lapply(x, function(z){
+##             return((is(z, "AnnotationFilter") | is(z, "GRangesFilter")))
+##         }), use.names = FALSE)))
+##             stop("One of more elements in 'filter' are not filter objects!")
+##     }else{
+##         if(is(x, "AnnotationFilter") | is(x, "GRangesFilter")){
+##             x <- list(x)
+##         }else{
+##             stop("'filter' has to be a filter object or a list of",
+##                  " filter objects!")
+##         }
+##     }
+##     return(x)
+## }

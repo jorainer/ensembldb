@@ -189,13 +189,6 @@ test_properties <- function(){
                 length(origProps) + 1)
 }
 
-test_checkFilter <- function() {
-    checkException(ensembldb:::checkFilter("a"))
-    checkException(ensembldb:::checkFilter(list("b", GenenameFilter("b"))))
-    flts <- list(GenenameFilter("a"), TxBiotypeFilter("b"))
-    checkEquals(flts, ensembldb:::checkFilter(flts))
-}
-
 test_anyProteinColumns <- function() {
     checkTrue(ensembldb:::anyProteinColumns(c("gene_id", "protein_id")))
     checkTrue(!ensembldb:::anyProteinColumns(c("gene_id", "exon_id")))
