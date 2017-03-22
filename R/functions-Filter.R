@@ -136,32 +136,44 @@
 #' 
 #' @noRd
 .processFilterParam <- function(...) {
-    cat(".processFilterParam:\n")
-    ## First converting expressions to filter
-    res <- convertFilterExpression(...)
-    ## If res is an AnnotationFilterList we're fine.
-    if (!is(res, "AnnotationFilterList")) {
-        if (is(res, "list")) {
-            if (length(res)) {
-                ## Check that all elements are AnnotationFilter objects!
-                if (!all(unlist(lapply(res, function(z) {
-                    is(z, "AnnotationFilter")
-                }), use.names = FALSE)))
-                    stop("One of more elements in 'filter' are not ",
-                         "'AnnotationFilter' objects!")
-                res <- as(res, "AnnotationFilterList")
-                res@logOp <- rep("&", (length(res) - 1))
-            } else {
-                res <- AnnotationFilterList()
-            }
+    ## Try to translate a filter expression to a filter.
+    res <- NULL
+    res <- try(convertFilterExpression(...), silent = TRUE)
+    ## Check if we were able to translate the call:
+    if (is(res, "AnnotationFilter"))
+        res <- AnnotationFilterList(res)
+    if (is(res, "AnnotationFilterList"))
+        return(res)
+    ## Otherwise continue.
+    ## Check if the error might be worth while to return:
+    if (is(res, "try-error")) {
+        errmsg <- unlist(strsplit(as.character(res), "\n", fixed = TRUE))
+        if (length(errmsg) == 2)
+            if (length(grep("No AnnotationFilter class", errmsg[[2]])))
+                stop(errmsg[[2]])
+    }
+    res <- unlist(list(...))
+    ## Did not get a filter expression, thus checking what we've got.
+    if (is(res, "list")) {
+        if (length(res)) {
+            ## Check that all elements are AnnotationFilter objects!
+            if (!all(unlist(lapply(res, function(z) {
+                inherits(z, "AnnotationFilter")
+            }), use.names = FALSE)))
+                stop("One of more elements in 'filter' are not ",
+                     "'AnnotationFilter' objects!")
+            res <- as(res, "AnnotationFilterList")
+            res@logOp <- rep("&", (length(res) - 1))
         } else {
-            if (is(res, "AnnotationFilter"))
-                res <- AnnotationFilterList(res)
-            else
-                stop("'filter' has to be an 'AnnotationFilter', a list of ",
-                     "'AnnotationFilter' object, an 'AnnotationFilterList' ",
-                     "or a filter expression!")
+            res <- AnnotationFilterList()
         }
+    } else {
+        if (inherits(res, "AnnotationFilter"))
+            res <- AnnotationFilterList(res)
+        else
+            stop("'filter' has to be an 'AnnotationFilter', a list of ",
+                 "'AnnotationFilter' object, an 'AnnotationFilterList' ",
+                 "or a valid filter expression!")
     }
     res
 }

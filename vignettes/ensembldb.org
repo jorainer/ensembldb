@@ -1404,12 +1404,14 @@ Done in issue #6.
    CLOSED: [2017-02-10 Fri 15:22]
 
    - State "CANCELED"   from "TODO"       [2017-02-10 Fri 15:22] \\
-     No need to perform this - we have now a dedicated =AnnotationFilters= package for
+     No need to perform this - we have now a dedicated =AnnotationFilter= package for
      this.
  To integrate =ensembldb= with =Organism.dplyr= we export database tables in an
  /un-normalized/ form so that it can be stored into a SQLite database for =dplyr=.
-** TODO Use =filters= as they are used in =Organism.dplyr=
+** DONE Use =filters= as they are used in =Organism.dplyr=
+   CLOSED: [2017-03-22 Wed 06:58]
 
+   - State "DONE"       from "TODO"       [2017-03-22 Wed 06:58]
 i.e. dynamically create filters. Check if we could do that.
 
 #+BEGIN_SRC R
@@ -1438,8 +1440,10 @@ This should also enable
   filter(edb, GeneidFilter(""a)) %>% genes()
 #+END_EXAMPLE
 
-** TODO Interpret R logical conditions
+** DONE Interpret R logical conditions
+   CLOSED: [2017-03-22 Wed 06:58]
 
+   - State "DONE"       from "TODO"       [2017-03-22 Wed 06:58]
 That would be the coolest thing ever, if we could use filters like
 
 #+BEGIN_EXAMPLE
@@ -1499,7 +1503,7 @@ Actually it would be better to replace first all =&= by =@&@=.
   (parse(text = res[2]))
 
   myE <- new.env()
-  library(AnnotationFilters)
+  library(AnnotationFilter)
   myE$gene_id <- GeneIdFilter
 
   eval(3 == 3, envir = myE)
