@@ -39,36 +39,6 @@ test_addRequiredTables <- function() {
     }
 }
 
-## test_prefixColumns <- function() {
-##     ## gene
-##     res <- ensembldb:::prefixColumns(edb, "gene_id")
-##     checkEquals(unname(unlist(res)), "gene.gene_id")
-##     res <- ensembldb:::prefixColumns(edb, "gene_id",
-##                                      with.tables = c("tx", "exon"))
-##     checkEquals(unname(unlist(res)), "tx.gene_id")
-##     ## tx
-##     res <- ensembldb:::prefixColumns(edb, "tx_id")
-##     checkEquals(unname(unlist(res)), "tx.tx_id")
-##     res <- ensembldb:::prefixColumns(edb, "tx_id",
-##                                      with.tables = "tx2exon")
-##     checkEquals(unname(unlist(res)), "tx2exon.tx_id")
-##     ## exon
-##     res <- ensembldb:::prefixColumns(edb, "exon_id")
-##     checkEquals(unname(unlist(res)), "tx2exon.exon_id")
-##     res <- ensembldb:::prefixColumns(edb, "exon_id",
-##                                      with.tables = c("exon"))
-##     checkEquals(unname(unlist(res)), "exon.exon_id")
-
-##     if (hasProteinData(edb)) {
-##         res <- ensembldb:::prefixColumns(edb, "protein_id")
-##         checkEquals(unname(unlist(res)), "protein.protein_id")
-##         res <- ensembldb:::prefixColumns(edb, "protein_id",
-##                                          with.tables = c("uniprot",
-##                                                          "protein_domain"))
-##         checkEquals(unname(unlist(res)), "uniprot.protein_id")
-##     }
-## }
-
 test_prefixColumns <- function() {
     res <- ensembldb:::prefixColumns(edb, columns = "a")
     checkTrue(is.null(res))
@@ -121,36 +91,72 @@ test_prefixColumns <- function() {
     }
 }
 
-## test_joinQueryOnTables <- function() {
-##     res <- ensembldb:::joinQueryOnTables(edb, tab = c("exon", "gene"))
-##     checkEquals(res, paste0("gene join tx on (gene.gene_id=tx.gene_id) ",
-##                             "join tx2exon on (tx.tx_id=tx2exon.tx_id) ",
-##                             "join exon on (tx2exon.exon_id=exon.exon_id)"))
-##     res <- ensembldb:::joinQueryOnTables(edb, tab = c("gene", "chromosome"))
-##     checkEquals(res, "gene join chromosome on (gene.seq_name=chromosome.seq_name)")
-##     res <- ensembldb:::joinQueryOnTables(edb, tab = c("exon", "tx"))
-##     checkEquals(res, paste0("tx join tx2exon on (tx.tx_id=tx2exon.tx_id) ",
-##                             "join exon on (tx2exon.exon_id=exon.exon_id)"))
-##     res <- ensembldb:::joinQueryOnTables(edb, tab = c("chromosome", "tx"))
-##     checkEquals(res, paste0("gene join tx on (gene.gene_id=tx.gene_id) ",
-##                             "join chromosome on (gene.seq_name=chromosome.seq_name)"))
-##     if (hasProteinData(edb)) {
-##         res <- ensembldb:::joinQueryOnTables(edb, tab = c("tx", "uniprot"))
-##         checkEquals(res, paste0("tx join protein on (tx.tx_id=protein.tx_id) ",
-##                                 "join uniprot on (protein.protein_id=uniprot.protein_id)"))
-##         res <- ensembldb:::joinQueryOnTables(edb, tab = c("protein", "gene"))
-##         checkEquals(res, paste0("gene join tx on (gene.gene_id=tx.gene_id) ",
-##                                 "join protein on (tx.tx_id=protein.tx_id)"))
-##         res <- ensembldb:::joinQueryOnTables(edb,
-##                                              tab = c("uniprot", "protein_domain"))
-##         checkEquals(res, "uniprot join protein_domain on (uniprot.protein_id=protein_domain.protein_id)")
-##         res <- ensembldb:::joinQueryOnTables(edb, tab = c("uniprot", "exon"))
-##         checkEquals(res, paste0("tx join tx2exon on (tx.tx_id=tx2exon.tx_id) ",
-##                                 "join exon on (tx2exon.exon_id=exon.exon_id) ",
-##                                 "join protein on (tx.tx_id=protein.tx_id) ",
-##                                 "join uniprot on (protein.protein_id=uniprot.protein_id)"))
-##     }
-## }
+test_buildQuery_filter <- function() {
+    columns <- c("gene_id", "gene_name", "exon_id")
+    gnf <- GenenameFilter("BCL2")
+    Q <- ensembldb:::.buildQuery(edb, columns = columns,
+                                 filter = AnnotationFilterList(gnf))
+    want <- paste0("select distinct gene.gene_id,gene.gene_name,",
+                   "tx2exon.exon_id from gene join tx on (gene.gene_id",
+                   "=tx.gene_id) join tx2exon on (tx.tx_id=tx2exon.tx_id)",
+                   " where (gene.gene_name = 'BCL2')")
+    checkEquals(Q, want)
+    library(RSQLite)
+    res <- dbGetQuery(dbconn(edb), Q)
+    checkEquals(unique(res$gene_name), "BCL2")
+    ## Two GeneNameFilters combined with or
+    gnf2 <- GenenameFilter("BCL2L11")
+    columns <- c("gene_id", "gene_name", "exon_id")
+    Q <- ensembldb:::.buildQuery(edb, columns = columns,
+                                 filter = AnnotationFilterList(gnf, gnf2,
+                                                               logOp = "|"))
+    want <- paste0("select distinct gene.gene_id,gene.gene_name,",
+                   "tx2exon.exon_id from gene join tx on (gene.gene_id",
+                   "=tx.gene_id) join tx2exon on (tx.tx_id=tx2exon.tx_id)",
+                   " where (gene.gene_name = 'BCL2') or (gene.gene_name = ",
+                   "'BCL2L11')")
+    checkEquals(Q, want)
+    res <- dbGetQuery(dbconn(edb), Q)
+    checkTrue(all(res$gene_name %in% c("BCL2", "BCL2L11")))
+    ## Combine with a SeqnameFilter.
+    snf <- SeqNameFilter(2)
+    flt <- AnnotationFilterList(gnf, gnf2, snf, logOp = c("|", "&"))
+    Q <- ensembldb:::.buildQuery(edb, columns = columns, filter = flt)
+    want <- paste0("select distinct gene.gene_id,gene.gene_name,",
+                   "tx2exon.exon_id,gene.seq_name from gene join tx on (",
+                   "gene.gene_id=tx.gene_id) join tx2exon on (tx.tx_id=",
+                   "tx2exon.tx_id) where (gene.gene_name = 'BCL2') or (",
+                   "gene.gene_name = 'BCL2L11') and (gene.seq_name = '2')")
+    checkEquals(Q, want)
+    res <- dbGetQuery(dbconn(edb), Q)
+    checkTrue(all(res$gene_name %in% c("BCL2", "BCL2L11")))
+    ## If we only want to get BCL2L11 back:
+    flt <- AnnotationFilterList(GenenameFilter(c("BCL2", "BCL2L11")), snf,
+                                logOp = "&")
+    Q <- ensembldb:::.buildQuery(edb, columns = columns, filter = flt)
+    want <- paste0("select distinct gene.gene_id,gene.gene_name,",
+                   "tx2exon.exon_id,gene.seq_name from gene join tx on (",
+                   "gene.gene_id=tx.gene_id) join tx2exon on (tx.tx_id=",
+                   "tx2exon.tx_id) where (gene.gene_name in ('BCL2','BCL2L11'",
+                   ")) and (gene.seq_name = '2')")
+    checkEquals(Q, want)
+    res <- dbGetQuery(dbconn(edb), Q)
+    checkTrue(all(res$gene_name == "BCL2L11"))
+    
+    ## Check with a GRangesFilter.
+    grf <- GRangesFilter(GRanges(seqnames = 18, IRanges(60790600, 60790700)))
+    flt <- AnnotationFilterList(grf)
+    Q <- ensembldb:::.buildQuery(edb, columns = columns, filter = flt)
+    want <- paste0("select distinct gene.gene_id,gene.gene_name,tx2exon.",
+                   "exon_id,gene.seq_name,gene.gene_seq_start,gene.gene_seq",
+                   "_end,gene.seq_strand from gene join tx on (gene.gene_id",
+                   "=tx.gene_id) join tx2exon on (tx.tx_id=tx2exon.tx_id) ",
+                   "where (gene.gene_seq_start<=60790700 and gene.gene_seq",
+                   "_end>=60790600 and gene.seq_name='18')")
+    checkEquals(Q, want)
+    res <- dbGetQuery(dbconn(edb), Q)
+    checkTrue(all(res$gene_name == "BCL2"))
+}
 
 test_buildQuery_startWith <- function() {
     columns <- c("gene_id", "gene_name", "exon_id")

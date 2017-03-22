@@ -23,8 +23,23 @@ setMethod("ensDbQuery", "list",
                                  collapse = " and "))
               wq
           })
-
-## TODO: ensDbQuery for AnnotationFilterList.
+setMethod("ensDbQuery", "AnnotationFilterList",
+          function(object, db, with.tables = character()) {
+              wq <- NULL
+              if (length(object)) {
+                  wq <- ensDbQuery(object[[1]], db, with.tables = with.tables)
+                  if (length(object) > 1) {
+                      for (i in 2:length(object)) {
+                          wq <- paste(wq, .logOp2SQL(object@logOp[(i -1)]),
+                                      ensDbQuery(object[[i]], db,
+                                                 with.tables = with.tables))
+                      }
+                  }
+                  ## Encapsule all inside brackets.
+                  wq <- paste0("(", wq, ")")
+              }
+              wq
+          })
 
 ## setMethod("value", "SeqNameFilter",
 ##           function(object, db){
@@ -264,7 +279,7 @@ buildWhereForGRanges <- function(grf, columns, db = NULL){
         quers <- paste0("(", quers, ")")
     ## Collapse now the queries.
     query <- paste0(quers, collapse=" or ")
-    query
+    paste0("(", query, ")")
 }
 
 ## map chromosome strand...

@@ -537,11 +537,12 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                                        "seq_strand")))
     }
     if (missing(filter))
-        filter <- list()
-    filter <- .processFilterParam(filter)
-    filter <- setFeatureInGRangesFilter(filter, "tx")
+        fltr <- list()
+    else fltr <- filter
+    fltr <- .processFilterParam(fltr)
+    fltr <- setFeatureInGRangesFilter(fltr, "tx")
     ## Eventually add columns for the filters:
-    columns <- addFilterColumns(columns, filter, x)
+    columns <- addFilterColumns(columns, fltr, x)
     retColumns <- columns
     ## If we don't have an order.by define one.
     if(all(order.by == "")){
@@ -553,7 +554,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
         if(is.null(order.by))
             order.by <- ""
     }
-    Res <- getWhat(x, columns=columns, filter=filter,
+    Res <- getWhat(x, columns=columns, filter = fltr,
                    order.by=order.by, order.type=order.type,
                    startWith = "tx", join = "suggested")
     if(return.type=="data.frame" | return.type=="DataFrame"){

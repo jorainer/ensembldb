@@ -75,7 +75,7 @@ EnsDb <- function(x){
     OK <- validateEnsDb(EDB)
     if (is.character(OK))
         stop(OK)
-    return(EDB)
+    EDB
 }
 
 ## loadEnsDb <- function(x) {
@@ -90,88 +90,6 @@ EnsDb <- function(x){
     return(dbGetQuery(x, paste0("select value from metadata where name='",
                                 name, "'"))[ 1, 1])
 }
-
-####
-## THIS HAS BEEN REPLACED WITH prefixColumns!
-##
-## Note: that's the central function that checks which tables are needed for the
-## least expensive join!!! The names of the tables should then also be submitted
-## to any other method that calls prefixColumns (e.g. where of the Filter classes)
-##
-## this function checks:
-## a) for multi-table columns, selects the table with the highest degree
-## b) pre-pend (inverse of append ;)) the table name to the column name.
-## returns a list, names being the tables and the values being the columns
-## named: <table name>.<column name>
-## clean: whether a cleanColumns should be called on the submitted columns.
-## with.tables: force the prefix to be specifically on the submitted tables.
-## prefixColumns_old <- function(x, columns, clean = TRUE, with.tables){
-##     if (missing(columns))
-##         stop("columns is empty! No columns provided!")
-##     ## first get to the tables that contain these columns
-##     Tab <- listTables(x)   ## returns the tables by degree!
-##     if (!missing(with.tables)) {
-##         with.tables <- with.tables[ with.tables %in% names(Tab) ]
-##         if (length(with.tables) > 0) {
-##             Tab <- Tab[ with.tables ]
-##         } else {
-##             warning("The submitted table names are not valid in the database",
-##                     " and were thus dropped.")
-##         }
-##         if (length(Tab) == 0)
-##             stop("None of the tables submitted with with.tables is present",
-##                  " in the database!")
-##     }
-##     if (clean)
-##         columns <- cleanColumns(x, columns)
-##     if (length(columns) == 0) {
-##         return(NULL)
-##     }
-##     ## group the columns by table.
-##     columns.bytable <- sapply(Tab, function(z){
-##         return(z[ z %in% columns ])
-##     }, simplify=FALSE, USE.NAMES=TRUE)
-##     ## kick out empty tables...
-##     columns.bytable <- columns.bytable[ unlist(lapply(columns.bytable,
-##                                                       function(z){
-##                                                           return(length(z) > 0)
-##                                                       })) ]
-##     if(length(columns.bytable)==0)
-##         stop("No columns available!")
-##     have.columns <- NULL
-##     ## new approach! order the tables by number of elements, and after that,
-##     ## re-order them.
-##     columns.bytable <- columns.bytable[ order(unlist(lapply(columns.bytable,
-##                                                             length)),
-##                                               decreasing=TRUE) ]
-##     ## has to be a for loop!!!
-##     ## loop throught the columns by table and sequentially kick out columns
-##     ## for the current table if they where already
-##     ## in a previous (more relevant) table
-##     ## however, prefer also cases were fewer tables are returned.
-##     for(i in 1:length(columns.bytable)){
-##         bm <- columns.bytable[[ i ]] %in% have.columns
-##         keepvals <- columns.bytable[[ i  ]][ !bm ]   ## keep those
-##         if(length(keepvals) > 0){
-##             have.columns <- c(have.columns, keepvals)
-##         }
-##         if(length(keepvals) > 0){
-##             columns.bytable[[ i ]] <- paste(names(columns.bytable)[ i ],
-##                                             keepvals, sep=".")
-##         }else{
-##             columns.bytable[[ i ]] <- keepvals
-##         }
-##     }
-##     ## kick out those tables with no elements left...
-##     columns.bytable <- columns.bytable[ unlist(lapply(columns.bytable,
-##                                                       function(z){
-##                                                           return(length(z) > 0)
-##     })) ]
-##     ## re-order by degree.
-##     columns.bytable <- columns.bytable[ tablesByDegree(x,
-##                                                        names(columns.bytable)) ]
-##     return(columns.bytable)
-## }
 
 ############################################################
 ## prefixColumns
@@ -242,60 +160,6 @@ prefixColumnsKeepOrder <- function(x, columns, clean = TRUE, with.tables) {
     })
     return(res_order[!is.null(res_order)])
 }
-
-
-
-## define a function to create a join query based on columns
-## this function has to first get all tables that contain the columns,
-## and then select, for columns present in more than one
-## x... EnsDb
-## columns... the columns
-## joinQueryOnColumns <- function(x, columns, join = "join"){
-##     columns.bytable <- prefixColumns(x, columns)
-##     ## based on that we can build the query based on the tables we've got. Note that the
-##     ## function internally
-##     ## adds tables that might be needed for the join.
-##     Query <- joinQueryOnTables(x, names(columns.bytable))
-##     return(Query)
-## }
-
-
-## only list direct joins!!!
-## .JOINS <- rbind(
-##     c("gene", "tx", "tx on (gene.gene_id=tx.gene_id)"),
-##     c("gene", "chromosome",
-##       "chromosome on (gene.seq_name=chromosome.seq_name)"),
-##     c("tx", "tx2exon", "tx2exon on (tx.tx_id=tx2exon.tx_id)"),
-##     c("tx2exon", "exon", "exon on (tx2exon.exon_id=exon.exon_id)"),
-##     c("tx", "protein", "protein on (tx.tx_id=protein.tx_id)"),
-##     c("protein", "uniprot",
-##       "uniprot on (protein.protein_id=uniprot.protein_id)"),
-##     c("protein", "protein_domain",
-##       "protein_domain on (protein.protein_id=protein_domain.protein_id)"),
-##     c("uniprot", "protein_domain",
-##       "protein_domain on (uniprot.protein_id=protein_domain.protein_id)")
-## )
-
-############################################################
-## joinQueryOnTables
-##
-## Helper function to generate the join query based on the provided tables.
-## joinQueryOnTables <- function(x, tab, join = "join"){
-##     ## Evaluate whether we have all required tables to join;
-##     ## this will also ensure that the order is by degree.
-##     tab <- addRequiredTables(x, tab)
-##     Query <- tab[1]
-##     previous.table <- tab[1]
-##     for (i in 1:length(tab)) {
-##         if (i > 1) {
-##             Query <- paste(Query, join, .JOINS[.JOINS[, 1] %in% previous.table &
-##                                                .JOINS[, 2] == tab[i], 3])
-##             ## Add the table to the previous tables.
-##             previous.table <- c(previous.table, tab[i])
-##         }
-##     }
-##     return(Query)
-## }
 
 ############################################################
 ## ** NEW JOIN ENGINE **
@@ -438,14 +302,14 @@ addRequiredTables <- function(x, tab){
 ## columns, the provided filters etc.
 ## x an EnsDb object
 ## startWith: optional table from which the join should start.
-.buildQuery <- function(x, columns, filter = list(), order.by = "",
-                        order.type = "asc", group.by, skip.order.check=FALSE,
-                        return.all.columns = TRUE, join = "suggested",
-                        startWith = NULL) {
+.buildQuery <- function(x, columns, filter = AnnotationFilterList(),
+                        order.by = "", order.type = "asc", group.by,
+                        skip.order.check=FALSE, return.all.columns = TRUE,
+                        join = "suggested", startWith = NULL) {
     resultcolumns <- columns    ## just to remember what we really want to give back
     ## 1) get all column names from the filters also removing the prefix.
-    if (class(filter)!="list")
-        stop("parameter filter has to be a list of AnnotationFilter classes!")
+    if (!is(filter, "AnnotationFilterList"))
+        stop("parameter 'filter' has to be an 'AnnotationFilterList'!")
     if (length(filter) > 0) {
         ## check filter!
         ## add the columns needed for the filter
@@ -475,10 +339,9 @@ addRequiredTables <- function(x, tab){
                                      startWith = startWith)
     ## b) the filter part of the query
     if (length(filter) > 0) {
-        filterquery <- paste(" where",
-                             paste(unlist(lapply(filter, ensDbQuery, x,
-                                                 with.tables = need.tables)),
-                                   collapse=" and "))
+        ## USE THE ensDbQuery method here!!!
+        filterquery <- paste0(" where ", ensDbQuery(filter, x,
+                                                    with.tables = need.tables))
     } else {
         filterquery <- ""
     }
@@ -524,7 +387,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 ## query
 ## join: what type of join should be performed.
 ## startWith: the name of the table from which the query should be started.
-.getWhat <- function(x, columns, filter = list(), order.by = "",
+.getWhat <- function(x, columns, filter = AnnotationFilterList(), order.by = "",
                      order.type = "asc", group.by = NULL,
                      skip.order.check = FALSE, join = "suggested",
                      startWith = NULL) {
@@ -535,8 +398,8 @@ removePrefix <- function(x, split=".", fixed=TRUE){
     if(any(columns == "tx_name"))
         fetchColumns <- unique(c("tx_id",
                                  fetchColumns[fetchColumns != "tx_name"]))
-    if (class(filter) != "list")
-        stop("parameter filter has to be a list of AnnotationFilter classes!")
+    if (!is(filter, "AnnotationFilterList"))
+        stop("parameter 'filter' has to be an 'AnnotationFilterList'!")
     ## If any filter is a SymbolFilter, add "symbol" to the return columns.
     if (length(filter) > 0) {
         if (any(unlist(lapply(filter, function(z) {
@@ -612,7 +475,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
     }
     ## Ensure that the ordering is as requested.
     Res <- Res[, columns, drop=FALSE]
-    return(Res)
+    Res
 }
 
 ############################################################
@@ -808,3 +671,14 @@ listEnsDbs <- function(dbcon, host, port, user, pass) {
         stop("Required package 'RMySQL' is not installed.")
     }
 }
+
+#' Simple helper that "translates" R logical operators to SQL.
+#' @noRd
+.logOp2SQL <- function(x) {
+    if (x == "|")
+        return("or")
+    if (x == "&")
+        return("and")
+    return(NULL)
+}
+

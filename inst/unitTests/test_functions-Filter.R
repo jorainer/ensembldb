@@ -119,7 +119,11 @@ test_processFilterParam <- function() {
     ## res <- ensembldb:::.processFilterParam()
     ## checkTrue(is(res, "AnnotationFilterList"))
     ## checkTrue(length(res) == 0)
-    
+    snf <- SeqNameFilter(c("Y", 9))
+    res <- ensembldb:::.processFilterParam(snf)
+    checkTrue(is(res, "AnnotationFilterList"))
+    checkEquals(res[[1]], snf)
+
     ## - single filter
     gif <- GeneIdFilter("BCL2", condition = "!=")
     res <- ensembldb:::.processFilterParam(gif)
@@ -144,6 +148,10 @@ test_processFilterParam <- function() {
     ## - filter expression
     res <- ensembldb:::.processFilterParam(gene_id != "BCL2" | seq_name == "X")
     checkTrue(is(res, "AnnotationFilterList"))
+    checkEquals(res, AnnotationFilterList(gif, snf, logOp = "|"))
+    res <- ensembldb:::.processFilterParam(gene_id != "BCL2")
+    checkTrue(is(res, "AnnotationFilterList"))
+    checkEquals(res, AnnotationFilterList(gif))
 
     ## - Errors
     checkException(ensembldb:::.processFilterParam())
