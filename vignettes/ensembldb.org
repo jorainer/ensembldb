@@ -1382,8 +1382,10 @@ Support multiple regions for a =GRangesFilter=.
    - State "DONE"       from "TODO"       [2016-09-16 Fri 15:27]
 
 Done in issues #4 and #5.
-** TODO What about using pipe and /formula-like/ filters?
+** DONE What about using pipe and /formula-like/ filters?
+   CLOSED: [2017-03-27 Mon 09:35]
 
+   - State "DONE"       from "TODO"       [2017-03-27 Mon 09:35]
 ** DONE Fix the =select= method such that it always returns the values in the same order than the keys were
    CLOSED: [2016-09-16 Fri 15:26]
    - State "DONE"       from "TODO"       [2016-09-16 Fri 15:26]

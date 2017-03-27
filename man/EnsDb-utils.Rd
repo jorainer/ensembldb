@@ -10,10 +10,9 @@
 }
 \usage{
 
-\S4method{getGeneRegionTrackForGviz}{EnsDb}(x, filter=list(),
-                                            chromosome=NULL,
-                                            start=NULL, end=NULL,
-                                            featureIs="gene_biotype")
+\S4method{getGeneRegionTrackForGviz}{EnsDb}(x,
+        filter = AnnotationFilterList(), chromosome = NULL,
+        start = NULL, end = NULL, featureIs = "gene_biotype")
 }
 \arguments{
 
@@ -37,9 +36,13 @@
   }
 
   \item{filter}{
-    A filter object extending \code{AnnotationFilter} or a list
-    of such object(s) to select specific entries from the database (see
-    examples below).
+    A filter describing which results to retrieve from the database. Can
+    be a single object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an
+    \code{\link[AnnotationFilter]{AnnotationFilterList}} object
+    combining several such objects or a \code{formula} representing a
+    filter expression (see examples below or
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details).
   }
 
   \item{start}{
@@ -98,15 +101,15 @@ edb <- EnsDb.Hsapiens.v75
 ######   getGeneRegionTrackForGviz
 ##
 ## Get all genes encoded on chromosome Y in the specifyed region.
-AllY <- getGeneRegionTrackForGviz(edb, chromosome="Y", start=5000000,
-                                  end=7000000)
+AllY <- getGeneRegionTrackForGviz(edb, chromosome = "Y", start = 5000000,
+                                  end = 7000000)
 ## We could plot this now using plotTracks(GeneRegionTrack(AllY))
 
 ## We can also use filters to further restrict the query to e.g.
 ## all lincRNA genes encoded in that region.
-lincsY <- getGeneRegionTrackForGviz(edb, chromosome="Y", start=5000000,
-                                    end=7000000,
-                                    filter=GeneBiotypeFilter("lincRNA"))
+lincsY <- getGeneRegionTrackForGviz(edb, chromosome = "Y", start = 5000000,
+                                    end = 7000000,
+                                    filter = GeneBiotypeFilter("lincRNA"))
 
 }
 \keyword{classes}

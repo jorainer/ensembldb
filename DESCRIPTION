@@ -27,7 +27,6 @@ Imports:
     IRanges,
     ProtGenerics,
     Biostrings,
-    testthat,
     RCurl
 Depends:
     BiocGenerics (>= 0.15.10),
@@ -39,9 +38,9 @@ Suggests:
     knitr,
     rmarkdown,
     EnsDb.Hsapiens.v75 (>= 0.99.8),
-    RUnit,
     shiny,
     Gviz,
+    testthat,
     BSgenome.Hsapiens.UCSC.hg19
 Enhances: RMySQL
 VignetteBuilder: knitr

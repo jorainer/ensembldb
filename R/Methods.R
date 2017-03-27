@@ -1230,7 +1230,7 @@ getUTRsByTranscript <- function(x, what, columns = NULL,
 ## threeUTRsByTranscript
 ##
 setMethod("threeUTRsByTranscript", "EnsDb",
-          function(x, columns = NULL, filter = AnnotationFilterList) {
+          function(x, columns = NULL, filter = AnnotationFilterList()) {
               filter <- .processFilterParam(filter, x)
               getUTRsByTranscript(x = x, what = "three", columns = columns,
                                   filter = filter)
@@ -1240,7 +1240,7 @@ setMethod("threeUTRsByTranscript", "EnsDb",
 ## fiveUTRsByTranscript
 ##
 setMethod("fiveUTRsByTranscript", "EnsDb",
-          function(x, columns = NULL, filter = AnnotationFilterList) {
+          function(x, columns = NULL, filter = AnnotationFilterList()) {
     filter <- .processFilterParam(filter, x)
     getUTRsByTranscript(x = x, what = "five", columns = columns,
                         filter = filter)
@@ -1939,6 +1939,17 @@ setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
     return(res$uniprot_mapping_type)
 })
 
+#' @description \code{supportedFilters} returns the names of all supported
+#'     filters for the \code{EnsDb} object.
+#'
+#' @param object For \code{supportedFilters}: an \code{EnsDb} object.
+#'
+#' @param ... For \code{supportedFilters}: currently not used.
+#'
+#' @return For \code{supportedFilters}: the names of the supported filter
+#'     classes.
+#' 
+#' @rdname Filter-classes
 setMethod("supportedFilters", "EnsDb", function(object, ...) {
     .supportedFilters(object)
 })

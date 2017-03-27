@@ -14,7 +14,8 @@
 listProteinColumns(object)
 
 \S4method{proteins}{EnsDb}(object, columns = listColumns(object, "protein"),
-  filter, order.by = "", order.type = "asc", return.type = "DataFrame")
+  filter = AnnotationFilterList(), order.by = "", order.type = "asc",
+  return.type = "DataFrame")
 
 \S4method{listUniprotDbs}{EnsDb}(object)
 
