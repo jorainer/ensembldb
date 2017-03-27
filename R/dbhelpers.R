@@ -420,6 +420,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                          skip.order.check = skip.order.check, join = join,
                          startWith = startWith)
         ## Get the data
+        ## cat("Query: ", Q, "\n")
         Res <- dbGetQuery(dbconn(x), Q)
         ## Note: we can only order by the columns that we did get back from the
         ## database; that might be different for the SQL sorting!
@@ -433,6 +434,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                          skip.order.check = skip.order.check, join = join,
                          startWith = startWith)
         ## Get the data
+        ## cat("Query: ", Q, "\n")
         Res <- dbGetQuery(dbconn(x), Q)
     }
     ## cat("Query:\n", Q, "\n")

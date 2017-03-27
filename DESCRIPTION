@@ -27,17 +27,18 @@ Imports:
     IRanges,
     ProtGenerics,
     Biostrings,
+    testthat,
     RCurl
 Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.23.21),
     GenomicFeatures (>= 1.23.18),
-    AnnotationFilter (>= 0.99.0)
+    AnnotationFilter (>= 0.99.7)
 Suggests:
     BiocStyle,
     knitr,
     rmarkdown,
-    EnsDb.Hsapiens.v75 (>= 0.99.7),
+    EnsDb.Hsapiens.v75 (>= 0.99.8),
     RUnit,
     shiny,
     Gviz,

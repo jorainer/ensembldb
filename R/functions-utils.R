@@ -53,23 +53,22 @@ checkOrderBy <- function(orderBy, supported = character()) {
 ##    column call without db are added).
 ## b) GRangesFilter: the feature is set based on the specified feature parameter
 ## Args:
-addFilterColumns <- function(cols, filter = list(), edb) {
+addFilterColumns <- function(cols, filter = AnnotationFilterList(), edb) {
     if (missing(cols))
         cols <- NULL
     gimmeAll <- returnFilterColumns(edb)
-    if (!missing(filter)) {
-        if(!is.list(filter))
-            filter <- list(filter)
-    } else {
-        return(cols)
-    }
     if (!gimmeAll)
         return(cols)
+    ## Put filter into an AnnotationFilterList if it's not already one
+    if (is(filter, "AnnotationFilter"))
+        filter <- AnnotationFilterList(filter)
     ## Or alternatively process the filters and add columns.
     symFilts <- c("SymbolFilter")
     addC <- unlist(lapply(filter, function(z) {
         if(class(z) %in% symFilts)
             return(z@field)
+        if (is(z, "AnnotationFilterList"))
+            return(addFilterColumns(cols = cols, filter = z, edb))
         return(ensDbColumn(z))
     }))
     return(unique(c(cols, addC)))
@@ -89,7 +88,8 @@ SQLiteName2MySQL <- function(x) {
 runEnsDbApp <- function(...){
     if(requireNamespace("shiny", quietly=TRUE)){
         message("Starting the EnsDb shiny web app. Use Ctrl-C to stop.")
-        shiny::runApp(appDir=system.file("shinyHappyPeople", package="ensembldb"), ...)
+        shiny::runApp(appDir=system.file("shinyHappyPeople",
+                                         package="ensembldb"), ...)
     }else{
         stop("Package shiny not installed!")
     }
@@ -183,3 +183,25 @@ listProteinColumns <- function(object) {
     ##return(new("Proteins", aa = aass, pranges = pranges, metadata = metadata))
 }
 
+## map chromosome strand...
+strand2num <- function(x){
+    if (is.numeric(x)) {
+        if (x >= 0) return(1)
+        else return(-1)
+    }
+    xm <- x
+    if(xm == "+" | xm == "-")
+        xm <- paste0(xm, 1)
+    xm <- as.numeric(xm)
+    if (is.na(xm))
+        stop("'", x, "' can not be converted to a strand!")
+    return(xm)
+}
+
+num2strand <- function(x){
+    if(x < 0){
+        return("-")
+    }else{
+        return("+")
+    }
+}

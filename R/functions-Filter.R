@@ -129,54 +129,52 @@
 #' Simple helper function to convert expressions to AnnotationFilter or
 #' AnnotationFilterList.
 #'
-#' @param ... Can be an \code{AnnotationFilter}, an \code{AnnotationFilterList},
+#' @param x Can be an \code{AnnotationFilter}, an \code{AnnotationFilterList},
 #' a \code{list} or a filter \code{expression}. This should NOT be empty!
 #' 
 #' @return Returns an \code{AnnotationFilterList} with all filters.
 #' 
 #' @noRd
-.processFilterParam <- function(...) {
-    ## Try to translate a filter expression to a filter.
-    res <- NULL
-    res <- try(convertFilterExpression(...), silent = TRUE)
-    ## Check if we were able to translate the call:
+.processFilterParam <- function(x, db) {
+    if (missing(db))
+        stop("Argument 'db' missing.")
+    cat(".processFilterParam\n")
+    ## Check if x is a formula and eventually translate it.
+    if (is(x, "formula"))
+        res <- AnnotationFilter(x)
+    else res <- x
     if (is(res, "AnnotationFilter"))
         res <- AnnotationFilterList(res)
-    if (is(res, "AnnotationFilterList"))
-        return(res)
-    ## Otherwise continue.
-    ## Check if the error might be worth while to return:
-    if (is(res, "try-error")) {
-        errmsg <- unlist(strsplit(as.character(res), "\n", fixed = TRUE))
-        if (length(errmsg) == 2)
-            if (length(grep("No AnnotationFilter class", errmsg[[2]])))
-                stop(errmsg[[2]])
-    }
-    res <- unlist(list(...))
-    ## Did not get a filter expression, thus checking what we've got.
-    if (is(res, "list")) {
-        if (length(res)) {
-            ## Check that all elements are AnnotationFilter objects!
-            if (!all(unlist(lapply(res, function(z) {
-                inherits(z, "AnnotationFilter")
-            }), use.names = FALSE)))
-                stop("One of more elements in 'filter' are not ",
-                     "'AnnotationFilter' objects!")
-            res <- as(res, "AnnotationFilterList")
-            res@logOp <- rep("&", (length(res) - 1))
+    if (!is(res, "AnnotationFilterList")) {
+        ## Did not get a filter expression, thus checking what we've got.
+        if (is(res, "list")) {
+            if (length(res)) {
+                ## Check that all elements are AnnotationFilter objects!
+                if (!all(unlist(lapply(res, function(z) {
+                    inherits(z, "AnnotationFilter")
+                }), use.names = FALSE)))
+                    stop("One of more elements in 'filter' are not ",
+                         "'AnnotationFilter' objects!")
+                res <- as(res, "AnnotationFilterList")
+                res@logOp <- rep("&", (length(res) - 1))
+            } else {
+                res <- AnnotationFilterList()
+            }
         } else {
-            res <- AnnotationFilterList()
-        }
-    } else {
-        if (inherits(res, "AnnotationFilter"))
-            res <- AnnotationFilterList(res)
-        else
             stop("'filter' has to be an 'AnnotationFilter', a list of ",
                  "'AnnotationFilter' object, an 'AnnotationFilterList' ",
                  "or a valid filter expression!")
+        }
     }
+    supp_filters <- supportedFilters(db)
+    have_filters <- unique(.AnnotationFilterClassNames(res))
+    if (!all(have_filters %in% supp_filters))
+        stop("AnnotationFilter classes: ",
+             paste(have_filters[!(have_filters %in% supp_filters)]),
+             " are not supported by EnsDb databases.")
     res
 }
+
 
 ############################################################
 ## setFeatureInGRangesFilter
@@ -185,24 +183,29 @@
 ## depending on the calling method.
 setFeatureInGRangesFilter <- function(x, feature){
     for (i in seq(along.with = x)){
-        if (is(x[[i]], "GRangesFilter")) {
+        if (is(x[[i]], "GRangesFilter"))
             x[[i]]@feature <- feature
-        }
+        if (is(x[[i]], "AnnotationFilterList"))
+            x[[i]] <- setFeatureInGRangesFilter(x[[i]], feature = feature)
     }
-    return(x)
+    x
 }
 
 ############################################################
 ## isProteinFilter
 ##' evaluates whether the filter is a protein annotation related filter.
-##' @param x The object that should be evaluated.
+##' @param x The object that should be evaluated. Can be an AnnotationFilter or
+##'     an AnnotationFilterList.
 ##' @return Returns TRUE if 'x' is a filter for protein annotation tables and
 ##' FALSE otherwise.
 ##' @noRd
 isProteinFilter <- function(x) {
-    return(is(x, "ProteinIdFilter") | is(x, "UniprotFilter") |
-           is(x, "ProtDomIdFilter") | is(x, "UniprotDbFilter") |
-           is(x, "UniprotMappingTypeFilter"))
+    if (is(x, "AnnotationFilterList"))
+        return(unlist(lapply(x, isProteinFilter)))
+    else
+        return(is(x, "ProteinIdFilter") | is(x, "UniprotFilter") |
+               is(x, "ProtDomIdFilter") | is(x, "UniprotDbFilter") |
+               is(x, "UniprotMappingTypeFilter"))
 }
 
 ## ############################################################
@@ -229,3 +232,94 @@ isProteinFilter <- function(x) {
 ##     }
 ##     return(x)
 ## }
+
+#' build the \emph{where} query for a \code{GRangedFilter}. Supported conditions
+#' are: \code{"start"}, \code{"end"}, \code{"equal"}, \code{"within"},
+#' \code{"any"}.
+#'
+#' @param grf \code{GRangesFilter}.
+#'
+#' @param columns named character vectors with the column names for start, end,
+#'     strand and seq_name.
+#'
+#' @param db An optional \code{EnsDb} instance. Used to \emph{translate}
+#'     seqnames depending on the specified seqlevels style.
+#'
+#' @return A character with the corresponding \emph{where} query.
+#' @noRd
+buildWhereForGRanges <- function(grf, columns, db = NULL){
+    condition <- condition(grf)
+    if (!(condition %in% c("start", "end", "within", "equal", "any")))
+        stop("'condition' ", condition, " not supported. Condition (type) can ",
+             "be one of 'any', 'start', 'end', 'equal', 'within'.")
+    if( is.null(names(columns)))
+        stop("The vector with the required column names for the",
+             " GRangesFilter query has to have names!")
+    if (!all(c("start", "end", "seqname", "strand") %in% names(columns)))
+        stop("'columns' has to be a named vector with names being ",
+             "'start', 'end', 'seqname', 'strand'!")
+    ## Build the query to fetch all features that are located within the range
+    quers <- sapply(value(grf), function(z) {
+        if (!is.null(db)) {
+            seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
+        } else {
+            seqn <- as.character(seqnames(z))
+        }
+        ## start: start, seqname and strand have to match.
+        if (condition == "start") {
+            query <- paste0(columns["start"], "=", start(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## end: end, seqname and strand have to match.
+        if (condition == "end") {
+            query <- paste0(columns["end"], "=", end(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## equal: start, end, seqname and strand have to match.
+        if (condition == "equal") {
+            query <- paste0(columns["start"], "=", start(z), " and ",
+                            columns["end"], "=", end(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## within: start has to be >= start, end <= end, seqname and strand
+        ##         have to match.
+        if (condition == "within") {
+            query <- paste0(columns["start"], ">=", start(z), " and ",
+                            columns["end"], "<=", end(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## any: essentially the overlapping.
+        if (condition == "any") {
+            query <- paste0(columns["start"], "<=", end(z), " and ",
+                            columns["end"], ">=", start(z), " and ",
+                            columns["seqname"], "='", seqn, "'")
+        }
+        ## Include the strand, if it's not "*"
+        if(as.character(strand(z)) != "*"){
+            query <- paste0(query, " and ", columns["strand"], " = ",
+                            strand2num(as.character(strand(z))))
+        }
+        return(query)
+    })
+    if(length(quers) > 1)
+        quers <- paste0("(", quers, ")")
+    ## Collapse now the queries.
+    query <- paste0(quers, collapse=" or ")
+    paste0("(", query, ")")
+}
+
+#' @description Helper to extract all AnnotationFilter class names from an
+#'     AnnotationFilterList (recursively!)
+#'
+#' @param x The \code{AnnotationFilterList}.
+#'
+#' @return A \code{character} with the names of the classes.
+#' @noRd
+.AnnotationFilterClassNames <- function(x) {
+    classes <- lapply(x, function(z) {
+        if (is(z, "AnnotationFilterList"))
+            return(.AnnotationFilterClassNames(z))
+        class(z)
+    })
+    unlist(classes, use.names = FALSE)
+}

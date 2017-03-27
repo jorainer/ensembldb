@@ -1,4 +1,18 @@
+## Methods for filter classes.
 
+#' @description Extract the field/column name from an AnnotationFilter and
+#'     ensure that it matches the correct database column name. Depending on
+#'     whether argument \code{db} is present, the column names are also
+#'     prefixed with the name of the corresponding table.
+#'
+#' @param object An \code{AnnotationFilter} object.
+#'
+#' @param db An \code{EnsDb} object.
+#'
+#' @param with.tables \code{character} specifying the tables that should be
+#'     considered when prefixing the column name.
+#' 
+#' @noRd
 setMethod("ensDbColumn", "AnnotationFilter",
           function(object, db, with.tables = character()) {
               clmn <- .fieldInEnsDb(object@field)
@@ -9,20 +23,24 @@ setMethod("ensDbColumn", "AnnotationFilter",
               unlist(prefixColumns(db, clmn, with.tables = with.tables),
                      use.names = FALSE)
           })
+
+setMethod("ensDbColumn", "AnnotationFilterList",
+          function(object, db, with.tables = character()) {
+              if (length(object) == 0)
+                  return(character())
+              unique(unlist(lapply(object, ensDbColumn, db,
+                                   with.tables = with.tables)))
+          })
+
+#' @description Build the \emph{where} query for an \code{AnnotationFilter} or
+#'     \code{AnnotationFilterList}.
+#'
+#' @noRd
 setMethod("ensDbQuery", "AnnotationFilter",
           function(object, db, with.tables = character()) {
               .queryForEnsDbWithTables(object, db, with.tables)
           })
 
-setMethod("ensDbQuery", "list",
-          function(object, db, with.tables = character()) {
-              wq <- paste0(" where ",
-                           paste(unlist(lapply(object, ensDbQuery, db,
-                                               with.tables = with.tables),
-                                        use.names = FALSE),
-                                 collapse = " and "))
-              wq
-          })
 setMethod("ensDbQuery", "AnnotationFilterList",
           function(object, db, with.tables = character()) {
               wq <- NULL
@@ -41,19 +59,6 @@ setMethod("ensDbQuery", "AnnotationFilterList",
               wq
           })
 
-## setMethod("value", "SeqNameFilter",
-##           function(object, db){
-##               if (missing(db))
-##                   return(object@value)
-##               val <- formatSeqnamesForQuery(db, object@value)
-##               if(any(is.na(val))){
-##                   stop("A value of <NA> is not allowed for a SeqNameFilter!")
-##               }
-##               if (length(val) > 1)
-##                   val <- paste0("(",  paste0(val, collapse = ","), ")")
-##               return(val)
-##               ##return(ucscToEns(value(x)))
-##           })
 #' Need an ensDbQuery for SeqNameFilter to support different chromosome naming
 #' styles
 #' 
@@ -99,14 +104,17 @@ setMethod("start", signature(x="GRangesFilter"),
           function(x, ...){
               start(value(x))
           })
+
 setMethod("end", signature(x="GRangesFilter"),
           function(x, ...){
               end(value(x))
           })
+
 setMethod("strand", signature(x="GRangesFilter"),
           function(x, ...){
               as.character(strand(value(x)))
           })
+
 #' @description \code{seqnames}: accessor for the sequence names of the
 #' \code{GRanges} object within a \code{GRangesFilter}
 #' @param x For \code{seqnames}, \code{seqlevels}: a \code{GRangesFilter} object.
@@ -116,6 +124,7 @@ setMethod("seqnames", signature(x="GRangesFilter"),
           function(x){
               as.character(seqnames(value(x)))
           })
+
 #' @description \code{seqnames}: accessor for the \code{seqlevels} of the
 #' \code{GRanges} object within a \code{GRangesFilter}
 #' 
@@ -124,6 +133,7 @@ setMethod("seqlevels", signature(x="GRangesFilter"),
           function(x){
               seqlevels(value(x))
           })
+
 setMethod("ensDbColumn", "GRangesFilter",
           function(object, db, with.tables = character(), ...){
               feature <- object@feature
@@ -151,6 +161,7 @@ setMethod("ensDbColumn", "GRangesFilter",
               }
               cols[c("start", "end", "seqname", "strand")]
           })
+
 setMethod("ensDbQuery", "GRangesFilter",
           function(object, db, with.tables = character()) {
               cols <- ensDbColumn(object, db, with.tables)
@@ -158,151 +169,6 @@ setMethod("ensDbQuery", "GRangesFilter",
                   db <- NULL
               buildWhereForGRanges(object, cols, db = db)
           })
-
-
-## grf: GRangesFilter
-## buildWhereForGRanges_old <- function(grf, columns, db=NULL){
-##     condition <- condition(grf)
-##     if(!any(condition == c("within", "overlapping")))
-##         stop(paste0("'condition' for GRangesFilter should either be ",
-##                     "'within' or 'overlapping', got ", condition, "."))
-##     if(is.null(names(columns))){
-##         stop(paste0("The vector with the required column names for the",
-##                     " GRangesFilter query has to have names!"))
-##     }
-##     if(!all(c("start", "end", "seqname", "strand") %in% names(columns)))
-##         stop(paste0("'columns' has to be a named vector with names being ",
-##                     "'start', 'end', 'seqname', 'strand'!"))
-##     ## Build the query to fetch all features that are located within the range
-##     quers <- sapply(value(grf), function(z){
-##         if(!is.null(db)){
-##             seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
-##         }else{
-##             seqn <- as.character(seqnames(z))
-##         }
-##         if(condition == "within"){
-##             query <- paste0(columns["start"], " >= ", start(z), " and ",
-##                             columns["end"], " <= ", end(z), " and ",
-##                             columns["seqname"], " = '", seqn, "'")
-##         }
-##         ## Build the query to fetch all features (partially) overlapping
-##         ## the range. This includes also all features (genes or transcripts)
-##         ## that have an intron at that position.
-##         if(condition == "overlapping"){
-##             query <- paste0(columns["start"], " <= ", end(z), " and ",
-##                             columns["end"], " >= ", start(z), " and ",
-##                             columns["seqname"], " = '", seqn, "'")
-##         }
-##         ## Include the strand, if it's not "*"
-##         if(as.character(strand(z)) != "*"){
-##             query <- paste0(query, " and ", columns["strand"], " = ",
-##                             strand2num(as.character(strand(z))))
-##         }
-##         return(query)
-##     })
-##     if(length(quers) > 1)
-##         quers <- paste0("(", quers, ")")
-##     query <- paste0(quers, collapse=" or ")
-##     ## Collapse now the queries.
-##     query
-## }
-
-#' build the \emph{where} query for a \code{GRangedFilter}. Supported conditions
-#' are: \code{"start"}, \code{"end"}, \code{"equal"}, \code{"within"},
-#' \code{"any"}.
-#'
-#' @param grf \code{GRangesFilter}.
-#'
-#' @param columns named character vectors with the column names for start, end,
-#'     strand and seq_name.
-#'
-#' @param db An optional \code{EnsDb} instance. Used to \emph{translate}
-#'     seqnames depending on the specified seqlevels style.
-#'
-#' @return A character with the corresponding \emph{where} query.
-#' @noRd
-buildWhereForGRanges <- function(grf, columns, db = NULL){
-    condition <- condition(grf)
-    if (!(condition %in% c("start", "end", "within", "equal", "any")))
-        stop("'condition' ", condition, " not supported. Condition (type) can ",
-             "be one of 'any', 'start', 'end', 'equal', 'within'.")
-    if( is.null(names(columns)))
-        stop("The vector with the required column names for the",
-             " GRangesFilter query has to have names!")
-    if (!all(c("start", "end", "seqname", "strand") %in% names(columns)))
-        stop("'columns' has to be a named vector with names being ",
-             "'start', 'end', 'seqname', 'strand'!")
-    ## Build the query to fetch all features that are located within the range
-    quers <- sapply(value(grf), function(z) {
-        if (!is.null(db)) {
-            seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
-        } else {
-            seqn <- as.character(seqnames(z))
-        }
-        ## start: start, seqname and strand have to match.
-        if (condition == "start") {
-            query <- paste0(columns["start"], "=", start(z), " and ",
-                            columns["seqname"], "='", seqn, "'")
-        }
-        ## end: end, seqname and strand have to match.
-        if (condition == "end") {
-            query <- paste0(columns["end"], "=", end(z), " and ",
-                            columns["seqname"], "='", seqn, "'")
-        }
-        ## equal: start, end, seqname and strand have to match.
-        if (condition == "equal") {
-            query <- paste0(columns["start"], "=", start(z), " and ",
-                            columns["end"], "=", end(z), " and ",
-                            columns["seqname"], "='", seqn, "'")
-        }
-        ## within: start has to be >= start, end <= end, seqname and strand
-        ##         have to match.
-        if (condition == "within") {
-            query <- paste0(columns["start"], ">=", start(z), " and ",
-                            columns["end"], "<=", end(z), " and ",
-                            columns["seqname"], "='", seqn, "'")
-        }
-        ## any: essentially the overlapping.
-        if (condition == "any") {
-            query <- paste0(columns["start"], "<=", end(z), " and ",
-                            columns["end"], ">=", start(z), " and ",
-                            columns["seqname"], "='", seqn, "'")
-        }
-        ## Include the strand, if it's not "*"
-        if(as.character(strand(z)) != "*"){
-            query <- paste0(query, " and ", columns["strand"], " = ",
-                            strand2num(as.character(strand(z))))
-        }
-        return(query)
-    })
-    if(length(quers) > 1)
-        quers <- paste0("(", quers, ")")
-    ## Collapse now the queries.
-    query <- paste0(quers, collapse=" or ")
-    paste0("(", query, ")")
-}
-
-## map chromosome strand...
-strand2num <- function(x){
-    if (is.numeric(x)) {
-        if (x >= 0) return(1)
-        else return(-1)
-    }
-    xm <- x
-    if(xm == "+" | xm == "-")
-        xm <- paste0(xm, 1)
-    xm <- as.numeric(xm)
-    if (is.na(xm))
-        stop("'", x, "' can not be converted to a strand!")
-    return(xm)
-}
-num2strand <- function(x){
-    if(x < 0){
-        return("-")
-    }else{
-        return("+")
-    }
-}
 
 setMethod("ensDbColumn", signature(object = "OnlyCodingTxFilter"),
           function(object, db, ...) {

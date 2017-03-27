@@ -159,7 +159,7 @@ SeqstartFilter <- function(value, condition=">", feature="gene"){
     feature <- match.arg(feature, c("gene", "exon", "tx"))
     return(new(paste0(sub("^([[:alpha:]])", "\\U\\1", feature, perl=TRUE),
                       "StartFilter"), value = as.integer(value),
-               .valueIsCharacter = FALSE, condition = condition,
+               condition = condition,
                field = paste0(feature, "_start")))
 }
 
@@ -177,6 +177,6 @@ SeqendFilter <- function(value, condition="<", feature="gene"){
     feature <- match.arg(feature, c("gene", "exon", "tx"))
     return(new(paste0(sub("^([[:alpha:]])", "\\U\\1", feature, perl=TRUE)),
                "EndFilter"), value = as.integer(value),
-           .valueIsCharacter = FALSE, condition = condition,
+           condition = condition,
            field = paste0(feature, "_end"))
 }

@@ -50,10 +50,6 @@
 }
 \usage{
 
-\S4method{buildQuery}{EnsDb}(x, columns=c("gene_id", "gene_biotype",
-                                    "gene_name"), filter=list(), order.by,
-                             order.type="asc", skip.order.check=FALSE)
-
 \S4method{dbconn}{EnsDb}(x)
 
 \S4method{ensemblVersion}{EnsDb}(x)
@@ -164,11 +160,6 @@
 \section{Methods and Functions}{
   \describe{
 
-    \item{buildQuery}{
-      Helper function building the SQL query to be used to retrieve the
-      wanted information. Usually there is no need to call this method.
-    }
-
     \item{dbconn}{
       Returns the connection to the internal SQL database.
     }
@@ -232,10 +223,6 @@
 }
 \value{
   \describe{
-    \item{For \code{buildQuery}}{
-      A character string with the SQL query.
-    }
-
     \item{For \code{connection}}{
       The SQL connection to the RSQLite database.
     }
@@ -325,16 +312,6 @@ metadata(EnsDb.Hsapiens.v75)
 
 ## Get all the sequence names.
 seqlevels(EnsDb.Hsapiens.v75)
-
-######    buildQuery
-##
-## Join tables gene and transcript and return gene_id and tx_id
-buildQuery(EnsDb.Hsapiens.v75, columns=c("gene_id", "tx_id"))
-
-
-## Get all exon_ids and transcript ids of genes encoded on chromosome Y.
-buildQuery(EnsDb.Hsapiens.v75, columns=c("exon_id", "tx_id"),
-           filter=list(SeqNameFilter( "Y")))
 
 ## List all available gene biotypes from the database:
 listGenebiotypes(EnsDb.Hsapiens.v75)
