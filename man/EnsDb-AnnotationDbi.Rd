@@ -46,8 +46,11 @@
   \item{keys}{
     The keys/ids for which data should be retrieved from the
     database. This can be either a character vector of keys/IDs, a
-    single filter object extending \code{AnnotationFilter} or a
-    list of such objects.
+    single filter object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an combination of
+    filters \code{\link[AnnotationFilter]{AnnotationFilterList}} or a
+    \code{formula} representing a filter expression (see
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details).
   }
 
   \item{keytype}{
@@ -179,12 +182,12 @@ columns(edb)
 listColumns(edb)
 
 ## Retrieve all keys corresponding to transcript ids.
-txids <- keys(edb, keytype="TXID")
+txids <- keys(edb, keytype = "TXID")
 length(txids)
 head(txids)
 
 ## Retrieve all keys corresponding to gene names of genes encoded on chromosome X
-gids <- keys(edb, keytype="GENENAME", filter=SeqNameFilter("X"))
+gids <- keys(edb, keytype = "GENENAME", filter = SeqNameFilter("X"))
 length(gids)
 head(gids)
 
@@ -194,27 +197,29 @@ maps <- mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID",
                keytype = "GENENAME", multiVals = "list")
 maps
 
-## Perform the same query using a combination of a GenenameFilter and a TxBiotypeFilter
-## to just retrieve protein coding transcripts for these two genes.
-mapIds(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
-                      TxBiotypeFilter("protein_coding")), column="TXID",
-       multiVals="list")
+## Perform the same query using a combination of a GenenameFilter and a
+## TxBiotypeFilter to just retrieve protein coding transcripts for these
+## two genes.
+mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+                        TxBiotypeFilter("protein_coding")), column = "TXID",
+       multiVals = "list")
 
 ## select:
 ## Retrieve all transcript and gene related information for the above example.
-select(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
-                      TxBiotypeFilter("protein_coding")),
-       columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE", "TXSEQSTART", "TXSEQEND",
-                 "SEQNAME", "SEQSTRAND"))
+select(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+                        TxBiotypeFilter("protein_coding")),
+       columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE", "TXSEQSTART",
+                   "TXSEQEND", "SEQNAME", "SEQSTRAND"))
 
 ## Get all data for genes encoded on chromosome Y
-Y <- select(edb, keys="Y", keytype="SEQNAME")
+Y <- select(edb, keys = "Y", keytype = "SEQNAME")
 head(Y)
 nrow(Y)
 
-## Get selected columns for all lincRNAs encoded on chromosome Y
-Y <- select(edb, keys=list(SeqNameFilter("Y"), GeneBiotypeFilter("lincRNA")),
-            columns=c("GENEID", "GENEBIOTYPE", "TXID", "GENENAME"))
+## Get selected columns for all lincRNAs encoded on chromosome Y. Here we use
+## a filter expression to define what data to retrieve.
+Y <- select(edb, keys = ~ seq_name == "Y" & gene_biotype == "lincRNA",
+            columns = c("GENEID", "GENEBIOTYPE", "TXID", "GENENAME"))
 head(Y)
 nrow(Y)
 

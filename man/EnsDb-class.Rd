@@ -2,8 +2,6 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{EnsDb-class}
-\alias{buildQuery}
-\alias{buildQuery,EnsDb-method}
 \alias{dbconn}
 \alias{dbconn,EnsDb-method}
 \alias{ensemblVersion}
@@ -33,12 +31,11 @@
 \alias{returnFilterColumns<-}
 \alias{returnFilterColumns<-,EnsDb-method}
 
-
 \title{Basic usage of an Ensembl based annotation database}
 \description{
-  Get some basic information from an Ensembl based annotation package
-  generated with \code{\link{makeEnsembldbPackage}}.
-
+  The \code{EnsDb} class provides access to an Ensembl-based annotation
+  package. This help page describes functions to get some basic
+  informations from such an object.
 }
 \section{Objects from the Class}{
   A connection to the respective annotation database is created upon
@@ -87,39 +84,14 @@
     Not used.
   }
 
-  \item{columns}{
-    Columns (attributes) to be retrieved from the database tables. Use the
-    \code{listColumns} or \code{listTables} method for a list of
-    supported columns.
-  }
-
-  \item{filter}{
-    list of \code{Filter} instance(s) to
-    select specific entries from the database (see examples below).
-  }
-
   \item{object}{
     For \code{organism}: an \code{EnsDb} instance.
-  }
-
-  \item{order.by}{name of one of the columns above on which the
-    results should be sorted.
-  }
-
-  \item{order.type}{if the results should be ordered ascending
-    (\code{asc}, default) or descending (\code{desc}).
   }
 
   \item{skip.keys}{
     for \code{listColumns}: whether primary and foreign keys (not
     being e.g. \code{"gene_id"} or alike) should be returned or not. By
     default these will not be returned.
-  }
-
-  \item{skip.order.check}{
-    if paramter \code{order.by} should be checked for allowed column
-    names. If \code{TRUE} the function checks if the provided order
-    criteria orders on columns present in the database tables.
   }
 
   \item{table}{

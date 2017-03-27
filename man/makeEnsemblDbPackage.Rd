@@ -29,13 +29,13 @@
 ensDbFromAH(ah, outfile, path, organism, genomeVersion, version)
 
 ensDbFromGRanges(x, outfile, path, organism, genomeVersion,
-                 version)
+                 version, ...)
 
 ensDbFromGff(gff, outfile, path, organism, genomeVersion,
-             version)
+             version, ...)
 
 ensDbFromGtf(gtf, outfile, path, organism, genomeVersion,
-             version)
+             version, ...)
 
 fetchTablesFromEnsembl(version, ensemblapi, user="anonymous",
                        host="ensembldb.ensembl.org", pass="",
@@ -151,6 +151,10 @@ makeEnsembldbPackage(ensdb, version, maintainer, author,
 
   \item{x}{
     For \code{ensDbFromGRanges}: the \code{GRanges} object.
+  }
+
+  \item{...}{
+    Currently not used.
   }
 
 }
