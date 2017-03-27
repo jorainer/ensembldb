@@ -13,15 +13,16 @@ setClass("EnsDb",
 #' @title Filters supported by ensembldb
 #'
 #' @description \code{ensembldb} supports most of the filters from the
-#'     \code{AnnotationFilter} package to retrieve specific content from
+#'     \code{\link{AnnotationFilter}} package to retrieve specific content from
 #'     \code{\linkS4class{EnsDb}} databases.
 #'
-#'     Note for users of \code{ensembldb} version < 2.0: in the
+#' @note For users of \code{ensembldb} version < 2.0: in the
 #'     \code{\link[AnnotationFilter]{GRangesFilter}} from the
 #'     \code{AnnotationFilter} package the \code{condition} parameter was
 #'     renamed to \code{type} (to be consistent with the \code{IRanges} package)
-#'     and that, to get overlapping features, \code{type = "any"} has to be
-#'     used instead of \code{condition = "overlapping"}.
+#'     . In addition, the \code{condition = "overlapping"} is no longer
+#'     recognized. To retrieve all features overlapping the range
+#'     \code{type = "any"} has to be used.
 #'     
 #' @details \code{ensembldb} supports the following filters from the
 #' \code{AnnotationFilter} package:
@@ -194,41 +195,43 @@ setClass("EnsDb",
 #'     annotation filters.
 #' 
 #' @name Filter-classes
-#' @seealso 
-#' \code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
-#' list all Uniprot database names respectively mapping method types from the
-#' database.
+#' @seealso
+#' \code{\link{supportedFilters}} to list all filters supported for \code{EnsDb}
+#'     objects.
+#'     \code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
+#'     list all Uniprot database names respectively mapping method types from
+#'     the database.
 #'
-#' \code{\link[AnnotationFilter]{GeneIdFilter}} for more details on the filter
-#' objects.
+#'     \code{\link[AnnotationFilter]{GeneIdFilter}} for more details on the
+#'     filter objects.
 #'
-#' \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
-#' \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.
+#'     \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
+#'     \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.
 #' 
 #' @author Johannes Rainer
 #' @examples
 #'
-#' ## create a filter that could be used to retrieve all informations for
+#' ## Create a filter that could be used to retrieve all informations for
 #' ## the respective gene.
-#' Gif <- GeneIdFilter("ENSG00000012817")
-#' Gif
+#' gif <- GeneIdFilter("ENSG00000012817")
+#' gif
 #' 
-#' ## create a filter for a chromosomal end position of a gene
-#' Sef <- GeneEndFilter(10000, condition=">")
-#' Sef
+#' ## Create a filter for a chromosomal end position of a gene
+#' sef <- GeneEndFilter(10000, condition = ">")
+#' sef
 #' 
-#' ## for additional examples see the help page of "genes"
+#' ## For additional examples see the help page of "genes".
 #' 
 #' 
 #' ## Example for GRangesFilter:
 #' ## retrieve all genes overlapping the specified region
-#' grf <- GRangesFilter(GRanges("11", ranges=IRanges(114000000, 114000050),
-#'                              strand="+"), type = "any")
+#' grf <- GRangesFilter(GRanges("11", ranges = IRanges(114000000, 114000050),
+#'                              strand = "+"), type = "any")
 #' library(EnsDb.Hsapiens.v75)
 #' edb <- EnsDb.Hsapiens.v75
 #' genes(edb, filter = grf)
 #' 
-#' ## Get also all transcripts overlapping that region
+#' ## Get also all transcripts overlapping that region.
 #' transcripts(edb, filter = grf)
 #' 
 #' ## Retrieve all transcripts for the above gene
@@ -256,16 +259,16 @@ setClass("EnsDb",
 #' ## Example for ExonRankFilter
 #' ## Extract all exons 1 and (if present) 2 for all genes encoded on the
 #' ## Y chromosome
-#' exons(edb, columns=c("tx_id", "exon_idx"),
+#' exons(edb, columns = c("tx_id", "exon_idx"),
 #'       filter=list(SeqNameFilter("Y"),
-#'                   ExonRankFilter(3, condition="<")))
+#'                   ExonRankFilter(3, condition = "<")))
 #' 
 #' 
 #' ## Get all transcripts for the gene SKA2
-#' transcripts(edb, filter=GenenameFilter("SKA2"))
+#' transcripts(edb, filter = GenenameFilter("SKA2"))
 #' 
 #' ## Which is the same as using a SymbolFilter
-#' transcripts(edb, filter=SymbolFilter("SKA2"))
+#' transcripts(edb, filter = SymbolFilter("SKA2"))
 #' 
 #' 
 #' ## Create a ProteinIdFilter:
@@ -296,7 +299,6 @@ setClass("EnsDb",
 #' }
 #'
 NULL
-                                        #> NULL
 
 ############################################################
 ## OnlyCodingTxFilter
