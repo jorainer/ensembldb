@@ -123,13 +123,12 @@ filterForKeytype <- function(keytype, x, vals){
 ##
 ####------------------------------------------------------------
 setMethod("keys", "EnsDb",
-          function(x, keytype, filter,...){
+          function(x, keytype, filter, ...){
               if(missing(keytype))
                   keytype <- "GENEID"
               if(missing(filter))
-                  filter <- list()
-              if(is(filter, "AnnotationFilter"))
-                  filter <- list(filter)
+                  filter <- AnnotationFilterList()
+              filter <- .processFilterParam(filter, x)
               keyt <- keytypes(x)
               if (length(keytype) > 1) {
                   keytype <- keytype[1]
@@ -143,7 +142,7 @@ setMethod("keys", "EnsDb",
               ## Map the keytype to the appropriate column name.
               dbColumn <- ensDbColumnForColumn(x, keytype)
               ## Perform the query.
-              res <- getWhat(x, columns=dbColumn, filter=filter)[, dbColumn]
+              res <- getWhat(x, columns = dbColumn, filter = filter)[, dbColumn]
               return(res)
           })
 
@@ -194,19 +193,11 @@ setMethod("select", "EnsDb",
         ## Get everything from the database...
         keys <- list()
     } else {
-        if (!(is(keys, "character") | is(keys, "list") |
-              is(keys, "AnnotationFilter")))
+        if (!(is(keys, "character") | is(keys, "list") | is(keys, "formula") |
+              is(keys, "AnnotationFilter") | is(keys, "AnnotationFilterList")))
             stop("Argument keys should be a character vector, an object",
-                 " extending AnnotationFilter",
-                 " or a list of objects extending AnnotationFilter.")
-        if (is(keys, "list")) {
-            if (!all(vapply(keys, is, logical(1L), "AnnotationFilter")))
-                stop("If keys is a list it should be a list of objects",
-                     " extending AnnotationFilter!")
-        }
-        if (is(keys, "AnnotationFilter")) {
-            keys <- list(keys)
-        }
+                 " extending AnnotationFilter, a filter expression",
+                 " or an AnnotationFilterList.")
         if (is(keys, "character")) {
             if (is.null(keytype)) {
                 stop("Argument keytype is mandatory if keys is a",
@@ -225,17 +216,20 @@ setMethod("select", "EnsDb",
             if (!any(columns == keytype))
                 columns <- c(keytype, columns)
         }
+        ## Check and fix filter.
+        keys <- .processFilterParam(keys, x)
     }
     ## Map the columns to column names we have in the database and
     ## add filter columns too.
     ensCols <- unique(c(ensDbColumnForColumn(x, columns),
                         addFilterColumns(character(), filter = keys, x)))
-    ## TODO @jo: Do we have to check that we are allowed to have proteni filters
+    ## TODO @jo: Do we have to check that we are allowed to have protein filters
     ##           or columns?
     ## OK, now perform the query given the filters we've got.
     ## Check if keys does only contain protein annotation columns; in that case
     ## select one of tables "protein", "uniprot", "protein_domain" in that order
-    if (all(unlist(lapply(keys, isProteinFilter)))) {
+    ## if (all(unlist(lapply(keys, isProteinFilter)))) {
+    if (all(isProteinFilter(keys))) {
         startWith <- "protein_domain"
         if (any(unlist(lapply(keys, function(z) is(z, "UniprotFilter")))))
             startWith <- "uniprot"
@@ -275,7 +269,7 @@ setMethod("select", "EnsDb",
     rownames(res) <- NULL
     if (returnFilterColumns(x))
         return(res)
-    return(res[, columns])
+    res[, columns]
 }
 
 ############################################################
@@ -301,10 +295,10 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                     multiVals = NULL) {
     if (is.null(keys))
         stop("Argument keys has to be provided!")
-    if (!(is(keys, "character") | is(keys, "list") |
-          is(keys, "AnnotationFilter")))
-        stop("Argument keys should be a character vector, an object extending",
-             " AnnotationFilter or a list of objects extending AnnotationFilter.")
+    ## if (!(is(keys, "character") | is(keys, "list") |
+    ##       is(keys, "AnnotationFilter")))
+    ##     stop("Argument keys should be a character vector, an object extending",
+    ##          " AnnotationFilter or a list of objects extending AnnotationFilter.")
     if (is.null(column))
         column <- "GENEID"
     ## Have to specify the columns argument. Has to be keytype and column.
@@ -312,22 +306,34 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
         if (is.null(keytype))
             stop("Argument keytype is mandatory if keys is a character vector!")
         columns <- c(keytype, column)
-    }
-    if(is(keys, "list") | is(keys, "AnnotationFilter")){
-        if(is(keys, "list")){
-            if(length(keys) > 1)
-                warning("Got ", length(keys), " filter objects.",
-                        " Will use the keys of the first for the mapping!")
-            cn <- class(keys[[1]])[1]
-        }else{
-            cn <- class(keys)[1]
-        }
+    } else {
+        ## Test if we can convert the filter. Returns ALWAYS an
+        ## AnnotationFilterList
+        keys <- .processFilterParam(keys, x)
+        if(length(keys) > 1)
+            warning("Got ", length(keys), " filter objects.",
+                    " Will use the keys of the first for the mapping!")
+        cn <- class(keys[[1]])[1]
         ## Use the first element to determine the keytype...
         mapping <- .keytype2FilterMapping()
         columns <- c(names(mapping)[mapping == cn], column)
         keytype <- NULL
     }
-    res <- select(x, keys=keys, columns=columns, keytype=keytype)
+    ## if(is(keys, "list") | is(keys, "AnnotationFilter")){
+    ##     if(is(keys, "list")){
+    ##         if(length(keys) > 1)
+    ##             warning("Got ", length(keys), " filter objects.",
+    ##                     " Will use the keys of the first for the mapping!")
+    ##         cn <- class(keys[[1]])[1]
+    ##     }else{
+    ##         cn <- class(keys)[1]
+    ##     }
+    ##     ## Use the first element to determine the keytype...
+    ##     mapping <- .keytype2FilterMapping()
+    ##     columns <- c(names(mapping)[mapping == cn], column)
+    ##     keytype <- NULL
+    ## }
+    res <- select(x, keys = keys, columns = columns, keytype = keytype)
     if(nrow(res) == 0)
         return(character())
     ## Handling multiVals.
