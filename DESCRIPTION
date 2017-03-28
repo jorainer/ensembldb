@@ -39,7 +39,6 @@ Suggests:
     rmarkdown,
     EnsDb.Hsapiens.v75 (>= 0.99.8),
     shiny,
-    Gviz,
     testthat,
     BSgenome.Hsapiens.UCSC.hg19
 Enhances: RMySQL
