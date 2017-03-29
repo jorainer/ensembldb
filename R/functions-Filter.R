@@ -138,7 +138,6 @@
 .processFilterParam <- function(x, db) {
     if (missing(db))
         stop("Argument 'db' missing.")
-    cat(".processFilterParam\n")
     ## Check if x is a formula and eventually translate it.
     if (is(x, "formula"))
         res <- AnnotationFilter(x)
