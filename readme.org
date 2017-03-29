@@ -26,6 +26,10 @@
 # #+LATEX_HEADER: \def\verbatim@font{\scriptsize\ttfamily}
 #+LATEX_HEADER: \makeatother
 
+#+HTML: <p align = "center"><a href = "https://github.com/Bioconductor/BiocStickers/"><img src = "https://github.com/Bioconductor/BiocStickers/blob/master/ensembldb/ensembldb.png" height = "100"></a></p>
+
+
+* =ensembldb=: build and use Ensembl-based annotation packages
 # badges:
 
 [[http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html][http://www.bioconductor.org/shields/years-in-bioc/ensembldb.svg]]
@@ -33,9 +37,6 @@
 [[http://bioconductor.org/checkResults/devel/bioc-LATEST/ensembldb][http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg]]
 [[https://travis-ci.org/jotsetung/ensembldb][https://travis-ci.org/jotsetung/ensembldb.svg?branch=master]]
 [[https://codecov.io/github/jotsetung/ensembldb?branch=master][https://codecov.io/github/jotsetung/ensembldb/coverage.svg?branch=master]]
-
-
-* =ensembldb=: build and use Ensembl-based annotation packages
 
 For more information please refer to the [[file:vignettes/ensembldb.org]] file.
 
