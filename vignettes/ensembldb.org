@@ -1639,10 +1639,21 @@ first passed argument. I can check for an existing column using the
 + [ ] =chimeraviz=: added an issue to
   https://github.com/stianlagstad/chimeraviz/issues/3. Just needs to import the
   =GeneIdFilter= from =AnnotationFilter= instead.
-+ [ ] =ggbio=: *has to be fixed*.
++ [X] =ggbio=: *has to be fixed*.
 
 To fix it:
 1) Install =AnnotationFilter=.
 2) Disable the =Gviz= and =ggbio= vignette and (momentarily) remove =Gviz= suggestion
    (from DESCRIPTION and vignette depends).
-3) Install/fix =biocvizBase= (don't use =ensembldb= version > 1.99.13.).
+3) Install/fix =biocvizBase=.
+4) Install/fix =ggio=.
+5) Install/fix =Pbase=.
+
+The remaining packages (=Gviz=, =alpine=, =ChIPpeakAnno=).
+
+
+Steps when =AnnotationFilter= is accepted:
++ [ ] Contact Micheal Lawrence that =biovizBase= and =ggbio= should be fixed (have
+  patches).
++ [ ] Push new =ensembldb= package.
++ [ ] Contact developers of =chimeraviz= and =TVTB=.
