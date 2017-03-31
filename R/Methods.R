@@ -1573,6 +1573,18 @@ setMethod("setProperty", "EnsDb", function(x, ...){
     return(x)
 })
 
+#' remove the property with the specified name.
+#' @noRd
+dropProperty <- function(x, name) {
+    if (missing(name))
+        return(x)
+    prps <- x@.properties
+    if (any(names(prps) == name))
+        prps <- prps[names(prps) != name]
+    x@.properties <- prps
+    x
+}
+
 ####============================================================
 ##  updateEnsDb
 ##

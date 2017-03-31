@@ -24,7 +24,7 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub}
 ---
 #+END_EXPORT
 
@@ -59,7 +59,7 @@ similar to that of the =TxDb= packages from the =GenomicFeatures= package, but, 
 addition to retrieve all gene/transcript models and annotations from the
 database, the =ensembldb= package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
-region or transcript models of lincRNA genes. From version 1.7 on =EnsDb=
+region or transcript models of lincRNA genes. From version 1.7 on, =EnsDb=
 databases created by the =ensembldb= package contain also protein annotation data
 (see Section [[section.database.layout]] for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
@@ -75,8 +75,8 @@ also allows to load multiple annotation packages at the same time in order to
 e.g. compare gene models between Ensembl releases.
 
 In the example below we load an Ensembl based annotation package for Homo
-sapiens, Ensembl version 75. The connection to the database is bound to the
-variable =EnsDb.Hsapiens.v75=.
+sapiens, Ensembl version 75. The =EnsDb= object providing access to the underlying
+SQLite database is bound to the variable name =EnsDb.Hsapiens.v75=.
 
 #+BEGIN_SRC R :ravel warning=FALSE, message=FALSE
   library(EnsDb.Hsapiens.v75)
@@ -93,15 +93,32 @@ variable =EnsDb.Hsapiens.v75=.
 
 * Using =ensembldb= annotation packages to retrieve specific annotations
 
-The =ensembldb= package supports most of the filters defined in the
-=AnnotationFilter= Bioconductor package and defines some additional filters
-specific to the data stored in =EnsDb= databases. These filters allow to specify
-which features should be fetched from the database. The =supportedFilters= method
-can be used to get the names of the supported filter classes.
+One of the strengths of the =ensembldb= package and the related =EnsDb= databases is
+its implementation of a filter framework that enables to efficiently extract
+data sub-sets from the databases. The =ensembldb= package supports most of the
+filters defined in the =AnnotationFilter= Bioconductor package and defines some
+additional filters specific to the data stored in =EnsDb= databases. The
+=supportedFilters= method can be used to get an overview over all supported filter
+classes, each of them (except the =GRangesFilter=) working on a single
+column/field in the database.
 
 #+BEGIN_SRC R 
   supportedFilters(edb)
 #+END_SRC
+
+These filters can be divided into 3 main filter types:
++ =IntegerFilter=: filter classes extending this basic object can take a single
+  numeric value as input and support the conditions ==, !=, >, <, >= and <=. All
+  filters that work on chromosomal coordinates, such as the =GeneEndFilter= extend
+  =IntegerFilter=.
++ =CharacterFilter=: filter classes extending this object can take a single or
+  multiple character values as input and allow conditions: ==, !=, "startsWith"
+  and "endsWith". All filters working on IDs extend this class.
++ =GRangesFilter=: takes a =GRanges= object as input and supports all conditions
+  that =findOverlaps= from the =IRanges= package supports ("any", "start", "end",
+  "within", "equal"). Note that these have to be passed using the parameter =type=
+  to the constructor function.
+
 
 The supported filters are:
 + =EntrezFilter=: allows to filter results based on NCBI Entrezgene
@@ -139,10 +156,8 @@ The supported filters are:
   the transcript IDs).
 + =TxStartFilter=: filter using the chromosomal start coordinate of transcripts.
 
-In addition to the above /DNA-RNA-based/ filters, the following /protein-specific/
-filters are available (Note however that these can only be used on =EnsDb=
-databases that provide such annotations, i.e. for which a call to =hasProteinData=
-returns =TRUE=):
+In addition to the above listed /DNA-RNA-based/ filters, /protein-specific/
+filters are also available: 
 
 + =ProtDomIdFilter=: filter by the protein domain ID.
 + =ProteinIdFilter=: filter by Ensembl protein ID filters.
@@ -151,26 +166,17 @@ returns =TRUE=):
 + =UniprotMappingTypeFilter=: filter by the mapping type of Ensembl protein IDs to
   Uniprot IDs.
 
-Filters can be divided into main filter types:
-+ =IntegerFilter=: filter classes extending this basic object can take a single
-  numeric value as input and allow =condition= ==, !=, >, <, >= and <=. All
-  filters that work on chromosomal coordinates, such as the =GeneEndFilter= extend
-  =IntegerFilter=.
-+ =CharacterFilter=: filter classes extending this object can take a single or
-  multiple character values as input and allow conditions: ==, !=, "startsWith"
-  and "endsWith". All filters working on IDs extend this class.
-+ =GRangesFilter=: takes a =GRanges= object as input and supports all conditions
-  that =findOverlaps= from the =IRanges= package supports ("any", "start", "end",
-  "within", "equal"). Note that these have to be passed using the parameter =type=
-  to the constructor function.
+These can however only be used on =EnsDb= databases that provide protein
+annotations, i.e. for which a call to =hasProteinData= returns =TRUE=.
 
-A simple example would be to get all transcripts for the gene /BCL2L11/. To this
-end we specify a =GenenameFilter= with the value /BCL2L11/. As a result we get
-a =GRanges= object with =start=, =end=, =strand= and =seqname= of the =GRanges=
-object being the start coordinate, end coordinate, chromosome name and strand
-for the respective transcripts. All additional annotations are available as
-metadata columns. Alternatively, by setting =return.type= to "DataFrame", or
-"data.frame" the method would return a =DataFrame= or =data.frame= object.
+A simple use case for the filter framework would be to get all transcripts for
+the gene /BCL2L11/. To this end we specify a =GenenameFilter= with the value
+/BCL2L11/. As a result we get a =GRanges= object with =start=, =end=, =strand= and =seqname=
+being the start coordinate, end coordinate, chromosome name and strand for the
+respective transcripts. All additional annotations are available as metadata
+columns. Alternatively, by setting =return.type= to "DataFrame", or "data.frame"
+the method would return a =DataFrame= or =data.frame= object instead of the default
+=GRanges=.
 
 #+BEGIN_SRC R
   Tx <- transcripts(edb, filter = list(GenenameFilter("BCL2L11")))
@@ -184,16 +190,17 @@ metadata columns. Alternatively, by setting =return.type= to "DataFrame", or
   head(Tx$tx_biotype)
 #+END_SRC
 
-The parameter =columns= of the =exons=, =genes= and =transcripts= method allows
-to specify which database attributes (columns) should be retrieved. The =exons=
-method returns by default all exon-related columns, the =transcripts= all columns
-from the transcript database table and the =genes= all from the gene table. Note
-however that in the example above we got also a column =gene_name= although this
-column is not present in the transcript database table. By default the methods
-return also all columns that are used by any of the filters submitted with the
-=filter= argument (thus, because a =GenenameFilter= was used, the column =gene_name=
-is also returned). Setting =returnFilterColumns(edb) <- FALSE= disables this
-option and only the columns specified by the =columns= parameter are retrieved.
+The parameter =columns= of the extractor methods (such as =exons=, =genes= or
+=transcripts)= allows to specify which database attributes (columns) should be
+retrieved. The =exons= method returns by default all exon-related columns, the
+=transcripts= all columns from the transcript database table and the =genes= all
+from the gene table. Note however that in the example above we got also a column
+=gene_name= although this column is not present in the transcript database
+table. By default the methods return also all columns that are used by any of
+the filters submitted with the =filter= argument (thus, because a =GenenameFilter=
+was used, the column =gene_name= is also returned). Setting
+=returnFilterColumns(edb) <- FALSE= disables this option and only the columns
+specified by the =columns= parameter are retrieved.
 
 Instead of passing a filter /object/ to the method it is also possible to provide
 a filter /expression/ written as a =formula=.
@@ -357,6 +364,7 @@ database.
                       ExonRankFilter(3, condition = "<")))
 #+END_SRC
 
+
 * Extracting gene/transcript/exon models for RNASeq feature counting
 
 For the feature counting step of an RNAseq experiment, the gene or transcript
@@ -495,6 +503,7 @@ the =EnsDb= object, eventually using a filter to restrict the query.
 Note: in the next section we describe how transcript sequences can be retrieved
 from a =BSgenome= package that is based on UCSC, not Ensembl.
 
+
 * Integrating annotations from Ensembl based  =EnsDb= packages with UCSC based annotations
 
 Sometimes it might be useful to combine (Ensembl based) annotations from =EnsDb=
@@ -581,6 +590,7 @@ At last changing the seqname style to the default value ="Ensembl"=.
 #+BEGIN_SRC R
   seqlevelsStyle(edb) <- "Ensembl"
 #+END_SRC
+
 
 * Interactive annotation lookup using the =shiny= web app
 
@@ -771,40 +781,71 @@ help avoiding them):
 
 
 
-* Building an transcript-centric database package based on Ensembl annotation
+* Getting or building =EnsDb= databases/packages
 
-The code in this section is not supposed to be automatically executed when the
-vignette is built, as this would require a working installation of the Ensembl
-Perl API, which is not expected to be available on each system. Also, building
-=EnsDb= from alternative sources, like GFF or GTF files takes some time and
-thus also these examples are not directly executed when the vignette is build.
+Some of the code in this section is not supposed to be automatically executed
+when the vignette is built, as this would require a working installation of the
+Ensembl Perl API, which is not expected to be available on each system. Also,
+building =EnsDb= from alternative sources, like GFF or GTF files takes some time
+and thus also these examples are not directly executed when the vignette is
+build.
 
-** Requirements
+** Getting =EnsDb= databases
 
-The =fetchTablesFromEnsembl= function of the package uses the Ensembl Perl API
-to retrieve the required annotations from an Ensembl database (e.g. from the
-main site /ensembldb.ensembl.org/). Thus, to use the functionality to built
-databases, the Ensembl Perl API needs to be installed (see [fn:2] for details).
+Some =EnsDb= databases are available as =R= packages from Bioconductor and can be
+simply installed with the =biocLite= function from the =BiocInstaller= package. The
+name of such annotation packages starts with /EnsDb/ followed by the abbreviation
+of the organism and the Ensembl version on which the annotation
+bases. =EnsDb.Hsapiens.v86= provides thus an =EnsDb= database for homo sapiens with
+annotations from Ensembl version 86.
 
-Alternatively, the =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and =ensDbFromGtf=
-functions allow to build EnsDb SQLite files from a =GRanges= object or GFF/GTF
-files from Ensembl (either provided as files or /via/ =AnnotationHub=). These
-functions do not depend on the Ensembl Perl API, but require a working internet
-connection to fetch the chromosome lengths from Ensembl as these are not
-provided within GTF or GFF files. Also note that protein annotations are usually
-not available in GTF or GFF files, thus, such annotations will not be included
-in the generated =EnsDb= database - protein annotations are only available in
-=EnsDb= databases created with the Ensembl Perl API.
+Since Bioconductor version 3.5 =EnsDb= databases can also be retrieved directly
+from =AnnotationHub=.
+
+#+BEGIN_SRC R :ravel message = FALSE
+  library(AnnotationHub)
+  ## Load the annotation resource.
+  ah <- AnnotationHub()
+
+  ## Query for all available EnsDb databases
+  query(ah, "EnsDb")
+#+END_SRC
+
+We can simply fetch one of the databases.
+
+#+BEGIN_SRC R
+  ahDb <- query(ah, pattern = c("Xiphophorus Maculatus", "EnsDb", 87))
+  ## What have we got
+  ahDb
+#+END_SRC
+
+Fetch the =EnsDb= and use it.
+
+#+BEGIN_SRC R :ravel eval = FALSE
+  ahEdb <- ahDb[[1]]
+
+  ## retriebe all genes
+  gns <- genes(ahEdb)
+
+#+END_SRC
+
+We could even make an annotation package from this =EnsDb= object using the
+=makeEnsembldbPackage= and passing =dbfile(dbconn(ahEdb))= as =ensdb= argument.
 
 
 ** Building annotation packages
 
-The functions below use the Ensembl Perl API to fetch the required data directly
-from the Ensembl core databases. Thus, the path to the Perl API specific for the
-desired Ensembl version needs to be added to the =PERL5LIB= environment variable.
+*** Directly from Ensembl databases
 
-An annotation package containing all human genes for Ensembl version 75 can be
-created using the code in the block below.
+The =fetchTablesFromEnsembl= function uses the Ensembl Perl API
+to retrieve the required annotations from an Ensembl database (e.g. from the
+main site /ensembldb.ensembl.org/). Thus, to use this functionality to build
+databases, the Ensembl Perl API needs to be installed (see [fn:2] for details).
+
+Below we create an =EnsDb= database by fetching the required data directly from
+the Ensembl core databases. The =makeEnsembldbPackage= function is then used to
+create an annotation package from this =EnsDb= containing all human genes for
+Ensembl version 75.
 
 #+BEGIN_SRC R :ravel eval=FALSE
   library(ensembldb)
@@ -835,6 +876,20 @@ To fetch and build annotation packages for plant genomes (e.g. arabidopsis
 thaliana), the /Ensembl genomes/ should be specified as a host, i.e. setting
 =host= to "mysql-eg-publicsql.ebi.ac.uk", =port= to =4157= and =species= to
 e.g. "arabidopsis thaliana".
+
+
+*** From a GTF or GFF file
+
+Alternatively, the =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and =ensDbFromGtf=
+functions allow to build EnsDb SQLite files from a =GRanges= object or GFF/GTF
+files from Ensembl (either provided as files or /via/ =AnnotationHub=). These
+functions do not depend on the Ensembl Perl API, but require a working internet
+connection to fetch the chromosome lengths from Ensembl as these are not
+provided within GTF or GFF files. Also note that protein annotations are usually
+not available in GTF or GFF files, thus, such annotations will not be included
+in the generated =EnsDb= database - protein annotations are only available in
+=EnsDb= databases created with the Ensembl Perl API (such as the ones provided
+through =AnnotationHub= or as Bioconductor packages).
 
 In the next example we create an =EnsDb= database using the =AnnotationHub=
 package and load also the corresponding genomic DNA sequence matching the
@@ -877,7 +932,7 @@ last we retrieve the sequences of all exons using the =getSeq= method.
 #+END_SRC
 
 In the example below we load a =GRanges= containing gene definitions for genes
-encoded on chromosome Y and generate a EnsDb SQLite database from that
+encoded on chromosome Y and generate a =EnsDb= SQLite database from that
 information.
 
 #+BEGIN_SRC R :ravel message=FALSE
@@ -886,26 +941,26 @@ information.
   load(system.file("YGRanges.RData", package = "ensembldb"))
   Y
 
+  ## Create the EnsDb database file
   DB <- ensDbFromGRanges(Y, path = tempdir(), version = 75,
 			 organism = "Homo_sapiens")
 
+  ## Load the database
   edb <- EnsDb(DB)
   edb
-
-  ## As shown in the example below, we could make an EnsDb package on
-  ## this DB object using the makeEnsembldbPackage function.
 
 #+END_SRC
 
 
 Alternatively we can build the annotation database using the =ensDbFromGtf=
-=ensDbFromGff= functions, that extracts most of the required data from a GTF
-respectively GFF (version 3) file which can be downloaded from Ensembl (e.g. from
-ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens for human gene definitions
-from Ensembl version 75; for plant genomes etc files can be retrieved from
-ftp://ftp.ensemblgenomes.org). All information except the chromosome lengths and
-the NCBI Entrezgene IDs can be extracted from these GTF files. The function also
-tries to retrieve chromosome length information automatically from Ensembl.
+=ensDbFromGff= functions, that extract most of the required data from a GTF
+respectively GFF (version 3) file which can be downloaded from Ensembl
+(e.g. from ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens for human gene
+definitions from Ensembl version 75; for plant genomes etc, files can be
+retrieved from ftp://ftp.ensemblgenomes.org). All information except the
+chromosome lengths, the NCBI Entrezgene IDs and protein annotations can be
+extracted from these GTF files. The function also tries to retrieve chromosome
+length information automatically from Ensembl.
 
 Below we create the annotation from a gtf file that we fetch directly from Ensembl.
 
@@ -1451,6 +1506,13 @@ This should also enable
 #+BEGIN_EXAMPLE
   filter(edb, GeneidFilter(""a)) %>% genes()
 #+END_EXAMPLE
+
+The idea would be to add filter(s) as =AnnotationFilterList= object(s) to the
+=EnsDb= object. Eventually by binding/adding it to the =.properties= slot. There are
+even the =properties=, =getProperty=, =dropProperty= and =setProperty= methods (check
+/Methods.R/.
+
+
 
 ** DONE Interpret R logical conditions
    CLOSED: [2017-03-22 Wed 06:58]
