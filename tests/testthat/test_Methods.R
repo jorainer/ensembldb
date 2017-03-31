@@ -769,7 +769,10 @@ test_that("properties work", {
     edb <- ensembldb:::setProperty(edb, foo="bar")
     expect_equal(ensembldb:::getProperty(edb, "foo"), "bar")
     expect_equal(length(ensembldb:::properties(edb)),
-                length(origProps) + 1)
+                 length(origProps) + 1)
+    expect_true(any(names(ensembldb:::properties(edb)) == "foo"))
+    edb <- ensembldb:::dropProperty(edb, "foo")
+    expect_true(all(names(ensembldb:::properties(edb)) != "foo"))
 })
 
 ## Compare the results for genes call with and without ordering in R
