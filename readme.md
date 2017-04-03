@@ -1,5 +1,5 @@
 
-<img src="https://github.com/jotsetung/BioC-stickers/blob/master/ensembldb/ensembldb.png" height="100">
+<p align = "center"><img src="https://github.com/jotsetung/BioC-stickers/blob/master/ensembldb/ensembldb.png" height="100"></p>
 
 [![Years in Bioconductor](http://www.bioconductor.org/shields/years-in-bioc/ensembldb.svg)](http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html)
 [![Bioconductor release build status](http://www.bioconductor.org/shields/build/release/bioc/ensembldb.svg)](http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html)
