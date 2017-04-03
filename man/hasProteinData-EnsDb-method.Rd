@@ -2,8 +2,8 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{hasProteinData,EnsDb-method}
-\alias{hasProteinData}
 \alias{hasProteinData,EnsDb-method}
+\alias{hasProteinData}
 \title{Determine whether protein data is available in the database}
 \usage{
 \S4method{hasProteinData}{EnsDb}(x)
@@ -24,10 +24,9 @@ library(EnsDb.Hsapiens.v75)
 ## Does this database/package have protein annotations?
 hasProteinData(EnsDb.Hsapiens.v75)
 }
-\author{
-Johannes Rainer
-}
 \seealso{
 \code{\link{listTables}}
 }
-
+\author{
+Johannes Rainer
+}

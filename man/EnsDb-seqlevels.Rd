@@ -116,12 +116,12 @@ seqlevels(edb)
 
 ## Change the option ensembldb.seqnameNotFound to return NA in case
 ## the seqname can not be mapped form Ensembl to UCSC.
-options(ensembldb.seqnameNotFound=NA)
+options(ensembldb.seqnameNotFound = NA)
 
 seqlevels(edb)
 
 ## Restoring the original setting.
-options(ensembldb.seqnameNotFound="ORIGINAL")
+options(ensembldb.seqnameNotFound = "ORIGINAL")
 
 
 ## Integrate Ensembl based annotations with a BSgenome package that is based on
@@ -135,9 +135,10 @@ unique(genome(edb))
 ## Although differently named, both represent genome build GRCh37.
 
 ## Extract the full transcript sequences of all lincRNAs encoded on chromsome Y.
-yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx",
-                                              filter=list(SeqnameFilter("chrY"),
-                                                          GenebiotypeFilter("lincRNA"))))
+yTxSeqs <- extractTranscriptSeqs(bsg,
+                                 exonsBy(edb, "tx",
+                                         filter = ~ seq_name == "chrY" &
+                                             gene_biotype == "lincRNA"))
 yTxSeqs
 
 }

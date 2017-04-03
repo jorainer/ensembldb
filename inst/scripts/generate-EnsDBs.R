@@ -29,7 +29,7 @@ listCoreDbsInFolder <- function(ftp_folder) {
 ##'
 ##' @param ftp_folder The ftp url to the per-species mysql folders. If not
 ##' provided it will use the default Ensembl ftp:
-##' \code{ftp://ftp.ensembl.org/pub/relases-<ens_version>/mysql/}.
+##' \code{ftp://ftp.ensembl.org/pub/release-<ens_version>/mysql/}.
 ##' @param ens_version The Ensembl version (version of the Ensembl Perl API).
 ##' @param species The name of the species (e.g. "homo_sapiens").
 ##' @param user The user name for the MySQL database (write access).

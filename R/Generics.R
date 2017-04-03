@@ -12,12 +12,6 @@ setGeneric("buildQuery", function(x, ...)
 ## C
 setGeneric("cleanColumns", function(x, columns, ...)
     starndardGeneric("cleanColumns"))
-setGeneric("column", function(object, db, with.tables, ...)
-    standardGeneric("column"))
-setGeneric("condition", function(x, ...)
-    standardGeneric("condition"))
-setGeneric("condition<-", function(x, value)
-    standardGeneric("condition<-"))
 
 ## D
 setGeneric("dbSeqlevelsStyle", function(x, ...)
@@ -26,10 +20,10 @@ setGeneric("dbSeqlevelsStyle", function(x, ...)
 ## E
 setGeneric("ensemblVersion", function(x)
     standardGeneric("ensemblVersion"))
-## setGeneric("exons", function(x, ...)
-##     standardGeneric("exons"))
-## setGeneric("exonsBy", function(x, ...)
-##     standardGeneric("exonsBy"))
+setGeneric("ensDbColumn", function(object, ...)
+    standardGeneric("ensDbColumn"))
+setGeneric("ensDbQuery", function(object, ...)
+    standardGeneric("ensDbQuery"))
 
 ## F
 setGeneric("formatSeqnamesForQuery", function(x, sn, ...)
@@ -38,8 +32,6 @@ setGeneric("formatSeqnamesFromQuery", function(x, sn, ...)
     standardGeneric("formatSeqnamesFromQuery"))
 
 ## G
-## setGeneric("genes", function(x, ...)
-##     standardGeneric("genes"))
 setGeneric("getGeneRegionTrackForGviz", function(x, ...)
     standardGeneric("getGeneRegionTrackForGviz"))
 setGeneric("getGenomeFaFile", function(x, ...)
@@ -57,12 +49,6 @@ setGeneric("getWhat", function(x, ...)
 setGeneric("hasProteinData", function(x)
     standardGeneric("hasProteinData"))
 
-## I
-
-## J
-
-## K
-
 ## L
 setGeneric("lengthOf", function(x, ...)
     standardGeneric("lengthOf"))
@@ -79,10 +65,6 @@ setGeneric("listUniprotDbs", function(object, ...)
 setGeneric("listUniprotMappingTypes", function(object, ...)
     standardGeneric("listUniprotMappingTypes"))
 
-## M
-
-## N
-
 ## O
 setGeneric("orderResultsInR", function(x)
     standardGeneric("orderResultsInR"))
@@ -94,8 +76,6 @@ setGeneric("print", function(x, ...)
     standardGeneric("print"))
 setGeneric("properties", function(x, ...)
     standardGeneric("properties"))
-
-## Q
 
 ## R
 setGeneric("requireTable", function(x, db, ...)
@@ -122,28 +102,13 @@ setGeneric("tablesForColumns", function(x, attributes, ...)
     standardGeneric("tablesForColumns"))
 setGeneric("toSAF", function(x, ...)
     standardGeneric("toSAF"))
-setGeneric("transcriptLengths", function(x, with.cds_len=FALSE,
-                                         with.utr5_len=FALSE,
-                                         with.utr3_len=FALSE, ...)
-    standardGeneric("transcriptLengths"))
-## setGeneric("transcripts", function(x, ...)
-##     standardGeneric("transcripts"))
-## setGeneric("transcriptsBy", function(x, ...)
-##     standardGeneric("transcriptsBy"))
+## setGeneric("transcriptLengths", function(x, with.cds_len=FALSE,
+##                                          with.utr5_len=FALSE,
+##                                          with.utr3_len=FALSE, ...)
+##     standardGeneric("transcriptLengths"))
 
 ## U
 setGeneric("updateEnsDb", function(x, ...)
     standardGeneric("updateEnsDb"))
 setGeneric("useMySQL", function(x, host = "localhost", port = 3306, user, pass)
     standardGeneric("useMySQL"))
-
-## V
-setGeneric("value", function(x, db, ...)
-    standardGeneric("value"))
-setGeneric("value<-", function(x, value)
-    standardGeneric("value<-"))
-
-## W
-setGeneric("where", function(object, db, with.tables, ...)
-    standardGeneric("where"))
-

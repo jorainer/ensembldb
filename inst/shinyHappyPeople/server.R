@@ -22,13 +22,13 @@ TheFilter <- function(input){
         return(GenenameFilter(Vals, condition=Cond))
     }
     if(input$type=="Chrom name"){
-        return(SeqnameFilter(Vals, condition=Cond))
+        return(SeqNameFilter(Vals, condition=Cond))
     }
     if(input$type=="Gene biotype"){
-        return(GenebiotypeFilter(Vals, condition=Cond))
+        return(GeneBiotypeFilter(Vals, condition=Cond))
     }
     if(input$type=="Tx biotype"){
-        return(TxbiotypeFilter(Vals, condition=Cond))
+        return(TxBiotypeFilter(Vals, condition=Cond))
     }
 }
 

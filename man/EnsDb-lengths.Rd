@@ -14,7 +14,7 @@
 }
 \usage{
 
-\S4method{lengthOf}{EnsDb}(x, of="gene", filter=list())
+\S4method{lengthOf}{EnsDb}(x, of="gene", filter = AnnotationFilterList())
 
 }
 \arguments{
@@ -22,8 +22,13 @@
   (In alphabetic order)
 
   \item{filter}{
-    list of \code{\linkS4class{BasicFilter}} instance(s) to
-    select specific entries from the database (see examples below).
+    A filter describing which results to retrieve from the database. Can
+    be a single object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an
+    \code{\link[AnnotationFilter]{AnnotationFilterList}} object
+    combining several such objects or a \code{formula} representing a
+    filter expression (see examples below or
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details).
   }
 
   \item{of}{
@@ -75,31 +80,28 @@ edb <- EnsDb.Hsapiens.v75
 #####    lengthOf
 ##
 ## length of a specific gene.
-lengthOf(edb,
-         filter=list(GeneidFilter("ENSG00000000003")))
+lengthOf(edb, filter = GeneIdFilter("ENSG00000000003"))
 
 ## length of a transcript
-lengthOf(edb, of="tx",
-         filter=list(TxidFilter("ENST00000494424")))
+lengthOf(edb, of = "tx", filter = TxIdFilter("ENST00000494424"))
 
-## average length of all protein coding genes encoded on chromosomes X
-## and Y
-mean(lengthOf(edb, of="gene",
-              filter=list(GenebiotypeFilter("protein_coding"),
-                  SeqnameFilter(c("X", "Y")))))
+## Average length of all protein coding genes encoded on chromosomes X
+mean(lengthOf(edb, of = "gene",
+              filter = ~ gene_biotype == "protein_coding" &
+                  seq_name == "X"))
 
-## average length of all snoRNAs
-mean(lengthOf(edb, of="gene",
-              filter=list(GenebiotypeFilter("snoRNA"),
-                  SeqnameFilter(c("X", "Y")))))
+## Average length of all snoRNAs
+mean(lengthOf(edb, of = "gene",
+              filter = ~ gene_biotype == "snoRNA" &
+                  seq_name == "X"))
 
 ##### transcriptLengths
 ##
 ## Calculate the length of transcripts encoded on chromosome Y, including
 ## length of the CDS, 5' and 3' UTR.
-##len <- transcriptLengths(edb, with.cds_len=TRUE, with.utr5_len=TRUE,
-##                         with.utr3_len=TRUE, filter=SeqnameFilter("Y"))
-##head(len)
+len <- transcriptLengths(edb, with.cds_len = TRUE, with.utr5_len = TRUE,
+                         with.utr3_len = TRUE, filter = SeqNameFilter("Y"))
+head(len)
 
 }
 \keyword{classes}

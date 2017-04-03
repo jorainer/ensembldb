@@ -27,49 +27,51 @@
 \description{
   Retrieve gene/transcript/exons annotations stored in an Ensembl based
   database package generated with the \code{\link{makeEnsembldbPackage}}
-  function.
+  function. Parameter \code{filter} enables to define filters to
+  retrieve only specific data.
 }
 \usage{
 
-\S4method{exons}{EnsDb}(x, columns=listColumns(x,"exon"),
-                        filter, order.by, order.type="asc",
-                        return.type="GRanges")
+\S4method{exons}{EnsDb}(x, columns = listColumns(x,"exon"),
+        filter = AnnotationFilterList(), order.by,
+        order.type = "asc", return.type = "GRanges")
 
-\S4method{exonsBy}{EnsDb}(x, by=c("tx", "gene"),
-                          columns=listColumns(x, "exon"), filter, use.names=FALSE)
+\S4method{exonsBy}{EnsDb}(x, by = c("tx", "gene"),
+        columns = listColumns(x, "exon"), filter =
+        AnnotationFilterList(), use.names = FALSE)
 
-\S4method{exonsByOverlaps}{EnsDb}(x, ranges, maxgap=0L, minoverlap=1L,
-                                  type=c("any", "start", "end"),
-                                  columns=listColumns(x, "exon"),
-                                  filter)
+\S4method{exonsByOverlaps}{EnsDb}(x, ranges, maxgap = 0L, minoverlap = 1L,
+        type = c("any", "start", "end"), columns = listColumns(x, "exon"),
+        filter = AnnotationFilterList())
 
-\S4method{transcripts}{EnsDb}(x, columns=listColumns(x, "tx"),
-                              filter, order.by, order.type="asc",
-                              return.type="GRanges")
+\S4method{transcripts}{EnsDb}(x, columns = listColumns(x, "tx"),
+        filter = AnnotationFilterList(), order.by, order.type = "asc",
+        return.type = "GRanges")
 
-\S4method{transcriptsBy}{EnsDb}(x, by=c("gene", "exon"),
-                                columns=listColumns(x, "tx"), filter)
+\S4method{transcriptsBy}{EnsDb}(x, by = c("gene", "exon"),
+        columns = listColumns(x, "tx"), filter = AnnotationFilterList())
 
-\S4method{transcriptsByOverlaps}{EnsDb}(x, ranges, maxgap=0L, minoverlap=1L,
-                                        type=c("any", "start", "end"),
-                                        columns=listColumns(x, "tx"),
-                                        filter)
+\S4method{transcriptsByOverlaps}{EnsDb}(x, ranges, maxgap = 0L,
+        minoverlap = 1L, type = c("any", "start", "end"),
+        columns = listColumns(x, "tx"), filter = AnnotationFilterList())
 
-\S4method{promoters}{EnsDb}(x, upstream=2000, downstream=200, ...)
+\S4method{promoters}{EnsDb}(x, upstream = 2000, downstream = 200, ...)
 
-\S4method{genes}{EnsDb}(x, columns=listColumns(x, "gene"), filter,
-                        order.by, order.type="asc",
-                        return.type="GRanges")
+\S4method{genes}{EnsDb}(x, columns = listColumns(x, "gene"),
+        filter = AnnotationFilterList(), order.by, order.type = "asc",
+        return.type = "GRanges")
 
-\S4method{disjointExons}{EnsDb}(x, aggregateGenes=FALSE,
-                                includeTranscripts=TRUE, filter, ...)
+\S4method{disjointExons}{EnsDb}(x, aggregateGenes = FALSE,
+        includeTranscripts = TRUE, filter = AnnotationFilterList(), ...)
 
-\S4method{cdsBy}{EnsDb}(x, by=c("tx", "gene"), columns=NULL, filter,
-                        use.names=FALSE)
+\S4method{cdsBy}{EnsDb}(x, by = c("tx", "gene"), columns = NULL,
+        filter = AnnotationFilterList(), use.names = FALSE)
 
-\S4method{fiveUTRsByTranscript}{EnsDb}(x, columns=NULL, filter)
+\S4method{fiveUTRsByTranscript}{EnsDb}(x, columns = NULL,
+        filter = AnnotationFilterList())
 
-\S4method{threeUTRsByTranscript}{EnsDb}(x, columns=NULL, filter)
+\S4method{threeUTRsByTranscript}{EnsDb}(x, columns = NULL,
+        filter = AnnotationFilterList())
 
 \S4method{toSAF}{GRangesList}(x, ...)
 
@@ -127,9 +129,13 @@
   }
 
   \item{filter}{
-    A filter object extending \code{\linkS4class{BasicFilter}} or a list
-    of such object(s) to select specific entries from the database (see
-    examples below).
+    A filter describing which results to retrieve from the database. Can
+    be a single object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an
+    \code{\link[AnnotationFilter]{AnnotationFilterList}} object
+    combining several such objects or a \code{formula} representing a
+    filter expression (see examples below or
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details).
   }
 
   \item{includeTranscripts}{
@@ -171,10 +177,10 @@
 
   \item{return.type}{
     Type of the returned object. Can be either
-    \code{"data.frame"}, \code{"DataFrame"} or \code{"GRanges"}. In the latter case the return
-    object will be a \code{GRanges} object with the GRanges specifying the
-    chromosomal start and end coordinates of the feature (gene,
-    transcript or exon, depending whether \code{genes},
+    \code{"data.frame"}, \code{"DataFrame"} or \code{"GRanges"}. In the
+    latter case the return object will be a \code{GRanges} object with
+    the GRanges specifying the chromosomal start and end coordinates of
+    the feature (gene, transcript or exon, depending whether \code{genes},
     \code{transcripts} or \code{exons} was called). All additional
     columns are added as metadata columns to the GRanges object.
   }
@@ -353,14 +359,14 @@
       its position inside these transcript might differ.}
   }
 
-  Also, the vignette provides examples on how to retrieve sequences for
-  genes/transcripts/exons.
+  Many \code{EnsDb} databases provide also protein related
+  annotations. See \code{\link{listProteinColumns}} for more information.
 }
 \note{
   Ensembl defines genes not only on standard chromosomes, but also on
   patched chromosomes and chromosome variants. Thus it might be
   advisable to restrict the queries to just those chromosomes of
-  interest (e.g. by specifying a \code{SeqnameFilter(c(1:22, "X", "Y"))}).
+  interest (e.g. by specifying a \code{SeqNameFilter(c(1:22, "X", "Y"))}).
   In addition, also so called LRG genes (Locus Reference Genomic) are defined in
   Ensembl. Their gene id starts with LRG instead of ENS for Ensembl
   genes, thus, a filter can be applied to specifically select those
@@ -429,8 +435,9 @@
   Johannes Rainer, Tim Triche
 }
 \seealso{
-  \code{\link{makeEnsembldbPackage}}, \code{\linkS4class{BasicFilter}},
-      \code{\link{listColumns}}, \code{\link{lengthOf}}
+  \code{\link{supportedFilters}} to get an overview of supported filters.
+  \code{\link{makeEnsembldbPackage}},
+  \code{\link{listColumns}}, \code{\link{lengthOf}}
 }
 \examples{
 
@@ -439,89 +446,94 @@ edb <- EnsDb.Hsapiens.v75
 
 ######   genes
 ##
-## get all genes endcoded on chromosome Y
-AllY <- genes(edb, filter=SeqnameFilter("Y"))
+## Get all genes encoded on chromosome Y
+AllY <- genes(edb, filter = SeqNameFilter("Y"))
 AllY
 
-## return result as DataFrame.
+## Return the result as a DataFrame; also, we use a filter expression here
+## to define which features to extract from the database.
 AllY.granges <- genes(edb,
-                      filter=SeqnameFilter("Y"),
+                      filter = ~ seq_name == "Y",
                       return.type="DataFrame")
 AllY.granges
 
-## include all transcripts of the gene and their chromosomal
+## Include all transcripts of the gene and their chromosomal
 ## coordinates, sort by chrom start of transcripts and return as
 ## GRanges.
 AllY.granges.tx <- genes(edb,
-                         filter=SeqnameFilter("Y"),
-                         columns=c("gene_id", "seq_name",
-                             "seq_strand", "tx_id", "tx_biotype",
-                             "tx_seq_start", "tx_seq_end"),
-                         order.by="tx_seq_start")
+                         filter = SeqNameFilter("Y"),
+                         columns = c("gene_id", "seq_name",
+                                     "seq_strand", "tx_id", "tx_biotype",
+                                     "tx_seq_start", "tx_seq_end"),
+                         order.by = "tx_seq_start")
 AllY.granges.tx
 
 
 
 ######   transcripts
 ##
-## get all transcripts of a gene
+## Get all transcripts of a gene
 Tx <- transcripts(edb,
-                  filter=GeneidFilter("ENSG00000184895"),
-                  order.by="tx_seq_start")
+                  filter = GeneIdFilter("ENSG00000184895"),
+                  order.by = "tx_seq_start")
 Tx
 
-## get all transcripts of two genes along with some information on the
+## Get all transcripts of two genes along with some information on the
 ## gene and transcript
 Tx <- transcripts(edb,
-                  filter=GeneidFilter(c("ENSG00000184895",
-                      "ENSG00000092377")),
-                      columns=c("gene_id", "gene_seq_start",
-                          "gene_seq_end", "gene_biotype", "tx_biotype"))
+                  filter = GeneIdFilter(c("ENSG00000184895",
+                                          "ENSG00000092377")),
+                  columns = c("gene_id", "gene_seq_start", "gene_seq_end",
+                              "gene_biotype", "tx_biotype"))
 Tx
 
 ######   promoters
 ##
-## get the bona-fide promoters (2k up- to 200nt downstream of TSS)
-promoters(edb, filter=GeneidFilter(c("ENSG00000184895",
-                                     "ENSG00000092377")))
+## Get the bona-fide promoters (2k up- to 200nt downstream of TSS)
+promoters(edb, filter = GeneIdFilter(c("ENSG00000184895",
+                                       "ENSG00000092377")))
 
 ######   exons
 ##
-## get all exons of the provided genes
+## Get all exons of protein coding transcript for the gene ENSG00000184895
 Exon <- exons(edb,
-              filter=GeneidFilter(c("ENSG00000184895",
-                  "ENSG00000092377")),
-              order.by="exon_seq_start",
-              columns=c( "gene_id", "gene_seq_start",
-                  "gene_seq_end", "gene_biotype"))
+              filter = ~ gene_id == "ENSG00000184895" &
+                  tx_biotype == "protein_coding",
+              columns = c("gene_id", "gene_seq_start", "gene_seq_end",
+                          "tx_biotype", "gene_biotype"))
 Exon
 
 
 
 #####    exonsBy
 ##
-## get all exons for transcripts encoded on chromosomes X and Y.
-ETx <- exonsBy(edb, by="tx",
-               filter=SeqnameFilter(c("X", "Y")))
+## Get all exons for transcripts encoded on chromosomes X and Y.
+ETx <- exonsBy(edb, by = "tx",
+               filter = SeqNameFilter(c("X", "Y")))
 ETx
-## get all exons for genes encoded on chromosome 1 to 22, X and Y and
+## Get all exons for genes encoded on chromosome 1 to 22, X and Y and
 ## include additional annotation columns in the result
-EGenes <- exonsBy(edb, by="gene",
-                  filter=SeqnameFilter(c("X", "Y")),
-                  columns=c("gene_biotype", "gene_name"))
+EGenes <- exonsBy(edb, by = "gene",
+                  filter = SeqNameFilter(c("X", "Y")),
+                  columns = c("gene_biotype", "gene_name"))
 EGenes
 
 ## Note that this might also contain "LRG" genes.
 length(grep(names(EGenes), pattern="LRG"))
 
-## to fetch just Ensemblgenes, use an GeneidFilter with value
+## to fetch just Ensemblgenes, use an GeneIdFilter with value
 ## "ENS%" and condition "like"
-
+eg <- exonsBy(edb, by = "gene",
+              filter = AnnotationFilterList(SeqNameFilter(c("X", "Y")),
+                                            GeneIdFilter("ENS", "startsWith")),
+              columns = c("gene_biotype", "gene_name"))
+eg
+length(grep(names(eg), pattern="LRG"))
 
 #####    transcriptsBy
 ##
-TGenes <- transcriptsBy(edb, by="gene",
-                        filter=SeqnameFilter(c("X", "Y")))
+TGenes <- transcriptsBy(edb, by = "gene",
+                        filter = SeqNameFilter(c("X", "Y")))
 TGenes
 
 ## convert this to a SAF formatted data.frame that can be used by the
@@ -531,8 +543,8 @@ head(toSAF(TGenes))
 
 #####   transcriptsByOverlaps
 ##
-ir <- IRanges(start=c(2654890, 2709520, 28111770),
-              end=c(2654900, 2709550, 28111790))
+ir <- IRanges(start = c(2654890, 2709520, 28111770),
+              end = c(2654900, 2709550, 28111790))
 gr <- GRanges(rep("Y", length(ir)), ir)
 
 ## Retrieve all transcripts overlapping any of the regions.
@@ -540,8 +552,8 @@ txs <- transcriptsByOverlaps(edb, gr)
 txs
 
 ## Alternatively, use a GRangesFilter
-grf <- GRangesFilter(gr, condition="overlapping")
-txs <- transcripts(edb, filter=grf)
+grf <- GRangesFilter(gr, type = "any")
+txs <- transcripts(edb, filter = grf)
 txs
 
 
@@ -549,15 +561,15 @@ txs
 ## Get the coding region for all transcripts on chromosome Y.
 ## Specifying also additional annotation columns (in addition to the default
 ## exon_id and exon_rank).
-cds <- cdsBy(edb, by="tx", filter=SeqnameFilter("Y"),
-             columns=c("tx_biotype", "gene_name"))
+cds <- cdsBy(edb, by = "tx", filter = SeqNameFilter("Y"),
+             columns = c("tx_biotype", "gene_name"))
 
 ####    the 5' untranslated regions:
-fUTRs <- fiveUTRsByTranscript(edb, filter=SeqnameFilter("Y"))
+fUTRs <- fiveUTRsByTranscript(edb, filter = SeqNameFilter("Y"))
 
 ####    the 3' untranslated regions with additional column gene_name.
-tUTRs <- threeUTRsByTranscript(edb, filter=SeqnameFilter("Y"),
-                               columns="gene_name")
+tUTRs <- threeUTRsByTranscript(edb, filter = SeqNameFilter("Y"),
+                               columns = "gene_name")
 
 
 }

@@ -2,8 +2,8 @@
 % Please edit documentation in R/Methods.R
 \docType{methods}
 \name{useMySQL,EnsDb-method}
-\alias{useMySQL}
 \alias{useMySQL,EnsDb-method}
+\alias{useMySQL}
 \title{Use a MySQL backend}
 \usage{
 \S4method{useMySQL}{EnsDb}(x, host = "localhost", port = 3306, user, pass)
@@ -53,4 +53,3 @@ edb_mysql <- useMySQL(edb, host = "localhost", user = my_user, pass = my_pass)
 \author{
 Johannes Rainer
 }
-
