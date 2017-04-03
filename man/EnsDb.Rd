@@ -47,4 +47,3 @@ edb <- EnsDb(dbcon)
 \author{
 Johannes Rainer
 }
-

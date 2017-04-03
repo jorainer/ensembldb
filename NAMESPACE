@@ -44,7 +44,6 @@ importMethodsFrom("IRanges",
                   "subsetByOverlaps")
 import("GenomicRanges")
 import("GenomicFeatures")
-##importMethodsFrom(GenomicFeatures, extractTranscriptSeqs)
 
 ## AnnotationHub
 importFrom("AnnotationHub",
@@ -76,6 +75,66 @@ importFrom("Biostrings",
 importFrom("RCurl",
            "getURL")
 
+## AnnotationFilter
+importClassesFrom("AnnotationFilter",
+                  "AnnotationFilter",
+                  "CharacterFilter",
+                  "IntegerFilter",
+                  "ExonIdFilter",
+                  "ExonRankFilter",
+                  "ExonStartFilter",
+                  "ExonEndFilter",
+                  "GeneIdFilter",
+                  "GenenameFilter",
+                  "GeneBiotypeFilter",
+                  "GeneStartFilter",
+                  "GeneEndFilter",
+                  "EntrezFilter",
+                  "SymbolFilter",
+                  "TxIdFilter",
+                  "TxNameFilter",
+                  "TxBiotypeFilter",
+                  "TxStartFilter",
+                  "TxEndFilter",
+                  "ProteinIdFilter",
+                  "UniprotFilter",
+                  "SeqNameFilter",
+                  "SeqStrandFilter",
+                  "GRangesFilter",
+                  "AnnotationFilterList"
+                  )
+importMethodsFrom("AnnotationFilter",
+                  "field",
+                  "value",
+                  "condition",
+                  "supportedFilters")
+importFrom("AnnotationFilter",
+           "AnnotationFilter",
+           "ExonIdFilter",
+           "ExonRankFilter",
+           "ExonStartFilter",
+           "ExonEndFilter",
+           "GeneIdFilter",
+           "GenenameFilter",
+           "GeneBiotypeFilter",
+           "GeneStartFilter",
+           "GeneEndFilter",
+           "EntrezFilter",
+           "SymbolFilter",
+           "TxIdFilter",
+           "TxNameFilter",
+           "TxBiotypeFilter",
+           "TxStartFilter",
+           "TxEndFilter",
+           "ProteinIdFilter",
+           "UniprotFilter",
+           "SeqNameFilter",
+           "SeqStrandFilter",
+           "GRangesFilter",
+           "AnnotationFilterList",
+           "feature"
+           )
+
 ## Functions
 export("ensDbFromAH",
        "ensDbFromGff",
@@ -88,49 +147,23 @@ export("ensDbFromAH",
        "runEnsDbApp"
        )
 ## Classes
-exportClasses("BasicFilter",
+exportClasses(
               "EnsDb",
-              "EntrezidFilter",
-              "GenebiotypeFilter",
-              "GeneidFilter",
-              "GenenameFilter",
-              "GRangesFilter",
-              "ExonidFilter",
-              "ExonrankFilter",
-              "ProtdomidFilter",
-              "ProteinidFilter",
-              "SeqnameFilter",
-              "SeqstrandFilter",
-              "SeqstartFilter",
-              "SeqendFilter",
-              "SymbolFilter",
-              "TxidFilter",
-              "TxbiotypeFilter",
-              "UniprotidFilter",
-              "UniprotdbFilter",
-              "UniprotmappingtypeFilter",
+              "ProtDomIdFilter",
+              "UniprotDbFilter",
+              "UniprotMappingTypeFilter",
               "OnlyCodingTxFilter"
               )
 ## Methods for EnsFilter
-exportMethods("column",
-              "condition",
-              "condition<-",
-              "end",
-              "print",
-              "seqnames",
-              "start",
-              "strand",
-              "seqlevels",
-              "show",
-              "value",
-              "value<-",
-              "where"
-              )
+exportMethods(
+    "seqnames",
+    "seqlevels",
+    "show"
+)
 ## Methods for class EnsDb:
 exportMethods("cdsBy",
               "dbconn",
               "disjointExons",
-              "buildQuery",
               "ensemblVersion",
               "exons",
               "exonsBy",
@@ -156,7 +189,9 @@ exportMethods("cdsBy",
               "transcriptsBy",
               "transcriptsByOverlaps",
               "updateEnsDb",
-              "useMySQL")
+              "useMySQL",
+              "supportedFilters"
+              )
 ## Protein data related stuff
 exportMethods("hasProteinData",
               "proteins",
@@ -176,28 +211,24 @@ exportMethods("seqlevelsStyle",
               "seqlevels")
 
 ## Constructor functions:
-export("EnsDb",
-       "EntrezidFilter",
-       "ExonidFilter",
-       "ExonrankFilter",
-       "GeneidFilter",
-       "GenenameFilter",
-       "GenebiotypeFilter",
-       "GRangesFilter",
-       "ProtdomidFilter",
-       "ProteinidFilter",
-       "SeqnameFilter",
-       "SeqstrandFilter",
-       "SeqstartFilter",
-       "SeqendFilter",
-       "SymbolFilter",
-       "TxidFilter",
-       "TxbiotypeFilter",
-       "UniprotidFilter",
-       "UniprotdbFilter",
-       "UniprotmappingtypeFilter",
-       "OnlyCodingTxFilter"
-       )
+export(
+    "EnsDb",
+    "EntrezidFilter",
+    "ExonidFilter",
+    "ExonrankFilter",
+    "GeneidFilter",
+    "GenebiotypeFilter",
+    "SeqnameFilter",
+    "SeqstrandFilter",
+    "SeqstartFilter",
+    "SeqendFilter",
+    "TxidFilter",
+    "TxbiotypeFilter",
+    "UniprotDbFilter",
+    "UniprotMappingTypeFilter",
+    "OnlyCodingTxFilter",
+    "ProtDomIdFilter"
+)
 
 
 

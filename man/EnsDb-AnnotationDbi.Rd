@@ -46,22 +46,25 @@
   \item{keys}{
     The keys/ids for which data should be retrieved from the
     database. This can be either a character vector of keys/IDs, a
-    single filter object extending \code{\linkS4class{BasicFilter}} or a
-    list of such objects.
+    single filter object extending
+    \code{\link[AnnotationFilter]{AnnotationFilter}}, an combination of
+    filters \code{\link[AnnotationFilter]{AnnotationFilterList}} or a
+    \code{formula} representing a filter expression (see
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details).
   }
 
   \item{keytype}{
     For \code{mapIds} and \code{select}: the type (column) that matches
     the provided keys. This argument does not have to be specified if
     argument \code{keys} is a filter object extending
-    \code{\linkS4class{BasicFilter}} or a \code{list} of such objects.
+    \code{AnnotationFilter} or a \code{list} of such objects.
 
     For \code{keys}: which keys should be returned from the database.
   }
 
   \item{filter}{
     For \code{keys}: either a single object extending
-    \code{\linkS4class{BasicFilter}} or a list of such object to
+    \code{AnnotationFilter} or a list of such object to
     retrieve only specific keys from the database.
   }
 
@@ -114,7 +117,7 @@
       Retrieve the mapped ids for a set of keys that are of a particular
       keytype. Argument \code{keys} can be either a character vector of
       keys/IDs, a single filter object extending
-      \code{\linkS4class{BasicFilter}} or a list of such objects. For
+      \code{AnnotationFilter} or a list of such objects. For
       the latter, the argument \code{keytype} does not have to be
       specified. Importantly however, if the filtering system is used,
       the ordering of the results might not represent the ordering of
@@ -132,7 +135,7 @@
       arguments. Multiple matches of the keys are returned in one row
       for each possible match. Argument \code{keys} can be either a
       character vector of keys/IDs, a single filter object extending
-      \code{\linkS4class{BasicFilter}} or a list of such objects. For
+      \code{AnnotationFilter} or a list of such objects. For
       the latter, the argument \code{keytype} does not have to be
       specified.
 
@@ -161,7 +164,6 @@
   Johannes Rainer
 }
 \seealso{
-  \code{\linkS4class{BasicFilter}}
   \code{\link{listColumns}}
   \code{\link{transcripts}}
 }
@@ -180,42 +182,44 @@ columns(edb)
 listColumns(edb)
 
 ## Retrieve all keys corresponding to transcript ids.
-txids <- keys(edb, keytype="TXID")
+txids <- keys(edb, keytype = "TXID")
 length(txids)
 head(txids)
 
 ## Retrieve all keys corresponding to gene names of genes encoded on chromosome X
-gids <- keys(edb, keytype="GENENAME", filter=SeqnameFilter("X"))
+gids <- keys(edb, keytype = "GENENAME", filter = SeqNameFilter("X"))
 length(gids)
 head(gids)
 
 ## Get a mapping of the genes BCL2 and BCL2L11 to all of their
 ## transcript ids and return the result as list
-maps <- mapIds(edb, keys=c("BCL2", "BCL2L11"), column="TXID",
-               keytype="GENENAME", multiVals="list")
+maps <- mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID",
+               keytype = "GENENAME", multiVals = "list")
 maps
 
-## Perform the same query using a combination of a GenenameFilter and a TxbiotypeFilter
-## to just retrieve protein coding transcripts for these two genes.
-mapIds(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
-                      TxbiotypeFilter("protein_coding")), column="TXID",
-       multiVals="list")
+## Perform the same query using a combination of a GenenameFilter and a
+## TxBiotypeFilter to just retrieve protein coding transcripts for these
+## two genes.
+mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+                        TxBiotypeFilter("protein_coding")), column = "TXID",
+       multiVals = "list")
 
 ## select:
 ## Retrieve all transcript and gene related information for the above example.
-select(edb, keys=list(GenenameFilter(c("BCL2", "BCL2L11")),
-                      TxbiotypeFilter("protein_coding")),
-       columns=c("GENEID", "GENENAME", "TXID", "TXBIOTYPE", "TXSEQSTART", "TXSEQEND",
-                 "SEQNAME", "SEQSTRAND"))
+select(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+                        TxBiotypeFilter("protein_coding")),
+       columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE", "TXSEQSTART",
+                   "TXSEQEND", "SEQNAME", "SEQSTRAND"))
 
 ## Get all data for genes encoded on chromosome Y
-Y <- select(edb, keys="Y", keytype="SEQNAME")
+Y <- select(edb, keys = "Y", keytype = "SEQNAME")
 head(Y)
 nrow(Y)
 
-## Get selected columns for all lincRNAs encoded on chromosome Y
-Y <- select(edb, keys=list(SeqnameFilter("Y"), GenebiotypeFilter("lincRNA")),
-            columns=c("GENEID", "GENEBIOTYPE", "TXID", "GENENAME"))
+## Get selected columns for all lincRNAs encoded on chromosome Y. Here we use
+## a filter expression to define what data to retrieve.
+Y <- select(edb, keys = ~ seq_name == "Y" & gene_biotype == "lincRNA",
+            columns = c("GENEID", "GENEBIOTYPE", "TXID", "GENENAME"))
 head(Y)
 nrow(Y)
 
