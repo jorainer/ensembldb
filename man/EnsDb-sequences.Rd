@@ -88,7 +88,6 @@
   Johannes Rainer
 }
 \seealso{
-  \code{\linkS4class{BasicFilter}}
   \code{\link{transcripts}}
   \code{\link{exonsBy}}
 }
@@ -105,7 +104,7 @@ edb <- EnsDb.Hsapiens.v75
     Dna <- getGenomeFaFile(edb)
     ## Extract the transcript sequence for all transcripts encoded on chromosome
     ## Y.
-    ##extractTranscriptSeqs(Dna, edb, filter=SeqnameFilter("Y"))
+    ##extractTranscriptSeqs(Dna, edb, filter=SeqNameFilter("Y"))
 
 }
 

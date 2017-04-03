@@ -3,18 +3,19 @@
 \docType{methods}
 \name{listProteinColumns}
 \alias{listProteinColumns}
-\alias{listUniprotDbs}
-\alias{listUniprotDbs,EnsDb-method}
-\alias{listUniprotMappingTypes}
-\alias{listUniprotMappingTypes,EnsDb-method}
-\alias{proteins}
 \alias{proteins,EnsDb-method}
+\alias{proteins}
+\alias{listUniprotDbs,EnsDb-method}
+\alias{listUniprotDbs}
+\alias{listUniprotMappingTypes,EnsDb-method}
+\alias{listUniprotMappingTypes}
 \title{Protein related functionality}
 \usage{
 listProteinColumns(object)
 
 \S4method{proteins}{EnsDb}(object, columns = listColumns(object, "protein"),
-  filter, order.by = "", order.type = "asc", return.type = "DataFrame")
+  filter = AnnotationFilterList(), order.by = "", order.type = "asc",
+  return.type = "DataFrame")
 
 \S4method{listUniprotDbs}{EnsDb}(object)
 
@@ -28,9 +29,10 @@ be extracted from the database. Can be any column(s) listed by the
 \code{\link{listColumns}} method.}
 
 \item{filter}{For \code{proteins}: A filter object extending
-\code{\linkS4class{BasicFilter}} or a list of such objects to select
-specific entries from the database. See \code{\link{RNA-DNA-filters}} and
-\code{\link{ProteinFilters}} for the full list of supported filters.}
+\code{AnnotationFilter} or a list of such objects to select
+specific entries from the database. See \code{\link{Filter-classes}} for a
+documentation of available filters and use \code{\link{supportedFilters}} to
+get the full list of supported filters.}
 
 \item{order.by}{For \code{proteins}: a character vector specifying the
 column(s) by which the result should be ordered.}
@@ -111,4 +113,3 @@ if (hasProteinData(edb))
 \author{
 Johannes Rainer
 }
-

@@ -1,3 +1,13 @@
+CHANGES IN VERSION 1.99.13
+--------------------------
+
+USER VISIBLE CHANGES:
+    o Most filter classes are now imported from the AnnotationFilter package.
+    o Parameter 'filter' supports now filter expression.
+    o Multiple filters can be combined with & and |.
+    o buildQuery is no longer exported.
+
+
 CHANGES IN VERSION 1.99.11
 --------------------------
 

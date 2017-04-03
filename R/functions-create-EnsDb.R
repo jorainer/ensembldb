@@ -267,7 +267,8 @@ makeEnsembldbPackage <- function(ensdb,
 ## + The CDS features in the GTF are somewhat problematic, while we're used to get just the
 ##   coding start and end for a transcript from the Ensembl perl API, here we get the coding
 ##   start and end for each exon.
-ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version){
+ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
+                         version, ...){
     options(useFancyQuotes=FALSE)
     message("Importing GTF file ... ", appendLF=FALSE)
     ## wanted.features <- c("gene", "transcript", "exon", "CDS")
@@ -324,8 +325,10 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion, version){
 
     GTF <- fixCDStypeInEnsemblGTF(GTF)
     ## here on -> call ensDbFromGRanges.
-    dbname <- ensDbFromGRanges(GTF, outfile=outfile, path=path, organism=organism,
-                               genomeVersion=genomeVersion, version=ensemblVersion)
+    dbname <- ensDbFromGRanges(GTF, outfile = outfile, path = path,
+                               organism = organism,
+                               genomeVersion = genomeVersion,
+                               version = ensemblVersion, ...)
 
     gtfFilename <- unlist(strsplit(gtf, split=.Platform$file.sep))
     gtfFilename <- gtfFilename[length(gtfFilename)]
@@ -461,7 +464,8 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
 ##  ensDbFromGff
 ##
 ####------------------------------------------------------------
-ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
+ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion,
+                         version, ...){
     options(useFancyQuotes=FALSE)
 
     ## Check parameters
@@ -593,9 +597,10 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
     message("Proceeding to create the database.")
 
     ## Proceed.
-    dbname <- ensDbFromGRanges(theGff, outfile=outfile, path=path,
-                               organism=orgFromFile,
-                               genomeVersion=genFromFile, version=ensFromFile)
+    dbname <- ensDbFromGRanges(theGff, outfile = outfile, path = path,
+                               organism = orgFromFile,
+                               genomeVersion = genFromFile,
+                               version = ensFromFile, ...)
 
     gtfFilename <- unlist(strsplit(gff, split=.Platform$file.sep))
     gtfFilename <- gtfFilename[length(gtfFilename)]
@@ -620,7 +625,8 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion, version){
 ##    the organism, genome build and ensembl version from the file name, if not
 ##    provided.
 ##
-ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion, version){
+ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
+                             version, ...){
     if(!is(x, "GRanges"))
         stop("This method can only be called on GRanges objects!")
     ## check for missing parameters
@@ -979,45 +985,6 @@ checkValidEnsDb <- function(x){
 }
 
 
-## organism is expected to be e.g. Homo_sapiens, so the full organism name, with
-## _ as a separator
-## tryGetSeqinfoFromEnsembl_old <- function(organism, ensemblVersion, seqnames){
-##     ## Quick fix if organism contains whitespace instead of _:
-##     organism <- gsub(organism, pattern=" ", replacement="_", fixed=TRUE)
-##     Dataset <- paste0(c(tolower(.abbrevOrganismName(organism)), "gene_ensembl"),
-##                       collapse="_")
-##     message("Fetch seqlengths from ensembl, dataset ", Dataset, " version ",
-##             ensemblVersion, "...", appendLF=FALSE)
-##     ## get it all from the ensemblgenomes.org host???
-##     tmp <- try(
-##         GenomicFeatures:::fetchChromLengthsFromEnsembl(dataset=Dataset,
-##                                                        release=ensemblVersion,
-##                                                        extra_seqnames=seqnames),
-##         silent=TRUE)
-##     if(class(tmp)=="try-error"){
-##         message(paste0("Unable to get sequence lengths from Ensembl for dataset: ",
-##                        Dataset, ". Error was: ", message(tmp), "\n"))
-##     }else{
-##         message("OK")
-##         return(tmp)
-##     }
-##     ## try plant genomes...
-##     tmp <- try(
-##         GenomicFeatures:::fetchChromLengthsFromEnsemblPlants(dataset=Dataset,
-##                                                              extra_seqnames=seqnames),
-##         silent=TRUE)
-##     if(class(tmp)=="try-error"){
-##         message(paste0("Unable to get sequence lengths from Ensembl plants",
-##                        " for dataset: ", Dataset, ". Error was: ",
-##                        message(tmp), "\n"))
-##     }else{
-##         message("OK")
-##         return(tmp)
-##     }
-##     message("FAIL")
-##     return(matrix(ncol=2, nrow=0))
-## }
-
 ############################################################
 ##' Fetch chromosome sequence lengths from Ensembl.
 ##' @param organism The organism. Has to be in the form "Homo sapiens"
@@ -1025,7 +992,10 @@ checkValidEnsDb <- function(x){
 ##' @param seqnames The names of the chromosomes/sequences; optional.
 ##' @return A matrix with two columns name and seq_length.
 ##' @noRd
-tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames){
+tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames,
+                                     skip = FALSE){
+    if (skip)
+        return(matrix(nrow = 0, ncol = 2))
     message("Fetch seqlengths from ensembl ... ", appendLF=FALSE)
     tmp <- try(
         .getSeqlengthsFromMysqlFolder(organism = organism,

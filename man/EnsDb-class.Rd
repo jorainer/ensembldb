@@ -2,8 +2,6 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{EnsDb-class}
-\alias{buildQuery}
-\alias{buildQuery,EnsDb-method}
 \alias{dbconn}
 \alias{dbconn,EnsDb-method}
 \alias{ensemblVersion}
@@ -33,12 +31,11 @@
 \alias{returnFilterColumns<-}
 \alias{returnFilterColumns<-,EnsDb-method}
 
-
 \title{Basic usage of an Ensembl based annotation database}
 \description{
-  Get some basic information from an Ensembl based annotation package
-  generated with \code{\link{makeEnsembldbPackage}}.
-
+  The \code{EnsDb} class provides access to an Ensembl-based annotation
+  package. This help page describes functions to get some basic
+  informations from such an object.
 }
 \section{Objects from the Class}{
   A connection to the respective annotation database is created upon
@@ -49,10 +46,6 @@
   \code{\link{makeEnsemblSQLiteFromTables}} for an example).
 }
 \usage{
-
-\S4method{buildQuery}{EnsDb}(x, columns=c("gene_id", "gene_biotype",
-                                    "gene_name"), filter=list(), order.by,
-                             order.type="asc", skip.order.check=FALSE)
 
 \S4method{dbconn}{EnsDb}(x)
 
@@ -91,39 +84,14 @@
     Not used.
   }
 
-  \item{columns}{
-    Columns (attributes) to be retrieved from the database tables. Use the
-    \code{listColumns} or \code{listTables} method for a list of
-    supported columns.
-  }
-
-  \item{filter}{
-    list of \code{\linkS4class{BasicFilter}} instance(s) to
-    select specific entries from the database (see examples below).
-  }
-
   \item{object}{
     For \code{organism}: an \code{EnsDb} instance.
-  }
-
-  \item{order.by}{name of one of the columns above on which the
-    results should be sorted.
-  }
-
-  \item{order.type}{if the results should be ordered ascending
-    (\code{asc}, default) or descending (\code{desc}).
   }
 
   \item{skip.keys}{
     for \code{listColumns}: whether primary and foreign keys (not
     being e.g. \code{"gene_id"} or alike) should be returned or not. By
     default these will not be returned.
-  }
-
-  \item{skip.order.check}{
-    if paramter \code{order.by} should be checked for allowed column
-    names. If \code{TRUE} the function checks if the provided order
-    criteria orders on columns present in the database tables.
   }
 
   \item{table}{
@@ -163,11 +131,6 @@
 }
 \section{Methods and Functions}{
   \describe{
-
-    \item{buildQuery}{
-      Helper function building the SQL query to be used to retrieve the
-      wanted information. Usually there is no need to call this method.
-    }
 
     \item{dbconn}{
       Returns the connection to the internal SQL database.
@@ -232,10 +195,6 @@
 }
 \value{
   \describe{
-    \item{For \code{buildQuery}}{
-      A character string with the SQL query.
-    }
-
     \item{For \code{connection}}{
       The SQL connection to the RSQLite database.
     }
@@ -299,7 +258,7 @@
 }
 \seealso{
   \code{\link{EnsDb}},
-  \code{\link{makeEnsembldbPackage}}, \code{\linkS4class{BasicFilter}},
+  \code{\link{makeEnsembldbPackage}},
       \code{\link{exonsBy}}, \code{\link{genes}},
       \code{\link{transcripts}},
       \code{\link{makeEnsemblSQLiteFromTables}}
@@ -326,16 +285,6 @@ metadata(EnsDb.Hsapiens.v75)
 ## Get all the sequence names.
 seqlevels(EnsDb.Hsapiens.v75)
 
-######    buildQuery
-##
-## Join tables gene and transcript and return gene_id and tx_id
-buildQuery(EnsDb.Hsapiens.v75, columns=c("gene_id", "tx_id"))
-
-
-## Get all exon_ids and transcript ids of genes encoded on chromosome Y.
-buildQuery(EnsDb.Hsapiens.v75, columns=c("exon_id", "tx_id"),
-           filter=list(SeqnameFilter( "Y")))
-
 ## List all available gene biotypes from the database:
 listGenebiotypes(EnsDb.Hsapiens.v75)
 
@@ -350,16 +299,16 @@ returnFilterColumns(EnsDb.Hsapiens.v75)
 
 ## Get protein coding genes on chromosome X, specifying to return
 ## only columns gene_name as additional column.
-genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("X"),
-                                      GenebiotypeFilter("protein_coding")),
+genes(EnsDb.Hsapiens.v75, filter=list(SeqNameFilter("X"),
+                                      GeneBiotypeFilter("protein_coding")),
       columns=c("gene_name"))
 ## By default we get also the gene_biotype column as the data was filtered
 ## on this column.
 
 ## This can be changed using the returnFilterColumns option
 returnFilterColumns(EnsDb.Hsapiens.v75) <- FALSE
-genes(EnsDb.Hsapiens.v75, filter=list(SeqnameFilter("X"),
-                                      GenebiotypeFilter("protein_coding")),
+genes(EnsDb.Hsapiens.v75, filter=list(SeqNameFilter("X"),
+                                      GeneBiotypeFilter("protein_coding")),
       columns=c("gene_name"))
 
 

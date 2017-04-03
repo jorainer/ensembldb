@@ -455,10 +455,11 @@ setMethod("hasProteinData", "EnsDb", function(x) {
 ##
 ## get genes from the database.
 setMethod("genes", "EnsDb", function(x,
-                                     columns=listColumns(x, "gene"),
-                                     filter, order.by="",
-                                     order.type="asc",
-                                     return.type="GRanges"){
+                                     columns = listColumns(x, "gene"),
+                                     filter = AnnotationFilterList(),
+                                     order.by = "",
+                                     order.type = "asc",
+                                     return.type = "GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
     columns <- cleanColumns(x, unique(c(columns, "gene_id")))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
@@ -467,11 +468,7 @@ setMethod("genes", "EnsDb", function(x,
         columns <- unique(c(columns, c("gene_seq_start", "gene_seq_end",
                                        "seq_name", "seq_strand")))
     }
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     filter <- setFeatureInGRangesFilter(filter, "gene")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
@@ -525,9 +522,10 @@ setMethod("genes", "EnsDb", function(x,
 ## transcripts:
 ##
 ## get transcripts from the database.
-setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
-                                           filter, order.by="", order.type="asc",
-                                           return.type="GRanges"){
+setMethod("transcripts", "EnsDb", function(x, columns = listColumns(x, "tx"),
+                                           filter = AnnotationFilterList(),
+                                           order.by = "", order.type = "asc",
+                                           return.type = "GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
     columns <- cleanColumns(x, unique(c(columns, "tx_id")))
     ## if return.type is GRanges we require columns: seq_name, gene_seq_start
@@ -538,11 +536,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
                                        "seq_name",
                                        "seq_strand")))
     }
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
@@ -557,7 +551,7 @@ setMethod("transcripts", "EnsDb", function(x, columns=listColumns(x, "tx"),
         if(is.null(order.by))
             order.by <- ""
     }
-    Res <- getWhat(x, columns=columns, filter=filter,
+    Res <- getWhat(x, columns=columns, filter = filter,
                    order.by=order.by, order.type=order.type,
                    startWith = "tx", join = "suggested")
     if(return.type=="data.frame" | return.type=="DataFrame"){
@@ -614,9 +608,10 @@ setMethod("promoters", "EnsDb",
 ## exons
 ##
 ## get exons from the database.
-setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
-                                     order.by="", order.type="asc",
-                                     return.type="GRanges"){
+setMethod("exons", "EnsDb", function(x, columns = listColumns(x, "exon"),
+                                     filter = AnnotationFilterList(),
+                                     order.by = "", order.type = "asc",
+                                     return.type = "GRanges"){
     return.type <- match.arg(return.type, c("data.frame", "GRanges", "DataFrame"))
     if(!any(columns %in% c(listColumns(x, "exon"), "exon_idx"))){
         ## have to have at least one column from the gene table...
@@ -631,11 +626,7 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
                                        "seq_name",
                                        "seq_strand")))
     }
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     filter <- setFeatureInGRangesFilter(filter, "exon")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
@@ -696,7 +687,8 @@ setMethod("exons", "EnsDb", function(x, columns=listColumns(x, "exon"), filter,
 ## should return a GRangesList
 setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
                                        columns = listColumns(x, "exon"),
-                                       filter, use.names = FALSE) {
+                                       filter = AnnotationFilterList(),
+                                       use.names = FALSE) {
     by <- match.arg(by, c("tx", "gene"))
     bySuff <- "_id"
     if (use.names) {
@@ -708,11 +700,7 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
             bySuff <- "_name"
         }
     }
-    if (missing(filter)) {
-        filter <- list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     ## We're applying eventual GRangesFilter to either gene or tx.
     filter <- setFeatureInGRangesFilter(filter, by)
     ## Eventually add columns for the filters:
@@ -810,7 +798,7 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
 ##
 setMethod("transcriptsBy", "EnsDb", function(x, by = c("gene", "exon"),
                                              columns = listColumns(x, "tx"),
-                                             filter){
+                                             filter = AnnotationFilterList()) {
     if (any(by == "cds"))
         stop("fetching transcripts by cds is not (yet) implemented.")
     by <- match.arg(by, c("gene", "exon"))
@@ -828,11 +816,7 @@ setMethod("transcriptsBy", "EnsDb", function(x, by = c("gene", "exon"),
                 " transcripts are fetched.")
     columns <- columns[!torem]
     ## Process filters
-    if (missing(filter)) {
-        filter <- list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     ## GRanges filter should be based on either gene or exon coors.
     filter <- setFeatureInGRangesFilter(filter, by)
     ## Eventually add columns for the filters:
@@ -893,7 +877,8 @@ setMethod("lengthOf", "GRangesList", function(x, ...){
 ##    return(unlist(lapply(width(reduce(x)), sum)))
 })
 ## return the length of genes or transcripts
-setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
+setMethod("lengthOf", "EnsDb", function(x, of="gene",
+                                        filter=AnnotationFilterList()){
     of <- match.arg(of, c("gene", "tx"))
     ## get the exons by gene or transcript from the database...
     suppressWarnings(
@@ -922,10 +907,12 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
 ## })
 ## implement the method from the GenomicFeatures package
 .transcriptLengths <- function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-                               with.utr3_len=FALSE, filter=list()){
+                               with.utr3_len=FALSE,
+                               filter = AnnotationFilterList()){
     ## First we're going to fetch the exonsBy.
     ## Or use getWhat???
     ## Dash, have to make two queries!
+    filter <- .processFilterParam(filter, x)
     allTxs <- transcripts(x, filter=filter)
     exns <- exonsBy(x, filter=filter)
     ## Match ordering
@@ -1000,20 +987,17 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene", filter=list()){
 ##
 ## Return coding region ranges by tx or by gene.
 setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
-                                     columns = NULL, filter,
+                                     columns = NULL,
+                                     filter = AnnotationFilterList(),
                                      use.names = FALSE){
     by <- match.arg(by, c("tx", "gene"))
-    if (missing(filter)) {
-        filter = list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     filter <- setFeatureInGRangesFilter(filter, by)
     columns <- cleanColumns(x, columns)
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
     ## Add a filter ensuring that only coding transcripts are queried.
-    filter <- c(list(OnlyCodingTxFilter()), filter)
+    filter <- AnnotationFilterList(OnlyCodingTxFilter() ,filter)
     bySuff <- "_id"
     if (by == "tx") {
         ## adding exon_id, exon_idx to the columns.
@@ -1120,19 +1104,16 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
 ############################################################
 ## getUTRsByTranscript
 ##
-getUTRsByTranscript <- function(x, what, columns = NULL, filter) {
-    if (missing(filter)) {
-        filter <- list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+getUTRsByTranscript <- function(x, what, columns = NULL,
+                                filter = AnnotationFilterList()) {
+    filter <- .processFilterParam(filter, x)
     columns <- cleanColumns(x, columns)
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, x)
     columns <- unique(c(columns, "exon_id", "exon_idx"))
     ## Add the filter for coding tx only.
-    filter <- c(list(OnlyCodingTxFilter()), filter)
+    filter <- AnnotationFilterList(OnlyCodingTxFilter(), filter)
     ## what do we need: tx_cds_seq_start, tx_cds_seq_end and exon_idx
     fetchCols <- unique(c("tx_id", columns, "tx_cds_seq_start",
                           "tx_cds_seq_end", "seq_name", "seq_strand",
@@ -1248,25 +1229,21 @@ getUTRsByTranscript <- function(x, what, columns = NULL, filter) {
 ############################################################
 ## threeUTRsByTranscript
 ##
-setMethod("threeUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
-    if(missing(filter)){
-        filter=list()
-    }else{
-        filter <- checkFilter(filter)
-    }
-    return(getUTRsByTranscript(x=x, what="three", columns=columns, filter=filter))
+setMethod("threeUTRsByTranscript", "EnsDb",
+          function(x, columns = NULL, filter = AnnotationFilterList()) {
+              filter <- .processFilterParam(filter, x)
+              getUTRsByTranscript(x = x, what = "three", columns = columns,
+                                  filter = filter)
 })
 
 ############################################################
 ## fiveUTRsByTranscript
 ##
-setMethod("fiveUTRsByTranscript", "EnsDb", function(x, columns=NULL, filter){
-    if (missing(filter)) {
-        filter=list()
-    } else {
-        filter <- checkFilter(filter)
-    }
-    return(getUTRsByTranscript(x=x, what="five", columns=columns, filter=filter))
+setMethod("fiveUTRsByTranscript", "EnsDb",
+          function(x, columns = NULL, filter = AnnotationFilterList()) {
+    filter <- .processFilterParam(filter, x)
+    getUTRsByTranscript(x = x, what = "five", columns = columns,
+                        filter = filter)
 })
 
 ############################################################
@@ -1293,7 +1270,7 @@ setMethod("toSAF", "GRangesList", function(x, ...){
 ## buildQuery
 setMethod("buildQuery", "EnsDb",
           function(x, columns=c("gene_id", "gene_biotype", "gene_name"),
-                   filter=list(), order.by="",
+                   filter = AnnotationFilterList(), order.by="",
                    order.type="asc",
                    skip.order.check=FALSE){
               return(.buildQuery(x=x,
@@ -1317,8 +1294,9 @@ setMethod("buildQuery", "EnsDb",
 ##   "left outer join" or "suggested".
 setMethod("getWhat", "EnsDb",
           function(x, columns = c("gene_id", "gene_biotype", "gene_name"),
-                   filter = list(), order.by = "", order.type = "asc",
-                   group.by = NULL, skip.order.check = FALSE, startWith = NULL,
+                   filter = AnnotationFilterList(), order.by = "",
+                   order.type = "asc", group.by = NULL,
+                   skip.order.check = FALSE, startWith = NULL,
                    join = "suggested") {
               Res <- .getWhat(x = x,
                               columns = columns,
@@ -1341,12 +1319,8 @@ setMethod("getWhat", "EnsDb",
 ## that's similar to the code from the GenomicFeatures package.
 setMethod("disjointExons", "EnsDb",
           function(x, aggregateGenes = FALSE, includeTranscripts = TRUE,
-                   filter, ...){
-              if (missing(filter)) {
-                  filter <- list()
-              } else {
-                  filter <- checkFilter(filter)
-              }
+                   filter = AnnotationFilterList(), ...){
+              filter <- .processFilterParam(filter, x)
 
               exonsByGene <- exonsBy(x, by = "gene", filter = filter)
               exonicParts <- disjoin(unlist(exonsByGene, use.names = FALSE))
@@ -1392,31 +1366,6 @@ setMethod("disjointExons", "EnsDb",
          )
 
 ############################################################
-## checkFilter:
-##
-## checks the filter argument and ensures that a list of Filter
-## object is returned
-checkFilter <- function(x){
-    if(is(x, "list")){
-        if(length(x) == 0)
-            return(x)
-        ## check if all elements are Filter classes.
-        if(!all(unlist(lapply(x, function(z){
-            return(is(z, "BasicFilter"))
-        }), use.names = FALSE)))
-            stop("One of more elements in 'filter' are not filter objects!")
-    }else{
-        if(is(x, "BasicFilter")){
-            x <- list(x)
-        }else{
-            stop("'filter' has to be a filter object or a list of",
-                 " filter objects!")
-        }
-    }
-    return(x)
-}
-
-############################################################
 ## getGeneRegionTrackForGviz
 ## Fetch data to add as a GeneTrack.
 ## filter ...                 Used to filter the result.
@@ -1428,162 +1377,141 @@ checkFilter <- function(x){
 ##                            is performed afterwards.
 ## featureIs ...              Wheter gene_biotype or tx_biotype should be
 ##                            mapped to the column feature.
-setMethod("getGeneRegionTrackForGviz", "EnsDb", function(x, filter=list(),
-                                                         chromosome=NULL,
-                                                         start=NULL,
-                                                         end=NULL,
-                                                         featureIs="gene_biotype"){
-    featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
-    filter <- checkFilter(filter)
-    if(missing(chromosome))
-        chromosome <- NULL
-    if(missing(start))
-        start <- NULL
-    if(missing(end))
-        end <- NULL
-    ## If only chromosome is specified, create a SeqnameFilter and
-    ## add it to the filter
-    if(is.null(start) & is.null(end) & !is.null(chromosome)){
-        filter <- c(filter, list(SeqnameFilter(chromosome)))
-        chromosome <- NULL
-    }
-    if(any(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
-        ## Require however that all are defined!!!
-        if(all(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
-            ## Fix eventually provided UCSC chromosome names:
-            chromosome <- ucscToEns(chromosome)
-            ## Fetch all transcripts in that region:
-            tids <- dbGetQuery(dbconn(x),
-                               paste0("select distinct tx.tx_id from tx join",
-                                      " gene on (tx.gene_id=gene.gene_id)",
-                                      " where seq_name='", chromosome, "' and (",
-                                      "(tx_seq_start >=", start,
-                                      " and tx_seq_start <=", end, ") or ",
-                                      "(tx_seq_end >=", start,
-                                      " and tx_seq_end <=", end, ") or ",
-                                      "(tx_seq_start <=", start,
-                                      " and tx_seq_end >=",end,")",
-                                      ")"))[, "tx_id"]
-            if(length(tids) == 0)
-                stop("Did not find any transcript on chromosome ",
-                     chromosome, " from ", start, " to ", end, "!")
-            filter <- c(filter, TxidFilter(tids))
-        }else{
-            stop("Either all or none of arguments 'chromosome', 'start' and",
-                 " 'end' have to be specified!")
+setMethod(
+    "getGeneRegionTrackForGviz",
+    "EnsDb",
+    function(x, filter = AnnotationFilterList(), chromosome = NULL,
+             start = NULL, end = NULL, featureIs = "gene_biotype")
+    {
+        featureIs <- match.arg(featureIs, c("gene_biotype", "tx_biotype"))
+        filter <- .processFilterParam(filter, x)
+        if(missing(chromosome))
+            chromosome <- NULL
+        if(missing(start))
+            start <- NULL
+        if(missing(end))
+            end <- NULL
+        ## If only chromosome is specified, create a SeqNameFilter and
+        ## add it to the filter
+        if(is.null(start) & is.null(end) & !is.null(chromosome)){
+            filter <- AnnotationFilterList(filter, SeqNameFilter(chromosome))
+            chromosome <- NULL
         }
-    }
-    ## Return a data.frame with columns: chromosome, start, end, width,
-    ## strand, feature,
-    ## gene, exon, transcript and symbol.
-    ## 1) Query the data as we usually would.
-    ## 2) Perform an additional query to get cds and utr, remove all entries
-    ##    from the first result for the same transcripts and rbind the data.frames.
-    needCols <- c("seq_name", "exon_seq_start", "exon_seq_end", "seq_strand",
-                  featureIs, "gene_id", "exon_id",
-                  "exon_idx", "tx_id", "gene_name")
-    ## That's the names to which we map the original columns from the EnsDb.
-    names(needCols) <- c("chromosome", "start", "end", "strand",
-                         "feature", "gene", "exon", "exon_rank", "transcript",
-                         "symbol")
-    txs <- transcripts(x, filter=filter,
-                       columns=needCols, return.type="data.frame")
-    ## Rename columns
-    idx <- match(needCols, colnames(txs))
-    notThere <- is.na(idx)
-    idx <- idx[!notThere]
-    colnames(txs)[idx] <- names(needCols)[!notThere]
-    ## now processing the 5utr
-    fUtr <- fiveUTRsByTranscript(x, filter=filter, columns=needCols)
-    if(length(fUtr) > 0){
-        fUtr <- as(unlist(fUtr, use.names=FALSE), "data.frame")
-        fUtr <- fUtr[, !(colnames(fUtr) %in% c("width", "seq_name",
-                                               "exon_seq_start",
-                                               "exon_seq_end", "strand"))]
-        colnames(fUtr)[1] <- "chromosome"
-        idx <- match(needCols, colnames(fUtr))
+        if(any(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
+            ## Require however that all are defined!!!
+            if(all(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
+                ## Fix eventually provided UCSC chromosome names:
+                chromosome <- ucscToEns(chromosome)
+                ## Define a GRangesFilter to include all features that overlap
+                ## that region.
+                grg <- GRangesFilter(GRanges(seqnames = chromosome,
+                                             ranges = IRanges(start, end)),
+                                     feature = "tx", type = "any")
+                tids <- transcripts(x, filter = grg, columns = "tx_id")$tx_id
+                filter <- AnnotationFilterList(filter, TxIdFilter(tids))
+            }else{
+                stop("Either all or none of arguments 'chromosome', 'start' and",
+                     " 'end' have to be specified!")
+            }
+        }
+        ## Return a data.frame with columns: chromosome, start, end, width,
+        ## strand, feature,
+        ## gene, exon, transcript and symbol.
+        ## 1) Query the data as we usually would.
+        ## 2) Perform an additional query to get cds and utr, remove all entries
+        ##    from the first result for the same transcripts and rbind the
+        ##    data.frames.
+        needCols <- c("seq_name", "exon_seq_start", "exon_seq_end", "seq_strand",
+                      featureIs, "gene_id", "exon_id",
+                      "exon_idx", "tx_id", "gene_name")
+        ## That's the names to which we map the original columns from the EnsDb.
+        names(needCols) <- c("chromosome", "start", "end", "strand",
+                             "feature", "gene", "exon", "exon_rank", "transcript",
+                             "symbol")
+        txs <- transcripts(x, filter = filter,
+                           columns = needCols, return.type="data.frame")
+        ## Rename columns
+        idx <- match(needCols, colnames(txs))
         notThere <- is.na(idx)
         idx <- idx[!notThere]
-        colnames(fUtr)[idx] <- names(needCols)[!notThere]
-        ## Force being in the correct ordering:
-        fUtr <- fUtr[, names(needCols)]
-        fUtr$feature <- "utr5"
-        ## Remove transcripts from the txs data.frame
-        txs <- txs[!(txs$transcript %in% fUtr$transcript), , drop=FALSE]
-    }
-    tUtr <- threeUTRsByTranscript(x, filter=filter, columns=needCols)
-    if(length(tUtr) > 0){
-        tUtr <- as(unlist(tUtr, use.names=FALSE), "data.frame")
-        tUtr <- tUtr[, !(colnames(tUtr) %in% c("width", "seq_name",
-                                               "exon_seq_start",
-                                               "exon_seq_end", "strand"))]
-        colnames(tUtr)[1] <- "chromosome"
-        idx <- match(needCols, colnames(tUtr))
-        notThere <- is.na(idx)
-        idx <- idx[!notThere]
-        colnames(tUtr)[idx] <- names(needCols)[!notThere]
-        ## Force being in the correct ordering:
-        tUtr <- tUtr[, names(needCols)]
-        tUtr$feature <- "utr3"
-        ## Remove transcripts from the txs data.frame
-        if(nrow(txs) > 0){
-            txs <- txs[!(txs$transcript %in% tUtr$transcript), , drop=FALSE]
+        colnames(txs)[idx] <- names(needCols)[!notThere]
+        ## now processing the 5utr
+        fUtr <- fiveUTRsByTranscript(x, filter = filter, columns=needCols)
+        if(length(fUtr) > 0){
+            fUtr <- as(unlist(fUtr, use.names=FALSE), "data.frame")
+            fUtr <- fUtr[, !(colnames(fUtr) %in% c("width", "seq_name",
+                                                   "exon_seq_start",
+                                                   "exon_seq_end", "strand"))]
+            colnames(fUtr)[1] <- "chromosome"
+            idx <- match(needCols, colnames(fUtr))
+            notThere <- is.na(idx)
+            idx <- idx[!notThere]
+            colnames(fUtr)[idx] <- names(needCols)[!notThere]
+            ## Force being in the correct ordering:
+            fUtr <- fUtr[, names(needCols)]
+            fUtr$feature <- "utr5"
+            ## Remove transcripts from the txs data.frame
+            txs <- txs[!(txs$transcript %in% fUtr$transcript), , drop=FALSE]
         }
-    }
-    cds <- cdsBy(x, filter=filter, columns=needCols)
-    if(length(cds) > 0){
-        cds <- as(unlist(cds, use.names=FALSE), "data.frame")
-        cds <- cds[, !(colnames(cds) %in% c("width", "seq_name",
-                                            "exon_seq_start",
-                                            "exon_seq_end", "strand"))]
-        colnames(cds)[1] <- "chromosome"
-        idx <- match(needCols, colnames(cds))
-        notThere <- is.na(idx)
-        idx <- idx[!notThere]
-        colnames(cds)[idx] <- names(needCols)[!notThere]
-        ## Force being in the correct ordering:
-        cds <- cds[, names(needCols)]
-        ## Remove transcripts from the txs data.frame
-        if(nrow(txs) > 0){
-            txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
+        tUtr <- threeUTRsByTranscript(x, filter = filter, columns=needCols)
+        if(length(tUtr) > 0){
+            tUtr <- as(unlist(tUtr, use.names=FALSE), "data.frame")
+            tUtr <- tUtr[, !(colnames(tUtr) %in% c("width", "seq_name",
+                                                   "exon_seq_start",
+                                                   "exon_seq_end", "strand"))]
+            colnames(tUtr)[1] <- "chromosome"
+            idx <- match(needCols, colnames(tUtr))
+            notThere <- is.na(idx)
+            idx <- idx[!notThere]
+            colnames(tUtr)[idx] <- names(needCols)[!notThere]
+            ## Force being in the correct ordering:
+            tUtr <- tUtr[, names(needCols)]
+            tUtr$feature <- "utr3"
+            ## Remove transcripts from the txs data.frame
+            if(nrow(txs) > 0){
+                txs <- txs[!(txs$transcript %in% tUtr$transcript), , drop=FALSE]
+            }
         }
-    }
-    if(length(fUtr) > 0){
-        txs <- rbind(txs, fUtr)
-    }
-    if(length(tUtr) > 0){
-        txs <- rbind(txs, tUtr)
-    }
-    if(length(cds) > 0){
-        txs <- rbind(txs, cds)
-    }
-    ## Convert into GRanges.
-    suppressWarnings(
-        SI <- seqinfo(x)
-    )
-    SI <- SI[as.character(unique(txs$chromosome))]
-    GR <- GRanges(seqnames=Rle(txs$chromosome),
-                  strand=Rle(txs$strand),
-                  ranges=IRanges(start=txs$start, end=txs$end),
-                  seqinfo=SI,
-                  txs[, c("feature", "gene", "exon", "exon_rank",
-                          "transcript", "symbol"), drop=FALSE])
-    return(GR)
-})
-
-############################################################
-## setFeatureInGRangesFilter
-##
-## Simple helper function to set the @feature in GRangesFilter
-## depending on the calling method.
-setFeatureInGRangesFilter <- function(x, feature){
-    for(i in seq(along.with=x)){
-        if(is(x[[i]], "GRangesFilter")){
-            x[[i]]@feature <- feature
+        cds <- cdsBy(x, filter = filter, columns = needCols)
+        if(length(cds) > 0){
+            cds <- as(unlist(cds, use.names=FALSE), "data.frame")
+            cds <- cds[, !(colnames(cds) %in% c("width", "seq_name",
+                                                "exon_seq_start",
+                                                "exon_seq_end", "strand"))]
+            colnames(cds)[1] <- "chromosome"
+            idx <- match(needCols, colnames(cds))
+            notThere <- is.na(idx)
+            idx <- idx[!notThere]
+            colnames(cds)[idx] <- names(needCols)[!notThere]
+            ## Force being in the correct ordering:
+            cds <- cds[, names(needCols)]
+            ## Remove transcripts from the txs data.frame
+            if(nrow(txs) > 0){
+                txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
+            }
         }
-    }
-    return(x)
-}
+        if(length(fUtr) > 0){
+            txs <- rbind(txs, fUtr)
+        }
+        if(length(tUtr) > 0){
+            txs <- rbind(txs, tUtr)
+        }
+        if(length(cds) > 0){
+            txs <- rbind(txs, cds)
+        }
+        ## Convert into GRanges.
+        suppressWarnings(
+            SI <- seqinfo(x)
+        )
+        SI <- SI[as.character(unique(txs$chromosome))]
+        GR <- GRanges(seqnames=Rle(txs$chromosome),
+                      strand=Rle(txs$strand),
+                      ranges=IRanges(start=txs$start, end=txs$end),
+                      seqinfo=SI,
+                      txs[, c("feature", "gene", "exon", "exon_rank",
+                              "transcript", "symbol"), drop=FALSE])
+        return(GR)
+    })
 
 ####============================================================
 ##  properties
@@ -1645,6 +1573,18 @@ setMethod("setProperty", "EnsDb", function(x, ...){
     return(x)
 })
 
+#' remove the property with the specified name.
+#' @noRd
+dropProperty <- function(x, name) {
+    if (missing(name))
+        return(x)
+    prps <- x@.properties
+    if (any(names(prps) == name))
+        prps <- prps[names(prps) != name]
+    x@.properties <- prps
+    x
+}
+
 ####============================================================
 ##  updateEnsDb
 ##
@@ -1667,20 +1607,17 @@ setMethod("updateEnsDb", "EnsDb", function(x, ...){
 setMethod("transcriptsByOverlaps", "EnsDb",
           function(x, ranges, maxgap = 0L, minoverlap = 1L,
                    type = c("any", "start", "end"),
-                   columns=listColumns(x, "tx"),
-                   filter) {
-    if(missing(ranges))
+                   columns = listColumns(x, "tx"),
+                   filter = AnnotationFilterList()) {
+    if (missing(ranges))
         stop("Parameter 'ranges' is missing!")
-    if(missing(filter)){
-        filter <- list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     SLs <- unique(as.character(seqnames(ranges)))
-    filter <- c(filter, SeqnameFilter(SLs))
+    filter <- AnnotationFilterList(filter, SeqNameFilter(SLs))
     columns <- cleanColumns(x, columns)
-    return(subsetByOverlaps(transcripts(x, columns=columns, filter=filter),
-           ranges, maxgap=maxgap, minoverlap=minoverlap, type=match.arg(type)))
+    subsetByOverlaps(transcripts(x, columns = columns, filter = filter),
+                     ranges, maxgap = maxgap, minoverlap = minoverlap,
+                     type = match.arg(type))
 })
 
 ####============================================================
@@ -1688,22 +1625,19 @@ setMethod("transcriptsByOverlaps", "EnsDb",
 ##
 ####------------------------------------------------------------
 setMethod("exonsByOverlaps", "EnsDb",
-          function(x, ranges, maxgap=0L, minoverlap=1L,
-                   type=c("any", "start", "end"),
-                   columns=listColumns(x, "exon"),
-                   filter) {
+          function(x, ranges, maxgap = 0L, minoverlap = 1L,
+                   type = c("any", "start", "end"),
+                   columns = listColumns(x, "exon"),
+                   filter = AnnotationFilterList()) {
     if(missing(ranges))
         stop("Parameter 'ranges' is missing!")
-    if(missing(filter)){
-        filter <- list()
-    }else{
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, x)
     SLs <- unique(as.character(seqnames(ranges)))
-    filter <- c(filter, SeqnameFilter(SLs))
+    filter <- AnnotationFilterList(filter, SeqNameFilter(SLs))
     columns <- cleanColumns(x, columns)
-    return(subsetByOverlaps(exons(x, columns=columns, filter=filter),
-           ranges, maxgap=maxgap, minoverlap=minoverlap, type=match.arg(type)))
+    subsetByOverlaps(exons(x, columns = columns, filter = filter),
+                     ranges, maxgap = maxgap, minoverlap = minoverlap,
+                     type = match.arg(type))
 })
 
 ############################################################
@@ -1860,28 +1794,37 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##' protein coding transcripts, the \code{\link{genes}} or
 ##' \code{\link{transcripts}} methods have to be used to retrieve annotations
 ##' for non-coding transcripts.
+##' 
 ##' @param object The \code{\linkS4class{EnsDb}} object.
+##'
 ##' @param columns For \code{proteins}: character vector defining the columns to
 ##' be extracted from the database. Can be any column(s) listed by the
 ##' \code{\link{listColumns}} method.
+##'
 ##' @param filter For \code{proteins}: A filter object extending
-##' \code{\linkS4class{BasicFilter}} or a list of such objects to select
-##' specific entries from the database. See \code{\link{RNA-DNA-filters}} and
-##' \code{\link{ProteinFilters}} for the full list of supported filters.
+##' \code{AnnotationFilter} or a list of such objects to select
+##' specific entries from the database. See \code{\link{Filter-classes}} for a
+##' documentation of available filters and use \code{\link{supportedFilters}} to
+##' get the full list of supported filters.
+##'
 ##' @param order.by For \code{proteins}: a character vector specifying the
 ##' column(s) by which the result should be ordered.
+##'
 ##' @param order.type For \code{proteins}: if the results should be ordered
 ##' ascending (\code{order.type = "asc"}) or descending
 ##' (\code{order.type = "desc"})
+##'
 ##' @param return.type For \code{proteins}: character of lenght one specifying
 ##' the type of the returned object. Can be either \code{"DataFrame"},
 ##' \code{"data.frame"} or \code{"AAStringSet"}.
+##'
 ##' @return The \code{proteins} method returns protein related annotations from
 ##' an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
 ##' allowing to define the type of the returned object. Note that if
 ##' \code{return.type = "AAStringSet"} additional annotation columns are stored
 ##' in a \code{DataFrame} that can be accessed with the \code{mcols} method on
 ##' the returned object.
+##'
 ##' @rdname ProteinFunctionality
 ##' @author Johannes Rainer
 ##' @examples
@@ -1894,7 +1837,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##'     proteins(edb, filter = GenenameFilter("ZBTB16"))
 setMethod("proteins", "EnsDb", function(object,
                                         columns = listColumns(object, "protein"),
-                                        filter,
+                                        filter = AnnotationFilterList(),
                                         order.by = "",
                                         order.type = "asc",
                                         return.type = "DataFrame") {
@@ -1904,11 +1847,7 @@ setMethod("proteins", "EnsDb", function(object,
     return.type <- match.arg(return.type, c("DataFrame", "AAStringSet",
                                             "data.frame"))
     columns <- cleanColumns(object, unique(c(columns, "protein_id")))
-    if (missing(filter)) {
-        filter = list()
-    } else {
-        filter <- checkFilter(filter)
-    }
+    filter <- .processFilterParam(filter, object)
     filter <- setFeatureInGRangesFilter(filter, "tx")
     ## Eventually add columns for the filters:
     columns <- addFilterColumns(columns, filter, object)
@@ -2010,4 +1949,19 @@ setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
     res <- dbGetQuery(dbconn(object),
                       "select distinct uniprot_mapping_type from uniprot")
     return(res$uniprot_mapping_type)
+})
+
+#' @description \code{supportedFilters} returns the names of all supported
+#'     filters for the \code{EnsDb} object.
+#'
+#' @param object For \code{supportedFilters}: an \code{EnsDb} object.
+#'
+#' @param ... For \code{supportedFilters}: currently not used.
+#'
+#' @return For \code{supportedFilters}: the names of the supported filter
+#'     classes.
+#' 
+#' @rdname Filter-classes
+setMethod("supportedFilters", "EnsDb", function(object, ...) {
+    .supportedFilters(object)
 })

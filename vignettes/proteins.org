@@ -124,7 +124,7 @@ such cases a redundant list of transcripts is returned.
 Some of the n:m mappings for Uniprot IDs can be resolved by restricting either
 to entries from one Uniprot database (/SPTREMBL/ or /SWISSPROT/) or to mappings of a
 certain type of mapping method. The corresponding filters are the
-=UniprotdbFilter= and the =UniprotmappingtypeFilter= (using the =uniprot_db= and
+=UniprotDbFilter= and the =UniprotMappingTypeFilter= (using the =uniprot_db= and
 =uniprot_mapping_type= columns of the =uniprot= database table). In the example
 below we restrict the result to Uniprot IDs with the mapping type /DIRECT/.
 
@@ -137,12 +137,12 @@ below we restrict the result to Uniprot IDs with the mapping type /DIRECT/.
   ## and Uniprot IDs, restricting to protein_id to uniprot_id mappings based
   ## on "DIRECT" mapping methods.
   txs <- transcripts(edb, filter = list(GenenameFilter("ZBTB16"),
-					UniprotmappingtypeFilter("DIRECT")),
+					UniprotMappingTypeFilter("DIRECT")),
                      columns = c("protein_id", "uniprot_id", "uniprot_db"))
   mcols(txs)
 #+END_SRC
 
-For this example the use of the =UniprotmappingtypeFilter= resolved the multiple
+For this example the use of the =UniprotMappingTypeFilter= resolved the multiple
 mapping of Uniprot IDs to Ensembl protein IDs, but the Uniprot ID /Q05516/ is
 still assigned to the two Ensembl protein IDs /ENSP00000338157/ and
 /ENSP00000376721/.
@@ -163,14 +163,14 @@ encoded by any of its transcripts.
 #+BEGIN_SRC R :ravel eval = haveProt
   ## Get all genes that encode a transcript encoding for a protein that contains
   ## a certain protein domain.
-  gns <- genes(edb, filter = ProtdomidFilter("PS50097"))
+  gns <- genes(edb, filter = ProtDomIdFilter("PS50097"))
   length(gns)
 
   sort(gns$gene_name)
 #+END_SRC
 
 So, in total we got 152 genes with that protein domain. In addition to the
-=ProtdomidFilter=, also the =ProteinidFilter= and the =UniprotidFilter= can be used to
+=ProtDomIdFilter=, also the =ProteinidFilter= and the =UniprotidFilter= can be used to
 query the database for entries matching conditions on their protein ID or
 Uniprot ID.
 
