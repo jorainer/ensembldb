@@ -601,7 +601,7 @@ search interactively for gene/transcript/exon annotations using the internal,
 to the R workspace either as a =data.frame= or =GRanges= object.
 
 
-* Plotting gene/transcript features using =ensembldb= and =Gviz= and =ggbio= :noexport:
+* Plotting gene/transcript features using =ensembldb= and =Gviz= and =ggbio=
 
 The =Gviz= package provides functions to plot genes and transcripts along with
 other data on a genomic scale. Gene models can be provided either as a
@@ -679,6 +679,28 @@ different gene region tracks, one for protein coding genes and one for lincRNAs.
   seqlevelsStyle <- "Ensembl"
 
 #+END_SRC
+
+Alternatively, we can also use =ggbio= for plotting. For =ggplot= we can directly
+pass the =EnsDb= object along with optional filters (or as in the example below a
+filter expression as a =formula=).
+
+#+BEGIN_SRC R :ravel pplot-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4
+  library(ggbio)
+
+  ## Create a plot for all transcripts of the gene SKA2
+  autoplot(edb, ~ genename == "SKA2")
+#+END_SRC
+
+To plot the genomic region and plot genes from both strands we can use a
+=GRangesFilter=.
+
+#+BEGIN_SRC R :ravel pplot-plot-2, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4
+  ## Get the chromosomal region in which the gene is encoded
+  ska2 <- genes(edb, filter = ~ genename == "SKA2")
+  strand(ska2) <- "*"
+  autoplot(edb, GRangesFilter(ska2), names.expr = "gene_name")
+#+END_SRC
+
 
 
 * Using =EnsDb= objects in the =AnnotationDbi= framework
@@ -1718,4 +1740,128 @@ Steps when =AnnotationFilter= is accepted:
 + [ ] Contact Micheal Lawrence that =biovizBase= and =ggbio= should be fixed (have
   patches).
 + [ ] Push new =ensembldb= package.
-+ [ ] Contact developers of =chimeraviz= and =TVTB=.
++ [ ] Contact developers of =chimeraviz= and =TVTB= and =wiggleplotr=.
+
+** TODO Fix/check packages failing to build for Bioc 3.5
+
+A
++ [ ] affycoretools: because of ReportingTools
++ [ ] AgiMicroRna: because of affycoretools
++ [X] AllelicImbalance: because of Gviz
++ [X] ASpli: because of Gviz
+
+B
++ [ ] BgeeDB ? not related to ensembldb
++ [X] biomvRCNS: because of Gviz
++ [X] biovizBase: *depends* on ensembldb!!! Has been fixed. XXXX
++ [X] BubbleTree: because of biovizBase
+
+C
++ [X] CAFE: because of biovizBase
++ [X] ChAMP: because of DMRcate
++ [X] Chicago: because of GenomicInteractions
++ [X] chimeraviz: *depends* on ensembldb!!! XXXX
++ [X] ChIPexoQual: depends on biovizBase
++ [X] ChIPpeakAnno: *depends* on ensembldb XXXX, but BUILDS.
++ [X] CINdex: depends on biovizBase.
++ [X] CNEr: depends on Gviz.
++ [X] coMET: depends on Gviz.
++ [X] compEpiTools: depends on methylPipe.
++ [X] cummeRbund: depends on Gviz.
+
+D
++ [X] DeepBlueR: depends on Gviz.
++ [X] derfinder: depends on biovizBase.
++ [X] derfinderPlot: depends on derfinder, biovizBase
++ [X] DMRcate: depends on Gviz.
++ [X] DMRforPairs: depends on Gviz.
+
+E
++ [ ] EnrichmentBrowser: depends on GSEABase.
+
+F
++ [X] FourCSeq: depends on ggbio.
+
+G
++ [X] GeneGeneInteR: depends on GGtools.
++ [X] GenomicInteractions: depends on Gviz.
++ [X] GGBase: depends on GGtools.
++ [X] ggbio: *depends* on ensembldb!!!! XXXX
++ [X] GGtools: depends on Gviz.
++ [X] GoogleGenomics: depends on ggbio.
++ [X] gQTLBase: depends on GGtools.
++ [ ] GSEABase: depends on ReportingTools.
++ [X] Gviz: depends on biovizBase.
++ [X] gwascat: depends on Gviz, ggbio.
+
+H
+I
++ [X] InPAS: depends on Gviz.
++ [X] intansv: depends on ggbio.
+
+J
+
+K
++ [X] karyoploteR: depends on biovizBase.
+
+L
++ [X] ldblock: depends on gwascat.
+
+M
++ [X] MEAL: depends on DMRcate.
++ [X] meshr: depends on cummeRbund.
++ [X] methyAnalysis: depends on Gviz.
++ [X] methylPipe: depends on Gviz.
++ [X] motifbreakR: depends on Gviz.
+
+N
++ [X] NADfinder: depends on trackViewer.
+
+P
++ [ ] Pbase: *depends* on ensembldb!!! XXXX Fixed/not fixed.
++ [X] pepStat: depends on Pviz.
++ [X] Pi: depends on ggbio.
++ [X] PING: depends on Gviz.
++ [X] pqsfinder: depends on Gviz. -> biomaRt error.
++ [X] Pviz: depends on Gviz.
+
+Q
++ [X] qrqc: depends on biovizBase.
++ [X] QuasR: depends on Gviz.
+
+R
++ [X] R3CPET: depends on ggbio.
++ [X] RareVariantVis: depends on VariantFiltering.
++ [X] Rariant: depends on ggbio.
++ [ ] ReportingTools: depends on ggbio. PFAM.db not available.
++ [X] RiboProfiling: depends on ggbio
++ [X] Rqc: depends on biovizBase.
+
+S
++ [X] SomaticSignatures: depends on ggbio.
++ [X] spliceR: depends on cummeRbund.
++ [X] SplicingGraphs: depends on Gviz.
++ [X] SPLINTER: depends on Gviz.
++ [X] STAN: depends on Gviz.
+
+T
++ [X] trackViewer: depends on Gviz.
+
+V
++ [X] VariantFiltering: depends on Gviz.
++ [X] vtpnet: depends on gwascat.
+
+W
++ [ ] wiggleplotr: *depends* on ensembldb!!!! XXXX
+
+Y
++ [X] YAPSA: depends on SomaticSignatures.
+
+
+Base on =ensembldb=:
++ [X] =biovizBase=:
++ [X] =chimeraviz=:
++ [X] =ChIPpeakAnno=:
++ [X] =ggbio=:
++ [ ] =Pbase=:
++ [ ] =wiggleplotr=:
