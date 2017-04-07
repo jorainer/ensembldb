@@ -25,7 +25,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [10](#org905b017) for the database layout and an overview of
+(see Section [11](#org9c3495f) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -559,6 +559,104 @@ search interactively for gene/transcript/exon annotations using the internal,
 to the R workspace either as a `data.frame` or `GRanges` object.
 
 
+# Plotting gene/transcript features using `ensembldb` and `Gviz` and `ggbio`
+
+The `Gviz` package provides functions to plot genes and transcripts along with
+other data on a genomic scale. Gene models can be provided either as a
+`data.frame`, `GRanges`, `TxDB` database, can be fetched from biomart and can
+also be retrieved from `ensembldb`.
+
+Below we generate a `GeneRegionTrack` fetching all transcripts from a certain
+region on chromosome Y.
+
+Note that if we want in addition to work also with BAM files that were aligned
+against DNA sequences retrieved from Ensembl or FASTA files representing genomic
+DNA sequences from Ensembl we should change the `ucscChromosomeNames` option from
+`Gviz` to `FALSE` (i.e. by calling `options(ucscChromosomeNames = FALSE)`).  This is
+not necessary if we just want to retrieve gene models from an `EnsDb` object, as
+the `ensembldb` package internally checks the `ucscChromosomeNames` option and,
+depending on that, maps Ensembl chromosome names to UCSC chromosome names.
+
+```{r gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25}
+## Loading the Gviz library
+library(Gviz)
+library(EnsDb.Hsapiens.v75)
+edb <- EnsDb.Hsapiens.v75
+
+## Retrieving a Gviz compatible GRanges object with all genes
+## encoded on chromosome Y.
+gr <- getGeneRegionTrackForGviz(edb, chromosome = "Y",
+				start = 20400000, end = 21400000)
+## Define a genome axis track
+gat <- GenomeAxisTrack()
+
+## We have to change the ucscChromosomeNames option to FALSE to enable Gviz usage
+## with non-UCSC chromosome names.
+options(ucscChromosomeNames = FALSE)
+
+plotTracks(list(gat, GeneRegionTrack(gr)))
+
+options(ucscChromosomeNames = TRUE)
+```
+
+Above we had to change the option `ucscChromosomeNames` to `FALSE` in order to
+use it with non-UCSC chromosome names. Alternatively, we could however also
+change the `seqnamesStyle` of the `EnsDb` object to `UCSC`. Note that we have to
+use now also chromosome names in the *UCSC style* in the `SeqNameFilter`
+(i.e. "chrY" instead of `Y`).
+
+```{r message=FALSE}
+seqlevelsStyle(edb) <- "UCSC"
+## Retrieving the GRanges objects with seqnames corresponding to UCSC chromosome names.
+gr <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
+				start = 20400000, end = 21400000)
+seqnames(gr)
+## Define a genome axis track
+gat <- GenomeAxisTrack()
+plotTracks(list(gat, GeneRegionTrack(gr)))
+```
+
+We can also use the filters from the `ensembldb` package to further refine what
+transcripts are fetched, like in the example below, in which we create two
+different gene region tracks, one for protein coding genes and one for lincRNAs.
+
+```{r gviz-separate-tracks, message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25}
+protCod <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
+				     start = 20400000, end = 21400000,
+				     filter = GeneBiotypeFilter("protein_coding"))
+lincs <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
+				   start = 20400000, end = 21400000,
+				   filter = GeneBiotypeFilter("lincRNA"))
+
+plotTracks(list(gat, GeneRegionTrack(protCod, name = "protein coding"),
+		GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
+
+## At last we change the seqlevels style again to Ensembl
+seqlevelsStyle <- "Ensembl"
+```
+
+Alternatively, we can also use `ggbio` for plotting. For `ggplot` we can directly
+pass the `EnsDb` object along with optional filters (or as in the example below a
+filter expression as a `formula`).
+
+```{r pplot-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4}
+library(ggbio)
+
+## Create a plot for all transcripts of the gene SKA2
+autoplot(edb, ~ genename == "SKA2")
+```
+
+To plot the genomic region and plot genes from both strands we can use a
+`GRangesFilter`.
+
+```{r pplot-plot-2, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4}
+## Get the chromosomal region in which the gene is encoded
+ska2 <- genes(edb, filter = ~ genename == "SKA2")
+strand(ska2) <- "*"
+autoplot(edb, GRangesFilter(ska2), names.expr = "gene_name")
+```
+
+
 # Using `EnsDb` objects in the `AnnotationDbi` framework
 
 Most of the methods defined for objects extending the basic annotation package
@@ -858,10 +956,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org905b017"></a>
+# Database layout<a id="org9c3495f"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [149](#org586837f)). Note that the protein-specific annotations
+shown in Figure [156](#org92f0a36)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 

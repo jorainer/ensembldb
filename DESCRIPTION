@@ -1,15 +1,17 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 1.99.13
+Version: 1.99.14
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
 	   person(given = "Tim", family = "Triche",
 	   email = "tim.triche@usc.edu",
-	   role = "ctb"))
+	   role = "ctb"),
+	   person(given = "Christian", family = "Weichenberger",
+	   email = "christian.weichenberger@eurac.edu", role = "ctb"))
 Author: Johannes Rainer <johannes.rainer@eurac.edu> with contributions
-	from Tim Triche.
+	from Tim Triche and Christian Weichenberger.
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
 URL: https://github.com/jotsetung/ensembldb
 BugReports: https://github.com/jotsetung/ensembldb/issues
