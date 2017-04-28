@@ -10,7 +10,7 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub,ggbio,Gviz}
 ---
 
 
@@ -25,7 +25,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org9c3495f) for the database layout and an overview of
+(see Section [11](#orgd0a7259) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -956,10 +956,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org9c3495f"></a>
+# Database layout<a id="orgd0a7259"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [156](#org92f0a36)). Note that the protein-specific annotations
+shown in Figure [156](#orga2ff17d)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
