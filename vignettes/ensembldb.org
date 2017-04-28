@@ -24,7 +24,7 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub,ggbio,Gviz}
 ---
 #+END_EXPORT
 
