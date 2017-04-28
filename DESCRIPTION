@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.1.0
+Version: 2.1.1
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -42,7 +42,9 @@ Suggests:
     EnsDb.Hsapiens.v75 (>= 0.99.8),
     shiny,
     testthat,
-    BSgenome.Hsapiens.UCSC.hg19
+    BSgenome.Hsapiens.UCSC.hg19,
+    ggbio (>= 1.24.0),
+    Gviz (>= 1.20.0)
 Enhances: RMySQL
 VignetteBuilder: knitr
 Description: The package provides functions to create and use
