@@ -78,6 +78,7 @@ In the example below we load an Ensembl based annotation package for Homo
 sapiens, Ensembl version 75. The =EnsDb= object providing access to the underlying
 SQLite database is bound to the variable name =EnsDb.Hsapiens.v75=.
 
+#+NAME: load-libs
 #+BEGIN_SRC R :ravel warning=FALSE, message=FALSE
   library(EnsDb.Hsapiens.v75)
 
@@ -102,6 +103,7 @@ additional filters specific to the data stored in =EnsDb= databases. The
 classes, each of them (except the =GRangesFilter=) working on a single
 column/field in the database.
 
+#+NAME: filters
 #+BEGIN_SRC R 
   supportedFilters(edb)
 #+END_SRC
@@ -396,7 +398,7 @@ restrict to Ensembl genes only, as also /LRG/ (Locus Reference Genomic)
 genes[fn:3] are defined in the database, which are partially redundant with
 Ensembl genes.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
   ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
   ## Note: want to get rid of the "LRG" genes!!!
   EnsGenes <- exonsBy(edb, by = "gene", filter = AnnotationFilterList(
@@ -411,7 +413,7 @@ Alternatively, the above =GRangesList= can be transformed to a =data.frame= in
 /SAF/ format that can be used as an input to the =featureCounts= function of the
 =Rsubread= package [fn:5].
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
   ## Transforming the GRangesList into a data.frame in SAF format
   EnsGenes.SAF <- toSAF(EnsGenes)
 
@@ -426,7 +428,7 @@ In addition, the =disjointExons= function (similar to the one defined in
 =GenomicFeatures=) can be used to generate a =GRanges= of non-overlapping exon
 parts which can be used in the =DEXSeq= package.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
   ## Create a GRanges of non-overlapping exon parts.
   DJE <- disjointExons(edb, filter = AnnotationFilterList(
 				SeqNameFilter(c(1:22, "X", "Y")),
@@ -455,7 +457,7 @@ the package, subset to genes encoded on sequences available in the =FaFile= and
 extract all of their sequences. Note: these sequences represent the sequence
 between the chromosomal start and end coordinates of the gene.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
   library(EnsDb.Hsapiens.v75)
   library(Rsamtools)
   edb <- EnsDb.Hsapiens.v75
@@ -481,7 +483,7 @@ To retrieve the (exonic) sequence of transcripts (i.e. without introns) we can
 use directly the =extractTranscriptSeqs= method defined in the =GenomicFeatures= on
 the =EnsDb= object, eventually using a filter to restrict the query.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
   ## get all exons of all transcripts encoded on chromosome Y
   yTx <- exonsBy(edb, filter = SeqNameFilter("Y"))
 
@@ -537,7 +539,7 @@ ones from Ensembl) are returned. With =ensembldb.seqnameNotFound= "MISSING" each
 time a seqname can not be found an error is thrown. For all other cases
 (e.g. =ensembldb.seqnameNotFound = NA=) the value of the option is returned.
 
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel message = FALSE
   seqlevelsStyle(edb) <- "UCSC"
 
   ## Getting the default option:
@@ -619,7 +621,7 @@ not necessary if we just want to retrieve gene models from an =EnsDb= object, as
 the =ensembldb= package internally checks the =ucscChromosomeNames= option and,
 depending on that, maps Ensembl chromosome names to UCSC chromosome names.
 
-#+BEGIN_SRC R :ravel gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
+#+BEGIN_SRC R :ravel gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.3
   ## Loading the Gviz library
   library(Gviz)
   library(EnsDb.Hsapiens.v75)
@@ -715,7 +717,7 @@ In the example below we first evaluate all the available columns and keytypes in
 the database and extract then the gene names for all genes encoded on chromosome
 X.
 
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel message = FALSE
   library(EnsDb.Hsapiens.v75)
   edb <- EnsDb.Hsapiens.v75
 
@@ -746,7 +748,7 @@ In the next example we retrieve specific information from the database using the
 we employ the filtering system to perform a more fine-grained query to fetch
 only the protein coding transcripts for these genes.
 
-#+BEGIN_SRC R :ravel warning=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, warning=FALSE
   ## Use the /standard/ way to fetch data.
   select(edb, keys = c("BCL2", "BCL2L11"), keytype = "GENENAME",
 	 columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
@@ -761,18 +763,18 @@ Finally, we use the =mapIds= method to establish a mapping between ids and
 values. In the example below we fetch transcript ids for the two genes from the
 example above.
 
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel message = FALSE
   ## Use the default method, which just returns the first value for multi mappings.
   mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID", keytype = "GENENAME")
 
   ## Alternatively, specify multiVals="list" to return all mappings.
   mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID", keytype = "GENENAME",
-         multiVals = "list")
+	 multiVals = "list")
 
   ## And, just like before, we can use filters to map only to protein coding transcripts.
   mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
                           TxBiotypeFilter("protein_coding")), column = "TXID",
-         multiVals = "list")
+	 multiVals = "list")
 #+END_SRC
 
 Note that, if the filters are used, the ordering of the result does no longer
@@ -835,7 +837,7 @@ from =AnnotationHub=.
 
 We can simply fetch one of the databases.
 
-#+BEGIN_SRC R
+#+BEGIN_SRC R :ravel message = FALSE
   ahDb <- query(ah, pattern = c("Xiphophorus Maculatus", "EnsDb", 87))
   ## What have we got
   ahDb
@@ -843,7 +845,7 @@ We can simply fetch one of the databases.
 
 Fetch the =EnsDb= and use it.
 
-#+BEGIN_SRC R :ravel eval = FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval = FALSE
   ahEdb <- ahDb[[1]]
 
   ## retriebe all genes
@@ -869,7 +871,8 @@ the Ensembl core databases. The =makeEnsembldbPackage= function is then used to
 create an annotation package from this =EnsDb= containing all human genes for
 Ensembl version 75.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+NAME: edb-from-ensembl
+#+BEGIN_SRC R :ravel message = FALSE, eval = FALSE
   library(ensembldb)
 
   ## get all human gene/transcript/exon annotations from Ensembl (75)
@@ -922,8 +925,8 @@ then use the =getGenomeFaFile= method on the =EnsDb= to directly look up and
 retrieve the correct or best matching =FaFile= with the genomic DNA sequence. At
 last we retrieve the sequences of all exons using the =getSeq= method.
 
-
-#+BEGIN_SRC R :ravel eval=FALSE
+#+NAME: gtf-gff-edb
+#+BEGIN_SRC R :ravel message = FALSE, eval = FALSE
   ## Load the AnnotationHub data.
   library(AnnotationHub)
   ah <- AnnotationHub()
@@ -957,7 +960,7 @@ In the example below we load a =GRanges= containing gene definitions for genes
 encoded on chromosome Y and generate a =EnsDb= SQLite database from that
 information.
 
-#+BEGIN_SRC R :ravel message=FALSE
+#+BEGIN_SRC R :ravel message = FALSE
   ## Generate a sqlite database from a GRanges object specifying
   ## genes encoded on chromosome Y
   load(system.file("YGRanges.RData", package = "ensembldb"))
@@ -986,7 +989,7 @@ length information automatically from Ensembl.
 
 Below we create the annotation from a gtf file that we fetch directly from Ensembl.
 
-#+BEGIN_SRC R :ravel eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval = FALSE
   library(ensembldb)
 
   ## the GTF file can be downloaded from

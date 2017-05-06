@@ -25,7 +25,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#orgd0a7259) for the database layout and an overview of
+(see Section [11](#org43dc748) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -42,7 +42,7 @@ In the example below we load an Ensembl based annotation package for Homo
 sapiens, Ensembl version 75. The `EnsDb` object providing access to the underlying
 SQLite database is bound to the variable name `EnsDb.Hsapiens.v75`.
 
-```{r warning=FALSE, message=FALSE}
+```{r load-libs, warning=FALSE, message=FALSE}
 library(EnsDb.Hsapiens.v75)
 
 ## Making a "short cut"
@@ -66,7 +66,7 @@ additional filters specific to the data stored in `EnsDb` databases. The
 classes, each of them (except the `GRangesFilter`) working on a single
 column/field in the database.
 
-```{r }
+```{r filters}
 supportedFilters(edb)
 ```
 
@@ -497,7 +497,7 @@ ones from Ensembl) are returned. With `ensembldb.seqnameNotFound` "MISSING" each
 time a seqname can not be found an error is thrown. For all other cases
 (e.g. `ensembldb.seqnameNotFound = NA`) the value of the option is returned.
 
-```{r }
+```{r message = FALSE}
 seqlevelsStyle(edb) <- "UCSC"
 
 ## Getting the default option:
@@ -577,7 +577,7 @@ not necessary if we just want to retrieve gene models from an `EnsDb` object, as
 the `ensembldb` package internally checks the `ucscChromosomeNames` option and,
 depending on that, maps Ensembl chromosome names to UCSC chromosome names.
 
-```{r gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25}
+```{r gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.3}
 ## Loading the Gviz library
 library(Gviz)
 library(EnsDb.Hsapiens.v75)
@@ -669,7 +669,7 @@ In the example below we first evaluate all the available columns and keytypes in
 the database and extract then the gene names for all genes encoded on chromosome
 X.
 
-```{r }
+```{r message = FALSE}
 library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
 
@@ -715,7 +715,7 @@ Finally, we use the `mapIds` method to establish a mapping between ids and
 values. In the example below we fetch transcript ids for the two genes from the
 example above.
 
-```{r }
+```{r message = FALSE}
 ## Use the default method, which just returns the first value for multi mappings.
 mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID", keytype = "GENENAME")
 
@@ -790,7 +790,7 @@ query(ah, "EnsDb")
 
 We can simply fetch one of the databases.
 
-```{r }
+```{r message = FALSE}
 ahDb <- query(ah, pattern = c("Xiphophorus Maculatus", "EnsDb", 87))
 ## What have we got
 ahDb
@@ -798,7 +798,7 @@ ahDb
 
 Fetch the `EnsDb` and use it.
 
-```{r eval = FALSE}
+```{r message = FALSE, eval = FALSE}
 ahEdb <- ahDb[[1]]
 
 ## retriebe all genes
@@ -824,7 +824,7 @@ the Ensembl core databases. The `makeEnsembldbPackage` function is then used to
 create an annotation package from this `EnsDb` containing all human genes for
 Ensembl version 75.
 
-```{r eval=FALSE}
+```{r edb-from-ensembl, message = FALSE, eval = FALSE}
 library(ensembldb)
 
 ## get all human gene/transcript/exon annotations from Ensembl (75)
@@ -876,7 +876,7 @@ then use the `getGenomeFaFile` method on the `EnsDb` to directly look up and
 retrieve the correct or best matching `FaFile` with the genomic DNA sequence. At
 last we retrieve the sequences of all exons using the `getSeq` method.
 
-```{r eval=FALSE}
+```{r gtf-gff-edb, message = FALSE, eval = FALSE}
 ## Load the AnnotationHub data.
 library(AnnotationHub)
 ah <- AnnotationHub()
@@ -909,7 +909,7 @@ In the example below we load a `GRanges` containing gene definitions for genes
 encoded on chromosome Y and generate a `EnsDb` SQLite database from that
 information.
 
-```{r message=FALSE}
+```{r message = FALSE}
 ## Generate a sqlite database from a GRanges object specifying
 ## genes encoded on chromosome Y
 load(system.file("YGRanges.RData", package = "ensembldb"))
@@ -936,7 +936,7 @@ length information automatically from Ensembl.
 
 Below we create the annotation from a gtf file that we fetch directly from Ensembl.
 
-```{r eval=FALSE}
+```{r message = FALSE, eval = FALSE}
 library(ensembldb)
 
 ## the GTF file can be downloaded from
@@ -956,10 +956,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="orgd0a7259"></a>
+# Database layout<a id="org43dc748"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [156](#orga2ff17d)). Note that the protein-specific annotations
+shown in Figure [156](#orgc122505)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 

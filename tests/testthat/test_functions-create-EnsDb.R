@@ -209,9 +209,13 @@ test_that("getEnsemblMysqlUrl works", {
 })
 
 test_that("getSeqlengthsFromMysqlFolder works", {
+    library(curl)
+    ch <- new_handle(timeout = 5)
+    handle_setopt(ch, timeout = 5)
     tmp <- try(
-        RCurl::getURL(ensembldb:::.ENSEMBL_URL, dirlistonly = TRUE,
-                      .opts = list(timeout = 5, maxredirs = 2))
+        ## RCurl::getURL(ensembldb:::.ENSEMBL_URL, dirlistonly = TRUE,
+        ##               .opts = list(timeout = 5, maxredirs = 2))
+        readLines(curl(ensembldb:::.ENSEMBL_URL, handle = ch))
     )
     if (!is(tmp, "try-error")) {
         ## Compare seqlengths we've in EnsDb.Hsapiens.v75 with the expected
