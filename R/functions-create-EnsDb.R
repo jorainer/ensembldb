@@ -1492,19 +1492,24 @@ elementFromEnsemblFilename <- function(x, which=1){
         db_name <- .guessDatabaseName(organism, ensembl)
         ## List folders; GenomicFeatures does it without 'dirlistonly',
         ## eventually that's what breaks on Windows?
-        res <- getURL(my_url, dirlistonly = TRUE)
+        ## res <- getURL(my_url, dirlistonly = TRUE)
+        res <- readLines(curl(my_url))
+        res <- gsub(res, pattern = "\r", replacement = "", fixed = TRUE)
         if (length(res) > 0) {
-            dirs <- unlist(strsplit(res, split = "\n"))
-            ## Remove the \r on Windows.
-            dirs <- sub(dirs, pattern = "\r", replacement = "", fixed = TRUE)
-            idx <- grep(dirs, pattern = db_name)
+            ## dirs <- unlist(strsplit(res, split = "\n"))
+            ## ## Remove the \r on Windows.
+            ## dirs <- sub(dirs, pattern = "\r", replacement = "", fixed = TRUE)
+            ## idx <- grep(dirs, pattern = db_name)
+            idx <- grep(res, pattern = db_name)
             if (length(idx) > 1)
                 stop("Found more than one database matching '", db_name,
                      "' in Ensembl's ftp server!")
             if (length(idx) == 0)
                 stop("No database matching '", db_name, "' found in Ensembl's",
                      " ftp server.")
-            return(paste0(my_url, dirs[idx]))
+            db_dir <- unlist(strsplit(res[idx], split = " ", fixed = TRUE))
+            db_dir <- db_dir[length(db_dir)]
+            return(paste0(my_url, db_dir))
         }
     } else {
         ## That's tricky! Have to find out whether the species is in plants,
@@ -1515,22 +1520,38 @@ elementFromEnsemblFilename <- function(x, which=1){
         for (fold in sub_folders) {
             my_url <- paste0(.ENSEMBLGENOMES_URL, "release-", ensembl, "/",
                              fold, "/mysql/")
-            ## Catch eventual errors
-            res <- try(getURL(my_url, dirlistonly = TRUE), silent = TRUE)
-            if (is(res, "try-error") | length(res) == 0)
+            res <- try(readLines(curl(my_url)))
+            if (is(res, "try-error")| length(res) == 0)
                 next
             if (length(res) > 0) {
-                dirs <- unlist(strsplit(res, split = "\n"))
-                ## Remove the \r on Windows.
-                dirs <- sub(dirs, pattern = "\r", replacement = "", fixed = TRUE)
-                idx <- grep(dirs, pattern = db_name)
-                if (length(idx) == 1)
-                    return(paste0(my_url, dirs[idx]))
+                res <- gsub(res, pattern = "\r", replacement = "", fixed = TRUE)
+                idx <- grep(res, pattern = db_name)
                 if (length(idx) > 1)
                     stop("Found more than one database matching '", db_name,
-                         "' in Ensembl's ftp server!")
-                ## Well, then let's go to the next one.
+                         "' in Ensemblgenomes' ftp server!")
+                if (length(idx) == 1) {
+                    db_dir <- unlist(strsplit(res[idx], split = " ",
+                                              fixed = TRUE))
+                    db_dir <- db_dir[length(db_dir)]
+                    return(paste0(my_url, db_dir))
+                }
             }
+            ## ## Catch eventual errors
+            ## res <- try(getURL(my_url, dirlistonly = TRUE), silent = TRUE)
+            ## if (is(res, "try-error") | length(res) == 0)
+            ##     next
+            ## if (length(res) > 0) {
+            ##     dirs <- unlist(strsplit(res, split = "\n"))
+            ##     ## Remove the \r on Windows.
+            ##     dirs <- sub(dirs, pattern = "\r", replacement = "", fixed = TRUE)
+            ##     idx <- grep(dirs, pattern = db_name)
+            ##     if (length(idx) == 1)
+            ##         return(paste0(my_url, dirs[idx]))
+            ##     if (length(idx) > 1)
+            ##         stop("Found more than one database matching '", db_name,
+            ##              "' in Ensembl's ftp server!")
+            ##     ## Well, then let's go to the next one.
+            ## }
         }
         stop("No database matching '", db_name, "' found in Ensembl's",
              " ftp server")

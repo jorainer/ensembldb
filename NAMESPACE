@@ -72,8 +72,8 @@ importClassesFrom("Biostrings",
 importFrom("Biostrings",
            "AAStringSet")
 
-importFrom("RCurl",
-           "getURL")
+importFrom("curl",
+           "curl")
 
 ## AnnotationFilter
 importClassesFrom("AnnotationFilter",

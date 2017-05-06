@@ -46,7 +46,11 @@ databases created through the Ensembl Perl API contain protein annotation, while
 databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
 `ensDbFromGtf` don't.
 
-```{r loadlib, messages = FALSE}
+```{r doeval, echo = FALSE, results = "hide"}
+evalMe <- TRUE
+```
+
+```{r loadlib, message = FALSE, eval = evalMe}
 library(ensembldb)
 library(EnsDb.Hsapiens.v75)
 edb <- EnsDb.Hsapiens.v75
@@ -57,7 +61,7 @@ hasProteinData(edb)
 If protein annotation is available, the additional tables and columns are also
 listed by the `listTables` and `listColumns` methods.
 
-```{r listCols}
+```{r listCols, message = FALSE, eval = evalMe}
 listTables(edb)
 ```
 
@@ -65,9 +69,9 @@ In the following sections we show examples how to 1) fetch protein annotations
 as additional columns to gene/transcript annotations, 2) fetch protein
 annotation data and 3) map proteins to the genome.
 
-```{r echo=FALSE, results="silent"}
+```{r haveprot, echo = FALSE, results = "hide", eval = evalMe}
 ## Use this to conditionally disable eval on following chunks
-haveProt <- hasProteinData(edb)
+haveProt <- hasProteinData(edb) & evalMe
 ```
 
 
@@ -166,7 +170,7 @@ The `select`, `keys` and `mapIds` methods from the `AnnotationDbi` package can a
 used to query `EnsDb` objects for protein annotations. Supported columns and
 key types are returned by the `columns` and `keytypes` methods.
 
-```{r a_2_annotationdbi}
+```{r a_2_annotationdbi, message = FALSE, eval = haveProt}
 ## Show all columns that are provided by the database
 columns(edb)
 
@@ -176,7 +180,7 @@ keytypes(edb)
 
 Below we fetch all Uniprot IDs annotated to the gene *ZBTB16*.
 
-```{r a_2_select, eval = haveProt}
+```{r a_2_select, message = FALSE, eval = haveProt}
 select(edb, keys = "ZBTB16", keytype = "GENENAME",
        columns = "UNIPROTID")
 ```
@@ -187,7 +191,7 @@ annotated to a protein, does not have an Uniprot ID assigned (thus `NA` is
 returned by the above call). As we see below, this transcript is targeted for
 non sense mediated mRNA decay.
 
-```{r a_2_select_nmd, eval = haveProt}
+```{r a_2_select_nmd, message = FALSE, eval = haveProt}
 ## Call select, this time providing a GenenameFilter.
 select(edb, keys = GenenameFilter("ZBTB16"),
        columns = c("TXBIOTYPE", "UNIPROTID", "PROTEINID"))
@@ -207,7 +211,7 @@ protein annotations becomes available.
 
 In the code chunk below we fetch all protein annotations for the gene *ZBTB16*.
 
-```{r b_proteins, eval = haveProt}
+```{r b_proteins, message = FALSE, eval = haveProt}
 ## Get all proteins and return them as an AAStringSet
 prts <- proteins(edb, filter = GenenameFilter("ZBTB16"),
 		 return.type = "AAStringSet")
@@ -219,7 +223,7 @@ that can be accessed with the `mcols` method (metadata columns). All additional
 columns provided with the parameter `columns` are also added to the `mcols`
 `DataFrame`.
 
-```{r b_proteins_mcols, eval = haveProt}
+```{r b_proteins_mcols, message = FALSE, eval = haveProt}
 mcols(prts)
 ```
 
@@ -231,7 +235,7 @@ previous section are not fetched.
 Querying in addition Uniprot identifiers or protein domain data will result at
 present in a redundant list of proteins as shown in the code block below.
 
-```{r b_proteins_prot_doms, eval = haveProt}
+```{r b_proteins_prot_doms, message = FALSE, eval = haveProt}
 ## Get also protein domain annotations in addition to the protein annotations.
 pd <- proteins(edb, filter = GenenameFilter("ZBTB16"),
 	       columns = c("tx_id", listColumns(edb, "protein_domain")),
@@ -243,7 +247,7 @@ The result contains one row/element for each protein domain in each of the
 proteins. The number of protein domains per protein and the `mcols` are shown
 below.
 
-```{r b_proteins_prot_doms_2, eval = haveProt}
+```{r b_proteins_prot_doms_2, message = FALSE, eval = haveProt}
 ## The number of protein domains per protein:
 table(names(pd))
 
