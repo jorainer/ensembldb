@@ -482,29 +482,84 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 
 ############################################################
 ## Check database validity.
-.ENSDB_TABLES <- list(gene = c("gene_id", "gene_name", "entrezid",
-                               "gene_biotype", "gene_seq_start",
-                               "gene_seq_end", "seq_name", "seq_strand",
-                               "seq_coord_system"),
-                      tx = c("tx_id", "tx_biotype", "tx_seq_start",
-                             "tx_seq_end", "tx_cds_seq_start",
-                             "tx_cds_seq_end", "gene_id"),
-                      tx2exon = c("tx_id", "exon_id", "exon_idx"),
-                      exon = c("exon_id", "exon_seq_start", "exon_seq_end"),
-                      chromosome = c("seq_name", "seq_length", "is_circular"),
-                      metadata = c("name", "value"))
-.ENSDB_PROTEIN_TABLES <- list(protein = c("tx_id", "protein_id",
-                                          "protein_sequence"),
-                              uniprot = c("protein_id", "uniprot_id",
-                                          "uniprot_db", "uniprot_mapping_type"),
-                              protein_domain = c("protein_id",
-                                                 "protein_domain_id",
-                                                 "protein_domain_source",
-                                                 "interpro_accession",
-                                                 "prot_dom_start",
-                                                 "prot_dom_end"))
+#' @description Return tables with attributes based on the provided schema.
+.ensdb_tables <- function(version = "1.0") {
+    .ENSDB_TABLES <- list(`1.0` = list(
+                              gene = c("gene_id", "gene_name", "entrezid",
+                                       "gene_biotype", "gene_seq_start",
+                                       "gene_seq_end", "seq_name", "seq_strand",
+                                       "seq_coord_system"),
+                              tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                                     "tx_seq_end", "tx_cds_seq_start",
+                                     "tx_cds_seq_end", "gene_id"),
+                              tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                              exon = c("exon_id", "exon_seq_start",
+                                       "exon_seq_end"),
+                              chromosome = c("seq_name", "seq_length",
+                                             "is_circular"),
+                              metadata = c("name", "value")),
+                          `2.0` = list(
+                              gene = c("gene_id", "gene_name",
+                                       "gene_biotype", "gene_seq_start",
+                                       "gene_seq_end", "seq_name", "seq_strand",
+                                       "seq_coord_system"),
+                              tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                                     "tx_seq_end", "tx_cds_seq_start",
+                                     "tx_cds_seq_end", "gene_id"),
+                              tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                              exon = c("exon_id", "exon_seq_start",
+                                       "exon_seq_end"),
+                              chromosome = c("seq_name", "seq_length",
+                                             "is_circular"),
+                              entrezgene = c("gene_id", "entrezid"),
+                              metadata = c("name", "value"))
+                          )
+    .ENSDB_TABLES[[version]]
+}
+.ensdb_protein_tables <- function(version = "1.0") {
+    .ENSDB_PROTEIN_TABLES <- list(`1.0` = list(
+                                      protein = c("tx_id", "protein_id",
+                                                  "protein_sequence"),
+                                      uniprot = c("protein_id", "uniprot_id",
+                                                  "uniprot_db",
+                                                  "uniprot_mapping_type"),
+                                      protein_domain = c("protein_id",
+                                                         "protein_domain_id",
+                                                         "protein_domain_source",
+                                                         "interpro_accession",
+                                                         "prot_dom_start",
+                                                         "prot_dom_end")),
+                                  `2.0` = list(
+                                      protein = c("tx_id", "protein_id",
+                                                  "protein_sequence"),
+                                      uniprot = c("protein_id", "uniprot_id",
+                                                  "uniprot_db",
+                                                  "uniprot_mapping_type"),
+                                      protein_domain = c("protein_id",
+                                                         "protein_domain_id",
+                                                         "protein_domain_source",
+                                                         "interpro_accession",
+                                                         "prot_dom_start",
+                                                         "prot_dom_end"))
+                                  )
+    .ENSDB_PROTEIN_TABLES[[version]]
+}
+    
+#' @description Extract the database schema version if available in the metadata
+#'     database column.
+#' @noRd
+dbSchemaVersion <- function(con) {
+    tabs <- dbListTables(con)
+    if (any(tabs == "metadata")) {
+        res <- dbGetQuery(con, "select * from metadata")
+        if (any(res$name == "DBSCHEMAVERSION") & any(colnames(res) == "value"))
+            return(res[res$name == "DBSCHEMAVERSION", "value"])
+    }
+    return("1.0")
+}
+
 dbHasRequiredTables <- function(con, returnError = TRUE,
-                                tables = .ENSDB_TABLES) {
+                                tables = .ensdb_tables(dbSchemaVersion(con))) {
     tabs <- dbListTables(con)
     if (length(tabs) == 0) {
         if (returnError)
@@ -521,7 +576,7 @@ dbHasRequiredTables <- function(con, returnError = TRUE,
     return(TRUE)
 }
 dbHasValidTables <- function(con, returnError = TRUE,
-                             tables = .ENSDB_TABLES) {
+                             tables = .ensdb_tables(dbSchemaVersion(con))) {
     for (tab in names(tables)) {
         cols <- tables[[tab]]
         from_db <- colnames(dbGetQuery(con, paste0("select * from ", tab,
@@ -584,6 +639,9 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
                    gene = "seq_name", tx = "tx_id", tx = "gene_id",
                    exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
+    if (as.numeric(dbSchemaVersion(con)) > 1)
+        indexCols <- c(indexCols,
+                       entrezgene = "gene_id", entrezgene = "entrezid")
     if (proteins) {
         indexCols <- c(indexCols,
                        protein = "tx_id",
