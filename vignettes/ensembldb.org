@@ -1749,18 +1749,20 @@ first passed argument. I can check for an existing column using the
 =exists("gene_id")= function.
 
 
-** TODO Ensure all depending packages work with =AnnotationFilter=
+** DONE Ensure all depending packages work with =AnnotationFilter=
+   CLOSED: [2017-05-16 Tue 06:24]
 
-+ [ ] =biovizBase=: *has to be fixed*. Uses filter classes from =ensembldb=. Forked
+   - State "DONE"       from "TODO"       [2017-05-16 Tue 06:24]
++ [X] =biovizBase=: *has to be fixed*. Uses filter classes from =ensembldb=. Forked
   the repo from github mirror and fixed it in version 1.23.3 (i.e. import
   filters from =AnnotationFilter= instead.
 + [X] =Gviz=: OK if =biovizBase= is fixed.
 + [X] =ChIPpeakAnno=: OK if =biovizBase= is fixed.
-+ [ ] =Pbase=: *has to be fixed*.
-+ [ ] =TVTB=: added an issue to https://github.com/kevinrue/TVTB/issues/5. Just
++ [X] =Pbase=: *has to be fixed*.
++ [X] =TVTB=: added an issue to https://github.com/kevinrue/TVTB/issues/5. Just
   needs to import the filters from =AnnotationFilter= instead of =ensembldb=.
 + [X] =VariantFiltering=: OK once =biovizBase= builds. Probably due to that.
-+ [ ] =chimeraviz=: added an issue to
++ [X] =chimeraviz=: added an issue to
   https://github.com/stianlagstad/chimeraviz/issues/3. Just needs to import the
   =GeneIdFilter= from =AnnotationFilter= instead.
 + [X] =ggbio=: *has to be fixed*.
@@ -1777,13 +1779,15 @@ The remaining packages (=Gviz=, =alpine=, =ChIPpeakAnno=).
 
 
 Steps when =AnnotationFilter= is accepted:
-+ [ ] Contact Micheal Lawrence that =biovizBase= and =ggbio= should be fixed (have
++ [X] Contact Micheal Lawrence that =biovizBase= and =ggbio= should be fixed (have
   patches).
-+ [ ] Push new =ensembldb= package.
-+ [ ] Contact developers of =chimeraviz= and =TVTB= and =wiggleplotr=.
++ [X] Push new =ensembldb= package.
++ [X] Contact developers of =chimeraviz= and =TVTB= and =wiggleplotr=.
 
-** TODO Fix/check packages failing to build for Bioc 3.5
+** DONE Fix/check packages failing to build for Bioc 3.5
+   CLOSED: [2017-05-16 Tue 06:24]
 
+   - State "DONE"       from "TODO"       [2017-05-16 Tue 06:24]
 A
 + [ ] affycoretools: because of ReportingTools
 + [ ] AgiMicroRna: because of affycoretools
@@ -1905,3 +1909,13 @@ Base on =ensembldb=:
 + [X] =ggbio=:
 + [ ] =Pbase=:
 + [ ] =wiggleplotr=:
+** TODO entrezid in separate database table
+
++ [ ] Perl script to save =entrezid= into a separate table =entrezgene=.
++ [ ] Import script to create the additional table and indices (=gene_id= and
+  =entrezid=).
++ [ ] Concatenate on SQL levels? =group_concat(X,Y)=.
++ [ ] Test if queries work for genes that don't have an entry in =entrezid=,
+  otherwise save just the =gene_id= into the table without =entrezid=.
++ [ ] Different SQL queries depending on DBSCHEMA version.
++ [ ] Put =entrezid= as a =list= into =GRanges=?
