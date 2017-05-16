@@ -57,6 +57,7 @@ databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
 #+NAME: doeval
 #+BEGIN_SRC R :ravel echo = FALSE, results = "hide"
   evalMe <- TRUE
+
 #+END_SRC
 
 #+NAME: loadlib
@@ -66,6 +67,7 @@ databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
   edb <- EnsDb.Hsapiens.v75
   ## Evaluate whether we have protein annotation available
   hasProteinData(edb)
+
 #+END_SRC
 
 If protein annotation is available, the additional tables and columns are also
@@ -74,6 +76,7 @@ listed by the =listTables= and =listColumns= methods.
 #+NAME: listCols
 #+BEGIN_SRC R :ravel message = FALSE, eval = evalMe
   listTables(edb)
+
 #+END_SRC
 
 In the following sections we show examples how to 1) fetch protein annotations
@@ -84,6 +87,7 @@ annotation data and 3) map proteins to the genome.
 #+BEGIN_SRC R :ravel echo = FALSE, results = "hide", eval = evalMe
   ## Use this to conditionally disable eval on following chunks
   haveProt <- hasProteinData(edb) & evalMe
+
 #+END_SRC
 
 * Fetch protein annotation for genes and transcripts
@@ -98,6 +102,7 @@ or =transcripts= methods.
   txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
                      columns = c("protein_id", "uniprot_id", "tx_biotype"))
   txs
+
 #+END_SRC
 
 The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the
@@ -110,6 +115,7 @@ associated with it, but no Uniprot ID.
   ## Subset to transcripts with tx_biotype other than protein_coding.
   txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
                                             "protein_id")]
+
 #+END_SRC
 
 While the mapping from a protein coding transcript to a Ensembl protein ID
@@ -125,6 +131,7 @@ such cases a redundant list of transcripts is returned.
   ## List the protein IDs and uniprot IDs for the coding transcripts
   mcols(txs[txs$tx_biotype == "protein_coding",
             c("tx_id", "protein_id", "uniprot_id")])
+
 #+END_SRC
 
 Some of the n:m mappings for Uniprot IDs can be resolved by restricting either
@@ -146,6 +153,7 @@ below we restrict the result to Uniprot IDs with the mapping type /DIRECT/.
 					UniprotMappingTypeFilter("DIRECT")),
                      columns = c("protein_id", "uniprot_id", "uniprot_db"))
   mcols(txs)
+
 #+END_SRC
 
 For this example the use of the =UniprotMappingTypeFilter= resolved the multiple
@@ -173,6 +181,7 @@ encoded by any of its transcripts.
   length(gns)
 
   sort(gns$gene_name)
+
 #+END_SRC
 
 So, in total we got 152 genes with that protein domain. In addition to the
@@ -193,6 +202,7 @@ key types are returned by the =columns= and =keytypes= methods.
 
   ## Show all key types/filters that are supported
   keytypes(edb)
+
 #+END_SRC
 
 Below we fetch all Uniprot IDs annotated to the gene /ZBTB16/.
@@ -201,6 +211,7 @@ Below we fetch all Uniprot IDs annotated to the gene /ZBTB16/.
 #+BEGIN_SRC R :ravel message = FALSE, eval = haveProt
   select(edb, keys = "ZBTB16", keytype = "GENENAME",
          columns = "UNIPROTID")
+
 #+END_SRC
 
 This returns us all Uniprot IDs of all proteins encoded by the gene's
@@ -214,6 +225,7 @@ non sense mediated mRNA decay.
   ## Call select, this time providing a GenenameFilter.
   select(edb, keys = GenenameFilter("ZBTB16"),
          columns = c("TXBIOTYPE", "UNIPROTID", "PROTEINID"))
+
 #+END_SRC
 
 Note also that we passed this time a =GenenameFilter= with the =keys= parameter.
@@ -235,6 +247,7 @@ In the code chunk below we fetch all protein annotations for the gene /ZBTB16/.
   prts <- proteins(edb, filter = GenenameFilter("ZBTB16"),
                    return.type = "AAStringSet")
   prts
+
 #+END_SRC
 
 Besides the amino acid sequence, the =prts= contains also additional annotations
@@ -245,6 +258,7 @@ columns provided with the parameter =columns= are also added to the =mcols=
 #+NAME: b_proteins_mcols
 #+BEGIN_SRC R :ravel message = FALSE, eval = haveProt
   mcols(prts)
+
 #+END_SRC
 
 Note that the =proteins= method will retrieve only gene/transcript annotations of
@@ -262,6 +276,7 @@ present in a redundant list of proteins as shown in the code block below.
                  columns = c("tx_id", listColumns(edb, "protein_domain")),
                  return.type = "AAStringSet")
   pd
+
 #+END_SRC
 
 The result contains one row/element for each protein domain in each of the
@@ -275,6 +290,7 @@ below.
 
   ## The mcols
   mcols(pd)
+
 #+END_SRC
 
 As we can see each protein can have several protein domains with the start and
