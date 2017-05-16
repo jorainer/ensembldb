@@ -71,7 +71,7 @@
 #' @noRd
 .conditionForEnsDb <- function(x) {
     cond <- condition(x)
-    if (length(value(x)) > 1) {
+    if (length(unique(value(x))) > 1) {
         if (cond == "==")
             cond <- "in"
         if (cond == "!=")
@@ -79,7 +79,7 @@
     }
     if (cond == "==")
         cond <- "="
-    if (cond %in% c("startsWith", "endsWith"))
+    if (cond %in% c("startsWith", "endsWith", "contains"))
         cond <- "like"
     cond
 }
@@ -100,6 +100,8 @@
         vals <- paste0("'", unique(x@value), "%'")
     if (condition(x) == "endsWith")
         vals <- paste0("'%", unique(x@value), "'")
+    if (condition(x) == "contains")
+        vals <- paste0("'%", unique(x@value), "%'")
     vals
 }
 
