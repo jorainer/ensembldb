@@ -63,12 +63,14 @@ validateEnsDb <- function(object){
         if (is.character(OK))
             msg <- validMsg(msg, OK)
         if (hasProteinData(object)) {
-            OK <- dbHasRequiredTables(object@ensdb,
-                                      tables = .ENSDB_PROTEIN_TABLES)
+            OK <- dbHasRequiredTables(
+                object@ensdb,
+                tables = .ensdb_protein_tables(dbSchemaVersion(dbconn(object))))
             if (is.character(OK))
                 msg <- validMsg(msg, OK)
-            OK <- dbHasValidTables(object@ensdb,
-                                   tables = .ENSDB_PROTEIN_TABLES)
+            OK <- dbHasValidTables(
+                object@ensdb,
+                tables = .ensdb_protein_tables(dbSchemaVersion(dbconn(object))))
             if (is.character(OK))
                 msg <- validMsg(msg, OK)
             cdsTx <- dbGetQuery(dbconn(object),
