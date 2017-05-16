@@ -100,7 +100,7 @@ runEnsDbApp <- function(...){
 ##
 ## Check if any of 'x' are protein columns.
 anyProteinColumns <- function(x){
-    return(any(x %in% unlist(.ENSDB_PROTEIN_TABLES, use.names = FALSE)))
+    return(any(x %in% unlist(.ensdb_protein_tables(), use.names = FALSE)))
 }
 
 ############################################################
