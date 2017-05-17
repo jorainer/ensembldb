@@ -1911,11 +1911,141 @@ Base on =ensembldb=:
 + [ ] =wiggleplotr=:
 ** TODO entrezid in separate database table
 
-+ [ ] Perl script to save =entrezid= into a separate table =entrezgene=.
-+ [ ] Import script to create the additional table and indices (=gene_id= and
++ [X] Perl script to save =entrezid= into a separate table =entrezgene=.
++ [X] Import script to create the additional table and indices (=gene_id= and
   =entrezid=).
-+ [ ] Concatenate on SQL levels? =group_concat(X,Y)=.
-+ [ ] Test if queries work for genes that don't have an entry in =entrezid=,
-  otherwise save just the =gene_id= into the table without =entrezid=.
-+ [ ] Different SQL queries depending on DBSCHEMA version.
-+ [ ] Put =entrezid= as a =list= into =GRanges=?
++ [X] Concatenate on SQL levels? =group_concat(X,Y)=. NO! Return the result as a
+  list.
++ [X] Test if queries work for genes that don't have an entry in =entrezid=,
+  otherwise save just the =gene_id= into the table without =entrezid=. Using a =left
+  outer join= seems to fix that.
++ [X] Different SQL queries depending on DBSCHEMA version: extract the
+  DBSCHEMAVERSION using the =dbSchemaVersion= function (passing the =EnsDb=). Seems
+  to work out of the box - no need to make schema dependent calls.
+
++ [X] Put =entrezid= as a =list= into =GRanges=? The point is we have to collapse the
+  entries we have to specify by what. E.g. by =gene_id= if the call is =genes=, by
+  =exon_id= if the call is =exons= or =exonsBy= etc. WORKS.
++ [X] Validity dependent on DB schema.
++ [ ] Build from GRanges: use database version 2.0 schema?
++ [ ] Update documentation: mention that column entrezid is a =list=.
++ [ ] Update vignette: mention that column entrezid is a =list= and update the
+  database layout.
++ [ ] Fix =select=.
++ [ ] Fix =mapIds=.
+
+
+Some test code below.
+#+BEGIN_SRC R :eval never
+  library(ensembldb)
+  library(testthat)
+
+  edb <- EnsDb("/Users/jo/tmp/ensdb_20/EnsDb.Hsapiens.v88.sqlite")
+
+  ensembldb:::dbSchemaVersion(edb)
+
+  system.time(gns1 <- genes(edb, return.type = "data.frame")) ## 0.677 sec
+  system.time(gns2 <- genes(edb, return.type = "data.frame",
+			    columns = c(listColumns(edb, "gene"), "entrezid"))) ## 1.5
+
+  all(unique(gns1$gene_id) == unique(gns2$gene_id))
+  expect_equal(gns1$gene_id, gns2$gene_id)
+
+  ## Seems to work...
+  gns2 <- genes(edb, columns = c(listColumns(edb, "gene"), "entrezid"))
+
+  ## Check for transcripts
+  ## transcripts
+  system.time(tx1 <- transcripts(edb))  ## 3.2 sec
+  system.time(tx2 <- transcripts(
+		  edb, columns = c(listColumns(edb, "tx"), "entrezid")))  ## 5.5
+  expect_equal(length(tx1), length(tx2))
+  expect_equal(mcols(tx1), mcols(tx2)[, -ncol(mcols(tx2))])
+  expect_equal(names(tx1), names(tx2))
+
+  ## transcriptsBy
+  tx1 <- transcriptsBy(edb)
+  tx2 <- transcriptsBy(edb, columns = c(listColumns(edb, "tx"), "entrezid"))
+  expect_equal(length(tx1), length(tx2))
+  expect_equal(mcols(tx1), mcols(tx2)[, -ncol(mcols(tx2))])
+  expect_equal(names(tx1), names(tx2))
+
+
+  ## Check for exons
+  ## exons
+  ex1 <- exons(edb)
+  ex2 <- exons(edb, columns = c(listColumns(edb, "exon"), "entrezid"))
+  expect_equal(length(ex1), length(ex2))
+  expect_equal(names(ex1), names(ex2))
+  ## Are all entrezids unique?
+  lens <- lengths(ex2$entrezid)
+  lens_2 <- lengths(lapply(ex2$entrezid, unique))
+  expect_equal(lens, lens_2)
+
+  ## exonsBy
+  ex1 <- exonsBy(edb)
+  ex2 <- exonsBy(edb, columns = c(listColumns(edb, "exon"), "entrezid"))
+  all.equal(names(ex1), names(ex2))
+  expect_equal(length(ex1), length(ex2))
+  expect_equal(mcols(ex1), mcols(ex2)[, -ncol(mcols(ex2))])
+
+  ## cdsBy
+  cs1 <- cdsBy(edb)
+  cs2 <- cdsBy(edb, columns = c("entrezid"))
+  all.equal(names(cs1), names(cs2))
+  expect_equal(length(cs1), length(cs2))
+  expect_equal(mcols(cs1), mcols(cs2)[, -1])
+
+  ## threeUTRsByTranscript
+  tu1 <- threeUTRsByTranscript(edb)
+  tu2 <- threeUTRsByTranscript(edb, columns = "entrezid")
+  all.equal(names(tu1), names(tu2))
+  expect_equal(length(tu1), length(tu2))
+  expect_equal(mcols(tu1), mcols(tu2)[, -1])
+  ## fiveUTRsByTranscript
+  fu1 <- fiveUTRsByTranscript(edb)
+  fu2 <- fiveUTRsByTranscript(edb, columns = "entrezid")
+  all.equal(names(fu1), names(fu2))
+  expect_equal(length(fu1), length(fu2))
+  expect_equal(mcols(fu1), mcols(fu2)[, -1])
+
+  ## proteins
+  pr1 <- proteins(edb)
+  pr2 <- proteins(edb, columns = c(listColumns(edb, "protein"), "entrezid"))
+  all.equal(pr1$protein_id, pr2$protein_id)
+  expect_equal(pr1, pr2[, -ncol(pr2)])
+
+
+  tmp <- ensembldb:::getWhat(edb, columns = c(listColumns(edb, "gene"), "entrezid"))
+
+  system.time(tmp_u <- unique(tmp[, -ncol(tmp)]))  ## 0.194
+
+  system.time(tmp_1 <- .collapseEntrezidInTable(tmp, by = "gene_id"))
+  system.time(tmp_2 <- ensembldb:::.collapseEntrezidInTable(tmp, by = "gene_id"))
+
+  expect_equal(tmp_1, tmp_2)
+
+
+  ## Check if we could do it faster...
+  system.time(ids <- apply(tmp[, -ncol(tmp)], MARGIN = 1, FUN = paste0, collapse = ""))
+
+  system.time(egs <- split(tmp$entrezid,
+			   f = factor(tmp$gene_id, levels = unique(tmp$gene_id))))  ## 0.019
+  system.time(egs <- lapply(egs, unique))  ## 0.6
+
+  system.time(eg2 <- aggregate(tmp$entrezid,
+			       by = list(factor(tmp$gene_id,
+					   levels = unique(tmp$gene_id))),
+			       FUN = unique))
+
+  system.time(tmp <- unique(gns2[, colnames(gns2) != "entrezid"]))  ## 0.201
+
+  system.time(tmp2 <- gns2[match(names(egs), gns2$gene_id), ])  ## 0.029
+
+  all.equal(tmp, tmp2[, -ncol(tmp2)])
+
+  DF <- DataFrame(tmp2)
+  DF$entrezid <- egs
+
+  system.time(Test <- .collapseEntrezidInTable(gns2))  ## 0.05
+#+END_SRC
