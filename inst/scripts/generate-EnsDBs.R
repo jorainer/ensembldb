@@ -163,8 +163,8 @@ processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
     res <- sapply(fls, unlink)
     ## (4) Create the EnsDb (requires the correct Ensembl API)
     ##     They are created in the local directory.
-    fetchTablesFromEnsembl(ens_version, species = species, user = user,
-                           host = host, pass = pass, port = port)
+    fetchTablesFromEnsembl(version = ens_version, species = species,
+                           user = user, host = host, pass = pass, port = port)
     DBFile <- makeEnsemblSQLiteFromTables()
     unlink("*.txt")
     ## (5) Delete the database.
