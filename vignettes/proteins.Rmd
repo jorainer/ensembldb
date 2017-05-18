@@ -47,6 +47,7 @@ databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
 `ensDbFromGtf` don't.
 
 ```{r doeval, echo = FALSE, results = "hide"}
+## Globally switch off execution of code chunks
 evalMe <- TRUE
 ```
 
