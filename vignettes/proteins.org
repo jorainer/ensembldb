@@ -56,6 +56,7 @@ databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
 
 #+NAME: doeval
 #+BEGIN_SRC R :ravel echo = FALSE, results = "hide"
+  ## Globally switch off execution of code chunks
   evalMe <- TRUE
 
 #+END_SRC
