@@ -100,26 +100,29 @@ runEnsDbApp <- function(...){
 ##
 ## Check if any of 'x' are protein columns.
 anyProteinColumns <- function(x){
-    return(any(x %in% unlist(.ENSDB_PROTEIN_TABLES, use.names = FALSE)))
+    return(any(x %in% unlist(.ensdb_protein_tables(), use.names = FALSE)))
 }
 
 ############################################################
 ## listProteinColumns
 ##
-##' @description The \code{listProteinColumns} function allows to conveniently
-##' extract all database columns containing protein annotations from
-##' an \code{\linkS4class{EnsDb}} database.
-##' @return The \code{listProteinColumns} function returns a character vector
-##' with the column names containing protein annotations or throws an error
-##' if no such annotations are available.
-##' @rdname ProteinFunctionality
-##' @examples
-##'
-##' ## List all columns containing protein annotations
-##' library(EnsDb.Hsapiens.v75)
-##' edb <- EnsDb.Hsapiens.v75
-##' if (hasProteinData(edb))
-##'     listProteinColumns(edb)
+#' @description The \code{listProteinColumns} function allows to conveniently
+#'     extract all database columns containing protein annotations from
+#'     an \code{\linkS4class{EnsDb}} database.
+#' 
+#' @return The \code{listProteinColumns} function returns a character vector
+#'     with the column names containing protein annotations or throws an error
+#'     if no such annotations are available.
+#' 
+#' @rdname ProteinFunctionality
+#' 
+#' @examples
+#'
+#' ## List all columns containing protein annotations
+#' library(EnsDb.Hsapiens.v75)
+#' edb <- EnsDb.Hsapiens.v75
+#' if (hasProteinData(edb))
+#'     listProteinColumns(edb)
 listProteinColumns <- function(object) {
     if (missing(object))
         stop("'object' is missing with no default.")
@@ -132,11 +135,13 @@ listProteinColumns <- function(object) {
 
 ############################################################
 ## .ProteinsFromDataframe
-##' @param x \code{EnsDb} object.
-##' @param data \code{data.frame} with the results from a call to the
-##' \code{proteins} method; has to have required columns \code{"protein_id"} and
-##' \code{"protein_sequence"}.
-##' @noRd
+#' @param x \code{EnsDb} object.
+#' 
+#' @param data \code{data.frame} with the results from a call to the
+#'     \code{proteins} method; has to have required columns \code{"protein_id"}
+#'     and \code{"protein_sequence"}.
+#' 
+#' @noRd
 .ProteinsFromDataframe <- function(x, data) {
     if (!all(c("protein_id", "protein_sequence") %in% colnames(data)))
         stop("Reguired columns 'protein_id' and 'protein_sequence' not in 'data'!")
@@ -204,4 +209,33 @@ num2strand <- function(x){
     }else{
         return("+")
     }
+}
+
+#' @description Collapses entries in the \code{"entrezid"} column of a
+#'     \code{data.frame} or \code{DataFrame} making the rest of \code{x} unique.
+#'
+#' @param x Either a \code{data.frame} or a \code{DataFrame}.
+#'
+#' @param by \code{character(1)} defining the column by which the
+#'     \code{"entrezid"} column should be splitted.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @noRd
+.collapseEntrezidInTable <- function(x, by = "gene_id") {
+    ## Slow version: use unique call.
+    eg_idx <- which(colnames(x) == "entrezid")
+    if (length(eg_idx)) {
+        ## Avoid an additional lapply unique call.
+        tmp <- unique(x[, c(by, "entrezid")])
+        egs <- split(tmp[, "entrezid"],
+                     f = factor(tmp[, by], levels = unique(tmp[, by])))
+        ## Use a unique call.
+        ## x_sub <- x[match(names(egs), x[, by]), , drop = FALSE] would be much
+        ## faster but does not work e.g. for exons or transcripts.
+        x_sub <- unique(x[, -eg_idx, drop = FALSE])
+        x_sub$entrezid <- egs[x_sub[, by]]
+        return(x_sub)
+    }
+    x
 }
