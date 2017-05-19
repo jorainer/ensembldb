@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.0: * Change database layout by adding a dedicated entrezgene
+##                  table.
 ## version 0.2.4: * Extract taxonomy ID and add that to  metadata table.
 ## version 0.2.3: * Add additional columns to the uniprot table:
 ##                  o uniprot_db: the Uniprot database name.
@@ -22,7 +24,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.2.4";
+my $script_version = "0.3.0";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -56,6 +58,7 @@ if($option{ h }){
   print("-s (optional): the species; defaults to human.\n");
   print("\n\nThe script will generate the following tables:\n");
   print("- ens_gene.txt: contains all genes defined in Ensembl.\n");
+  print("- ens_entrezgene.txt: contains mapping between ensembl gene_id and entrezgene ID.\n");
   print("- ens_transcript.txt: contains all transcripts of all genes.\n");
   print("- ens_exon.txt: contains all (unique) exons, along with their genomic alignment.\n");
   print("- ens_tx2exon.txt: relates transcript ids to exon ids (m:n), along with the index of the exon in the respective transcript (since the same exon can be part of different transcripts and have a different index in each transcript).\n");
@@ -117,7 +120,7 @@ print $infostring;
 
 ## preparing output files:
 open(GENE , ">ens_gene.txt");
-print GENE "gene_id\tgene_name\tentrezid\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\n";
+print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\n";
 
 open(TRANSCRIPT , ">ens_tx.txt");
 print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\n";
@@ -125,6 +128,8 @@ print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\
 open(EXON , ">ens_exon.txt");
 print EXON "exon_id\texon_seq_start\texon_seq_end\n";
 
+open(ENTREZGENE, ">ens_entrezgene.txt");
+print ENTREZGENE "gene_id\tentrezid\n";
 # open(G2T , ">ens_gene2transcript.txt");
 # print G2T "g2t_gene_id\tg2t_tx_id\n";
 
@@ -204,16 +209,19 @@ foreach my $gene_id (@gene_ids){
     my $gene_seq_end = $gene->end;
     ## get entrezgene ID, if any...
     my $all_entries = $gene->get_all_DBLinks("EntrezGene");
-    my %entrezgene_hash=();
     foreach my $dbe (@{$all_entries}){
-      $entrezgene_hash{ $dbe->primary_id } = 1;
+      print ENTREZGENE "$gene_id\t".$dbe->primary_id."\n";
     }
-    my $hash_size = keys %entrezgene_hash;
-    my $entrezid = "";
-    if($hash_size > 0){
-      $entrezid = join(";", keys %entrezgene_hash);
-    }
-    print GENE "$gene_id\t$gene_external_name\t$entrezid\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\n";
+    # my %entrezgene_hash=();
+    # foreach my $dbe (@{$all_entries}){
+    #   $entrezgene_hash{ $dbe->primary_id } = 1;
+    # }
+    # my $hash_size = keys %entrezgene_hash;
+    # my $entrezid = "";
+    # if($hash_size > 0){
+    #   $entrezid = join(";", keys %entrezgene_hash);
+    # }
+    print GENE "$gene_id\t$gene_external_name\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\n";
 
     ## process transcript(s)
     my @transcripts = @{ $gene->get_all_Transcripts };
@@ -318,13 +326,14 @@ print INFO "ensembl_host\t$host\n";
 print INFO "Organism\t$species_ens\n";
 print INFO "taxonomy_id\t$taxonomy_id\n";
 print INFO "genome_build\t$coord_system_version\n";
-print INFO "DBSCHEMAVERSION\t1.0\n";
+print INFO "DBSCHEMAVERSION\t2.0\n";
 
 close(INFO);
 
 close(GENE);
 close(TRANSCRIPT);
 close(EXON);
+close(ENTREZGENE);
 ##close(G2T);
 close(T2E);
 close(CHR);

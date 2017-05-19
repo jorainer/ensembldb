@@ -4,7 +4,8 @@ test_that("genes method works", {
     Gns <- genes(edb, filter = ~ genename == "BCL2")
     expect_identical(Gns$gene_name, "BCL2")
     Gns <- genes(edb, filter = SeqNameFilter("Y"), return.type = "DataFrame")
-    expect_identical(sort(colnames(Gns)), sort(listColumns(edb, "gene")))
+    expect_identical(sort(colnames(Gns)),
+                     sort(unique(c(listColumns(edb, "gene"), "entrezid"))))
     Gns <- genes(edb, filter = ~ seq_name == "Y" & gene_id == "ENSG00000012817",
                  return.type = "DataFrame",
                  columns = c("gene_id", "tx_name"))
@@ -644,63 +645,70 @@ test_that("listBiotypes works", {
 
 test_that("listTables works", {
     res <- listTables(edb)
+    schema_version <- ensembldb:::dbSchemaVersion(edb)
     if (!hasProteinData(edb)) {
-        expect_equal(names(res), names(ensembldb:::.ENSDB_TABLES))
+        expect_equal(names(res),
+                     names(ensembldb:::.ensdb_tables(schema_version)))
     } else {
-        expect_equal(names(res), c("gene", "tx", "tx2exon", "exon",
-                                  "chromosome", "protein", "uniprot",
-                                  "protein_domain", "metadata"))
+        expect_equal(
+            sort(names(res)),
+            sort(unique(c(names(ensembldb:::.ensdb_tables(schema_version)),
+                          names(ensembldb:::.ensdb_protein_tables(
+                                                schema_version))))))
     }
     ## Repeat with deleting the cached tables
     edb@tables <- list()
     res <- listTables(edb)
     if (!hasProteinData(edb)) {
-        expect_equal(names(res), names(ensembldb:::.ENSDB_TABLES))
+        expect_equal(names(res),
+                     names(ensembldb:::.ensdb_tables(schema_version)))
     } else {
-        expect_equal(names(res), c("gene", "tx", "tx2exon", "exon",
-                                  "chromosome", "protein", "uniprot",
-                                  "protein_domain", "metadata"))
+        expect_equal(
+            sort(names(res)),
+            sort(unique(c(names(ensembldb:::.ensdb_tables(schema_version)),
+                          names(ensembldb:::.ensdb_protein_tables(
+                                                schema_version))))))
     }
 })
 
 test_that("listColumns works", {
     res <- listColumns(edb, table = "gene")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$gene, "symbol"))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$gene, "symbol"))
     res <- listColumns(edb, table = "tx")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$tx, "tx_name"))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$tx, "tx_name"))
     res <- listColumns(edb, table = "exon")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$exon))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$exon))
     res <- listColumns(edb, table = "chromosome")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$chromosome))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$chromosome))
     res <- listColumns(edb, table = "tx2exon")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$tx2exon))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$tx2exon))
     if (hasProteinData(edb)) {
         res <- listColumns(edb, table = "protein")
-        expect_equal(res, ensembldb:::.ENSDB_PROTEIN_TABLES$protein)
+        expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$protein)
         res <- listColumns(edb, table = "uniprot")
-        expect_equal(res, ensembldb:::.ENSDB_PROTEIN_TABLES$uniprot)
+        expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$uniprot)
         res <- listColumns(edb, table = "protein_domain")
-        expect_equal(res, ensembldb:::.ENSDB_PROTEIN_TABLES$protein_domain)
+        expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$protein_domain)
     }
     ## Repeat with deleting the cached tables
     edb@tables <- list()
     res <- listColumns(edb, table = "gene")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$gene, "symbol"))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$gene, "symbol"))
     res <- listColumns(edb, table = "tx")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$tx, "tx_name"))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$tx, "tx_name"))
     res <- listColumns(edb, table = "exon")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$exon))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$exon))
     res <- listColumns(edb, table = "chromosome")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$chromosome))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$chromosome))
     res <- listColumns(edb, table = "tx2exon")
-    expect_equal(res, c(ensembldb:::.ENSDB_TABLES$tx2exon))
+    expect_equal(res, c(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$tx2exon))
     if (hasProteinData(edb)) {
         res <- listColumns(edb, table = "protein")
-        expect_equal(res, ensembldb:::.ENSDB_PROTEIN_TABLES$protein)
+        expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$protein)
         res <- listColumns(edb, table = "uniprot")
-        expect_equal(res, ensembldb:::.ENSDB_PROTEIN_TABLES$uniprot)
+        expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$uniprot)
         res <- listColumns(edb, table = "protein_domain")
-        expect_equal(res, ensembldb:::.ENSDB_PROTEIN_TABLES$protein_domain)
+        expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$protein_domain)
     }
 })
 

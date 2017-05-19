@@ -111,6 +111,17 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     rm(tmp)
     message("OK")
 
+    if (as.numeric(info[info$name == "DBSCHEMAVERSION", "value"]) > 1) {
+        message("Processing 'entrezgene' table ... ", appendLF = FALSE)
+        ## process genes: some gene names might have fancy names...
+        tmp <- read.table(paste0(path, .Platform$file.sep, "ens_entrezgene.txt"),
+                          sep="\t", as.is=TRUE, header=TRUE,
+                          quote="", comment.char="" )
+        dbWriteTable(con, name="entrezgene", tmp, row.names=FALSE)
+        rm(tmp)
+        message("OK")
+    }
+    
     message("Processing 'trancript' table ... ", appendLF = FALSE)
     ## process transcripts:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"),
