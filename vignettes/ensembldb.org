@@ -1964,7 +1964,8 @@ Base on =ensembldb=:
   database layout.
 + [X] Fix =select=.
 + [X] Fix =mapIds=.
-+ [ ] Check the package on the database with DBSCHEMAVERSION 2.0.
++ [X] Check the package on the database with DBSCHEMAVERSION 1.0.
++ [X] Check the package on the database with DBSCHEMAVERSION 2.0.
 
 
 Some test code below.

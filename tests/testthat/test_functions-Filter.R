@@ -94,13 +94,25 @@ test_that(".queryForEnsDbWithTables works", {
                  "gene.gene_id = 'b'")
     expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb, c("tx", "gene")),
                  "tx.gene_id = 'b'")
+    fl <- GeneIdFilter("b", condition = "contains")
+    expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb, c("tx", "gene")),
+                 "tx.gene_id like '%b%'")
     ## Entrez
-    fl <- EntrezFilter("g")
-    expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
-                 "gene.entrezid = 'g'")
-    fl <- EntrezFilter("g", condition = "endsWith")
-    expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
-                 "gene.entrezid like '%g'")
+    if (as.numeric(ensembldb:::dbSchemaVersion(edb)) > 1) {
+        fl <- EntrezFilter("g")
+        expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
+                     "entrezgene.entrezid = 'g'")
+        fl <- EntrezFilter("g", condition = "endsWith")
+        expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
+                     "entrezgene.entrezid like '%g'")
+    } else {
+        fl <- EntrezFilter("g")
+        expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
+                     "gene.entrezid = 'g'")
+        fl <- EntrezFilter("g", condition = "endsWith")
+        expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
+                     "gene.entrezid like '%g'")
+    }
     ## Numeric filters
     fl <- TxStartFilter(123)
     expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),

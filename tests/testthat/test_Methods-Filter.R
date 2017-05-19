@@ -28,7 +28,12 @@ test_that("ensDbColumn works", {
     expect_error(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
     fl <- EntrezFilter(123)
     expect_equal(unname(ensembldb:::ensDbColumn(fl)), "entrezid")
-    expect_equal(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.entrezid")
+    if (as.numeric(ensembldb:::dbSchemaVersion(edb)) > 1) {
+        expect_equal(unname(ensembldb:::ensDbColumn(fl, edb)),
+                     "entrezgene.entrezid")
+    } else {
+        expect_equal(unname(ensembldb:::ensDbColumn(fl, edb)), "gene.entrezid")
+    }
     expect_error(unname(ensembldb:::ensDbColumn(fl, edb, "tx")))
     fl <- SeqNameFilter("a")
     expect_equal(unname(ensembldb:::ensDbColumn(fl)), "seq_name")
