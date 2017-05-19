@@ -4,7 +4,8 @@ test_that("genes method works", {
     Gns <- genes(edb, filter = ~ genename == "BCL2")
     expect_identical(Gns$gene_name, "BCL2")
     Gns <- genes(edb, filter = SeqNameFilter("Y"), return.type = "DataFrame")
-    expect_identical(sort(colnames(Gns)), sort(listColumns(edb, "gene")))
+    expect_identical(sort(colnames(Gns)),
+                     sort(unique(c(listColumns(edb, "gene"), "entrezid"))))
     Gns <- genes(edb, filter = ~ seq_name == "Y" & gene_id == "ENSG00000012817",
                  return.type = "DataFrame",
                  columns = c("gene_id", "tx_name"))
@@ -644,25 +645,29 @@ test_that("listBiotypes works", {
 
 test_that("listTables works", {
     res <- listTables(edb)
+    schema_version <- ensembldb:::dbSchemaVersion(edb)
     if (!hasProteinData(edb)) {
         expect_equal(names(res),
-                     names(
-                         ensembldb:::.ensdb_tables(
-                                         ensembldb:::dbSchemaVersion(dbconn(edb)))))
+                     names(ensembldb:::.ensdb_tables(schema_version)))
     } else {
-        expect_equal(names(res), c("gene", "tx", "tx2exon", "exon",
-                                  "chromosome", "protein", "uniprot",
-                                  "protein_domain", "metadata"))
+        expect_equal(
+            sort(names(res)),
+            sort(unique(c(names(ensembldb:::.ensdb_tables(schema_version)),
+                          names(ensembldb:::.ensdb_protein_tables(
+                                                schema_version))))))
     }
     ## Repeat with deleting the cached tables
     edb@tables <- list()
     res <- listTables(edb)
     if (!hasProteinData(edb)) {
-        expect_equal(names(res), names(ensembldb:::.ensdb_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))))
+        expect_equal(names(res),
+                     names(ensembldb:::.ensdb_tables(schema_version)))
     } else {
-        expect_equal(names(res), c("gene", "tx", "tx2exon", "exon",
-                                  "chromosome", "protein", "uniprot",
-                                  "protein_domain", "metadata"))
+        expect_equal(
+            sort(names(res)),
+            sort(unique(c(names(ensembldb:::.ensdb_tables(schema_version)),
+                          names(ensembldb:::.ensdb_protein_tables(
+                                                schema_version))))))
     }
 })
 
