@@ -70,9 +70,10 @@
 
   \item{multiVals}{
     What should \code{mapIds} do when there are multiple values that
-    could be returned? Options are: \code{"first"}, \code{"list"},
+    could be returned? Options are: \code{"first"} (default), \code{"list"},
     \code{"filter"}, \code{"asNA"}. See
-    \code{\link[AnnotationDbi]{mapIds}} for a detailed description.
+    \code{\link[AnnotationDbi]{mapIds}} 
+    for a detailed description.
   }
 
   \item{x}{

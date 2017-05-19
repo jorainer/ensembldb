@@ -57,7 +57,7 @@
 
 \S4method{promoters}{EnsDb}(x, upstream = 2000, downstream = 200, ...)
 
-\S4method{genes}{EnsDb}(x, columns = listColumns(x, "gene"),
+\S4method{genes}{EnsDb}(x, columns = c(listColumns(x, "gene"), "entrezid"),
         filter = AnnotationFilterList(), order.by, order.type = "asc",
         return.type = "GRanges")
 
@@ -278,9 +278,12 @@
       and are added to the respective promoter annotation.
     }
     \item{genes}{
-      Retrieve gene information from the database. Additional
-      columns from transcripts or exons associated with the genes can be specified
-      and are added to the respective gene annotation.
+      Retrieve gene information from the database. Additional columns
+      from transcripts or exons associated with the genes can be
+      specified and are added to the respective gene annotation. Note
+      that column \code{"entrezid"} is a \code{list} of Entrezgene
+      identifiers to accomodate the potential 1:n mapping between
+      Ensembl genes and Entrezgene IDs.
     }
 
     \item{disjointExons}{
@@ -331,9 +334,10 @@
   \describe{
     \item{gene_id}{the Ensembl gene ID of the gene.}
     \item{gene_name}{the name of the gene (in most cases its official symbol).}
-    \item{entrezid}{the NCBI Entrezgene ID of the gene; note that this
-      can also be a \code{";"} separated list of IDs for Ensembl genes
-      mapped to more than one Entrezgene.}
+    \item{entrezid}{the NCBI Entrezgene ID of the gene. Note that this
+      column contains a \code{list} of Entrezgene identifiers to
+      accommodate the potential 1:n mapping between Ensembl genes and
+      Entrezgene IDs.}
     \item{gene_biotype}{the biotype of the gene.}
     \item{gene_seq_start}{the start coordinate of the gene on the
       sequence (usually a chromosome).}
@@ -388,10 +392,10 @@
   For \code{exons}, \code{transcripts} and \code{genes},
   a \code{data.frame}, \code{DataFrame}
   or a \code{GRanges}, depending on the value of the
-  \code{return.type} parameter. The result
-  is ordered as specified by the parameter \code{order.by} or, if not
-  provided, by \code{seq_name} and chromosomal start coordinate, but NOT
-  by any ordering of values in eventually submitted filter objects.
+  \code{return.type} parameter. The result is ordered as specified by
+  the parameter \code{order.by} or, if not provided, by \code{seq_name}
+  and chromosomal start coordinate, but NOT by any ordering of values in
+  eventually submitted filter objects.
 
   For \code{exonsBy}, \code{transcriptsBy}:
   a \code{GRangesList}, depending on the value of the

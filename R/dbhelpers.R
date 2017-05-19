@@ -1,39 +1,44 @@
 ############################################################
 ## EnsDb
 ## Constructor function.
-##' @title Connect to an EnsDb object
-##'
-##' @description The \code{EnsDb} constructor function connects to the database
-##' specified with argument \code{x} and returns a corresponding
-##' \code{\linkS4class{EnsDb}} object.
-##'
-##' @details By providing the connection to a MySQL database, it is possible
-##' to use MySQL as the database backend and queries will be performed on that
-##' database. Note however that this requires the package \code{RMySQL} to be
-##' installed. In addition, the user needs to have access to a MySQL server
-##' providing already an EnsDb database, or must have write privileges on a
-##' MySQL server, in which case the \code{\link{useMySQL}} method can be used
-##' to insert the annotations from an EnsDB package into a MySQL database.
-##' @param x Either a character specifying the \emph{SQLite} database file, or
-##' a \code{DBIConnection} to e.g. a MySQL database.
-##' @return A \code{\linkS4class{EnsDb}} object.
-##' @author Johannes Rainer
-##' @examples
-##' ## "Standard" way to create an EnsDb object:
-##' library(EnsDb.Hsapiens.v75)
-##' EnsDb.Hsapiens.v75
-##'
-##' ## Alternatively, provide the full file name of a SQLite database file
-##' dbfile <- system.file("extdata/EnsDb.Hsapiens.v75.sqlite", package = "EnsDb.Hsapiens.v75")
-##' edb <- EnsDb(dbfile)
-##' edb
-##'
-##' ## Third way: connect to a MySQL database
-##' \dontrun{
-##' library(RMySQL)
-##' dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v75")
-##' edb <- EnsDb(dbcon)
-##' }
+#' @title Connect to an EnsDb object
+#'
+#' @description The \code{EnsDb} constructor function connects to the database
+#'     specified with argument \code{x} and returns a corresponding
+#'     \code{\linkS4class{EnsDb}} object.
+#'
+#' @details By providing the connection to a MySQL database, it is possible
+#'     to use MySQL as the database backend and queries will be performed on
+#'     that database. Note however that this requires the package \code{RMySQL}
+#'     to be installed. In addition, the user needs to have access to a MySQL
+#'     server providing already an EnsDb database, or must have write
+#'     privileges on a MySQL server, in which case the \code{\link{useMySQL}}
+#'     method can be used to insert the annotations from an EnsDB package into
+#'     a MySQL database.
+#' 
+#' @param x Either a character specifying the \emph{SQLite} database file, or
+#'     a \code{DBIConnection} to e.g. a MySQL database.
+#' 
+#' @return A \code{\linkS4class{EnsDb}} object.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @examples
+#' ## "Standard" way to create an EnsDb object:
+#' library(EnsDb.Hsapiens.v75)
+#' EnsDb.Hsapiens.v75
+#'
+#' ## Alternatively, provide the full file name of a SQLite database file
+#' dbfile <- system.file("extdata/EnsDb.Hsapiens.v75.sqlite", package = "EnsDb.Hsapiens.v75")
+#' edb <- EnsDb(dbfile)
+#' edb
+#'
+#' ## Third way: connect to a MySQL database
+#' \dontrun{
+#' library(RMySQL)
+#' dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v75")
+#' edb <- EnsDb(dbcon)
+#' }
 EnsDb <- function(x){
     options(useFancyQuotes=FALSE)
     if(missing(x)){
@@ -65,8 +70,11 @@ EnsDb <- function(x){
                                                          tables[ i ], " limit 1")))
     }
     names(Tables) <- tables
-    EDB <- new("EnsDb", ensdb=con, tables=Tables)
+    EDB <- new("EnsDb", ensdb = con, tables = Tables)
     EDB <- setProperty(EDB, dbSeqlevelsStyle="Ensembl")
+    ## Add the db schema version to the properties.
+    EDB <- setProperty(EDB, DBSCHEMAVERSION =
+                                .getMetaDataValue(con, "DBSCHEMAVERSION"))
     ## Setting the default for the returnFilterColumns
     returnFilterColumns(EDB) <- TRUE
     ## Defining the default for the ordering
@@ -174,6 +182,8 @@ prefixColumnsKeepOrder <- function(x, columns, clean = TRUE, with.tables) {
     c("tx", "tx2exon", "on (tx.tx_id=tx2exon.tx_id)", "join"),
     c("tx2exon", "exon", "on (tx2exon.exon_id=exon.exon_id)", "join"),
     c("tx", "protein", "on (tx.tx_id=protein.tx_id)", "left outer join"),
+    c("gene", "entrezgene", "on (gene.gene_id=entrezgene.gene_id)",
+      "left outer join"),
     c("protein", "protein_domain",
       "on (protein.protein_id=protein_domain.protein_id)", "left outer join"),
     c("protein", "uniprot", "on (protein.protein_id=uniprot.protein_id)",
@@ -257,15 +267,6 @@ joinQueryOnColumns2 <- function(x, columns, join = "suggested",
 ## Add additional tables in case the submitted tables are not directly connected
 ## and can thus not be joined. That's however not so complicated, since the database
 ## layout is pretty simple.
-## The tables are:
-##
-##      uniprot -(protein_id=protein_id)-+-(protein_id=protein_id)- protein_domain
-##                                       |
-##                                    protein -(tx_id=tx_id)-+
-##                                                           |
-##  exon -(exon_id=t2e_exon_id)- tx2exon -(t2e_tx_id=tx_id)- tx -(gene_id=gene_id)- gene
-##                                                                                   |
-##                                                   chromosome -(seq_name=seq_name)-+
 addRequiredTables <- function(x, tab){
     ## dash it, as long as I can't find a way to get connected objects in a
     ## graph I'll do it manually...
@@ -284,13 +285,18 @@ addRequiredTables <- function(x, tab){
     if (hasProteinData(x)) {
         ## Resolve the proteins: need tx to map between proteome and genome
         if (any(tab %in% c("uniprot", "protein_domain", "protein")) &
-            any(tab %in% c("exon", "tx2exon", "gene", "chromosome")))
+            any(tab %in% c("exon", "tx2exon", "gene",
+                           "chromosome", "entrezgene")))
             tab <- unique(c(tab, "tx"))
         ## Need protein.
         if (any(tab %in% c("uniprot", "protein_domain")) &
-            any(tab %in% c("exon", "tx2exon", "tx", "gene", "chromosome")))
+            any(tab %in% c("exon", "tx2exon", "tx", "gene", "chromosome",
+                           "entrezgene")))
             tab <- unique(c(tab, "protein"))
     }
+    ## entrezgene is only linked via gene
+    if (any(tab == "entrezgene") & length(tab) > 1)
+        tab <- unique(c(tab, "gene"))
     return(tablesByDegree(x, tab))
 }
 
@@ -482,29 +488,94 @@ removePrefix <- function(x, split=".", fixed=TRUE){
 
 ############################################################
 ## Check database validity.
-.ENSDB_TABLES <- list(gene = c("gene_id", "gene_name", "entrezid",
-                               "gene_biotype", "gene_seq_start",
-                               "gene_seq_end", "seq_name", "seq_strand",
-                               "seq_coord_system"),
-                      tx = c("tx_id", "tx_biotype", "tx_seq_start",
-                             "tx_seq_end", "tx_cds_seq_start",
-                             "tx_cds_seq_end", "gene_id"),
-                      tx2exon = c("tx_id", "exon_id", "exon_idx"),
-                      exon = c("exon_id", "exon_seq_start", "exon_seq_end"),
-                      chromosome = c("seq_name", "seq_length", "is_circular"),
-                      metadata = c("name", "value"))
-.ENSDB_PROTEIN_TABLES <- list(protein = c("tx_id", "protein_id",
-                                          "protein_sequence"),
-                              uniprot = c("protein_id", "uniprot_id",
-                                          "uniprot_db", "uniprot_mapping_type"),
-                              protein_domain = c("protein_id",
-                                                 "protein_domain_id",
-                                                 "protein_domain_source",
-                                                 "interpro_accession",
-                                                 "prot_dom_start",
-                                                 "prot_dom_end"))
+#' @description Return tables with attributes based on the provided schema.
+#'
+#' @noRd
+.ensdb_tables <- function(version = "1.0") {
+    .ENSDB_TABLES <- list(`1.0` = list(
+                              gene = c("gene_id", "gene_name", "entrezid",
+                                       "gene_biotype", "gene_seq_start",
+                                       "gene_seq_end", "seq_name", "seq_strand",
+                                       "seq_coord_system"),
+                              tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                                     "tx_seq_end", "tx_cds_seq_start",
+                                     "tx_cds_seq_end", "gene_id"),
+                              tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                              exon = c("exon_id", "exon_seq_start",
+                                       "exon_seq_end"),
+                              chromosome = c("seq_name", "seq_length",
+                                             "is_circular"),
+                              metadata = c("name", "value")),
+                          `2.0` = list(
+                              gene = c("gene_id", "gene_name",
+                                       "gene_biotype", "gene_seq_start",
+                                       "gene_seq_end", "seq_name", "seq_strand",
+                                       "seq_coord_system"),
+                              tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                                     "tx_seq_end", "tx_cds_seq_start",
+                                     "tx_cds_seq_end", "gene_id"),
+                              tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                              exon = c("exon_id", "exon_seq_start",
+                                       "exon_seq_end"),
+                              chromosome = c("seq_name", "seq_length",
+                                             "is_circular"),
+                              entrezgene = c("gene_id", "entrezid"),
+                              metadata = c("name", "value"))
+                          )
+    .ENSDB_TABLES[[version]]
+}
+.ensdb_protein_tables <- function(version = "1.0") {
+    .ENSDB_PROTEIN_TABLES <- list(`1.0` = list(
+                                      protein = c("tx_id", "protein_id",
+                                                  "protein_sequence"),
+                                      uniprot = c("protein_id", "uniprot_id",
+                                                  "uniprot_db",
+                                                  "uniprot_mapping_type"),
+                                      protein_domain = c("protein_id",
+                                                         "protein_domain_id",
+                                                         "protein_domain_source",
+                                                         "interpro_accession",
+                                                         "prot_dom_start",
+                                                         "prot_dom_end")),
+                                  `2.0` = list(
+                                      protein = c("tx_id", "protein_id",
+                                                  "protein_sequence"),
+                                      uniprot = c("protein_id", "uniprot_id",
+                                                  "uniprot_db",
+                                                  "uniprot_mapping_type"),
+                                      protein_domain = c("protein_id",
+                                                         "protein_domain_id",
+                                                         "protein_domain_source",
+                                                         "interpro_accession",
+                                                         "prot_dom_start",
+                                                         "prot_dom_end"))
+                                  )
+    .ENSDB_PROTEIN_TABLES[[version]]
+}
+    
+#' @description Extract the database schema version if available in the metadata
+#'     database column.
+#'
+#' @param x Can be either a connection object or an \code{EnsDb} object.
+#' 
+#' @noRd
+dbSchemaVersion <- function(x) {
+    if (is(x, "EnsDb")) {
+        return(getProperty(x, "DBSCHEMAVERSION"))
+    } else {
+        tabs <- dbListTables(x)
+        if (any(tabs == "metadata")) {
+            res <- dbGetQuery(x, "select * from metadata")
+            if (any(res$name == "DBSCHEMAVERSION") &
+                any(colnames(res) == "value"))
+                return(res[res$name == "DBSCHEMAVERSION", "value"])
+        }
+    }
+    return("1.0")
+}
+
 dbHasRequiredTables <- function(con, returnError = TRUE,
-                                tables = .ENSDB_TABLES) {
+                                tables = .ensdb_tables(dbSchemaVersion(con))) {
     tabs <- dbListTables(con)
     if (length(tabs) == 0) {
         if (returnError)
@@ -521,7 +592,7 @@ dbHasRequiredTables <- function(con, returnError = TRUE,
     return(TRUE)
 }
 dbHasValidTables <- function(con, returnError = TRUE,
-                             tables = .ENSDB_TABLES) {
+                             tables = .ensdb_tables(dbSchemaVersion(con))) {
     for (tab in names(tables)) {
         cols <- tables[[tab]]
         from_db <- colnames(dbGetQuery(con, paste0("select * from ", tab,
@@ -584,6 +655,9 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
                    gene = "seq_name", tx = "tx_id", tx = "gene_id",
                    exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
+    if (as.numeric(dbSchemaVersion(con)) > 1)
+        indexCols <- c(indexCols,
+                       entrezgene = "gene_id", entrezgene = "entrezid")
     if (proteins) {
         indexCols <- c(indexCols,
                        protein = "tx_id",
@@ -618,35 +692,45 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
 ############################################################
 ## listEnsDbs
 ## list databases
-##' @title List EnsDb databases in a MySQL server
-##' @description The \code{listEnsDbs} function lists EnsDb databases in a
-##' MySQL server.
-##'
-##' @details The use of this function requires that the \code{RMySQL} package
-##' is installed and that the user has either access to a MySQL server with
-##' already installed EnsDb databases, or write access to a MySQL server in
-##' which case EnsDb databases could be added with the \code{\link{useMySQL}}
-##' method. EnsDb databases follow the same naming conventions than the EnsDb
-##' packages, with the exception that the name is all lower case and that
-##' \code{"."} is replaced by \code{"_"}.
-##' @param dbcon A \code{DBIConnection} object providing access to a MySQL
-##' database. Either \code{dbcon} or all of the other arguments have to be
-##' specified.
-##' @param host Character specifying the host on which the MySQL server is
-##' running.
-##' @param port The port of the MySQL server (usually \code{3306}).
-##' @param user The username for the MySQL server.
-##' @param pass The password for the MySQL server.
-##' @return A \code{data.frame} listing the database names, organism name
-##' and Ensembl version of the EnsDb databases found on the server.
-##' @author Johannes Rainer
-##' @seealso \code{\link{useMySQL}}
-##' @examples
-##' \dontrun{
-##' library(RMySQL)
-##' dbcon <- dbConnect(MySQL(), host = "localhost", user = my_user, pass = my_pass)
-##' listEnsDbs(dbcon)
-##' }
+#' @title List EnsDb databases in a MySQL server
+#'
+#' @description The \code{listEnsDbs} function lists EnsDb databases in a
+#'     MySQL server.
+#'
+#' @details The use of this function requires that the \code{RMySQL} package
+#'     is installed and that the user has either access to a MySQL server with
+#'     already installed EnsDb databases, or write access to a MySQL server in
+#'     which case EnsDb databases could be added with the \code{\link{useMySQL}}
+#'     method. EnsDb databases follow the same naming conventions than the EnsDb
+#'     packages, with the exception that the name is all lower case and that
+#'     \code{"."} is replaced by \code{"_"}.
+#' 
+#' @param dbcon A \code{DBIConnection} object providing access to a MySQL
+#'     database. Either \code{dbcon} or all of the other arguments have to be
+#'     specified.
+#' 
+#' @param host Character specifying the host on which the MySQL server is
+#'     running.
+#' 
+#' @param port The port of the MySQL server (usually \code{3306}).
+#' 
+#' @param user The username for the MySQL server.
+#' 
+#' @param pass The password for the MySQL server.
+#' 
+#' @return A \code{data.frame} listing the database names, organism name
+#'     and Ensembl version of the EnsDb databases found on the server.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @seealso \code{\link{useMySQL}}
+#' 
+#' @examples
+#' \dontrun{
+#' library(RMySQL)
+#' dbcon <- dbConnect(MySQL(), host = "localhost", user = my_user, pass = my_pass)
+#' listEnsDbs(dbcon)
+#' }
 listEnsDbs <- function(dbcon, host, port, user, pass) {
     if(requireNamespace("RMySQL", quietly = TRUE)) {
         if (missing(dbcon)) {

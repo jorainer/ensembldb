@@ -63,12 +63,14 @@ validateEnsDb <- function(object){
         if (is.character(OK))
             msg <- validMsg(msg, OK)
         if (hasProteinData(object)) {
-            OK <- dbHasRequiredTables(object@ensdb,
-                                      tables = .ENSDB_PROTEIN_TABLES)
+            OK <- dbHasRequiredTables(
+                object@ensdb,
+                tables = .ensdb_protein_tables(dbSchemaVersion(dbconn(object))))
             if (is.character(OK))
                 msg <- validMsg(msg, OK)
-            OK <- dbHasValidTables(object@ensdb,
-                                   tables = .ENSDB_PROTEIN_TABLES)
+            OK <- dbHasValidTables(
+                object@ensdb,
+                tables = .ensdb_protein_tables(dbSchemaVersion(dbconn(object))))
             if (is.character(OK))
                 msg <- validMsg(msg, OK)
             cdsTx <- dbGetQuery(dbconn(object),
@@ -410,17 +412,9 @@ setMethod("tablesForColumns", "EnsDb", function(x, columns, ...){
 setMethod("tablesByDegree", "EnsDb", function(x,
                                               tab=names(listTables(x)),
                                               ...){
-    ## ## to do this with a graph:
-    ## DBgraph <- graphNEL(nodes=c("gene", "tx", "tx2exon", "exon", "chromosome", "information"),
-    ##                  edgeL=list(gene=c("tx", "chromosome"),
-    ##                      tx=c("gene", "tx2exon"),
-    ##                      tx2exon=c("tx", "exon"),
-    ##                      exon="tx2exon",
-    ##                      chromosome="gene"
-    ##                          ))
-    ## Tab <- names(sort(degree(DBgraph), decreasing=TRUE))
     Table.order <- c(gene = 1, tx = 2, tx2exon = 3, exon = 4, chromosome = 5,
                      protein = 6, uniprot = 7, protein_domain = 8,
+                     entrezgene = 9,
                      metadata = 99)
     Tab <- tab[ order(Table.order[ tab ]) ]
     return(Tab)
@@ -431,19 +425,26 @@ setMethod("tablesByDegree", "EnsDb", function(x,
 ##
 ## Simply check if the database has required tables protein, uniprot
 ## and protein_domain.
-##' @title Determine whether protein data is available in the database
-##' @aliases hasProteinData
-##' @description Determines whether the \code{\linkS4class{EnsDb}}
-##' provides protein annotation data.
-##' @param x The \code{\linkS4class{EnsDb}} object.
-##' @return A logical of length one, \code{TRUE} if protein annotations are
-##' available and \code{FALSE} otherwise.
-##' @author Johannes Rainer
-##' @seealso \code{\link{listTables}}
-##' @examples
-##' library(EnsDb.Hsapiens.v75)
-##' ## Does this database/package have protein annotations?
-##' hasProteinData(EnsDb.Hsapiens.v75)
+#' @title Determine whether protein data is available in the database
+#' 
+#' @aliases hasProteinData
+#' 
+#' @description Determines whether the \code{\linkS4class{EnsDb}}
+#'     provides protein annotation data.
+#' 
+#' @param x The \code{\linkS4class{EnsDb}} object.
+#' 
+#' @return A logical of length one, \code{TRUE} if protein annotations are
+#'     available and \code{FALSE} otherwise.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @seealso \code{\link{listTables}}
+#' 
+#' @examples
+#' library(EnsDb.Hsapiens.v75)
+#' ## Does this database/package have protein annotations?
+#' hasProteinData(EnsDb.Hsapiens.v75)
 setMethod("hasProteinData", "EnsDb", function(x) {
     tabs <- listTables(x)
     return(all(c("protein", "uniprot", "protein_domain") %in%
@@ -455,7 +456,8 @@ setMethod("hasProteinData", "EnsDb", function(x) {
 ##
 ## get genes from the database.
 setMethod("genes", "EnsDb", function(x,
-                                     columns = listColumns(x, "gene"),
+                                     columns = c(listColumns(x, "gene"),
+                                                 "entrezid"),
                                      filter = AnnotationFilterList(),
                                      order.by = "",
                                      order.type = "asc",
@@ -486,7 +488,10 @@ setMethod("genes", "EnsDb", function(x,
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type,
                    startWith = "gene", join = "suggested")
-    if(return.type=="data.frame" | return.type=="DataFrame"){
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "gene_id")
+    if (return.type=="data.frame" | return.type=="DataFrame") {
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
             warning("Columns ",
@@ -498,7 +503,7 @@ setMethod("genes", "EnsDb", function(x,
             Res <- DataFrame(Res)
         return(Res)
     }
-    if(return.type=="GRanges"){
+    if (return.type=="GRanges") {
         metacols <- columns[ !(columns %in% c("seq_name",
                                               "seq_strand",
                                               "gene_seq_start",
@@ -554,6 +559,9 @@ setMethod("transcripts", "EnsDb", function(x, columns = listColumns(x, "tx"),
     Res <- getWhat(x, columns=columns, filter = filter,
                    order.by=order.by, order.type=order.type,
                    startWith = "tx", join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "tx_id")
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
@@ -644,6 +652,9 @@ setMethod("exons", "EnsDb", function(x, columns = listColumns(x, "exon"),
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, order.type=order.type,
                    startWith = "exon", join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "exon_id")
     if(return.type=="data.frame" | return.type=="DataFrame"){
         notThere <- !(retColumns %in% colnames(Res))
         if(any(notThere))
@@ -756,6 +767,9 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
     Res <- getWhat(x, columns = columns, filter = filter,
                    order.by = order.by, skip.order.check = TRUE,
                    startWith = by, join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "exon_id")
     ## Now, order in R, if not already done in SQL.
     if (orderR) {
         if (by == "gene") {
@@ -841,6 +855,9 @@ setMethod("transcriptsBy", "EnsDb", function(x, by = c("gene", "exon"),
     Res <- getWhat(x, columns=columns, filter=filter,
                    order.by=order.by, skip.order.check=TRUE,
                    startWith = by, join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "tx_id")
     if (orderR) {
         startEnd <- (Res$seq_strand == 1) * Res$tx_seq_start +
             (Res$seq_strand == -1) * (Res$tx_seq_end * -1)
@@ -1039,6 +1056,9 @@ setMethod("cdsBy", "EnsDb", function(x, by = c("tx", "gene"),
                    order.by = order.by,
                    skip.order.check = TRUE,
                    startWith = by, join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "exon_id")
     ## Remove rows with NA in tx_cds_seq_start; that's the case for "old"
     ## databases.
     nas <- is.na(Res$tx_cds_seq_start)
@@ -1130,6 +1150,9 @@ getUTRsByTranscript <- function(x, what, columns = NULL,
                    order.by=order.by,
                    skip.order.check=TRUE,
                    startWith = "tx", join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(x)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "exon_id")
     nas <- is.na(Res$tx_cds_seq_start)
     if (any(nas))
         Res <- Res[!nas, ]
@@ -1678,40 +1701,48 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 ## useMySQL
 ##
 ## Switch from RSQlite backend to a MySQL backend.
-##' @title Use a MySQL backend
-##' @aliases useMySQL
-##'
-##' @description Change the SQL backend from \emph{SQLite} to \emph{MySQL}.
-##' When first called on an \code{\linkS4class{EnsDb}} object, the function
-##' tries to create and save all of the data into a MySQL database. All
-##' subsequent calls will connect to the already existing MySQL database.
-##'
-##' @details This functionality requires that the \code{RMySQL} package is
-##' installed and that the user has (write) access to a running MySQL server.
-##' If the corresponding database does already exist users without write access
-##' can use this functionality.
-##'
-##' @note At present the function does not evaluate whether the versions
-##' between the SQLite and MySQL database differ.
-##'
-##' @param x The \code{\linkS4class{EnsDb}} object.
-##' @param host Character vector specifying the host on which the MySQL
-##' server runs.
-##' @param port The port on which the MySQL server can be accessed.
-##' @param user The user name for the MySQL server.
-##' @param pass The password for the MySQL server.
-##' @return A \code{\linkS4class{EnsDb}} object providing access to the
-##' data stored in the MySQL backend.
-##' @author Johannes Rainer
-##' @examples
-##' ## Load the EnsDb database (SQLite backend).
-##' library(EnsDb.Hsapiens.v75)
-##' edb <- EnsDb.Hsapiens.v75
-##' ## Now change the backend to MySQL; my_user and my_pass should
-##' ## be the user name and password to access the MySQL server.
-##' \dontrun{
-##' edb_mysql <- useMySQL(edb, host = "localhost", user = my_user, pass = my_pass)
-##' }
+#' @title Use a MySQL backend
+#' 
+#' @aliases useMySQL
+#'
+#' @description Change the SQL backend from \emph{SQLite} to \emph{MySQL}.
+#'     When first called on an \code{\linkS4class{EnsDb}} object, the function
+#'     tries to create and save all of the data into a MySQL database. All
+#'     subsequent calls will connect to the already existing MySQL database.
+#'
+#' @details This functionality requires that the \code{RMySQL} package is
+#'     installed and that the user has (write) access to a running MySQL server.
+#'     If the corresponding database does already exist users without write
+#'     access can use this functionality.
+#'
+#' @note At present the function does not evaluate whether the versions
+#'     between the SQLite and MySQL database differ.
+#'
+#' @param x The \code{\linkS4class{EnsDb}} object.
+#' 
+#' @param host Character vector specifying the host on which the MySQL
+#'     server runs.
+#' 
+#' @param port The port on which the MySQL server can be accessed.
+#'
+#' @param user The user name for the MySQL server.
+#'
+#' @param pass The password for the MySQL server.
+#'
+#' @return A \code{\linkS4class{EnsDb}} object providing access to the
+#'      data stored in the MySQL backend.
+#'
+#' @author Johannes Rainer
+#'
+#' @examples
+#' ## Load the EnsDb database (SQLite backend).
+#' library(EnsDb.Hsapiens.v75)
+#' edb <- EnsDb.Hsapiens.v75
+#' ## Now change the backend to MySQL; my_user and my_pass should
+#' ## be the user name and password to access the MySQL server.
+#' \dontrun{
+#' edb_mysql <- useMySQL(edb, host = "localhost", user = my_user, pass = my_pass)
+#' }
 setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
                                         port = 3306, user, pass) {
     if (missing(user))
@@ -1778,63 +1809,66 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ##
 ## If return type is GRanges, make a seqlevel and seqinfo for each protein, i.e.
 ## put each protein on its own sequence.
-##' @title Protein related functionality
-##' @aliases proteins
-##'
-##' @description This help page provides information about most of the
-##' functionality related to protein annotations in \code{ensembldb}.
-##'
-##' The \code{proteins} method retrieves protein related annotations from
-##' an \code{\linkS4class{EnsDb}} database.
-##'
-##' @details The \code{proteins} method performs the query starting from the
-##' \code{protein} tables and can hence return all annotations from the database
-##' that are related to proteins and transcripts encoding these proteins from
-##' the database. Since \code{proteins} does thus only query annotations for
-##' protein coding transcripts, the \code{\link{genes}} or
-##' \code{\link{transcripts}} methods have to be used to retrieve annotations
-##' for non-coding transcripts.
-##' 
-##' @param object The \code{\linkS4class{EnsDb}} object.
-##'
-##' @param columns For \code{proteins}: character vector defining the columns to
-##' be extracted from the database. Can be any column(s) listed by the
-##' \code{\link{listColumns}} method.
-##'
-##' @param filter For \code{proteins}: A filter object extending
-##' \code{AnnotationFilter} or a list of such objects to select
-##' specific entries from the database. See \code{\link{Filter-classes}} for a
-##' documentation of available filters and use \code{\link{supportedFilters}} to
-##' get the full list of supported filters.
-##'
-##' @param order.by For \code{proteins}: a character vector specifying the
-##' column(s) by which the result should be ordered.
-##'
-##' @param order.type For \code{proteins}: if the results should be ordered
-##' ascending (\code{order.type = "asc"}) or descending
-##' (\code{order.type = "desc"})
-##'
-##' @param return.type For \code{proteins}: character of lenght one specifying
-##' the type of the returned object. Can be either \code{"DataFrame"},
-##' \code{"data.frame"} or \code{"AAStringSet"}.
-##'
-##' @return The \code{proteins} method returns protein related annotations from
-##' an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
-##' allowing to define the type of the returned object. Note that if
-##' \code{return.type = "AAStringSet"} additional annotation columns are stored
-##' in a \code{DataFrame} that can be accessed with the \code{mcols} method on
-##' the returned object.
-##'
-##' @rdname ProteinFunctionality
-##' @author Johannes Rainer
-##' @examples
-##' library(ensembldb)
-##' library(EnsDb.Hsapiens.v75)
-##' edb <- EnsDb.Hsapiens.v75
-##' ## Get all proteins from tha database for the gene ZBTB16, if protein
-##' ## annotations are available
-##' if (hasProteinData(edb))
-##'     proteins(edb, filter = GenenameFilter("ZBTB16"))
+#' @title Protein related functionality
+#' 
+#' @aliases proteins
+#'
+#' @description This help page provides information about most of the
+#'     functionality related to protein annotations in \code{ensembldb}.
+#'
+#'     The \code{proteins} method retrieves protein related annotations from
+#'     an \code{\linkS4class{EnsDb}} database.
+#'
+#' @details The \code{proteins} method performs the query starting from the
+#'     \code{protein} tables and can hence return all annotations from the
+#'     database that are related to proteins and transcripts encoding these
+#'     proteins from the database. Since \code{proteins} does thus only query
+#'     annotations for protein coding transcripts, the \code{\link{genes}} or
+#'     \code{\link{transcripts}} methods have to be used to retrieve annotations
+#'     for non-coding transcripts.
+#' 
+#' @param object The \code{\linkS4class{EnsDb}} object.
+#'
+#' @param columns For \code{proteins}: character vector defining the columns to
+#'     be extracted from the database. Can be any column(s) listed by the
+#'     \code{\link{listColumns}} method.
+#'
+#' @param filter For \code{proteins}: A filter object extending
+#'     \code{AnnotationFilter} or a list of such objects to select
+#'     specific entries from the database. See \code{\link{Filter-classes}} for
+#'     a documentation of available filters and use
+#'     \code{\link{supportedFilters}} to get the full list of supported filters.
+#'
+#' @param order.by For \code{proteins}: a character vector specifying the
+#'     column(s) by which the result should be ordered.
+#'
+#' @param order.type For \code{proteins}: if the results should be ordered
+#'     ascending (\code{order.type = "asc"}) or descending
+#'     (\code{order.type = "desc"})
+#'
+#' @param return.type For \code{proteins}: character of lenght one specifying
+#'     the type of the returned object. Can be either \code{"DataFrame"},
+#'     \code{"data.frame"} or \code{"AAStringSet"}.
+#'
+#' @return The \code{proteins} method returns protein related annotations from
+#'     an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
+#'     allowing to define the type of the returned object. Note that if
+#'     \code{return.type = "AAStringSet"} additional annotation columns are
+#'     stored in a \code{DataFrame} that can be accessed with the \code{mcols}
+#'     method on the returned object.
+#'
+#' @rdname ProteinFunctionality
+#' 
+#' @author Johannes Rainer
+#'
+#' @examples
+#' library(ensembldb)
+#' library(EnsDb.Hsapiens.v75)
+#' edb <- EnsDb.Hsapiens.v75
+#' ## Get all proteins from tha database for the gene ZBTB16, if protein
+#' ## annotations are available
+#' if (hasProteinData(edb))
+#'     proteins(edb, filter = GenenameFilter("ZBTB16"))
 setMethod("proteins", "EnsDb", function(object,
                                         columns = listColumns(object, "protein"),
                                         filter = AnnotationFilterList(),
@@ -1885,6 +1919,9 @@ setMethod("proteins", "EnsDb", function(object,
     Res <- getWhat(object, columns = columns, filter = filter,
                    order.by = order.by, order.type = order.type,
                    startWith = "protein", join = "suggested")
+    ## issue #48: collapse entrezid column if dbschema 2.0 is used.
+    if (as.numeric(dbSchemaVersion(object)) > 1 & any(columns == "entrezid"))
+        Res <- .collapseEntrezidInTable(Res, by = "protein_id")
     ## Now process the result.
     cols_not_found <- !(retColumns %in% colnames(Res))
     retColumns <- retColumns[!cols_not_found]
@@ -1911,17 +1948,19 @@ setMethod("proteins", "EnsDb", function(object,
 
 ############################################################
 ## listUniprotDbs
-##' @aliases listUniprotDbs
-##' @description The \code{listUniprotDbs} method lists all Uniprot database
-##' names in the \code{EnsDb}.
-##' @examples
-##'
-##' ## List the names of all Uniprot databases from which Uniprot IDs are
-##' ## available in the EnsDb
-##' if (hasProteinData(edb))
-##'     listUniprotDbs(edb)
-##'
-##' @rdname ProteinFunctionality
+#' @aliases listUniprotDbs
+#' 
+#' @description The \code{listUniprotDbs} method lists all Uniprot database
+#'     names in the \code{EnsDb}.
+#' 
+#' @examples
+#'
+#' ## List the names of all Uniprot databases from which Uniprot IDs are
+#' ## available in the EnsDb
+#' if (hasProteinData(edb))
+#'     listUniprotDbs(edb)
+#'
+#' @rdname ProteinFunctionality
 setMethod("listUniprotDbs", "EnsDb", function(object) {
     if (!hasProteinData(object))
         stop("The provided EnsDb database does not provide protein annotations!")
@@ -1931,18 +1970,19 @@ setMethod("listUniprotDbs", "EnsDb", function(object) {
 
 ############################################################
 ## listUniprotMappingTypes
-##' @aliases listUniprotMappingTypes
-##' @description The \code{listUniprotMappingTypes} method lists all methods
-##' that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
-##'
-##' @examples
-##'
-##' ## List the type of all methods that were used to map Uniprot IDs to Ensembl
-##' ## protein IDs
-##' if (hasProteinData(edb))
-##'     listUniprotMappingTypes(edb)
-##'
-##' @rdname ProteinFunctionality
+#' @aliases listUniprotMappingTypes
+#' 
+#' @description The \code{listUniprotMappingTypes} method lists all methods
+#'     that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
+#'
+#' @examples
+#'
+#' ## List the type of all methods that were used to map Uniprot IDs to Ensembl
+#' ## protein IDs
+#' if (hasProteinData(edb))
+#'     listUniprotMappingTypes(edb)
+#'
+#' @rdname ProteinFunctionality
 setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
     if (!hasProteinData(object))
         stop("The provided EnsDb database does not provide protein annotations!")
