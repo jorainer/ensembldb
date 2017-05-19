@@ -25,7 +25,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#orgbbd4ad6) for the database layout and an overview of
+(see Section [11](#org35014ed) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -967,10 +967,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="orgbbd4ad6"></a>
+# Database layout<a id="org35014ed"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [159](#org4ac386c)). Note that the protein-specific annotations
+shown in Figure [159](#org6a42233)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
