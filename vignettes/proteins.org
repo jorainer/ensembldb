@@ -20,6 +20,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
 ---
+
 #+END_EXPORT
 
 From Bioconductor release 3.5 on, =EnsDb= databases/packages created by the
@@ -57,7 +58,8 @@ databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
 #+NAME: doeval
 #+BEGIN_SRC R :ravel echo = FALSE, results = "hide"
   ## Globally switch off execution of code chunks
-  evalMe <- TRUE
+  evalMe <- FALSE
+  haveProt <- FALSE
 
 #+END_SRC
 
