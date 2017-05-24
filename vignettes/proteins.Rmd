@@ -48,7 +48,8 @@ databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
 
 ```{r doeval, echo = FALSE, results = "hide"}
 ## Globally switch off execution of code chunks
-evalMe <- TRUE
+evalMe <- FALSE
+haveProt <- FALSE
 ```
 
 ```{r loadlib, message = FALSE, eval = evalMe}

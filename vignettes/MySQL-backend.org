@@ -19,6 +19,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
 ---
+
 #+END_EXPORT
 
 ** Introduction
@@ -52,6 +53,7 @@ that the user has write access to the server:
 
   ## Use this EnsDb object
   genes(edb_mysql)
+
 #+END_SRC
 
 To use an =EnsDb= in a MySQL server without the need to install the corresponding
@@ -75,5 +77,6 @@ MySQL database.
                      pass = "readonly", dbname = "ensdb_hsapiens_v75")
   edb <- EnsDb(dbcon)
   edb
+
 #+END_SRC
 
