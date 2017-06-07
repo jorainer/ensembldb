@@ -100,7 +100,7 @@ my $api_version="".software_version()."";
 if($ensembl_version ne $api_version){
     die "The submitted Ensembl version (".$ensembl_version.") does not match the version of the Ensembl API (".$api_version."). Please configure the environment variable ENS to point to the correct API.";
 }
-my $ensembl_version_num = sofware_version();
+my $ensembl_version_num = $ensembl_version + 0;
 
 print "Connecting to ".$host." at port ".$port."\n";
 
