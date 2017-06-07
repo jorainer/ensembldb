@@ -15,17 +15,18 @@ A \code{\linkS4class{EnsDb}} object.
 }
 \description{
 The \code{EnsDb} constructor function connects to the database
-specified with argument \code{x} and returns a corresponding
-\code{\linkS4class{EnsDb}} object.
+    specified with argument \code{x} and returns a corresponding
+    \code{\linkS4class{EnsDb}} object.
 }
 \details{
 By providing the connection to a MySQL database, it is possible
-to use MySQL as the database backend and queries will be performed on that
-database. Note however that this requires the package \code{RMySQL} to be
-installed. In addition, the user needs to have access to a MySQL server
-providing already an EnsDb database, or must have write privileges on a
-MySQL server, in which case the \code{\link{useMySQL}} method can be used
-to insert the annotations from an EnsDB package into a MySQL database.
+    to use MySQL as the database backend and queries will be performed on
+    that database. Note however that this requires the package \code{RMySQL}
+    to be installed. In addition, the user needs to have access to a MySQL
+    server providing already an EnsDb database, or must have write
+    privileges on a MySQL server, in which case the \code{\link{useMySQL}}
+    method can be used to insert the annotations from an EnsDB package into
+    a MySQL database.
 }
 \examples{
 ## "Standard" way to create an EnsDb object:

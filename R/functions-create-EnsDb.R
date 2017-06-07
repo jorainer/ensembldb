@@ -71,20 +71,22 @@ fetchTablesFromEnsembl <- function(version, ensemblapi, user="anonymous",
 makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     ## check if we have all files...
     in_files <- c("ens_gene.txt", "ens_tx.txt", "ens_exon.txt",
-                  "ens_tx2exon.txt", "ens_chromosome.txt", "ens_metadata.txt",
-                  "ens_counts.txt")
+                  "ens_tx2exon.txt", "ens_chromosome.txt", "ens_metadata.txt")
     ## check if we have all files...
     all_files <- dir(path, pattern="txt")
     if(sum(in_files %in% all_files)!=length(in_files))
         stop("Something went wrong! I'm missing some of the txt files the",
              " perl script should have generated.")
 
+    haveCounts <- file.exists(paste0(path,
+                                     .Platform$file.sep, "ens_counts.txt"))
     ## read the counts - use these numbers to validate that we did read
     ## everything
-    counts <- read.table(paste0(path, .Platform$file.sep, "ens_counts.txt"),
-                         sep = "\t", as.is = TRUE, header = TRUE)
+    if (haveCounts)
+        counts <- read.table(paste0(path, .Platform$file.sep, "ens_counts.txt"),
+                             sep = "\t", as.is = TRUE, header = TRUE)
     ## read information
-    info <- read.table(paste0(path, .Platform$file.sep ,"ens_metadata.txt"),
+    info <- read.table(paste0(path, .Platform$file.sep, "ens_metadata.txt"),
                        sep="\t", as.is=TRUE, header=TRUE)
     species <- .organismName(info[ info$name=="Organism", "value" ])
     ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
@@ -114,18 +116,21 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
                       quote="", comment.char="" )
     OK <- .checkIntegerCols(tmp)
     ## Check that we have the expected number of rows:
-    if (nrow(tmp) != counts[1, "gene"])
-        stop("The data read from the 'ens_gene.txt' file does not match the",
-             " expected number of entries.")
+    if (haveCounts)
+        if (nrow(tmp) != counts[1, "gene"])
+            stop("The data read from the 'ens_gene.txt' file does not match ",
+                 "the expected number of entries.")
     dbWriteTable(con, name="gene", tmp, row.names=FALSE)
     ## Check that we can read the correct number of entries
-    res <- dbGetQuery(con, "select count(*) from gene;")[1, 1]
-    if (res != counts[1, "gene"])
-        stop("The number of rows in the 'gene' database table does not match",
-             " the expected number.")
+    if (haveCounts) {
+        res <- dbGetQuery(con, "select count(*) from gene;")[1, 1]
+        if (res != counts[1, "gene"])
+            stop("The number of rows in the 'gene' database table does not ",
+                 "match the expected number.")
+    }
     rm(tmp)
     message("OK")
-
+    
     if (as.numeric(info[info$name == "DBSCHEMAVERSION", "value"]) > 1) {
         message("Processing 'entrezgene' table ... ", appendLF = FALSE)
         ## process genes: some gene names might have fancy names...
@@ -142,9 +147,10 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"),
                       sep="\t", as.is=TRUE, header=TRUE)
     ## Check that we have the expected number of rows:
-    if (nrow(tmp) != counts[1, "tx"])
-        stop("The data read from the 'ens_tx.txt' file does not match the",
-             " expected number of entries.")
+    if (haveCounts)
+        if (nrow(tmp) != counts[1, "tx"])
+            stop("The data read from the 'ens_tx.txt' file does not match the",
+                 " expected number of entries.")
     ## Fix the tx_cds_seq_start and tx_cds_seq_end columns: these should be integer!
     suppressWarnings(
         tmp[, "tx_cds_seq_start"] <- as.integer(tmp[, "tx_cds_seq_start"])
@@ -165,8 +171,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
                 z <- NA
             as.integer(z)
         })
+        tmp$tx_support_level <- unlist(tsl, use.names = FALSE)
     }
-    tmp$tx_support_level <- unlist(tsl, use.names = FALSE)
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
     message("OK")
@@ -175,9 +181,10 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     message("Processing 'exon' table ... ", appendLF = FALSE)
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_exon.txt"),
                       sep = "\t", as.is = TRUE, header = TRUE)
-    if (nrow(tmp) != counts[1, "exon"])
-        stop("The data read from the 'ens_exon.txt' file does not match the",
-             " expected number of entries.")
+    if (haveCounts)
+        if (nrow(tmp) != counts[1, "exon"])
+            stop("The data read from the 'ens_exon.txt' file does not match ",
+                 "the expected number of entries.")
     OK <- .checkIntegerCols(tmp)
     dbWriteTable(con, name="exon", tmp, row.names=FALSE)
     rm(tmp)
@@ -195,9 +202,10 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     if (file.exists(prot_file)) {
         message("Processing 'protein' table ... ", appendLF = FALSE)
         tmp <- read.table(prot_file, sep = "\t", as.is = TRUE, header = TRUE)
-        if (nrow(tmp) != counts[1, "protein"])
-            stop("The data read from the 'ens_protein.txt' file does not match",
-                 " the expected number of entries.")
+        if (haveCounts)
+            if (nrow(tmp) != counts[1, "protein"])
+                stop("The data read from the 'ens_protein.txt' file does not ",
+                     "match the expected number of entries.")
         OK <- .checkIntegerCols(tmp)
         dbWriteTable(con, name = "protein", tmp, row.names = FALSE)
         message("OK")
