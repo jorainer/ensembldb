@@ -25,7 +25,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org35014ed) for the database layout and an overview of
+(see Section [11](#orgd08c9a9) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -140,6 +140,11 @@ filters are also available:
 
 These can however only be used on `EnsDb` databases that provide protein
 annotations, i.e. for which a call to `hasProteinData` returns `TRUE`.
+
+`EnsDb` databases for more recent Ensembl versions (starting from Ensembl 87)
+provide also evidence levels for individual transcripts in the `tx_support_level`
+database column. Such databases support also a `TxSupportLevelFilter` filter to
+use this columns for filtering.
 
 A simple use case for the filter framework would be to get all transcripts for
 the gene *BCL2L11*. To this end we specify a `GenenameFilter` with the value
@@ -967,10 +972,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org35014ed"></a>
+# Database layout<a id="orgd08c9a9"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [159](#org6a42233)). Note that the protein-specific annotations
+shown in Figure [162](#org9f25eef)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
@@ -984,6 +989,7 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
     -   `seq_name`: the name of the sequence (usually the chromosome name).
     -   `seq_strand`: the strand on which the gene is encoded.
     -   `seq_coord_system`: the coordinate system of the sequence.
+    -   `description`: the description of the gene.
 
 -   **entrezgene**: mapping of Ensembl genes to NCBI Entrezgene identifiers. Note that
     this mapping can be a one-to-many mapping.
@@ -994,6 +1000,7 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
     is available in this database column, all methods to retrieve data from the
     database support also this column. The returned values are however the ID of
     the transcripts.
+    
     -   `tx_id`: the Ensembl transcript ID.
     -   `tx_biotype`: the biotype of the transcript.
     -   `tx_seq_start`: the start coordinate of the transcript.
@@ -1002,6 +1009,10 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
         transcript (NULL for non-coding transcripts).
     -   `tx_cds_seq_end`: the end coordinate of the coding region of the transcript.
     -   `gene_id`: the gene to which the transcript belongs.
+    
+    `EnsDb` databases for more recent Ensembl releases have also a column
+    `tx_support_level` providing the evidence level for a transcript (1 high
+    evidence, 5 low evidence, NA no evidence calculated).
 
 -   **exon**: all exon related annotation.
     -   `exon_id`: the Ensembl exon ID.

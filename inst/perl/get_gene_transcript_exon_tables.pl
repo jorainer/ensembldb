@@ -29,6 +29,7 @@ use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
 my $script_version = "0.3.1";
+my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -99,6 +100,7 @@ my $api_version="".software_version()."";
 if($ensembl_version ne $api_version){
     die "The submitted Ensembl version (".$ensembl_version.") does not match the version of the Ensembl API (".$api_version."). Please configure the environment variable ENS to point to the correct API.";
 }
+my $ensembl_version_num = sofware_version();
 
 print "Connecting to ".$host." at port ".$port."\n";
 
@@ -265,9 +267,12 @@ foreach my $gene_id (@gene_ids){
       my $tx_biotype = $transcript->biotype;
       my $tx_seq_start = $transcript->start;
       my $tx_seq_end = $transcript->end;
-      my $tx_tsl = $transcript->tsl;
-      if (!defined($tx_tsl)) {
-	$tx_tsl = "NULL";
+      my $tx_tsl = "NULL";
+      if ($ensembl_version_num >= $min_tsl_version) {
+	$tx_tsl = $transcript->tsl;
+	if (!defined($tx_tsl)) {
+	  $tx_tsl = "NULL";
+	}
       }
       my $tx_description = $transcript->description;
       # if (!defined($tx_description)) {

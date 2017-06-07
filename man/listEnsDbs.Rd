@@ -22,20 +22,20 @@ running.}
 }
 \value{
 A \code{data.frame} listing the database names, organism name
-and Ensembl version of the EnsDb databases found on the server.
+    and Ensembl version of the EnsDb databases found on the server.
 }
 \description{
 The \code{listEnsDbs} function lists EnsDb databases in a
-MySQL server.
+    MySQL server.
 }
 \details{
 The use of this function requires that the \code{RMySQL} package
-is installed and that the user has either access to a MySQL server with
-already installed EnsDb databases, or write access to a MySQL server in
-which case EnsDb databases could be added with the \code{\link{useMySQL}}
-method. EnsDb databases follow the same naming conventions than the EnsDb
-packages, with the exception that the name is all lower case and that
-\code{"."} is replaced by \code{"_"}.
+    is installed and that the user has either access to a MySQL server with
+    already installed EnsDb databases, or write access to a MySQL server in
+    which case EnsDb databases could be added with the \code{\link{useMySQL}}
+    method. EnsDb databases follow the same naming conventions than the EnsDb
+    packages, with the exception that the name is all lower case and that
+    \code{"."} is replaced by \code{"_"}.
 }
 \examples{
 \dontrun{
