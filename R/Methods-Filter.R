@@ -290,3 +290,25 @@ setMethod("ensDbQuery", "UniprotMappingTypeFilter",
                        " be used.")
               .queryForEnsDbWithTables(object, db, with.tables)
           })
+
+setMethod("ensDbColumn", "TxSupportLevelFilter",
+          function(object, db, with.tables = character(), ...) {
+              if (missing(db))
+                  return(callNextMethod())
+              if (!any(listColumns(db) %in% "tx_support_level"))
+                  stop("The 'EnsDb' database used does not provide",
+                       " transcript support levels! A 'TxSupportLevelFilter' ",
+                       "can not be used.")
+              callNextMethod()
+          })
+
+setMethod("ensDbQuery", "TxSupportLevelFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  return(callNextMethod())
+              if (!any(listColumns(db) %in% "tx_support_level"))
+                  stop("The 'EnsDb' database used does not provide",
+                       " transcript support levels! A 'TxSupportLevelFilter' ",
+                       "can not be used.")
+              .queryForEnsDbWithTables(object, db, with.tables)
+          })

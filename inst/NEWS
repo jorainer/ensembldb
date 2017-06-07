@@ -1,3 +1,12 @@
+CHANGES IN VERSION 2.1.8
+------------------------
+
+NEW FEATURES
+    o New annotations available in EnsDb objects: gene.description and
+      tx.tx_support_level.
+    o New TxSupportLevelFilter object.
+
+
 CHANGES IN VERSION 1.99.13
 --------------------------
 
