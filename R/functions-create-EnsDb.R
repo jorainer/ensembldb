@@ -154,7 +154,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     )
     OK <- .checkIntegerCols(tmp)
     ## Fix the tx_support_level column to ensure it contains only INTEGER!
-    if (any(columns(tmp) == "tx_support_level")) {
+    if (any(colnames(tmp) == "tx_support_level")) {
         tsl <- strsplit(tmp$tx_support_level, split = " ", fixed = TRUE)
         tsl <- lapply(tsl, function(z) {
             if (length(z) > 1)

@@ -152,7 +152,8 @@ exportClasses(
               "ProtDomIdFilter",
               "UniprotDbFilter",
               "UniprotMappingTypeFilter",
-              "OnlyCodingTxFilter"
+              "OnlyCodingTxFilter",
+              "TxSupportLevelFilter"
               )
 ## Methods for EnsFilter
 exportMethods(
@@ -227,7 +228,8 @@ export(
     "UniprotDbFilter",
     "UniprotMappingTypeFilter",
     "OnlyCodingTxFilter",
-    "ProtDomIdFilter"
+    "ProtDomIdFilter",
+    "TxSupportLevelFilter"
 )
 
 
