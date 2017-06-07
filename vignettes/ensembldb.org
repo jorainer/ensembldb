@@ -183,6 +183,11 @@ filters are also available:
 These can however only be used on =EnsDb= databases that provide protein
 annotations, i.e. for which a call to =hasProteinData= returns =TRUE=.
 
+=EnsDb= databases for more recent Ensembl versions (starting from Ensembl 87)
+provide also evidence levels for individual transcripts in the =tx_support_level=
+database column. Such databases support also a =TxSupportLevelFilter= filter to
+use this columns for filtering.
+
 A simple use case for the filter framework would be to get all transcripts for
 the gene /BCL2L11/. To this end we specify a =GenenameFilter= with the value
 /BCL2L11/. As a result we get a =GRanges= object with =start=, =end=, =strand= and =seqname=
@@ -1093,6 +1098,7 @@ might not be available in all =EnsDB= databases (e.g. such ones created with
   - =seq_name=: the name of the sequence (usually the chromosome name).
   - =seq_strand=: the strand on which the gene is encoded.
   - =seq_coord_system=: the coordinate system of the sequence.
+  - =description=: the description of the gene.
 
 + *entrezgene*: mapping of Ensembl genes to NCBI Entrezgene identifiers. Note that
   this mapping can be a one-to-many mapping.
@@ -1111,6 +1117,9 @@ might not be available in all =EnsDB= databases (e.g. such ones created with
     transcript (NULL for non-coding transcripts).
   - =tx_cds_seq_end=: the end coordinate of the coding region of the transcript.
   - =gene_id=: the gene to which the transcript belongs.
+  =EnsDb= databases for more recent Ensembl releases have also a column
+  =tx_support_level= providing the evidence level for a transcript (1 high
+  evidence, 5 low evidence, NA no evidence calculated).
 
 + *exon*: all exon related annotation.
   - =exon_id=: the Ensembl exon ID.

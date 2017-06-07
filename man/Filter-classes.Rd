@@ -11,6 +11,8 @@
 \alias{UniprotDbFilter}
 \alias{UniprotMappingTypeFilter-class}
 \alias{UniprotMappingTypeFilter}
+\alias{TxSupportLevelFilter-class}
+\alias{TxSupportLevelFilter}
 \alias{supportedFilters,EnsDb-method}
 \alias{seqnames,GRangesFilter-method}
 \alias{seqlevels,GRangesFilter-method}
@@ -23,6 +25,8 @@ ProtDomIdFilter(value, condition = "==")
 UniprotDbFilter(value, condition = "==")
 
 UniprotMappingTypeFilter(value, condition = "==")
+
+TxSupportLevelFilter(value, condition = "==")
 
 \S4method{supportedFilters}{EnsDb}(object, ...)
 
@@ -56,6 +60,9 @@ For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
 
 For \code{UniprotMappingTypeFilter}: A
 \code{UniprotMappingTypeFilter} object.
+
+For \code{TxSupportLevel}: A
+\code{TxSupportLevel} object.
 
 For \code{supportedFilters}: the names of the supported filter
     classes.
@@ -204,6 +211,14 @@ For \code{supportedFilters}: the names of the supported filter
 
 In addition, the following filters are defined by \code{ensembldb}:
 \describe{
+
+\item{TxSupportLevel}{
+    allows to filter results using the provided transcript support level.
+    Support levels for transcripts are defined by Ensembl based on the
+    available evidences for a transcript with 1 being the highest evidence
+    grade and 5 the lowest level. This filter is only supported on
+    \code{EnsDb} databases with a db schema version higher 2.1.
+}
 
 \item{UniprotDbFilter}{
     allows to filter results based on the specified Uniprot database name(s).
