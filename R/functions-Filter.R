@@ -13,12 +13,14 @@
     seq_strand = "seq_strand",
     gene_start = "gene_seq_start",
     gene_end = "gene_seq_end",
+    description = "description",
     ## tx
     tx_id = "tx_id",
     tx_biotype = "tx_biotype",
     tx_name = "tx_id",
     tx_start = "tx_seq_start",
     tx_end = "tx_seq_end",
+    tx_support_level = "tx_support_level",
     ## exon
     exon_id = "exon_id",
     exon_rank = "exon_idx",
@@ -43,6 +45,8 @@
     if (hasProteinData(x))
         flts <- c(flts, "ProteinIdFilter", "UniprotFilter", "UniprotDbFilter",
                   "UniprotMappingTypeFilter", "ProtDomIdFilter")
+    if (any(listColumns(x) == "tx_support_level"))
+        flts <- c(flts, "TxSupportLevelFilter")
     return(sort(flts))
 }
 

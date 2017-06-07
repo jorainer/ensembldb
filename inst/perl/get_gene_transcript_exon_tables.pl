@@ -28,7 +28,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.0";
+my $script_version = "0.3.1";
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
