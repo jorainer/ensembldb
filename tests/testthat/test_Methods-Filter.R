@@ -494,6 +494,7 @@ test_that("UniprotMappingTypeFilter works", {
     expect_equal(value(pf), "ABC")
     expect_equal(field(pf), "uniprot_mapping_type")
     expect_equal(ensembldb:::ensDbQuery(pf), "uniprot_mapping_type = 'ABC'")
+    expect_equal(unname(ensembldb:::ensDbColumn(pf)), "uniprot_mapping_type")
     if (hasProteinData(edb)) {
         expect_equal(ensembldb:::ensDbColumn(pf, edb),
                      "uniprot.uniprot_mapping_type")
@@ -512,4 +513,28 @@ test_that("UniprotMappingTypeFilter works", {
     pf <- UniprotMappingTypeFilter(c("A", "B"))
     expect_equal(ensembldb:::ensDbQuery(pf), "uniprot_mapping_type in ('A','B')")
     expect_error(UniprotMappingTypeFilter("B", condition = ">"))
+})
+
+test_that("TxSupportLevelFilter works", {
+    fl <- TxSupportLevelFilter(3)
+    expect_equal(value(fl), 3)
+    expect_equal(ensembldb:::ensDbQuery(fl), "tx_support_level = 3")
+    expect_equal(unname(ensembldb:::ensDbColumn(fl)), "tx_support_level")
+    supportsTsl <- any(supportedFilters(edb) == "TxSupportLevelFilter")
+    if (supportsTsl) {
+        expect_equal(unname(ensembldb:::ensDbColumn(fl, edb)),
+                     "tx.tx_support_level")
+        expect_equal(unname(ensembldb:::ensDbColumn(fl, edb, with.tables = "tx")),
+                     "tx.tx_support_level")
+        expect_equal(unname(ensembldb:::ensDbQuery(fl, edb)),
+                     "tx.tx_support_level = 3")
+        expect_equal(unname(ensembldb:::ensDbQuery(fl, edb, with.tables = "tx")),
+                     "tx.tx_support_level = 3")
+        expect_error(ensembldb:::ensDbQuery(fl, edb, with.tables = "gene"))
+    } else {
+        expect_error(ensembldb:::ensDbColumn(fl, edb))
+        expect_error(ensembldb:::ensDbColumn(fl, edb, with.tables = "tx"))
+        expect_error(ensembldb:::ensDbQuery(fl, edb))
+        expect_error(ensembldb:::ensDbQuery(fl, edb, with.tables = "tx"))
+    }
 })
