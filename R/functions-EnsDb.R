@@ -32,15 +32,17 @@
     filter <- .processFilterParam(filter, x)
     ## Now, if there was no error, filter is an AnnotationFilterList
     got_filter <- getProperty(x, "FILTER")
-    if (!is.na(got_filter)) {
-        if (!(is(got_filter, "AnnotationFilter") |
-              is(got_filter, "AnnotationFilterList")))
+    if (is(got_filter, "AnnotationFilter") |
+        is(got_filter, "AnnotationFilterList")) {
+        ## Append the new filter.
+        filter <- AnnotationFilterList(got_filter, filter)
+    } else {
+        if (!is.na(got_filter))
             stop("Globally set filter is not an 'AnnotationFilter' or ",
                  "'AnnotationFilterList'")
-        filter <- AnnotationFilterList(got_filter, filter)
     }
-    ## Now, what is with multiple encapsuled filters?
-    setProperty(x, FILTER = filter)
+    x@.properties$FILTER <- filter
+    x
 }
 
 #' @description \code{.dropFilter} drops all (globally) added filters from the
@@ -58,3 +60,18 @@
 .activeFilter <- function(x) {
     getProperty(x, "FILTER")
 }
+
+## filter <- function(x, ...) {
+##     if (is(x, "EnsDb"))
+##         addFilter(x)
+##     else
+##         stop("This is ensembldb::filter, that requires an EnsDb object as input")
+## }
+
+## x <- 1:100
+## stats::filter(x, rep(1, 3))
+
+## dplyr::filter(mtcars, cyl == 8)
+
+## filter(x, rep(1, 3))
+## class(mtcars)
