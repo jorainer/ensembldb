@@ -22,23 +22,23 @@ server runs.}
 }
 \value{
 A \code{\linkS4class{EnsDb}} object providing access to the
-data stored in the MySQL backend.
+     data stored in the MySQL backend.
 }
 \description{
 Change the SQL backend from \emph{SQLite} to \emph{MySQL}.
-When first called on an \code{\linkS4class{EnsDb}} object, the function
-tries to create and save all of the data into a MySQL database. All
-subsequent calls will connect to the already existing MySQL database.
+    When first called on an \code{\linkS4class{EnsDb}} object, the function
+    tries to create and save all of the data into a MySQL database. All
+    subsequent calls will connect to the already existing MySQL database.
 }
 \details{
 This functionality requires that the \code{RMySQL} package is
-installed and that the user has (write) access to a running MySQL server.
-If the corresponding database does already exist users without write access
-can use this functionality.
+    installed and that the user has (write) access to a running MySQL server.
+    If the corresponding database does already exist users without write
+    access can use this functionality.
 }
 \note{
 At present the function does not evaluate whether the versions
-between the SQLite and MySQL database differ.
+    between the SQLite and MySQL database differ.
 }
 \examples{
 ## Load the EnsDb database (SQLite backend).

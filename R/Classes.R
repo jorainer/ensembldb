@@ -153,6 +153,14 @@ setClass("EnsDb",
 #'
 #' In addition, the following filters are defined by \code{ensembldb}:
 #' \describe{
+#'
+#' \item{TxSupportLevel}{
+#'     allows to filter results using the provided transcript support level.
+#'     Support levels for transcripts are defined by Ensembl based on the
+#'     available evidences for a transcript with 1 being the highest evidence
+#'     grade and 5 the lowest level. This filter is only supported on
+#'     \code{EnsDb} databases with a db schema version higher 2.1.
+#' }
 #' 
 #' \item{UniprotDbFilter}{
 #'     allows to filter results based on the specified Uniprot database name(s).
@@ -364,5 +372,22 @@ setClass("UniprotMappingTypeFilter", contains = "CharacterFilter",
 UniprotMappingTypeFilter <- function(value, condition = "==") {
     new("UniprotMappingTypeFilter", condition = condition,
         value = as.character(value))
+}
+
+#' @rdname Filter-classes
+setClass("TxSupportLevelFilter", contains = "IntegerFilter",
+         prototype = list(
+             condition = "==",
+             values = 0L,
+             field = "tx_support_level"
+         ))
+#' @return For \code{TxSupportLevel}: A
+#' \code{TxSupportLevel} object.
+#' @rdname Filter-classes
+TxSupportLevelFilter <- function(value, condition = "==") {
+    if (!is.numeric(value))
+        stop("Parameter 'value' has to be numeric")
+    new("TxSupportLevelFilter", condition = condition,
+        value = as.integer(value))
 }
 

@@ -30,9 +30,9 @@ be extracted from the database. Can be any column(s) listed by the
 
 \item{filter}{For \code{proteins}: A filter object extending
 \code{AnnotationFilter} or a list of such objects to select
-specific entries from the database. See \code{\link{Filter-classes}} for a
-documentation of available filters and use \code{\link{supportedFilters}} to
-get the full list of supported filters.}
+specific entries from the database. See \code{\link{Filter-classes}} for
+a documentation of available filters and use
+\code{\link{supportedFilters}} to get the full list of supported filters.}
 
 \item{order.by}{For \code{proteins}: a character vector specifying the
 column(s) by which the result should be ordered.}
@@ -47,41 +47,41 @@ the type of the returned object. Can be either \code{"DataFrame"},
 }
 \value{
 The \code{listProteinColumns} function returns a character vector
-with the column names containing protein annotations or throws an error
-if no such annotations are available.
+    with the column names containing protein annotations or throws an error
+    if no such annotations are available.
 
 The \code{proteins} method returns protein related annotations from
-an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
-allowing to define the type of the returned object. Note that if
-\code{return.type = "AAStringSet"} additional annotation columns are stored
-in a \code{DataFrame} that can be accessed with the \code{mcols} method on
-the returned object.
+    an \code{\linkS4class{EnsDb}} object with its \code{return.type} argument
+    allowing to define the type of the returned object. Note that if
+    \code{return.type = "AAStringSet"} additional annotation columns are
+    stored in a \code{DataFrame} that can be accessed with the \code{mcols}
+    method on the returned object.
 }
 \description{
 The \code{listProteinColumns} function allows to conveniently
-extract all database columns containing protein annotations from
-an \code{\linkS4class{EnsDb}} database.
+    extract all database columns containing protein annotations from
+    an \code{\linkS4class{EnsDb}} database.
 
 This help page provides information about most of the
-functionality related to protein annotations in \code{ensembldb}.
+    functionality related to protein annotations in \code{ensembldb}.
 
-The \code{proteins} method retrieves protein related annotations from
-an \code{\linkS4class{EnsDb}} database.
+    The \code{proteins} method retrieves protein related annotations from
+    an \code{\linkS4class{EnsDb}} database.
 
 The \code{listUniprotDbs} method lists all Uniprot database
-names in the \code{EnsDb}.
+    names in the \code{EnsDb}.
 
 The \code{listUniprotMappingTypes} method lists all methods
-that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
+    that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
 }
 \details{
 The \code{proteins} method performs the query starting from the
-\code{protein} tables and can hence return all annotations from the database
-that are related to proteins and transcripts encoding these proteins from
-the database. Since \code{proteins} does thus only query annotations for
-protein coding transcripts, the \code{\link{genes}} or
-\code{\link{transcripts}} methods have to be used to retrieve annotations
-for non-coding transcripts.
+    \code{protein} tables and can hence return all annotations from the
+    database that are related to proteins and transcripts encoding these
+    proteins from the database. Since \code{proteins} does thus only query
+    annotations for protein coding transcripts, the \code{\link{genes}} or
+    \code{\link{transcripts}} methods have to be used to retrieve annotations
+    for non-coding transcripts.
 }
 \examples{
 

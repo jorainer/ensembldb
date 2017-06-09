@@ -17,6 +17,7 @@ checkEnsDbs <- function(x) {
         ensembldb:::validateEnsDb(edb)
         ## Now check also some query calls:
         gns <- genes(edb)
+        message(" version: ", ensembldb:::dbSchemaVersion(edb))
         message(" OK")
     }
 }
