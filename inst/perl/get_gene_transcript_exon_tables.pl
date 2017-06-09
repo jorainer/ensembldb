@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.1: * Add ens_counts.txt with the total counts of genes, tx, exons
+##                  and proteins for validation that all entries were added to
+##                  the database.
+##                * Extract gene descriptions and tx support level.
 ## version 0.3.0: * Change database layout by adding a dedicated entrezgene
 ##                  table.
 ## version 0.2.4: * Extract taxonomy ID and add that to  metadata table.
@@ -24,7 +28,8 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.0";
+my $script_version = "0.3.1";
+my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -95,6 +100,7 @@ my $api_version="".software_version()."";
 if($ensembl_version ne $api_version){
     die "The submitted Ensembl version (".$ensembl_version.") does not match the version of the Ensembl API (".$api_version."). Please configure the environment variable ENS to point to the correct API.";
 }
+my $ensembl_version_num = $ensembl_version + 0;
 
 print "Connecting to ".$host." at port ".$port."\n";
 
@@ -120,10 +126,10 @@ print $infostring;
 
 ## preparing output files:
 open(GENE , ">ens_gene.txt");
-print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\n";
+print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\tdescription\n";
 
 open(TRANSCRIPT , ">ens_tx.txt");
-print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\n";
+print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\n";
 
 open(EXON , ">ens_exon.txt");
 print EXON "exon_id\texon_seq_start\texon_seq_end\n";
@@ -149,14 +155,22 @@ print PROTDOM "protein_id\tprotein_domain_id\tprotein_domain_source\tinterpro_ac
 open(CHR , ">ens_chromosome.txt");
 print CHR "seq_name\tseq_length\tis_circular\n";
 
+open(COUNTS, ">ens_counts.txt");
+print COUNTS "gene\ttx\texon\tprotein\n";
+
 ##OK now running the stuff:
 print "Start fetching data\n";
 my %done_chromosomes=();
 my %done_exons=();  ## to keep track of which exons have already been saved.
 my $counta = 0;
+my $count_gene = 0;
+my $count_tx = 0;
+my $count_exon = 0;
+my $count_protein = 0;
 @gene_ids = @{$gene_adaptor->list_stable_ids()};
 foreach my $gene_id (@gene_ids){
   $counta++;
+  $count_gene++;
   if(($counta % 2000) == 0){
     print "processed $counta genes\n";
   }
@@ -207,6 +221,10 @@ foreach my $gene_id (@gene_ids){
     my $gene_biotype = $gene->biotype;
     my $gene_seq_start = $gene->start;
     my $gene_seq_end = $gene->end;
+    my $description = $gene->description;
+    if(!defined($description)){
+      $description = "NULL";
+    }
     ## get entrezgene ID, if any...
     my $all_entries = $gene->get_all_DBLinks("EntrezGene");
     foreach my $dbe (@{$all_entries}){
@@ -221,12 +239,13 @@ foreach my $gene_id (@gene_ids){
     # if($hash_size > 0){
     #   $entrezid = join(";", keys %entrezgene_hash);
     # }
-    print GENE "$gene_id\t$gene_external_name\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\n";
+    print GENE "$gene_id\t$gene_external_name\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\t$description\n";
 
     ## process transcript(s)
     my @transcripts = @{ $gene->get_all_Transcripts };
     ## ok looping through the transcripts
     foreach my $transcript (@transcripts){
+      $count_tx++;
       if($do_transform==1){
 	## just to be shure that we have the transcript in chromosomal coordinations.
 	## $transcript = $transcript->transform("chromosome");
@@ -248,13 +267,25 @@ foreach my $gene_id (@gene_ids){
       my $tx_biotype = $transcript->biotype;
       my $tx_seq_start = $transcript->start;
       my $tx_seq_end = $transcript->end;
+      my $tx_tsl = "NULL";
+      if ($ensembl_version_num >= $min_tsl_version) {
+	$tx_tsl = $transcript->tsl;
+	if (!defined($tx_tsl)) {
+	  $tx_tsl = "NULL";
+	}
+      }
+      my $tx_description = $transcript->description;
+      # if (!defined($tx_description)) {
+      # 	$tx_description = "NULL";
+      # }
       ## write info.
-      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\n";
+      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\n";
 ##      print G2T "$gene_id\t$tx_id\n";
 
       ## Process proteins/translations (if possible)
       my $transl = $transcript->translation();
       if (defined($transl)) {
+	$count_protein++;
 	my $transl_id = $transl->stable_id();
 	my $prot_seq = $transl->seq();
 	## Check if we could get UNIPROT ID(s):
@@ -299,6 +330,7 @@ foreach my $gene_id (@gene_ids){
 	  ## don't do anything.
 	}else{
 	  $done_exons{ $exon_id } = 1;
+	  $count_exon++;
 	  print EXON "$exon_id\t$exon_start\t$exon_end\n";
 	}
 	## saving the exon id to this file that provides the n:m mappint; also saving
@@ -326,7 +358,9 @@ print INFO "ensembl_host\t$host\n";
 print INFO "Organism\t$species_ens\n";
 print INFO "taxonomy_id\t$taxonomy_id\n";
 print INFO "genome_build\t$coord_system_version\n";
-print INFO "DBSCHEMAVERSION\t2.0\n";
+print INFO "DBSCHEMAVERSION\t2.1\n";
+
+print COUNTS "$count_gene\t$count_tx\t$count_exon\t$count_protein\n";
 
 close(INFO);
 
@@ -340,3 +374,4 @@ close(CHR);
 close(PROTEIN);
 close(PROTDOM);
 close(UNIPROT);
+close(COUNTS);

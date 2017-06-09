@@ -83,3 +83,9 @@ test_that("GRangesFilter works for EnsDb", {
     expect_equal(ensembldb:::ensDbQuery(grf2, edb), exp)
 })
 
+test_that("TxSupportLevelFilter works for EnsDb", {
+    fl <- TxSupportLevelFilter(3)
+    expect_true(is(fl, "TxSupportLevelFilter"))
+    fl <- AnnotationFilter(~ tx_support_level == 3)
+    expect_true(is(fl, "TxSupportLevelFilter"))
+})
