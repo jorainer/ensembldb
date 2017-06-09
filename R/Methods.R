@@ -2033,8 +2033,8 @@ setMethod("supportedFilters", "EnsDb", function(object, ...) {
 #'     \code{\link[AnnotationFilter]{AnnotationFilterList}} or filter
 #'     expression. See
 #'
-#' @return \code{addFilter} returns an \code{EnsDb} object with the specified
-#'     filter added.
+#' @return \code{addFilter} and \code{filter} return an \code{EnsDb} object
+#'     with the specified filter added.
 #' 
 #'     \code{activeFilter} returns an
 #'     \code{\link[AnnotationFilter]{AnnotationFilterList}} object being the
@@ -2057,6 +2057,8 @@ setMethod("supportedFilters", "EnsDb", function(object, ...) {
 #' ## queries will be applied on the filtered database.
 #' edb_y <- addFilter(edb, SeqNameFilter("Y"))
 #'
+#' ## Note: using the filter function is equivalent to a call to addFilter.
+#'
 #' ## Each call returns now only features encoded on chromosome Y
 #' gns <- genes(edb_y)
 #'
@@ -2078,12 +2080,18 @@ setMethod("addFilter", "EnsDb", function(x, filter = AnnotationFilterList()) {
 
 #' @aliases dropFilter dropFilter,EnsDb-method
 #'
+#' @description \code{dropFilter} deletes all globally set filters from the
+#'     \code{EnsDb} object.
+#'
 #' @rdname global-filters
 setMethod("dropFilter", "EnsDb", function(x) {
     .dropFilter(x)
 })
 
 #' @aliases activeFilter activeFilter,EnsDb-method
+#'
+#' @description \code{activeFilter} returns the globally set filter from an
+#'     \code{EnsDb} object.
 #' 
 #' @rdname global-filters
 setMethod("activeFilter", "EnsDb", function(x) {
@@ -2092,5 +2100,11 @@ setMethod("activeFilter", "EnsDb", function(x) {
 
 ## setMethod("filter", "EnsDb", function(x, filter = AnnotationFilterList()) {
 ##     .addFilter(x, filter)
+## })
+## setMethod("filter", "numeric", function(x, ...) {
+##     stats::filter(x, ...)
+## })
+## setMethod("filter", "data.frame", function(x, ...) {
+##     dplyr::filter(.data = x, ...)
 ## })
 

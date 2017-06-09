@@ -19,6 +19,7 @@ test_that(".addFilter .dropFilter and .activeFilter work", {
     
     ## Errors
     expect_error(ensembldb:::.addFilter(edb, "blabla"))
+    expect_error(ensembldb:::filter(edb, "blabla"))
     expect_error(ensembldb:::.addFilter(edb))
     
     ## .dropFilter
@@ -29,6 +30,9 @@ test_that(".addFilter .dropFilter and .activeFilter work", {
     gf <- GenenameFilter("BCL2")
     ## .addFilter and .activeFilter
     edb_2 <- addFilter(edb, filter = gf)
+    expect_equal(AnnotationFilterList(gf),
+                 ensembldb:::getProperty(edb_2, "FILTER"))
+    edb_2 <- filter(edb, filter = gf)
     expect_equal(AnnotationFilterList(gf),
                  ensembldb:::getProperty(edb_2, "FILTER"))
     expect_equal(AnnotationFilterList(gf),

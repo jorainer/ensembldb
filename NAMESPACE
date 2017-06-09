@@ -144,7 +144,8 @@ export("ensDbFromAH",
        "listEnsDbs",
        "makeEnsemblSQLiteFromTables",
        "makeEnsembldbPackage",
-       "runEnsDbApp"
+       "runEnsDbApp",
+       "filter"
        )
 ## Classes
 exportClasses(

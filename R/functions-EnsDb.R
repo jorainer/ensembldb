@@ -61,12 +61,21 @@
     getProperty(x, "FILTER")
 }
 
-## filter <- function(x, ...) {
-##     if (is(x, "EnsDb"))
-##         addFilter(x)
-##     else
-##         stop("This is ensembldb::filter, that requires an EnsDb object as input")
-## }
+
+#' @aliases filter
+#' 
+#' @description \code{filter} filters an \code{EnsDb} object. \code{filter} is
+#'     an alias for the \code{addFilter} function.
+#' 
+#' @rdname global-filters
+filter <- function(x, filter = AnnotationFilterList()) {
+    if (is(x, "EnsDb"))
+        addFilter(x, filter)
+    else
+        stop("ensembldb::filter requires an 'EnsDb' object as input. To call ",
+             "the filter function from the stats or dplyr package use ",
+             "stats::filter and dplyr::filter instead.")
+}
 
 ## x <- 1:100
 ## stats::filter(x, rep(1, 3))
