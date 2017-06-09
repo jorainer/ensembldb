@@ -76,11 +76,3 @@ filter <- function(x, filter = AnnotationFilterList()) {
              "the filter function from the stats or dplyr package use ",
              "stats::filter and dplyr::filter instead.")
 }
-
-## x <- 1:100
-## stats::filter(x, rep(1, 3))
-
-## dplyr::filter(mtcars, cyl == 8)
-
-## filter(x, rep(1, 3))
-## class(mtcars)

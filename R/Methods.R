@@ -2098,13 +2098,3 @@ setMethod("activeFilter", "EnsDb", function(x) {
     .activeFilter(x)
 })
 
-## setMethod("filter", "EnsDb", function(x, filter = AnnotationFilterList()) {
-##     .addFilter(x, filter)
-## })
-## setMethod("filter", "numeric", function(x, ...) {
-##     stats::filter(x, ...)
-## })
-## setMethod("filter", "data.frame", function(x, ...) {
-##     dplyr::filter(.data = x, ...)
-## })
-

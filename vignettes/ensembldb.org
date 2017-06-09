@@ -24,7 +24,7 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub,ggbio,Gviz}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub,ggbio,Gviz,magrittr}
 ---
 
 #+END_EXPORT
@@ -109,9 +109,14 @@ One of the strengths of the =ensembldb= package and the related =EnsDb= database
 its implementation of a filter framework that enables to efficiently extract
 data sub-sets from the databases. The =ensembldb= package supports most of the
 filters defined in the =AnnotationFilter= Bioconductor package and defines some
-additional filters specific to the data stored in =EnsDb= databases. The
-=supportedFilters= method can be used to get an overview over all supported filter
-classes, each of them (except the =GRangesFilter=) working on a single
+additional filters specific to the data stored in =EnsDb= databases. Filters can
+be passed directly to all methods extracting data from an =EnsDb= (such as =genes=,
+=transcripts= or =exons=). Alternatively it is possible with the =addFilter= or =filter=
+functions to add a filter directly to an =EnsDb= which will then be used in all
+queries on that object.
+
+The =supportedFilters= method can be used to get an overview over all supported
+filter classes, each of them (except the =GRangesFilter=) working on a single
 column/field in the database.
 
 #+NAME: filters
@@ -235,6 +240,37 @@ a filter /expression/ written as a =formula=.
 
 Filter expression have to be written as a formula (i.e. starting with a =~=) in
 the form /column name/ followed by the logical condition.
+
+Alternatively, =EnsDb= objects can be filtered directly using the =filter=
+function. In the example below we use the =filter= function to filter the =EnsDb=
+object and pass that filtered database to the =transcripts= method using the =%>%=
+from the =magrittr= package.
+
+#+NAME: transcripts-filter
+#+BEGIN_SRC R
+  library(magrittr)
+
+  filter(edb, ~ symbol == "BCL2" & tx_biotype != "protein_coding") %>% transcripts
+
+#+END_SRC
+
+Adding a filter to an =EnsDb= enables this filter (globally) on all subsequent
+queries on that object. We could thus filter an =EnsDb= to (virtually) contain
+only features encoded on chromosome Y.
+
+#+NAME: filter-Y
+#+BEGIN_SRC R
+  edb_y <- addFilter(edb, SeqNameFilter("Y"))
+
+  ## All subsequent filters on that EnsDb will only work on features encoded on
+  ## chromosome Y
+  genes(edb_y)
+
+  ## Get all lincRNAs on chromosome Y
+  genes(edb_y, filter = ~ gene_biotype == "lincRNA")
+
+#+END_SRC
+
 
 To get an overview of database tables and available columns the function
 =listTables= can be used. The method =listColumns= on the other hand lists columns
