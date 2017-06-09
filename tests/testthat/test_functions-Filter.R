@@ -18,6 +18,10 @@ test_that(".fieldInEnsDb works", {
                  "uniprot_mapping_type")
     expect_equal(unname(ensembldb:::.fieldInEnsDb("prot_dom_id")),
                  "protein_domain_id")
+    expect_equal(unname(ensembldb:::.fieldInEnsDb("description")),
+                 "description")
+    expect_equal(unname(ensembldb:::.fieldInEnsDb("tx_support_level")),
+                 "tx_support_level")
     expect_error(ensembldb:::.fieldInEnsDb("aaa"))
 })
 
@@ -46,6 +50,8 @@ test_that(".conditionForEnsDb works", {
     expect_equal(ensembldb:::.conditionForEnsDb(fl), "<")
     fl <- GeneStartFilter(4, condition = "<=")
     expect_equal(ensembldb:::.conditionForEnsDb(fl), "<=")
+    fl <- TxSupportLevelFilter(4, condition = "<=")
+    expect_equal(ensembldb:::.conditionForEnsDb(fl), "<=")
 })
 
 test_that(".valueForEnsDb works", {
@@ -70,6 +76,8 @@ test_that(".queryForEnsDb works", {
     ## Tests for numeric filters
     fl <- GeneStartFilter(5, condition = "<=")
     expect_equal(ensembldb:::.queryForEnsDb(fl), "gene_seq_start <= 5")
+    fl <- TxSupportLevelFilter(5, condition = "<=")
+    expect_equal(ensembldb:::.queryForEnsDb(fl), "tx_support_level <= 5")
 })
 
 test_that(".queryForEnsDbWithTables works", {
@@ -118,6 +126,11 @@ test_that(".queryForEnsDbWithTables works", {
     expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
                  "tx.tx_seq_start = 123")
     expect_error(ensembldb:::.queryForEnsDbWithTables(fl, edb, "gene"))
+    if (any(listColumns(edb) == "tx_support_level")) {
+        fl <- TxSupportLevelFilter(3)
+        expect_equal(ensembldb:::.queryForEnsDbWithTables(fl, edb),
+                     "tx.tx_support_level = 3")
+    }
 })
 
 test_that(".processFilterParam works", {
