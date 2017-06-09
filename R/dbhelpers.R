@@ -406,11 +406,14 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                                  fetchColumns[fetchColumns != "tx_name"]))
     if (!is(filter, "AnnotationFilterList"))
         stop("parameter 'filter' has to be an 'AnnotationFilterList'!")
+    ## Add also the global filter if present.
+    global_filter <- .activeFilter(x)
+    if (is(global_filter, "AnnotationFilter") |
+        is(global_filter, "AnnotationFilterList"))
+        filter <- AnnotationFilterList(global_filter, filter)
     ## If any filter is a SymbolFilter, add "symbol" to the return columns.
     if (length(filter) > 0) {
-        if (any(unlist(lapply(filter, function(z) {
-            return(is(z, "SymbolFilter"))
-        }))))
+        if (any(.anyIs(filter, "SymbolFilter")))
             columns <- unique(c(columns, "symbol"))  ## append a filter column.
     }
     ## Catch also a "symbol" in columns

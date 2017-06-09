@@ -70,7 +70,10 @@ For \code{supportedFilters}: the names of the supported filter
 \description{
 \code{ensembldb} supports most of the filters from the
     \code{\link{AnnotationFilter}} package to retrieve specific content from
-    \code{\linkS4class{EnsDb}} databases.
+    \code{\linkS4class{EnsDb}} databases. These filters can be passed to
+    the methods such as \code{\link{genes}} with the \code{filter} parameter
+    or can be added as a \emph{global} filter to an \code{EnsDb} object
+    (see \code{\link{addFilter}} for more details).
 
 \code{supportedFilters} returns the names of all supported
     filters for the \code{EnsDb} object.
@@ -359,6 +362,9 @@ if (hasProteinData(edb)) {
 
     \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
     \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.
+
+    \code{\link{addFilter}} for globally adding filters to an \code{EnsDb}
+    object.
 }
 \author{
 Johannes Rainer
