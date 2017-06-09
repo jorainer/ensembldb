@@ -3,11 +3,11 @@
 \docType{methods}
 \name{addFilter,EnsDb-method}
 \alias{addFilter,EnsDb-method}
-\alias{addFilter,}
+\alias{addFilter}
 \alias{dropFilter,EnsDb-method}
-\alias{dropFilter,}
+\alias{dropFilter}
 \alias{activeFilter,EnsDb-method}
-\alias{activeFilter,}
+\alias{activeFilter}
 \title{Globally add filters to an EnsDb database}
 \usage{
 \S4method{addFilter}{EnsDb}(x, filter = AnnotationFilterList())
