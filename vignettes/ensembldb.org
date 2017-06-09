@@ -1606,7 +1606,8 @@ The idea would be to add filter(s) as =AnnotationFilterList= object(s) to the
 even the =properties=, =getProperty=, =dropProperty= and =setProperty= methods (check
 /Methods.R/.
 
-
+Now, how should this function be called? =filter= would be intuitive, but is
+already taken. What about BioGenerics =Filter=?
 
 ** DONE Interpret R logical conditions
    CLOSED: [2017-03-22 Wed 06:58]

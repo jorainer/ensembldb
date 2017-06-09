@@ -2005,3 +2005,4 @@ setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
 setMethod("supportedFilters", "EnsDb", function(object, ...) {
     .supportedFilters(object)
 })
+
