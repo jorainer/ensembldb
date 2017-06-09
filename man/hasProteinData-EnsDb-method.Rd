@@ -13,11 +13,11 @@
 }
 \value{
 A logical of length one, \code{TRUE} if protein annotations are
-available and \code{FALSE} otherwise.
+    available and \code{FALSE} otherwise.
 }
 \description{
 Determines whether the \code{\linkS4class{EnsDb}}
-provides protein annotation data.
+    provides protein annotation data.
 }
 \examples{
 library(EnsDb.Hsapiens.v75)
