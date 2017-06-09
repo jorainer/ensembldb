@@ -3,6 +3,7 @@ CHANGES IN VERSION 2.1.9
 
 NEW FEATURES
     o Support for global filters in an EnsDb object.
+    o Add filter function.
     
 
 CHANGES IN VERSION 2.1.8

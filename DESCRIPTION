@@ -44,7 +44,8 @@ Suggests:
     testthat,
     BSgenome.Hsapiens.UCSC.hg19,
     ggbio (>= 1.24.0),
-    Gviz (>= 1.20.0)
+    Gviz (>= 1.20.0),
+    magrittr
 Enhances: RMySQL
 VignetteBuilder: knitr
 Description: The package provides functions to create and use
