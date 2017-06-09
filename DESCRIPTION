@@ -63,6 +63,7 @@ Collate:
     functions-utils.R
     dbhelpers.R
     Methods.R
+    functions-EnsDb.R
     functions-Filter.R
     Methods-Filter.R
     functions-create-EnsDb.R
