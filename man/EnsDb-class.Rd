@@ -259,9 +259,13 @@
 \seealso{
   \code{\link{EnsDb}},
   \code{\link{makeEnsembldbPackage}},
-      \code{\link{exonsBy}}, \code{\link{genes}},
-      \code{\link{transcripts}},
-      \code{\link{makeEnsemblSQLiteFromTables}}
+  \code{\link{exonsBy}}, \code{\link{genes}},
+  \code{\link{transcripts}},
+  \code{\link{makeEnsemblSQLiteFromTables}}
+  
+  \code{\link{addFilter}} for globally adding filters to an \code{EnsDb}
+  object.
+
 }
 \examples{
 

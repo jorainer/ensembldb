@@ -28,7 +28,9 @@
   Retrieve gene/transcript/exons annotations stored in an Ensembl based
   database package generated with the \code{\link{makeEnsembldbPackage}}
   function. Parameter \code{filter} enables to define filters to
-  retrieve only specific data.
+  retrieve only specific data. Alternatively, a global filter might be
+  added to the \code{EnsDb} object using the \code{\link{addFilter}}
+  method.
 }
 \usage{
 
@@ -442,6 +444,9 @@
   \code{\link{supportedFilters}} to get an overview of supported filters.
   \code{\link{makeEnsembldbPackage}},
   \code{\link{listColumns}}, \code{\link{lengthOf}}
+
+  \code{\link{addFilter}} for globally adding filters to an \code{EnsDb}
+  object.
 }
 \examples{
 
