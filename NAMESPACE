@@ -144,7 +144,8 @@ export("ensDbFromAH",
        "listEnsDbs",
        "makeEnsemblSQLiteFromTables",
        "makeEnsembldbPackage",
-       "runEnsDbApp"
+       "runEnsDbApp",
+       "filter"
        )
 ## Classes
 exportClasses(
@@ -191,7 +192,10 @@ exportMethods("cdsBy",
               "transcriptsByOverlaps",
               "updateEnsDb",
               "useMySQL",
-              "supportedFilters"
+              "supportedFilters",
+              "addFilter",
+              "activeFilter",
+              "dropFilter"
               )
 ## Protein data related stuff
 exportMethods("hasProteinData",

@@ -18,6 +18,28 @@ test_that("addFilterColumns works for AnnotationFilterList", {
     expect_equal(res, c("gene_biotype", "seq_name", "gene_name", "symbol"))
 })
 
+test_that("functions work for encapsuled AnnotationFilterLists", {
+    fl <- AnnotationFilterList(GenenameFilter("a"),
+                               AnnotationFilterList(TxIdFilter("b")))
+    res <- ensembldb:::.processFilterParam(fl, edb)
+    expect_equal(res, fl)
+    res <- ensembldb:::setFeatureInGRangesFilter(fl, "gene")
+    expect_equal(res, fl)
+    res <- ensembldb:::addFilterColumns("z", fl, edb)
+    expect_equal(res, c("z", "gene_name", "tx_id"))
+    res <- ensembldb:::getWhat(edb, filter = fl)
+    ## Check if content is the same
+    flts1 <- ~ genename == "BCL2" & tx_biotype == "protein_coding"
+    res1 <- transcripts(edb, filter = flts1)
+    flts2 <- AnnotationFilterList(
+        AnnotationFilterList(GenenameFilter("BCL2"),
+                             AnnotationFilterList(
+                                 TxBiotypeFilter("protein_coding"))
+                             ))
+    res2 <- transcripts(edb, filter = flts2)
+    expect_equal(res1, res2)
+})
+
 ## Here we want to test if we get always also the filter columns back.
 test_that("multiFilterReturnCols works also with symbolic filters", {
     cols <- ensembldb:::addFilterColumns(edb, cols = c("exon_id"),

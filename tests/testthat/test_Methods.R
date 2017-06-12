@@ -891,3 +891,34 @@ test_that("exonsByOverlaps works", {
     Test3 <- exonsByOverlaps(edb, gr2, filter=SeqStrandFilter("-"))
     expect_equal(names(Test), names(Test3))
 })
+
+test_that("methods work with global filter", {
+    g_f <- SeqNameFilter(18)
+    edb_2 <- ensembldb:::.addFilter(edb, g_f)
+
+    ## gns
+    gns <- genes(edb_2)
+    expect_equal(gns, genes(edb, filter = g_f))
+    edb_2 <- ensembldb:::.addFilter(edb_2, TxBiotypeFilter("protein_coding"))
+
+    gns_2 <- genes(edb_2)
+    expect_true(all(seqlevels(gns_2) == "18"))
+    expect_true(length(gns) > length(gns_2))
+
+    ## Combine with additional filter:
+    gns_2 <- genes(edb_2, filter = SeqStrandFilter("+"))
+    expect_true(all(as.character(strand(gns_2)) == "+"))
+    gns <- genes(edb_2, filter = GenenameFilter("ZBTB16"))
+    expect_true(length(gns) == 0)
+    gns <- genes(edb_2, filter = GenenameFilter("BCL2"))
+    expect_true(all(gns$symbol == "BCL2"))
+
+    ## transcripts
+    txs <- transcripts(edb_2, filter = ~ genename == "BCL2")
+    expect_true(all(txs$genename == "BCL2"))
+    expect_true(all(txs$tx_biotype == "protein_coding"))
+
+    ## exonsBy
+    exs <- exonsBy(edb_2, "gene")
+})
+
