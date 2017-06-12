@@ -28,6 +28,11 @@ setMethod("show", "EnsDb", function(object) {
                    ".\n"))
         if (hasProteinData(object))
             cat("|Protein data available.\n")
+        flts <- .activeFilter(object)
+        if (is(flts, "AnnotationFilter") | is(flts, "AnnotationFilterList")) {
+            cat("|Active filter(s):\n")
+            show(flts)
+        }
     }
 })
 
@@ -2005,3 +2010,91 @@ setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
 setMethod("supportedFilters", "EnsDb", function(object, ...) {
     .supportedFilters(object)
 })
+
+#' @title Globally add filters to an EnsDb database
+#'
+#' @aliases addFilter addFilter,EnsDb-method
+#'
+#' @description These methods allow to set, delete or show globally defined
+#'     filters on an \code{\linkS4class{EnsDb}} object.
+#'
+#'     \code{addFilter}: adds an annotation filter to the \code{EnsDb} object.
+#'
+#' @details Adding a filter to an \code{EnsDb} object causes this filter to be
+#'     permanently active. The filter will be used for all queries to the
+#'     database and is added to all additional filters passed to the methods
+#'     such as \code{\link{genes}}.
+#'
+#' @param x The \code{\linkS4class{EnsDb}} object to which the filter should be
+#'     added.
+#'
+#' @param filter The filter as an
+#'     \code{\link[AnnotationFilter]{AnnotationFilter}},
+#'     \code{\link[AnnotationFilter]{AnnotationFilterList}} or filter
+#'     expression. See
+#'
+#' @return \code{addFilter} and \code{filter} return an \code{EnsDb} object
+#'     with the specified filter added.
+#' 
+#'     \code{activeFilter} returns an
+#'     \code{\link[AnnotationFilter]{AnnotationFilterList}} object being the
+#'     active global filter or \code{NA} if no filter was added.
+#'
+#'     \code{dropFilter} returns an \code{EnsDb} object with all eventually
+#'     present global filters removed.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @rdname global-filters
+#'
+#' @seealso \code{\link{Filter-classes}} for a list of all supported filters.
+#' 
+#' @examples
+#' library(EnsDb.Hsapiens.v75)
+#' edb <- EnsDb.Hsapiens.v75
+#'
+#' ## Add a global SeqNameFilter to the database such that all subsequent
+#' ## queries will be applied on the filtered database.
+#' edb_y <- addFilter(edb, SeqNameFilter("Y"))
+#'
+#' ## Note: using the filter function is equivalent to a call to addFilter.
+#'
+#' ## Each call returns now only features encoded on chromosome Y
+#' gns <- genes(edb_y)
+#'
+#' seqlevels(gns)
+#'
+#' ## Get all lincRNA gene transcripts on chromosome Y
+#' transcripts(edb_y, filter = ~ gene_biotype == "lincRNA")
+#'
+#' ## Get the currently active global filter:
+#' activeFilter(edb_y)
+#'
+#' ## Delete this filter again.
+#' edb_y <- dropFilter(edb_y)
+#'
+#' activeFilter(edb_y)
+setMethod("addFilter", "EnsDb", function(x, filter = AnnotationFilterList()) {
+    .addFilter(x, filter)
+})
+
+#' @aliases dropFilter dropFilter,EnsDb-method
+#'
+#' @description \code{dropFilter} deletes all globally set filters from the
+#'     \code{EnsDb} object.
+#'
+#' @rdname global-filters
+setMethod("dropFilter", "EnsDb", function(x) {
+    .dropFilter(x)
+})
+
+#' @aliases activeFilter activeFilter,EnsDb-method
+#'
+#' @description \code{activeFilter} returns the globally set filter from an
+#'     \code{EnsDb} object.
+#' 
+#' @rdname global-filters
+setMethod("activeFilter", "EnsDb", function(x) {
+    .activeFilter(x)
+})
+

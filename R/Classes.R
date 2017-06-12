@@ -14,7 +14,10 @@ setClass("EnsDb",
 #'
 #' @description \code{ensembldb} supports most of the filters from the
 #'     \code{\link{AnnotationFilter}} package to retrieve specific content from
-#'     \code{\linkS4class{EnsDb}} databases.
+#'     \code{\linkS4class{EnsDb}} databases. These filters can be passed to
+#'     the methods such as \code{\link{genes}} with the \code{filter} parameter
+#'     or can be added as a \emph{global} filter to an \code{EnsDb} object
+#'     (see \code{\link{addFilter}} for more details).
 #'
 #' @note For users of \code{ensembldb} version < 2.0: in the
 #'     \code{\link[AnnotationFilter]{GRangesFilter}} from the
@@ -203,6 +206,7 @@ setClass("EnsDb",
 #'     annotation filters.
 #' 
 #' @name Filter-classes
+#' 
 #' @seealso
 #' \code{\link{supportedFilters}} to list all filters supported for \code{EnsDb}
 #'     objects.
@@ -215,6 +219,9 @@ setClass("EnsDb",
 #'
 #'     \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
 #'     \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.
+#'
+#'     \code{\link{addFilter}} for globally adding filters to an \code{EnsDb}
+#'     object.
 #' 
 #' @author Johannes Rainer
 #' @examples

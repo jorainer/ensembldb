@@ -4,6 +4,8 @@
 ##
 ##***********************************************************************
 ## A
+setGeneric("activeFilter", function(x, ...) standardGeneric("activeFilter"))
+setGeneric("addFilter", function(x, ...) standardGeneric("addFilter"))
 
 ## B
 setGeneric("buildQuery", function(x, ...)
@@ -16,6 +18,7 @@ setGeneric("cleanColumns", function(x, columns, ...)
 ## D
 setGeneric("dbSeqlevelsStyle", function(x, ...)
     standardGeneric("dbSeqlevelsStyle"))
+setGeneric("dropFilter", function(x, ...) standardGeneric("dropFilter"))
 
 ## E
 setGeneric("ensemblVersion", function(x)
@@ -26,6 +29,9 @@ setGeneric("ensDbQuery", function(object, ...)
     standardGeneric("ensDbQuery"))
 
 ## F
+## if (!isGeneric("filter"))
+##     setGeneric("filter", function(x, ...)
+##                standardGeneric("filter"))
 setGeneric("formatSeqnamesForQuery", function(x, sn, ...)
     standardGeneric("formatSeqnamesForQuery"))
 setGeneric("formatSeqnamesFromQuery", function(x, sn, ...)

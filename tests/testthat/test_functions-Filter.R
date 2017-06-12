@@ -240,3 +240,19 @@ test_that(".AnnottionFilterClassNames works", {
                  c("GeneStartFilter", "SeqStrandFilter", "GenenameFilter",
                    "SeqNameFilter", "SymbolFilter"))
 })
+
+test_that(".anyIs works", {
+    sf <- SymbolFilter("d")
+    expect_true(ensembldb:::.anyIs(sf, "SymbolFilter"))
+    expect_false(ensembldb:::.anyIs(GenenameFilter(3), "SymbolFilter"))
+
+    flts <- AnnotationFilterList(sf, TxIdFilter("b"))
+    expect_true(any(ensembldb:::.anyIs(flts, "SymbolFilter")))
+    expect_false(any(ensembldb:::.anyIs(flts, "BLa")))
+
+    ## Additional nesting.
+    flts <- AnnotationFilterList(flts, GenenameFilter("2"))
+    expect_true(any(ensembldb:::.anyIs(flts, "SymbolFilter")))
+    expect_true(any(ensembldb:::.anyIs(flts, "GenenameFilter")))
+    expect_true(any(ensembldb:::.anyIs(flts, "TxIdFilter")))    
+})

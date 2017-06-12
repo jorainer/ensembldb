@@ -328,3 +328,14 @@ buildWhereForGRanges <- function(grf, columns, db = NULL){
     })
     unlist(classes, use.names = FALSE)
 }
+
+#' @description Test if any of the filter(s) is an SymbolFilter.
+#'
+#' @noRd
+.anyIs <- function(x, what = "SymbolFilter") {
+    if (is(x, "AnnotationFilter")) {
+        is(x, what)
+    } else {
+        unlist(lapply(x, .anyIs, what = what))
+    }
+}
