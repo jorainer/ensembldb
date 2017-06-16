@@ -1996,15 +1996,16 @@ setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
     return(res$uniprot_mapping_type)
 })
 
-#' @description \code{supportedFilters} returns the names of all supported
-#'     filters for the \code{EnsDb} object.
+#' @description \code{supportedFilters} returns a \code{data.frame} with the
+#'     names of all filters and the corresponding field supported by the
+#'     \code{EnsDb} object.
 #'
 #' @param object For \code{supportedFilters}: an \code{EnsDb} object.
 #'
 #' @param ... For \code{supportedFilters}: currently not used.
 #'
-#' @return For \code{supportedFilters}: the names of the supported filter
-#'     classes.
+#' @return For \code{supportedFilters}: a \code{data.frame} with the names and
+#'     the corresponding field of the supported filter classes.
 #' 
 #' @rdname Filter-classes
 setMethod("supportedFilters", "EnsDb", function(object, ...) {

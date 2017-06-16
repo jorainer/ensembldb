@@ -34,20 +34,46 @@
     prot_dom_id = "protein_domain_id"
 )
 
+## .supportedFilters <- function(x) {
+##     flts <- c(
+##         "EntrezFilter", "GeneBiotypeFilter", "GeneIdFilter", "GenenameFilter",
+##         "SymbolFilter", "SeqNameFilter", "SeqStrandFilter", "GeneStartFilter",
+##         "GeneEndFilter", "TxIdFilter", "TxBiotypeFilter", "TxNameFilter",
+##         "TxStartFilter", "TxEndFilter", "ExonIdFilter", "ExonRankFilter",
+##         "ExonStartFilter", "ExonEndFilter", "GRangesFilter"
+##     )
+##     if (hasProteinData(x))
+##         flts <- c(flts, "ProteinIdFilter", "UniprotFilter", "UniprotDbFilter",
+##                   "UniprotMappingTypeFilter", "ProtDomIdFilter")
+##     if (any(listColumns(x) == "tx_support_level"))
+##         flts <- c(flts, "TxSupportLevelFilter")
+##     return(sort(flts))
+## }
 .supportedFilters <- function(x) {
-    flts <- c(
-        "EntrezFilter", "GeneBiotypeFilter", "GeneIdFilter", "GenenameFilter",
-        "SymbolFilter", "SeqNameFilter", "SeqStrandFilter", "GeneStartFilter",
-        "GeneEndFilter", "TxIdFilter", "TxBiotypeFilter", "TxNameFilter",
-        "TxStartFilter", "TxEndFilter", "ExonIdFilter", "ExonRankFilter",
-        "ExonStartFilter", "ExonEndFilter", "GRangesFilter"
-    )
+    flds <- .filterFields(x)
+    flts <- c(.fieldToClass(flds), "GRangesFilter")
+    flds <- c(flds, NA)
+    idx <- order(flts)
+    data.frame(filter = flts[idx], field = flds[idx], stringsAsFactors = FALSE)
+}
+
+.filterFields <- function(x) {
+    flds <- c("entrez", "gene_biotype", "gene_id", "genename", "symbol",
+              "seq_name", "seq_strand", "gene_start", "gene_end", "tx_id",
+              "tx_biotype", "tx_name", "tx_start", "tx_end", "exon_id",
+              "exon_rank", "exon_start", "exon_end")
     if (hasProteinData(x))
-        flts <- c(flts, "ProteinIdFilter", "UniprotFilter", "UniprotDbFilter",
-                  "UniprotMappingTypeFilter", "ProtDomIdFilter")
+        flds <- c(flds, "protein_id", "uniprot", "uniprot_db",
+                  "uniprot_mapping_type", "prot_dom_id")
     if (any(listColumns(x) == "tx_support_level"))
-        flts <- c(flts, "TxSupportLevelFilter")
-    return(sort(flts))
+        flds <- c(flds, "tx_support_level")
+    sort(flds)
+}
+
+.fieldToClass <- function(field) {
+    class <- gsub("_([[:alpha:]])", "\\U\\1", field, perl=TRUE)
+    class <- sub("^([[:alpha:]])", "\\U\\1", class, perl=TRUE)
+    paste0(class, if (length(class)) "Filter" else character(0))
 }
 
 #' Utility function to map from the default AnnotationFilters fields to the
@@ -171,7 +197,7 @@
                  "or a valid filter expression!")
         }
     }
-    supp_filters <- supportedFilters(db)
+    supp_filters <- supportedFilters(db)$filter
     have_filters <- unique(.AnnotationFilterClassNames(res))
     if (!all(have_filters %in% supp_filters))
         stop("AnnotationFilter classes: ",
