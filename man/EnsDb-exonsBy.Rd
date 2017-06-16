@@ -137,7 +137,9 @@
     \code{\link[AnnotationFilter]{AnnotationFilterList}} object
     combining several such objects or a \code{formula} representing a
     filter expression (see examples below or
-    \code{\link[AnnotationFilter]{AnnotationFilter}} for more details).
+    \code{\link[AnnotationFilter]{AnnotationFilter}} for more
+    details). Use the \code{\link{supportedFilters}} method to get an
+    overview of supported filter classes and related fields.
   }
 
   \item{includeTranscripts}{

@@ -17,7 +17,9 @@ setClass("EnsDb",
 #'     \code{\linkS4class{EnsDb}} databases. These filters can be passed to
 #'     the methods such as \code{\link{genes}} with the \code{filter} parameter
 #'     or can be added as a \emph{global} filter to an \code{EnsDb} object
-#'     (see \code{\link{addFilter}} for more details).
+#'     (see \code{\link{addFilter}} for more details). Use the
+#'     \code{\link{supportedFilters}} to list all filters supported for
+#'     \code{EnsDb} object.
 #'
 #' @note For users of \code{ensembldb} version < 2.0: in the
 #'     \code{\link[AnnotationFilter]{GRangesFilter}} from the

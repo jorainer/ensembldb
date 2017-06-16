@@ -256,3 +256,23 @@ test_that(".anyIs works", {
     expect_true(any(ensembldb:::.anyIs(flts, "GenenameFilter")))
     expect_true(any(ensembldb:::.anyIs(flts, "TxIdFilter")))    
 })
+
+test_that(".fieldToClass works", {
+    expect_equal(ensembldb:::.fieldToClass("gene_id"), "GeneIdFilter")
+})
+
+test_that(".filterFields works", {
+    res <- ensembldb:::.filterFields(edb)
+    if (hasProteinData(edb)) {
+        expect_true(any(res == "uniprot"))
+    }
+    expect_true(!any(res == "g_ranges"))
+})
+
+test_that(".supportedFilters works", {
+    res <- ensembldb:::.supportedFilters(edb)
+    expect_true(class(res) == "data.frame")
+    expect_equal(res[res$filter == "GRangesFilter", "field"], as.character(NA))
+    expect_equal(res[res$filter == "ExonIdFilter", "field"], "exon_id")
+    expect_equal(res[res$filter == "GenenameFilter", "field"], "genename")
+})
