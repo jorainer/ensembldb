@@ -229,7 +229,11 @@ was used, the column =gene_name= is also returned). Setting
 specified by the =columns= parameter are retrieved.
 
 Instead of passing a filter /object/ to the method it is also possible to provide
-a filter /expression/ written as a =formula=.
+a filter /expression/ written as a =formula=. The =formula= has to be written in the
+form =~ <field> <condition> <value>= with =<field>= being the field (database
+column) in the database, =<condition>= the condition for the filter object and
+=<value>= its value. Use the =supportedFilter= method to get the field names
+corresponding to each filter class.
 
 #+NAME: transcripts-filter-expression
 #+BEGIN_SRC R
@@ -1632,8 +1636,10 @@ Now, their filters are created /dynamically/, the first part of the name being t
 attribute (field) name followed by /Filter/. How could I use these? Problem comes
 since my attributes are not unique, i.e. present in one table only.
 
-** TODO Implement a different type of filtering
+** DONE Implement a different type of filtering
+   CLOSED: [2017-06-16 Fri 09:27]
 
+   - State "DONE"       from "TODO"       [2017-06-16 Fri 09:27]
 Implement a filtering that does allow calls like
 
 #+BEGIN_EXAMPLE
@@ -1987,8 +1993,10 @@ Base on =ensembldb=:
 + [X] =ggbio=:
 + [ ] =Pbase=:
 + [ ] =wiggleplotr=:
-** TODO entrezid in separate database table
+** DONE entrezid in separate database table
+   CLOSED: [2017-06-16 Fri 09:27]
 
+   - State "DONE"       from "TODO"       [2017-06-16 Fri 09:27]
 + [X] Perl script to save =entrezid= into a separate table =entrezgene=.
 + [X] Import script to create the additional table and indices (=gene_id= and
   =entrezid=).
