@@ -520,7 +520,7 @@ test_that("TxSupportLevelFilter works", {
     expect_equal(value(fl), 3)
     expect_equal(ensembldb:::ensDbQuery(fl), "tx_support_level = 3")
     expect_equal(unname(ensembldb:::ensDbColumn(fl)), "tx_support_level")
-    supportsTsl <- any(supportedFilters(edb) == "TxSupportLevelFilter")
+    supportsTsl <- any(supportedFilters(edb)$filter == "TxSupportLevelFilter")
     if (supportsTsl) {
         expect_equal(unname(ensembldb:::ensDbColumn(fl, edb)),
                      "tx.tx_support_level")

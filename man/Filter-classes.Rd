@@ -64,8 +64,8 @@ For \code{UniprotMappingTypeFilter}: A
 For \code{TxSupportLevel}: A
 \code{TxSupportLevel} object.
 
-For \code{supportedFilters}: the names of the supported filter
-    classes.
+For \code{supportedFilters}: a \code{data.frame} with the names and
+    the corresponding field of the supported filter classes.
 }
 \description{
 \code{ensembldb} supports most of the filters from the
@@ -73,10 +73,13 @@ For \code{supportedFilters}: the names of the supported filter
     \code{\linkS4class{EnsDb}} databases. These filters can be passed to
     the methods such as \code{\link{genes}} with the \code{filter} parameter
     or can be added as a \emph{global} filter to an \code{EnsDb} object
-    (see \code{\link{addFilter}} for more details).
+    (see \code{\link{addFilter}} for more details). Use the
+    \code{\link{supportedFilters}} to list all filters supported for
+    \code{EnsDb} object.
 
-\code{supportedFilters} returns the names of all supported
-    filters for the \code{EnsDb} object.
+\code{supportedFilters} returns a \code{data.frame} with the
+    names of all filters and the corresponding field supported by the
+    \code{EnsDb} object.
 
 \code{seqnames}: accessor for the sequence names of the
 \code{GRanges} object within a \code{GRangesFilter}
