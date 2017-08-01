@@ -320,23 +320,23 @@ makeEnsembldbPackage <- function(ensdb,
 ## a Ensembl GTF file.
 ## Limitation:
 ## + There is no way to get the Entrezgene ID from this file.
-## + Assuming that the element 2 in a row for a transcript represents its biotype, since
-##   there is no explicit key transcript_biotype in element 9.
-## + The CDS features in the GTF are somewhat problematic, while we're used to get just the
-##   coding start and end for a transcript from the Ensembl perl API, here we get the coding
-##   start and end for each exon.
+## + Assuming that the element 2 in a row for a transcript represents its
+##   biotype, since there is no explicit key transcript_biotype in element 9.
+## + The CDS features in the GTF are somewhat problematic, while we're used to
+##   get just the coding start and end for a transcript from the Ensembl perl
+##   API, here we get the coding start and end for each exon.
 ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
                          version, ...){
-    options(useFancyQuotes=FALSE)
-    message("Importing GTF file ... ", appendLF=FALSE)
+    options(useFancyQuotes = FALSE)
+    message("Importing GTF file ... ", appendLF = FALSE)
     ## wanted.features <- c("gene", "transcript", "exon", "CDS")
     wanted.features <- c("exon")
     ## GTF <- import(con=gtf, format="gtf", feature.type=wanted.features)
-    GTF <- import(con=gtf, format="gtf")
+    GTF <- import(con = gtf, format = "gtf")
     message("OK")
     ## check what we've got...
     ## all wanted features?
-    if(any(!(wanted.features %in% levels(GTF$type)))){
+    if (any(!(wanted.features %in% levels(GTF$type)))) {
         stop(paste0("One or more required types are not in the gtf file. Need ",
                     paste(wanted.features, collapse=","), " but got only ",
                     paste(wanted.features[wanted.features %in% levels(GTF$type)],
@@ -344,23 +344,30 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
                     "."))
     }
     ## transcript biotype?
-    if(any(colnames(mcols(GTF))=="transcript_biotype")){
+    if (any(colnames(mcols(GTF)) == "transcript_biotype")) {
         txBiotypeCol <- "transcript_biotype"
-    }else{
+    } else {
         ## that's a little weird, but it seems that certain gtf files from Ensembl
         ## provide the transcript biotype in the element "source"
         txBiotypeCol <- "source"
     }
     ## processing the metadata:
     ## first read the header...
-    tmp <- readLines(gtf, n=10)
-    tmp <- tmp[grep(tmp, pattern="^#")]
+    tmp <- readLines(gtf, n = 10)
+    tmp <- tmp[grep(tmp, pattern = "^#")]
     haveHeader <- FALSE
-    if(length(tmp) > 0){
+    if (length(tmp) > 0) {
         ##message("GTF file has a header.")
-        tmp <- gsub(tmp, pattern="^#", replacement="")
-        tmp <- gsub(tmp, pattern="^!", replacement="")
-        Header <- do.call(rbind, strsplit(tmp, split=" ", fixed=TRUE))
+        tmp <- gsub(tmp, pattern = "^#", replacement = "")
+        tmp <- gsub(tmp, pattern = "^!", replacement = "")
+        ## Splitting by " " but be careful, if there are more than one " "!
+        hdr <- strsplit(tmp, split = " ", fixed = TRUE)
+        hdr <- lapply(hdr, function(z) {
+            if (length(z) > 2)
+                z[2] <- paste(z[2:length(z)], collapse = " ")
+            z[1:2]
+        })
+        Header <- do.call(rbind, hdr)
         colnames(Header) <- c("name", "value")
         haveHeader <- TRUE
     }
@@ -370,7 +377,7 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     organism <- Parms["organism"]
     genomeVersion <- Parms["genomeVersion"]
 
-    if(haveHeader){
+    if (haveHeader) {
         if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"]){
             stop(paste0("The GTF file name is not as expected: <Organism>.",
                         "<genome version>.<Ensembl version>.gtf!",
