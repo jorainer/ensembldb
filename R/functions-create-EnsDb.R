@@ -400,9 +400,8 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname )
-    bla <- dbGetQuery(con, paste0("update metadata set value='",
-                                  gtfFilename,
-                                  "' where name='source_file';"))
+    bla <- dbExecute(con, paste0("update metadata set value='",
+                                 gtfFilename, "' where name='source_file';"))
     dbDisconnect(con)
     return(dbname)
 }
@@ -461,9 +460,8 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname )
-    bla <- dbGetQuery(con, paste0("update metadata set value='",
-                                  gtfFilename,
-                                  "' where name='source_file';"))
+    bla <- dbExecute(con, paste0("update metadata set value='",
+                                 gtfFilename, "' where name='source_file';"))
     dbDisconnect(con)
     return(dbname)
 }
@@ -672,9 +670,8 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion,
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname )
-    bla <- dbGetQuery(con, paste0("update metadata set value='",
-                                  gtfFilename,
-                                  "' where name='source_file';"))
+    bla <- dbExecute(con, paste0("update metadata set value='",
+                                 gtfFilename, "' where name='source_file';"))
     dbDisconnect(con)
     return(dbname)
 }
@@ -1029,9 +1026,9 @@ checkValidEnsDb <- function(x){
                                }))
     if(any(Different)){
         stop(paste0("Provided exon index in transcript does not match with",
-                    " ordering of the exons by chromosomal coordinates for",
-                    sum(Different), "of the", length(Different),
-                    "transcripts encoded on the + strand!"))
+                    " ordering of the exons by chromosomal coordinates for ",
+                    sum(Different), " of the ", length(Different),
+                    " transcripts encoded on the + strand!"))
     }
     extmp <- ex[ex$seq_strand==-1, c("exon_idx", "tx_id", "exon_seq_end")]
     extmp <- extmp[order(extmp$exon_seq_end, decreasing=TRUE), ]
@@ -1041,9 +1038,9 @@ checkValidEnsDb <- function(x){
                                }))
     if(any(Different)){
         stop(paste0("Provided exon index in transcript does not match with",
-                    " ordering of the exons by chromosomal coordinates for",
-                    sum(Different), "of the", length(Different),
-                    "transcripts encoded on the - strand!"))
+                    " ordering of the exons by chromosomal coordinates for ",
+                    sum(Different), " of the ", length(Different),
+                    " transcripts encoded on the - strand!"))
     }
     message("OK")
     return(TRUE)

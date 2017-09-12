@@ -684,12 +684,14 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
                 idxL <- paste0("(", min(c(max(nchar(ids)), 20)), ")")
             else
                 idxL <- ""
-            dbGetQuery(con, paste0("create index ", tabname, "_", colname, "_idx ",
-                                   "on ", tabname, " (",colname, idxL,")"))
+            aff_rows <- dbExecute(
+                con, paste0("create index ", tabname, "_", colname, "_idx ",
+                            "on ", tabname, " (",colname, idxL,")"))
         }
     }
     ## Add the one on the numeric index:
-    dbGetQuery(con, "create index tx2exon_exon_idx_idx on tx2exon (exon_idx);")
+    aff_rows <- dbExecute(con, paste0("create index tx2exon_exon_idx_idx on ",
+                                      "tx2exon (exon_idx);"))
 }
 
 ############################################################

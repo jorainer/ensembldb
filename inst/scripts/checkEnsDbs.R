@@ -15,6 +15,7 @@ checkEnsDbs <- function(x) {
         message("\nChecking EnsDb: ", basename(edbs[i]))
         edb <- EnsDb(edbs[i])
         ensembldb:::validateEnsDb(edb)
+        ensembldb:::checkValidEnsDb(edb)
         ## Now check also some query calls:
         gns <- genes(edb)
         message(" version: ", ensembldb:::dbSchemaVersion(edb))
