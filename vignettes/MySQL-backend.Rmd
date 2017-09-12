@@ -3,7 +3,7 @@ title: "Using a MySQL server backend"
 author: "Johannes Rainer"
 package: ensembldb
 output:
-  BiocStyle::html_document2:
+  BiocStyle::html_document:
     toc_float: true
 vignette: >
   %\VignetteIndexEntry{Using a MySQL server backend}
@@ -33,7 +33,7 @@ this would require access to a MySQL server.
 Installation of `EnsDb` databases in a MySQL server is straight forward - given
 that the user has write access to the server:
 
-```{r eval = FALSE}
+```{r  eval = FALSE }
 library(ensembldb)
 ## Load the EnsDb package that should be installed on the MySQL server
 library(EnsDb.Hsapiens.v75)
@@ -41,10 +41,11 @@ library(EnsDb.Hsapiens.v75)
 ## Call the useMySQL method providing the required credentials to create
 ## databases and inserting data on the MySQL server
 edb_mysql <- useMySQL(EnsDb.Hsapiens.v75, host = "localhost", user = "userwrite",
-		      pass = "userpass")
+                      pass = "userpass")
 
 ## Use this EnsDb object
 genes(edb_mysql)
+ 
 ```
 
 To use an `EnsDb` in a MySQL server without the need to install the corresponding
@@ -52,21 +53,22 @@ R-package, the connection to the database can be passed to the `EnsDb` construct
 function. With the resulting `EnsDb` object annotations can be retrieved from the
 MySQL database.
 
-```{r eval = FALSE}
+```{r  eval = FALSE }
 library(ensembldb)
 library(RMySQL)
 
 ## Connect to the MySQL database to list the databases.
 dbcon <- dbConnect(MySQL(), host = "localhost", user = "readonly",
-		   pass = "readonly")
+                   pass = "readonly")
 
 ## List the available databases
 listEnsDbs(dbcon)
 
 ## Connect to one of the databases and use that one.
 dbcon <- dbConnect(MySQL(), host = "localhost", user = "readonly",
-		   pass = "readonly", dbname = "ensdb_hsapiens_v75")
+                   pass = "readonly", dbname = "ensdb_hsapiens_v75")
 edb <- EnsDb(dbcon)
 edb
+ 
 ```
 

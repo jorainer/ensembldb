@@ -12,7 +12,7 @@ author: "Johannes Rainer"
 graphics: yes
 package: ensembldb
 output:
-  BiocStyle::html_document2:
+  BiocStyle::html_document:
     toc_float: true
 vignette: >
   %\VignetteIndexEntry{Querying protein features}
