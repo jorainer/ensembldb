@@ -11,7 +11,7 @@ title: "Using a MySQL server backend"
 author: "Johannes Rainer"
 package: ensembldb
 output:
-  BiocStyle::html_document2:
+  BiocStyle::html_document:
     toc_float: true
 vignette: >
   %\VignetteIndexEntry{Using a MySQL server backend}
