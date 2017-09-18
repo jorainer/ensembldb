@@ -42,7 +42,7 @@
         columns = listColumns(x, "exon"), filter =
         AnnotationFilterList(), use.names = FALSE)
 
-\S4method{exonsByOverlaps}{EnsDb}(x, ranges, maxgap = 0L, minoverlap = 1L,
+\S4method{exonsByOverlaps}{EnsDb}(x, ranges, maxgap = -1L, minoverlap = 0L,
         type = c("any", "start", "end"), columns = listColumns(x, "exon"),
         filter = AnnotationFilterList())
 
@@ -53,8 +53,8 @@
 \S4method{transcriptsBy}{EnsDb}(x, by = c("gene", "exon"),
         columns = listColumns(x, "tx"), filter = AnnotationFilterList())
 
-\S4method{transcriptsByOverlaps}{EnsDb}(x, ranges, maxgap = 0L,
-        minoverlap = 1L, type = c("any", "start", "end"),
+\S4method{transcriptsByOverlaps}{EnsDb}(x, ranges, maxgap = -1L,
+        minoverlap = 0L, type = c("any", "start", "end"),
         columns = listColumns(x, "tx"), filter = AnnotationFilterList())
 
 \S4method{promoters}{EnsDb}(x, upstream = 2000, downstream = 200, ...)
