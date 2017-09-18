@@ -2,6 +2,13 @@ CHANGES IN VERSION 2.1.12
 ------------------------
 
 BUG FIXES:
+    o Use new defaults from the IRanges package for arguments maxgap = -1L,
+      minoverlap = 0L in transcriptsByOverlaps and exonsByOverlaps methods.
+
+CHANGES IN VERSION 2.1.12
+------------------------
+
+BUG FIXES:
     o Remove RSQLite warnings (issue #54).
 
 CHANGES IN VERSION 2.1.11
