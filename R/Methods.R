@@ -1633,7 +1633,7 @@ setMethod("updateEnsDb", "EnsDb", function(x, ...){
 ##  GenomicFeature package, finetuning and adapting it for EnsDbs
 ####------------------------------------------------------------
 setMethod("transcriptsByOverlaps", "EnsDb",
-          function(x, ranges, maxgap = 0L, minoverlap = 1L,
+          function(x, ranges, maxgap = -1L, minoverlap = 0L,
                    type = c("any", "start", "end"),
                    columns = listColumns(x, "tx"),
                    filter = AnnotationFilterList()) {
@@ -1653,7 +1653,7 @@ setMethod("transcriptsByOverlaps", "EnsDb",
 ##
 ####------------------------------------------------------------
 setMethod("exonsByOverlaps", "EnsDb",
-          function(x, ranges, maxgap = 0L, minoverlap = 1L,
+          function(x, ranges, maxgap = -1L, minoverlap = 0L,
                    type = c("any", "start", "end"),
                    columns = listColumns(x, "exon"),
                    filter = AnnotationFilterList()) {
