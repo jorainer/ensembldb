@@ -107,7 +107,8 @@ importMethodsFrom("AnnotationFilter",
                   "field",
                   "value",
                   "condition",
-                  "supportedFilters")
+                  "supportedFilters",
+                  "convertFilter")
 importFrom("AnnotationFilter",
            "AnnotationFilter",
            "ExonIdFilter",
@@ -160,7 +161,8 @@ exportClasses(
 exportMethods(
     "seqnames",
     "seqlevels",
-    "show"
+    "show",
+    "convertFilter"
 )
 ## Methods for class EnsDb:
 exportMethods("cdsBy",

@@ -399,4 +399,3 @@ TxSupportLevelFilter <- function(value, condition = "==") {
     new("TxSupportLevelFilter", condition = condition,
         value = as.integer(value))
 }
-
