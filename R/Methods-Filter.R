@@ -32,6 +32,70 @@ setMethod("ensDbColumn", "AnnotationFilterList",
                                    with.tables = with.tables)))
           })
 
+#' @title Convert an AnnotationFilter to a SQL WHERE condition for EnsDb
+#'
+#' @aliases convertFilter,AnnotationFilter,EnsDb-method
+#'     convertFilter,AnnotationFilterList,EnsDb-method
+#' 
+#' @description `convertFilter` converts an `AnnotationFilter::AnnotationFilter`
+#'     or `AnnotationFilter::AnnotationFilterList` to an SQL where condition
+#'     for an `EnsDb` database.
+#'
+#' @note This function *might* be used in direct SQL queries on the SQLite
+#'     database underlying an `EnsDb` but is more thought to illustrate the
+#'     use of `AnnotationFilter` objects in combination with SQL databases.
+#'     This method is used internally to create the SQL calls to the database.
+#'
+#' @param object `AnnotationFilter` or `AnnotationFilterList` objects (or
+#'     objects extending these classes).
+#'
+#' @param db `EnsDb` object.
+#'
+#' @param with.tables optional `character` vector specifying the names of the
+#'     database tables that are being queried.
+#'
+#' @return A `character(1)` with the SQL where condition.
+#' 
+#' @md
+#'
+#' @rdname convertFilter
+#' 
+#' @author Johannes Rainer
+#'
+#' @examples
+#'
+#' library(EnsDb.Hsapiens.v75)
+#' edb <- EnsDb.Hsapiens.v75
+#'
+#' ## Define a filter
+#' flt <- AnnotationFilter(~ genename == "BCL2")
+#'
+#' ## Use the method from the AnnotationFilter package:
+#' convertFilter(flt)
+#'
+#' ## Create a combination of filters
+#' flt_list <- AnnotationFilter(~ genename %in% c("BCL2", "BCL2L11") &
+#'     tx_biotype == "protein_coding")
+#' flt_list
+#'
+#' convertFilter(flt_list)
+#'
+#' ## Use the filters in the context of an EnsDb database:
+#' convertFilter(flt, edb)
+#'
+#' convertFilter(flt_list, edb)
+setMethod("convertFilter", signature = c(object = "AnnotationFilter",
+                                         db = "EnsDb"),
+          function(object, db, with.tables = character()) {
+              ensDbQuery(object, db, with.tables)
+          })
+#' @rdname convertFilter
+setMethod("convertFilter", signature = c(object = "AnnotationFilterList",
+                                         db = "EnsDb"),
+          function(object, db, with.tables = character()) {
+              ensDbQuery(object, db, with.tables)
+          })
+
 #' @description Build the \emph{where} query for an \code{AnnotationFilter} or
 #'     \code{AnnotationFilterList}.
 #'

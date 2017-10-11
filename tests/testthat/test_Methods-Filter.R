@@ -538,3 +538,18 @@ test_that("TxSupportLevelFilter works", {
         expect_error(ensembldb:::ensDbQuery(fl, edb, with.tables = "tx"))
     }
 })
+
+test_that("convertFilter works", {
+    flt <- AnnotationFilter(~ genename == "BCL2")
+    expect_equal(convertFilter(flt), "genename == 'BCL2'")
+    expect_equal(convertFilter(flt, edb), "gene.gene_name = 'BCL2'")
+    
+    flt_list <- AnnotationFilter(~ genename %in% c("BCL2", "BCL2L11") &
+                                     tx_biotype == "protein_coding")
+    expect_equal(
+        convertFilter(flt_list),
+        "genename %in% c('BCL2', 'BCL2L11') & tx_biotype == 'protein_coding'")
+    expect_equal(
+        convertFilter(flt_list, edb),
+        "(gene.gene_name in ('BCL2','BCL2L11') and tx.tx_biotype = 'protein_coding')")
+})
