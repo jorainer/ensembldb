@@ -33,7 +33,7 @@ Imports:
 Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.23.21),
-    GenomicFeatures (>= 1.23.18),
+    GenomicFeatures (>= 1.29.10),
     AnnotationFilter (>= 1.1.1)
 Suggests:
     BiocStyle,
