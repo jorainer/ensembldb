@@ -2171,3 +2171,33 @@ Testing select etc methods:
 #+END_SRC
 
 Seems to work out of the box...
+
+** TODO Add functionality to map protein coords to genomic coords
+
++ Given: protein ID, coordinates within protein.
+1) Map protein coords to coords within transcript.
+2) Map within transcript coords to exon and genome coords.
+Result: GRanges with genomic start/end coords (eventually more if over splice
+junctions).
+
+The test object: ENSP00000269305, 281, 391
+
++ [ ] For each protein, fetch also its sequence and compare the length(s) of the
+  corresponding CDS(s) with its length and select the best matching CDS. If the
+  length does not perfectly match, show a warning that CDS and protein sequence
+  length do not macht for XXX, thus returned genomic coordinates might not be
+  OK. The code in =Pbase= contains an example tx.
+
++ [ ] =proteinToTranscript=: map within protein coordinates to within transcript
+  coordinates. Same concept as with =proteinToGenome=, but return the coordinates
+  relative to the (reported) TSS of the tx.
+
++ [ ] =genomeToTranscript=: see below, but one step less.
+
++ [ ] =genomeToProtein=: ? is this not something we can already do?
+  - For the genomic coords, get the exons there (using a =GRangesFilter=).
+  - Calculate the coordinates relative within the protein.
+
+** TODO Fix / adjust coordinate mapping for proteins without matching CDS
+
+Align RNA and AA sequence, trim AA sequence and adjust the within-AA position.
