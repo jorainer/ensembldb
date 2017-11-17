@@ -146,7 +146,8 @@ export("ensDbFromAH",
        "makeEnsemblSQLiteFromTables",
        "makeEnsembldbPackage",
        "runEnsDbApp",
-       "filter"
+       "filter",
+       "proteinToGenome"
        )
 ## Classes
 exportClasses(
