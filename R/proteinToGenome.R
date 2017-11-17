@@ -107,10 +107,12 @@
 #' @description
 #'
 #' Fetches the protein sequence using the provided `"protein_id"` in `cds` and
-#' selects checks whether the cds lenghts match the protein sequence. The
-#' function returns a single CDS for each protein/transcript (the first of
-#' those that have the correct length) and throws a warning if none of the
-#' specified CDS matches the protein sequence.
+#' checks whether the cds lenghts match the protein sequence. The
+#' function returns all CDS for each protein/transcript that have the correct
+#' length) and throws a warning if none of the specified CDS matches the
+#' protein sequence. In the latter case a single CDS (the one with the CDS
+#' length closest to the expected length). Whether a CDS has the expected length
+#' or not is also reported in the metadata column `"cds_ok"`.
 #'
 #' @details
 #'
@@ -121,7 +123,9 @@
 #'
 #' @param cds `GRangesList`
 #'
-#' @return `list` of `GRangesList` with one CDS per element/protein.
+#' @return `list` of `GRangesList`s with one list element per input protein,
+#'    and the `GRangesList` containing the CDS of all matching (or one not
+#'    matching) transcripts.
 #' 
 #' @author Johannes Rainer
 #' 
@@ -144,16 +148,27 @@
             cds_lens <- sum(width(z))
             prt_ids <- unlist(lapply(z, function(y) unique(y$protein_id)))
             diffs <- cds_lens - exp_cds_len[prt_ids]
-            ## Select one for which the
-            idx <- order(abs(diffs))[1]
-            if (diffs[idx] != 0)
+            ## Return all for which diff is 0, or otherwise the one with the
+            ## smallest diff.
+            if (any(diffs == 0)) {
+                z <- lapply(z, function(grng) {
+                    mcols(grng)$cds_ok <- TRUE
+                    grng
+                })
+                GRangesList(z[diffs == 0])
+            } else {
                 warning("Could not find a CDS whith the expected length for ",
                         "protein: '", nm, "'. The returned genomic ",
                         "coordinates might thus not be correct for this ",
                         "protein.", call. = FALSE)
-            ## Alternatively we could align the RNA and AA sequences and trim
-            ## the protein sequence...
-            z[idx]
+                ## Alternatively we could align the RNA and AA sequences and
+                ## trim the protein sequence...
+                z <- lapply(z, function(grng) {
+                    mcols(grng)$cds_ok <- FALSE
+                    grng
+                })
+                GRangesList(z[which.min(abs(diffs))])
+            }
         }
     })
 }
@@ -169,15 +184,53 @@ proteinToTranscript <- function(protein, x, id = "name",
 }
 
 
+#' @title Map within-protein coordinates to genomic coordinates
+#'
 #' @description
 #'
-#' Map within-protein coordinates to genome coordinates.
+#' `proteinToGenome` maps protein-relative coordinates to genomic coordinates
+#' based on the genomic coordinates of the CDS of the encoding transcript. The
+#' encoding transcript is identified using protein-to-transcript annotations
+#' (and eventually Uniprot to Ensembl protein identifier mappings) from the
+#' submittes `EnsDb` object (and thus based on annotations from Ensembl).
+#'
+#' Not all coding regions for protein coding transcripts are complete, and the
+#' function thus checks also if the length of the coding region matches the
+#' length of the protein sequence and throws a warning if that is not the case.
 #' 
+#' The genomic coordinates for the within-protein coordinates, the Ensembl
+#' protein ID, the ID of the encoding transcript and the within protein start
+#' and end coordinates are reported for each input range.
+#'
+#' @details
+#'
+#' Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
+#' be passed to the function as `names` of the `protein` `IRanges` object, or
+#' alternatively in any one of the metadata columns (`mcols`) of `protein`.
+#' 
+#' @note
+#'
+#' While the mapping for Ensembl protein IDs to encoding transcripts (and
+#' thus CDS) is 1:1, the mapping between Uniprot identifiers and encoding
+#' transcripts (which is based on Ensembl annotations) can be one to many. In
+#' such cases `proteinToGenome` calculates genomic coordinates for
+#' within-protein coordinates for all of the annotated Ensembl proteins and
+#' returns all of them. See below for examples.
+#' 
+#' A warning is thrown for proteins which sequence does not match the coding
+#' sequence length of any encoding transcripts. For such proteins/transcripts
+#' a `FALSE` is reported in the respective `"cds_ok"` metadata column.
+#' The most common reason for such discrepancies are incomplete 3' or 5' ends
+#' of the CDS. The positions within the protein might not be correclty
+#' mapped to the genome in such cases and it might be required to check
+#' the mapping manually in the Ensembl genome browser.
+#'
 #' @param protein `IRanges` with the coordinates within the protein(s). The
 #'     object has also to provide some means to identify the protein (see
 #'     details).
-#'
-#' @param genome `EnsDb` object.
+#' 
+#' @param db `EnsDb` object to be used to retrieve genomic coordinates of
+#'     encoding transcripts.
 #'
 #' @param id `character(1)` specifying where the protein identifier can be
 #'     found. Has to be either `"name"` or one of `colnames(mcols(prng))`.
@@ -185,32 +238,121 @@ proteinToTranscript <- function(protein, x, id = "name",
 #' @param idType `character(1)` defining what type of IDs are provided. Has to
 #'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
 #'
-#' @author Johannes Rainer
+#' @return
+#'
+#' `list`, each element being the mapping results for one of the input
+#' ranges in `protein` and names being the IDs used for the mapping. Each
+#' element can be either a:
+#' + `GRanges` object with the genomic coordinates calculated on the
+#'   protein-relative coordinates for the respective Ensembl protein (stored in
+#'   the `"protein_id"` metadata column.
+#' + `GRangesList` object, if the provided protein identifier in `protein` was
+#'   mapped to several Ensembl protein IDs (e.g. if Uniprot identifiers were
+#'   used). Each element in this `GRangesList` is a `GRanges` with the genomic
+#'   coordinates calculated for the protein-relative coordinates from the
+#'   respective Ensembl protein ID.
+#' 
+#' The following metadata columns are available in each `GRanges` in the result:
+#' + `"protein_id"`: the ID of the Ensembl protein for which the within-protein
+#'   coordinates were mapped to the genome.
+#' + `"tx_id"`: the Ensembl transcript ID of the encoding transcript.
+#' + `"exon_id"`: ID of the exons that have overlapping genomic coordinates.
+#' + `"exon_rank"`: the rank/index of the exon within the encoding transcript.
+#' + `"cds_ok"`: contains `TRUE` if the length of the CDS matches the length
+#'    of the amino acid sequence and `FALSE` otherwise.
+#' + `"protein_start"`: the within-protein sequence start coordinate of the
+#'   mapping.
+#' + `"protein_end"`: the within-protein sequence end coordinate of the mapping.
+#'
+#' Genomic coordinates are returned ordered by the exon index within the
+#' transcript.
+#' 
+#' @family coordinate mapping functions
+#' 
+#' @author Johannes Rainer based on initial code from Laurent Gatto and
+#'     Sebastian Gibb
 #' 
 #' @md
 #'
-#' @noRd
-#'
 #' @examples
 #'
-#' irs <- IRanges(start = c(14, 17, 13), end = c(14, 23, 13))
-#' names(irs) <- c("ALAT2_HUMAN", "H0YIP2_HUMAN", "what")
-proteinToGenome <- function(protein, genome, id = "name",
-                            idType = "protein_id") {
+#' library(EnsDb.Hsapiens.v75)
+#' ## Restrict all further queries to chromosome x to speed up the examples
+#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#'
+#' ## Define an IRange with protein-relative coordinates within a protein for
+#' ## the gene SYP
+#' syp <- IRanges(start = 4, end = 17)
+#' names(syp) <- "ENSP00000418169"
+#' res <- proteinToGenome(syp, edbx)
+#' res
+#' ## Positions 4 to 17 within the protein span two exons of the encoding
+#' ## transcript.
+#' 
+#' ## Perform the mapping for multiple proteins identified by their Uniprot
+#' ## IDs.
+#' ids <- c("SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+#' prngs <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
+#' names(prngs) <- ids
+#'
+#' res <- proteinToGenome(prngs, edbx, idType = "uniprot_id")
+#' 
+#' ## The result is a list, same length as the input object
+#' length(res)
+#' names(res)
+#'
+#' ## No protein/encoding transcript could be found for the last one
+#' res[[3]]
+#'
+#' ## The first protein could be mapped to multiple Ensembl proteins. The
+#' ## mapping result using all of their encoding transcripts are returned
+#' res[[1]]
+#'
+#' ## The coordinates within the second protein span two exons
+#' res[[2]]
+proteinToGenome <- function(protein, db, id = "name", idType = "protein_id") {
     coords_cds <- .proteinCoordsToTx(protein)
     ## 1) retrieve CDS for each protein
     message("Fetching CDS for ", length(protein), " proteins ... ",
             appendLF = FALSE)
-    cds_genome <- .cds_for_id_range(genome, protein, id = id, idType = idType)
-    message("OK")
-    ## Convert exons to tx relative, i.e. 1...10,11...15 etc.
-    ## identify the exons with the start end of the coords_cds
-    ## calculate the coords.
-    res <- mapply(cds_genome, as(coords_cds, "IRangesList"),
-                  function(x, y) {
-                      cds_rel <- .splice(x)
-                      start_exon <- which()
-                  })
+    cds_genome <- .cds_for_id_range(db, protein, id = id, idType = idType)
+    ## have a list of GRangesList
+    message(sum(lengths(cds_genome) > 0), " found")
+    ## 2) ensure that the CDS matches the AA sequence length
+    message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
+    cds_genome <- .cds_matching_protein(db, cds_genome)
+    are_ok <- unlist(lapply(cds_genome, function(x) {
+        if (is(x, "GRangesList"))
+            all(x[[1]]$cds_ok)
+        else NA
+    }))
+    are_ok <- are_ok[!is.na(are_ok)]
+    ## We've got now a list of GRanges
+    message(sum(are_ok), "/", length(are_ok), " OK")
+    ## Perform the mapping for each input range with each mapped cds
+    res <- mapply(
+        cds_genome, as(coords_cds, "IRangesList"), as(protein, "IRangesList"),
+        FUN = function(gnm, cds, prt) {
+            if (is.null(gnm)) {
+                GRanges()
+            } else {
+                ## Unlist because we'd like to have a GRanges here. Will split
+                ## again later.
+                maps <- unlist(.to_genome(gnm, cds))
+                ## Don't want to have GRanges names!
+                names(maps) <- NULL
+                mcols(maps)$protein_start <- start(prt)
+                mcols(maps)$protein_end <- end(prt)
+                maps[order(maps$exon_rank)]
+            }
+        })
+    ## Split each element again, if there are more than one protein_id. Names
+    ## of the elements are then the protein_id.
+    lapply(res, function(z) {
+        if (length(unique(z$protein_id)) > 1)
+            split(z, f = z$protein_id)
+        else z
+    })
 }
 
 #' @description
@@ -271,8 +413,10 @@ proteinToGenome <- function(protein, genome, id = "name",
 #' ##         11:12, 16:17, 21:22
 #' .to_genome(g_l, c_c)
 .to_genome <- function(g_coords, cds_coords) {
+    ## TODO: preserve mcols.
     if (is(g_coords, "GRangesList"))
-        return(lapply(g_coords, .to_genome, cds_coords = cds_coords))
+        return(GRangesList(
+            lapply(g_coords, .to_genome, cds_coords = cds_coords)))
     if (!is(g_coords, "GRanges"))
         stop("'g_coords' is supposed to be a 'GRanges' object")
     cds_rel <- .splice(g_coords)
@@ -312,7 +456,12 @@ proteinToGenome <- function(protein, genome, id = "name",
                              IRanges(start = genome_start, end = genome_end),
                              strand = strnd)
     seqinfo(genome_coords) <- seqinfo(g_coords)
-    intersect(genome_coords, g_coords)
+    genome_coords <- intersect(genome_coords, g_coords)
+    ## Now grab all of the metadata columns from the second...
+    mcols(genome_coords) <- mcols(g_coords[findOverlaps(genome_coords,
+                                                        g_coords,
+                                                        select = "first")])
+    genome_coords
 }
 
 .filter_for_idType <- function(x, idType) {
@@ -347,4 +496,21 @@ proteinToGenome <- function(protein, genome, id = "name",
     else
         IRanges(start = c(1, cumsum(width(x)[-length(x)]) + 1),
                 width = width(x))
+}
+
+#' @description
+#'
+#' Map positions along the genome to positions within the protein sequence if
+#' a protein is encoded at the location.
+#' 
+#' @md
+#' 
+#' @noRd
+genomeToProtein <- function(x, granges) {
+    ## 1) Use cdsBy to fetch cds regions overlapping the coords.
+    ## 2) Check if the full GRanges is within the CDS, throw error/return NULL if
+    ##    not
+    ## 3) splice the cds
+    ## 4) map the coords relative to the cds to AA sequence positions. Will have
+    ##    to manage the 3:1 mapping.
 }
