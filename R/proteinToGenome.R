@@ -173,14 +173,143 @@
     })
 }
 
+#' @title Map protein-relative coordinates to positions within the transcript
+#'
 #' @description
 #'
-#' Map protein-relative coordinates to coordinates within the encoding
-#' transcript.
+#' `proteinToTranscript` maps protein-relative coordinates to positions within
+#' the encoding transcript. Note that the returned positions are relative to
+#' the complete transcript length, which includes the 5' UTR.
 #'
-#' @noRd
-proteinToTranscript <- function(protein, x, id = "name",
+#' Similar to the [proteinToGenome()] function, `proteinToTranscript` compares
+#' for each protein whether the length of its sequence matches the length of
+#' the encoding CDS and throws a warning if that is not the case. Incomplete
+#' 3' or 5' CDS of the encoding transcript are the most common reasons for a
+#' mismatch between protein and transcript sequences.
+#' 
+#' @details
+#' 
+#' Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
+#' be passed to the function as `names` of the `protein` `IRanges` object, or
+#' alternatively in any one of the metadata columns (`mcols`) of `protein`.
+#'
+#' @note
+#'
+#' While mapping of Ensembl protein IDs to Ensembl transcript IDs is 1:1, a
+#' single Uniprot identifier can be annotated to several Ensembl protein IDs.
+#' `proteinToTranscript` calculates in such cases transcript-relative
+#' coordinates for each annotated Ensembl protein.
+#'
+#' @inheritParams proteinToGenome
+#' 
+#' @return
+#'
+#' `list`, each element being the mapping results for one of the input
+#' ranges in `protein` and names being the IDs used for the mapping. Each
+#' element is a `IRanges` object with the positions within the encoding
+#' transcript (relative to the start of the transcript, which includes the 5'
+#' UTR). The `IRanges` can be of length > 1 if the provided protein identifier
+#' is annotated to more than one Ensembl protein ID.
+#' 
+#' The following metadata columns are available in each `IRanges` in the result:
+#' + `"protein_id"`: the ID of the Ensembl protein for which the within-protein
+#'   coordinates were mapped to the genome.
+#' + `"tx_id"`: the Ensembl transcript ID of the encoding transcript.
+#' + `"cds_ok"`: contains `TRUE` if the length of the CDS matches the length
+#'    of the amino acid sequence and `FALSE` otherwise.
+#' + `"protein_start"`: the within-protein sequence start coordinate of the
+#'   mapping.
+#' + `"protein_end"`: the within-protein sequence end coordinate of the mapping.
+#'
+#' @family coordinate mapping functions
+#' 
+#' @author Johannes Rainer
+#' 
+#' @md
+#'
+#' @examples
+#'
+#' library(EnsDb.Hsapiens.v75)
+#' ## Restrict all further queries to chromosome x to speed up the examples
+#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#'
+#' ## Define an IRange with protein-relative coordinates within a protein for
+#' ## the gene SYP
+#' syp <- IRanges(start = 4, end = 17)
+#' names(syp) <- "ENSP00000418169"
+#' res <- proteinToTranscript(syp, edbx)
+#' res
+#' ## Positions 4 to 17 within the protein span are encoded by the region
+#' ## from nt 23 to 64.
+#' 
+#' ## Perform the mapping for multiple proteins identified by their Uniprot
+#' ## IDs.
+#' ids <- c("SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+#' prngs <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
+#' names(prngs) <- ids
+#'
+#' res <- proteinToTranscript(prngs, edbx, idType = "uniprot_id")
+#' 
+#' ## The result is a list, same length as the input object
+#' length(res)
+#' names(res)
+#'
+#' ## No protein/encoding transcript could be found for the last one
+#' res[[3]]
+#'
+#' ## The first protein could be mapped to multiple Ensembl proteins. The
+#' ## region within all transcripts encoding the region in the protein are
+#' ## returned
+#' res[[1]]
+#'
+#' ## The result for the region within the second protein
+#' res[[2]]
+proteinToTranscript <- function(protein, db, id = "name",
                                 idType = "protein_id") {
+    coords_cds <- .proteinCoordsToTx(protein)
+    ## 1) retrieve CDS for each protein
+    message("Fetching CDS for ", length(protein), " proteins ... ",
+            appendLF = FALSE)
+    cds_genome <- .cds_for_id_range(db, protein, id = id, idType = idType)
+    ## have a list of GRangesList
+    message(sum(lengths(cds_genome) > 0), " found")
+    ## 2) ensure that the CDS matches the AA sequence length
+    message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
+    cds_genome <- .cds_matching_protein(db, cds_genome)
+    are_ok <- unlist(lapply(cds_genome, function(x) {
+        if (is(x, "GRangesList"))
+            all(x[[1]]$cds_ok)
+        else NA
+    }))
+    are_ok <- are_ok[!is.na(are_ok)]
+    ## We've got now a list of GRanges
+    message(sum(are_ok), "/", length(are_ok), " OK")
+    ## Get for each transcript it's 5' UTR and add its width to the coords_cds
+    tx_ids <- unique(unlist(lapply(cds_genome, names), use.names = FALSE))
+    five_utr <- fiveUTRsByTranscript(db, filter = TxIdFilter(tx_ids))
+    ## Calculate 5' widths for these
+    five_width <- sum(width(five_utr))
+    mapply(
+        cds_genome, as(coords_cds, "IRangesList"), as(protein, "IRangesList"),
+        FUN = function(gnm, cds, prt) {
+            if (is.null(gnm)) {
+                IRanges()
+            } else {
+                ids <- names(gnm)
+                res <- IRanges(start = start(cds) + five_width[ids],
+                               end = end(cds) + five_width[ids],
+                               names = ids)
+                ## Populate mcols
+                mcols(res)$protein_id <- unlist(lapply(gnm,
+                                                       function(z)
+                                                           z$protein_id[1]))
+                mcols(res)$tx_id <- ids
+                mcols(res)$cds_ok <- gnm[[1]]$cds_ok[1]
+                mcols(res)$protein_start <- start(prt)
+                mcols(res)$protein_end <- end(prt)
+                res
+            }
+        })
 }
 
 
