@@ -125,6 +125,9 @@ res[[1]]
 ## The coordinates within the second protein span two exons
 res[[2]]
 }
+\seealso{
+Other coordinate mapping functions: \code{\link{proteinToTranscript}}
+}
 \author{
 Johannes Rainer based on initial code from Laurent Gatto and
 Sebastian Gibb

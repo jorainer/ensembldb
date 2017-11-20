@@ -133,6 +133,41 @@ test_that("proteinToGenome works", {
     expect_true(all(nds == nds[1]))
 })
 
+test_that("proteinToTranscript works", {
+    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    prng <- IRanges(start = c(1, 2, 3, 11, 12), end = c(1, 4, 9, 12, 12),
+                    names = c("ENSP00000014935", "ENSP00000173898",
+                              "ENSP00000217901", "ENSP00000425155", "ffff"))
+    tx_rel <- ensembldb:::proteinToTranscript(prng, edbx)
+    expect_true(is.list(tx_rel))
+    expect_true(all(unlist(lapply(tx_rel, function(z) is(z, "IRanges")))))
+    expect_equal(unname(lengths(tx_rel)), c(1, 1, 1, 1, 0))
+    ## All have cds OK, except 4
+    expect_true(mcols(tx_rel[[1]])$cds_ok)
+    expect_true(mcols(tx_rel[[2]])$cds_ok)
+    expect_true(mcols(tx_rel[[3]])$cds_ok)
+    expect_false(mcols(tx_rel[[4]])$cds_ok)
+    tx_rel <- IRangesList(tx_rel)
+    expect_equal(unlist(width(tx_rel), use.names = FALSE), c(3, 9, 21, 6))
+    expect_equal(start(tx_rel[["ENSP00000014935"]]), (622L + 85L + 87L + 1L))
+    expect_equal(start(tx_rel[["ENSP00000173898"]]), (68L + 44L + 4L))
+    expect_equal(start(tx_rel[["ENSP00000217901"]]), (197L + 7L))
+    expect_equal(start(tx_rel[["ENSP00000425155"]]), (86L + 92L + 31L))
+
+    ## Now for Uniprot...
+    ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+    prngs <- IRanges(start = c(1, 13, 43, 100), end = c(2, 21, 80, 100))
+    names(prngs) <- ids
+    tx_rel <- ensembldb:::proteinToTranscript(prngs, edbx, idType = "uniprot_id")
+    expect_equal(length(tx_rel), 4)
+    expect_equal(unname(lengths(tx_rel)), c(4, 4, 1, 0))
+    tx_rel <- IRangesList(tx_rel)
+    lens <- unlist(width(tx_rel))
+    expect_equal(unique(lens[1:4]), width(prngs)[1] * 3)
+    expect_equal(unique(lens[5:8]), width(prngs)[2] * 3)
+    expect_equal(unique(lens[9]), width(prngs)[3] * 3)    
+})
+
 test_that(".cds_for_id_range works", {
     rng <- IRanges(start = 2, end = 207)
     mcols(rng)$id <- "ENSP00000466417"
