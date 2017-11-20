@@ -1,0 +1,272 @@
+#+TITLE: Mapping between genome and protein coordinates
+#+AUTHOR: Johannes Rainer
+#+EMAIL:  johannes.rainer@eurac.edu
+#+OPTIONS: ^:{} toc:nil
+#+PROPERTY: header-args :exports code
+#+PROPERTY: header-args :session *R_prot*
+
+#+BEGIN_EXPORT html
+---
+title: "Mapping between genome and protein coordinates"
+author: "Johannes Rainer"
+graphics: yes
+package: ensembldb
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: >
+  %\VignetteIndexEntry{Mapping between genome and protein coordinates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,Gviz}
+---
+
+#+END_EXPORT
+
+#+NAME: biocstyle
+#+BEGIN_SRC R :ravel echo = FALSE, results = "asis"
+  BiocStyle::markdown()
+#+END_SRC
+
+* Introduction
+
+Besides retrieving genomic and protein annotations, =ensembldb= provides also
+functionality to map between protein and genome coordinates. This mapping relies
+on the mapping between proteins (their sequences) and their encoding
+transcript. =ensembldb= uses for this annotations provided from Ensembl and stored
+in an =EnsDb= database. Each protein encoding transcript is annotated by Ensembl
+to an unique translation with an assigned Ensembl protein ID. In addition,
+Ensembl provides a mapping from Uniprot identifiers to Ensembl protein IDs. This
+mapping can in some cases be one-to-many, i.e. a single Uniprot ID can be
+assigned to multiple Ensembl protein IDs. An additional complication is that the
+coding region of a protein coding transcript might not be complete and either
+its 3' or 5' end (or both) is not defined (or can not be mapped to the
+genome). The length of the CDS does in such cases not match with the length of
+the annotated protein sequence. Coordinate mappings are performed by =ensembldb=
+even if the CDS and protein sequences do not match, but a warning is thrown in
+this cases.
+
+* Mapping protein coordinates to the genome
+
+The =proteinToGenome= function allows to map coordinates within an amino acid of a
+protein to the corresponding DNA sequence on the genome. A protein identifier
+and the coordinates of the sequence within the amino acid sequence are required
+and have to be passed as an =IRanges= object to the function. The protein
+identifier can either be used as =names= of this object, or added to a metadata
+column (=mcols=). Below we load the =EnsDb= with human gene annotations based on
+Ensembl version 75. Since all of our example genes in this document are encoded
+on chromosome X, we apply a /global/ filter to (virtually) subset the =EnsDb= object
+to this chromosome. This improves the speed of all queries considerably.
+
+#+NAME: load-libs
+#+BEGIN_SRC R :ravel message = FALSE
+  library(ensembldb)
+  library(EnsDb.Hsapiens.v75)
+
+  edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#+END_SRC
+
+In our first example we retrieve the coordinates of positions 5 to 9 within the
+amino acid sequence of the gene GAGE10 in the genome. Below we first get the
+protein ID for this gene from the database and define then the =IRanges= with the
+within-protein coordinates.
+
+#+NAME: gage10-define
+#+BEGIN_SRC R :ravel message = FALSE
+  GAGE10 <- proteins(edbx, filter = ~ genename == "GAGE10")
+  GAGE10
+
+  ## Define the IRanges object.
+  GAGE10_prt <- IRanges(start = 5, end = 9, names = GAGE10$protein_id)
+
+#+END_SRC
+
+We can now map the protein-relative coordinates to genomic coordinates. By
+default the =mapToGenome= function assumes the names of the provided =IRanges=
+object to contain the protein identifier, and that these identifiers are Ensembl
+protein IDs.
+
+#+NAME: gage10-map
+#+BEGIN_SRC R
+  GAGE10_gnm <- proteinToGenome(GAGE10_prt, edbx)
+#+END_SRC
+
+=proteinToGenome= returns a =list=, one element for each range in the input
+=IRanges=. We did only map a single range and hence the result is a =list= of
+length 1. The =GRanges= object in the first element of =GAGE10_gnm= represents the
+coordinates of the DNA sequence encoding positions 5 to 9 in the protein.
+
+#+NAME: gage10-res
+#+BEGIN_SRC R
+  GAGE10_gnm
+#+END_SRC
+
+This =GRanges= contains also useful additional information as metadata columns,
+such as the ID of the encoding transcript (column /"tx_id"/), the ID and index of
+the exon within the protein region is encoded (columns /"exon_id"/ and
+/"exon_rank"/), the start and end coordinates from the input =IRanges= object
+(columns /"protein_start"/ and /"protein_end"/) and a =logical= indicating whether the
+length of the encoding transcript's CDS matches the protein sequence
+(/"cds_ok"/). Special care should be taken if =FALSE= is reported in this last
+column. In such cases the returned genomic coordinates might not be correct and
+they should be manually checked using the Ensembl genome browser.
+
+Next we first fetch all protein domains for the gene SYP and map all of them
+to the genome. To fetch protein domain information we select all columns from
+the /protein_domain/ table. In addition, we retrieve the result as a
+=AAStringSet=. Additional annotations will be available in the =mcols= of this
+result object.
+
+#+NAME: SYP-fetch-domains
+#+BEGIN_SRC R :ravel message = FALSE
+  SYP <- proteins(edbx, filter = ~ genename == "SYP",
+		  columns = c("protein_id", "tx_id",
+			      listColumns(edbx, "protein_domain")),
+		  return.type = "AAStringSet")
+
+  SYP
+#+END_SRC
+
+Each protein sequence of the gene SYP has multiple protein domains annotated to
+it, thus protein IDs and sequences are redundant in the =AAStringSet=. We restrict
+the result below to a single protein.
+
+#+NAME: SYP-single-protein
+#+BEGIN_SRC R :ravel message = FALSE
+  ## How many proteins are annotated to SYP?
+  unique(mcols(SYP)$protein_id)
+
+  ## Reduce the result to a single protein
+  SYP <- SYP[names(SYP) == "ENSP00000263233"]
+
+  ## List the available protein domains and additional annotations
+  mcols(SYP)
+#+END_SRC
+
+Next we create the =IRanges= object and perform the mapping of the protein domains
+to the genome. This time we provide the protein identifiers with one of the
+metadata columns and pass the name of this column with the =id= parameter.
+
+#+NAME: SYP-map
+#+BEGIN_SRC R :ravel 
+  SYP_rng <- IRanges(start = mcols(SYP)$prot_dom_start,
+		     end = mcols(SYP)$prot_dom_end)
+  mcols(SYP_rng) <- mcols(SYP)
+
+  ## Map the domains to the genome. We set "id" to the name
+  ## of the metadata columns containing the protein IDs
+  SYP_gnm <- proteinToGenome(SYP_rng, edbx, id = "protein_id")
+#+END_SRC
+
+The function mapped each domain to the genome and returned a =list= with the
+mapping result for each as a =GRanges= object. As an example we show the mapping
+result for the second protein domain (/PF01284/).
+
+#+NAME: SYP-second
+#+BEGIN_SRC R
+  SYP_gnm[[2]]
+#+END_SRC
+
+Note that the gene is encoded on the reverse strand. The individual ranges are
+ordered by the index of the respective exon within the transcript.
+
+At last we plot the encoding transcript and all of the mapped protein domains
+for the protein /ENSP00000263233/ of SYP.
+
+#+NAME: SYP-plot
+#+BEGIN_SRC R :ravel message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Transcript encoding the protein ENSP00000263233 of SYP with all protein domains."
+  library(Gviz)
+
+  ## Define a genome axis track
+  gat <- GenomeAxisTrack()
+
+  ## Get the transcript ID:
+  txid <- SYP_gnm[[1]]$tx_id[1]
+
+  ## Get a GRanges for the transcript
+  trt <- getGeneRegionTrackForGviz(edbx, filter = TxIdFilter(txid))
+
+  ## Define a GRanges for the mapped protein domains and add
+  ## metadata columns with the grouping of the ranges and the
+  ## IDs of the corresponding protein domains, so they can be
+  ## identified in the plot
+  dmns <- unlist(GRangesList(SYP_gnm))
+  dmns$grp <- rep(1:length(SYP_rng), lengths(SYP_gnm))
+  dmns$id <- rep(mcols(SYP_rng)$protein_domain_id, lengths(SYP_gnm))
+
+  ## Since we're using Ensembl chromosome names we have to set
+  options(ucscChromosomeNames = FALSE)
+
+  ## Plotting the transcript and the mapped protein domains.
+  plotTracks(list(gat,
+		  GeneRegionTrack(trt, name = "tx"),
+		  AnnotationTrack(dmns, group = dmns$grp,
+				  id = dmns$id,
+				  groupAnnotation = "id",
+				  just.group = "above",
+				  shape = "box",
+				  name = "Protein domains")),
+	     transcriptAnnotation = "transcript")
+
+#+END_SRC
+
+It is also possible to pass Uniprot IDs as identifiers for the protein. Ensembl
+provides mapping from these identifiers to Ensembl protein IDs (and it is hence
+available in the =EnsDb= databases), but this mapping can be one-to-many. To
+illustrate this, we map positions within 3 proteins identified by their Uniprot
+identifiers.
+
+#+NAME: uniprot-ids
+#+BEGIN_SRC R :ravel
+  ## Define the IRanges providing Uniprot IDs.
+  uni_rng <- IRanges(start = c(2, 12, 8), end = c(2, 15, 17),
+		     names = c("D6RDZ7_HUMAN", "SHOX_HUMAN", "H7C2F2_HUMAN"))
+
+  ## We have to specify that the IDs are Uniprot IDs
+  uni_gnm <- proteinToGenome(uni_rng, edbx, idType = "uniprot_id")
+#+END_SRC
+
+The length of the protein coding region of the encoding transcript for one of
+the 3 proteins (/H7C2F2_HUMAN/) does not match the length of the protein
+sequence. For some transcripts the CDS is not complete (either at the 3', 5' or
+both ends). Mapped coordinates might not be correct in such cases and it is
+strongly suggested to manually check the mapped coordinates. The result from the
+comparison of the protein sequence and the CDS length is provided in the /cds_ok/
+metadata column of the =GRanges= with the genomic coordinates. Below we print the
+mapping result for the /H7C2F2/ protein; note the value in the /cds_ok/ column.
+
+#+NAME: uniprot-cds_ok
+#+BEGIN_SRC R
+  uni_gnm[[3]]
+#+END_SRC
+
+Mappings between Uniprot and Ensembl protein IDs can be one-to-many. In such
+cases =proteinToGenome= returns a =GRangesList= with each element being the
+coordinates calculated for each annotated Ensembl protein. In our example, the
+first two proteins each was annotated to 4 Ensembl proteins.
+
+#+NAME: uniprot-counts
+#+BEGIN_SRC R
+  ## To how many Ensembl proteins was each Uniprot ID mapped?
+  lengths(uni_gnm)
+#+END_SRC
+
+Below we show the genomic coordinates for the within-protein positions
+calculated for all 4 Ensembl protein IDs for /D6RDZ7_HUMAN/.
+
+#+NAME: uniprot-multi
+#+BEGIN_SRC R
+  uni_gnm[["D6RDZ7_HUMAN"]]
+#+END_SRC
+
+
+* Mapping genomic coordinates to proteins                          :noexport:
+
+* Session information
+
+#+NAME: sessionInfo
+#+BEGIN_SRC R
+  sessionInfo()
+#+END_SRC
+
+* TODOs                                                            :noexport:
