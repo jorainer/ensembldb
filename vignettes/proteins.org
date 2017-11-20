@@ -303,11 +303,8 @@ end coordinates within the amino acid sequence being reported in columns
 
 * Map peptide features within proteins to the genome
 
-Functionality to map peptide features (i.e. ranges within the amino acid
-sequence of the protein) to genomic coordinates are provided by the =Pbase=
-Bioconductor package. These rely in part on the protein annotations provided by
-=EnsDb= databases. See the corresponding vignette /Pbase-with-ensembldb/ in that
-package.
+A detailed description for the mapping of within-protein coordinates to the
+genome is given in the /coordinate-mapping/ vignette.
 
 
 

@@ -140,16 +140,6 @@ test_that(".cds_for_id_range works", {
     expect_equal(length(res[[1]]), 0)
 })
 
-test_that("proteinToGenome works", {
-    rng <- IRanges(start = 1, end = 1)
-    names(rng) <- "H0YIP2_HUMAN"
-
-    protein <- rng
-    id <- "name"
-    idType <- "uniprot_id"
-    genome <- edb
-})
-
 test_that(".splice works", {
     ir <- IRanges(start = c(5, 10, 15), end = c(7, 13, 16))
     res <- .splice(ir)
