@@ -4,10 +4,10 @@
 \alias{proteinToTranscript}
 \title{Map protein-relative coordinates to positions within the transcript}
 \usage{
-proteinToTranscript(protein, db, id = "name", idType = "protein_id")
+proteinToTranscript(x, db, id = "name", idType = "protein_id")
 }
 \arguments{
-\item{protein}{\code{IRanges} with the coordinates within the protein(s). The
+\item{x}{\code{IRanges} with the coordinates within the protein(s). The
 object has also to provide some means to identify the protein (see
 details).}
 
@@ -22,7 +22,7 @@ be one of \code{"protein_id"} (default), \code{"uniprot_id"} or \code{"tx_id"}.}
 }
 \value{
 \code{list}, each element being the mapping results for one of the input
-ranges in \code{protein} and names being the IDs used for the mapping. Each
+ranges in \code{x} and names being the IDs used for the mapping. Each
 element is a \code{IRanges} object with the positions within the encoding
 transcript (relative to the start of the transcript, which includes the 5'
 UTR). The \code{IRanges} can be of length > 1 if the provided protein identifier
@@ -53,8 +53,8 @@ mismatch between protein and transcript sequences.
 }
 \details{
 Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
-be passed to the function as \code{names} of the \code{protein} \code{IRanges} object, or
-alternatively in any one of the metadata columns (\code{mcols}) of \code{protein}.
+be passed to the function as \code{names} of the \code{x} \code{IRanges} object, or
+alternatively in any one of the metadata columns (\code{mcols}) of \code{x}.
 }
 \note{
 While mapping of Ensembl protein IDs to Ensembl transcript IDs is 1:1, a
@@ -101,7 +101,8 @@ res[[1]]
 res[[2]]
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{proteinToGenome}}
+Other coordinate mapping functions: \code{\link{genomeToTranscript}},
+  \code{\link{proteinToGenome}}
 }
 \author{
 Johannes Rainer

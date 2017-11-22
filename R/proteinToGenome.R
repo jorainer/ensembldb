@@ -190,8 +190,8 @@
 #' @details
 #' 
 #' Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
-#' be passed to the function as `names` of the `protein` `IRanges` object, or
-#' alternatively in any one of the metadata columns (`mcols`) of `protein`.
+#' be passed to the function as `names` of the `x` `IRanges` object, or
+#' alternatively in any one of the metadata columns (`mcols`) of `x`.
 #'
 #' @note
 #'
@@ -205,7 +205,7 @@
 #' @return
 #'
 #' `list`, each element being the mapping results for one of the input
-#' ranges in `protein` and names being the IDs used for the mapping. Each
+#' ranges in `x` and names being the IDs used for the mapping. Each
 #' element is a `IRanges` object with the positions within the encoding
 #' transcript (relative to the start of the transcript, which includes the 5'
 #' UTR). The `IRanges` can be of length > 1 if the provided protein identifier
@@ -264,21 +264,25 @@
 #'
 #' ## The result for the region within the second protein
 #' res[[2]]
-proteinToTranscript <- function(protein, db, id = "name",
+proteinToTranscript <- function(x, db, id = "name",
                                 idType = "protein_id") {
-    coords_cds <- .proteinCoordsToTx(protein)
+    if (missing(x) || !is(x, "IRanges"))
+        stop("Argument 'x' is required and has to be an 'IRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    coords_cds <- .proteinCoordsToTx(x)
     ## 1) retrieve CDS for each protein
-    message("Fetching CDS for ", length(protein), " proteins ... ",
+    message("Fetching CDS for ", length(x), " proteins ... ",
             appendLF = FALSE)
-    cds_genome <- .cds_for_id_range(db, protein, id = id, idType = idType)
+    cds_genome <- .cds_for_id_range(db, x, id = id, idType = idType)
     ## have a list of GRangesList
     message(sum(lengths(cds_genome) > 0), " found")
     ## 2) ensure that the CDS matches the AA sequence length
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
     cds_genome <- .cds_matching_protein(db, cds_genome)
-    are_ok <- unlist(lapply(cds_genome, function(x) {
-        if (is(x, "GRangesList"))
-            all(x[[1]]$cds_ok)
+    are_ok <- unlist(lapply(cds_genome, function(z) {
+        if (is(z, "GRangesList"))
+            all(z[[1]]$cds_ok)
         else NA
     }))
     are_ok <- are_ok[!is.na(are_ok)]
@@ -290,7 +294,7 @@ proteinToTranscript <- function(protein, db, id = "name",
     ## Calculate 5' widths for these
     five_width <- sum(width(five_utr))
     mapply(
-        cds_genome, as(coords_cds, "IRangesList"), as(protein, "IRangesList"),
+        cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
         FUN = function(gnm, cds, prt) {
             if (is.null(gnm)) {
                 IRanges()
@@ -334,8 +338,8 @@ proteinToTranscript <- function(protein, db, id = "name",
 #' @details
 #'
 #' Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
-#' be passed to the function as `names` of the `protein` `IRanges` object, or
-#' alternatively in any one of the metadata columns (`mcols`) of `protein`.
+#' be passed to the function as `names` of the `x` `IRanges` object, or
+#' alternatively in any one of the metadata columns (`mcols`) of `x`.
 #' 
 #' @note
 #'
@@ -354,7 +358,7 @@ proteinToTranscript <- function(protein, db, id = "name",
 #' mapped to the genome in such cases and it might be required to check
 #' the mapping manually in the Ensembl genome browser.
 #'
-#' @param protein `IRanges` with the coordinates within the protein(s). The
+#' @param x `IRanges` with the coordinates within the protein(s). The
 #'     object has also to provide some means to identify the protein (see
 #'     details).
 #' 
@@ -370,12 +374,12 @@ proteinToTranscript <- function(protein, db, id = "name",
 #' @return
 #'
 #' `list`, each element being the mapping results for one of the input
-#' ranges in `protein` and names being the IDs used for the mapping. Each
+#' ranges in `x` and names being the IDs used for the mapping. Each
 #' element can be either a:
 #' + `GRanges` object with the genomic coordinates calculated on the
 #'   protein-relative coordinates for the respective Ensembl protein (stored in
 #'   the `"protein_id"` metadata column.
-#' + `GRangesList` object, if the provided protein identifier in `protein` was
+#' + `GRangesList` object, if the provided protein identifier in `x` was
 #'   mapped to several Ensembl protein IDs (e.g. if Uniprot identifiers were
 #'   used). Each element in this `GRangesList` is a `GRanges` with the genomic
 #'   coordinates calculated for the protein-relative coordinates from the
@@ -439,20 +443,24 @@ proteinToTranscript <- function(protein, db, id = "name",
 #'
 #' ## The coordinates within the second protein span two exons
 #' res[[2]]
-proteinToGenome <- function(protein, db, id = "name", idType = "protein_id") {
-    coords_cds <- .proteinCoordsToTx(protein)
+proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
+    if (missing(x) || !is(x, "IRanges"))
+        stop("Argument 'x' is required and has to be an 'IRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    coords_cds <- .proteinCoordsToTx(x)
     ## 1) retrieve CDS for each protein
-    message("Fetching CDS for ", length(protein), " proteins ... ",
+    message("Fetching CDS for ", length(x), " proteins ... ",
             appendLF = FALSE)
-    cds_genome <- .cds_for_id_range(db, protein, id = id, idType = idType)
+    cds_genome <- .cds_for_id_range(db, x, id = id, idType = idType)
     ## have a list of GRangesList
     message(sum(lengths(cds_genome) > 0), " found")
     ## 2) ensure that the CDS matches the AA sequence length
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
     cds_genome <- .cds_matching_protein(db, cds_genome)
-    are_ok <- unlist(lapply(cds_genome, function(x) {
-        if (is(x, "GRangesList"))
-            all(x[[1]]$cds_ok)
+    are_ok <- unlist(lapply(cds_genome, function(z) {
+        if (is(z, "GRangesList"))
+            all(z[[1]]$cds_ok)
         else NA
     }))
     are_ok <- are_ok[!is.na(are_ok)]
@@ -460,7 +468,7 @@ proteinToGenome <- function(protein, db, id = "name", idType = "protein_id") {
     message(sum(are_ok), "/", length(are_ok), " OK")
     ## Perform the mapping for each input range with each mapped cds
     res <- mapply(
-        cds_genome, as(coords_cds, "IRangesList"), as(protein, "IRangesList"),
+        cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
         FUN = function(gnm, cds, prt) {
             if (is.null(gnm)) {
                 GRanges()
@@ -625,21 +633,4 @@ proteinToGenome <- function(protein, db, id = "name", idType = "protein_id") {
     else
         IRanges(start = c(1, cumsum(width(x)[-length(x)]) + 1),
                 width = width(x))
-}
-
-#' @description
-#'
-#' Map positions along the genome to positions within the protein sequence if
-#' a protein is encoded at the location.
-#' 
-#' @md
-#' 
-#' @noRd
-genomeToProtein <- function(x, granges) {
-    ## 1) Use cdsBy to fetch cds regions overlapping the coords.
-    ## 2) Check if the full GRanges is within the CDS, throw error/return NULL if
-    ##    not
-    ## 3) splice the cds
-    ## 4) map the coords relative to the cds to AA sequence positions. Will have
-    ##    to manage the 3:1 mapping.
 }
