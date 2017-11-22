@@ -440,6 +440,20 @@ test_that("lengthOf works", {
     expect_equal(unname(res[names(tx), "tx_len"]),
                  unname(rowSums(res[names(tx),
                                     c("utr5_len", "cds_len", "utr3_len")])))
+    ## Compare 3' and 5' lengths
+    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    res <- ensembldb:::.transcriptLengths(edbx, with.cds_len = TRUE,
+                                          with.utr5_len = TRUE,
+                                          with.utr3_len = TRUE)
+    fives <- fiveUTRsByTranscript(edbx)
+    threes <- threeUTRsByTranscript(edbx)
+    cdss <- cdsBy(edbx)
+    exns <- exonsBy(edbx)
+    ## Compare transcript lengths
+    expect_equal(res$tx_len, unname(sum(width(exns))[res$tx_id]))
+    expect_equal(res[names(fives), "utr5_len"], unname(sum(width(fives))))
+    expect_equal(res[names(threes), "utr3_len"], unname(sum(width(threes))))
+    expect_equal(res[names(cdss), "cds_len"], unname(sum(width(cdss))))
 })
 
 

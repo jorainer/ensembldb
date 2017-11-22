@@ -74,6 +74,12 @@ test_that("proteinToGenome works", {
              "ENSP00000385415")
     prngs <- IRanges(start = c(23, 23, 141, 23), end = c(24, 24, 421, 111))
     names(prngs) <- ids
+
+    ## Test errors
+    expect_error(proteinToGenome())
+    expect_error(proteinToGenome(5, db = edbx))
+    expect_error(proteinToGenome(prngs))
+    expect_error(proteinToGenome(prngs, db = 5))
     
     expect_warning(res <- proteinToGenome(prngs, edbx))
     ## Result has to be a triplet
@@ -138,6 +144,12 @@ test_that("proteinToTranscript works", {
     prng <- IRanges(start = c(1, 2, 3, 11, 12), end = c(1, 4, 9, 12, 12),
                     names = c("ENSP00000014935", "ENSP00000173898",
                               "ENSP00000217901", "ENSP00000425155", "ffff"))
+
+    expect_error(proteinToTranscript())
+    expect_error(proteinToTranscript(5, db = edbx))
+    expect_error(proteinToTranscript(prng))
+    expect_error(proteinToTranscript(prng, db = 5))
+
     tx_rel <- ensembldb:::proteinToTranscript(prng, edbx)
     expect_true(is.list(tx_rel))
     expect_true(all(unlist(lapply(tx_rel, function(z) is(z, "IRanges")))))
@@ -242,3 +254,4 @@ test_that(".to_genome works", {
     c_coords <- IRanges(start = 40, end = 50)
     expect_error(.to_genome(g_coords, c_coords))
 })
+

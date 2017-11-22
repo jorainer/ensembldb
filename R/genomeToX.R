@@ -1,0 +1,222 @@
+#' @title Map genomic coordinates to transcript coordinates
+#'
+#' @description
+#'
+#' `genomeToTranscript` maps genomic coordinates to positions within the
+#' transcript (if at the provided genomic position a transcript is encoded).
+#' The function does only support mapping of genomic coordinates that are
+#' completely within the genomic region at which an exon is encoded. If the
+#' genomic region crosses the exon boundary an empty `IRanges` is returned.
+#' See examples for details.
+#'
+#' @details
+#'
+#' The function first retrieves all exons overlapping the provided genomic
+#' coordinates and identifies then exons that are fully containing the
+#' coordinates in `x`. The transcript-relative coordinates are calculated based
+#' on the relative position of the provided genomic coordinates in this exon.
+#'
+#' @note
+#'
+#' The function throws a warning and returns an empty `IRanges` object if the
+#' genomic coordinates can not be mapped to a transcript.
+#' 
+#' @param x `GRanges` object with the genomic coordinates that should be
+#'     mapped.
+#'
+#' @param db `EnsDb` object.
+#' 
+#' @return
+#'
+#' Depending on the length of the provided `GRanges` the function returns:
+#'
+#' + If `length(x) == 1`: an `IRanges` object with the relative coordinates in
+#'   any of the transcripts for which an exon is encoded at the provided
+#'   genomic location. An empty `IRanges` is returned, if the provided
+#'   genomic coordinates are not completely within the genomic coordinates
+#'   of an exon.
+#' + If `length(x) > 1`: an `IRangesList`, each element providing the mapping
+#'   for each input range (an `IRanges` object as described above).
+#'
+#' The ID of the exon and its rank (index of the exon in the transcript) are
+#' provided in the result's `IRanges` metadata columns as well as the genomic
+#' position of `x`.
+#' 
+#' @md
+#'
+#' @family coordinate mapping functions
+#'
+#' @author Johannes Rainer
+#'
+#' @examples
+#'
+#' library(EnsDb.Hsapiens.v75)
+#'
+#' ## Subsetting the EnsDb object to chromosome X only to speed up execution
+#' ## time of examples
+#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#'
+#' ## Define a genomic region and calculate within-transcript coordinates
+#' gnm <- GRanges("X:106959629-106959631")
+#'
+#' res <- genomeToTranscript(gnm, edbx)
+#' ## Result is an IRanges object with the start and end coordinates within
+#' ## each transcript that has an exon at the genomic range.
+#' res
+#'
+#' ## An empty IRanges is returned if at the provided position no exon is
+#' ## present. Below we use the same coordinates but specify that the
+#' ## coordinates are on the forward (+) strand
+#' gnm <- GRanges("X:106959629-106959631:+")
+#' genomeToTranscript(gnm, edbx)
+#'
+#' ## Next we provide two genomic positions.
+#' gnm <- GRanges("X", IRanges(start = c(605370, 106959629),
+#'     end = c(605374, 106959631)))
+#'
+#' ## The result of the mapping is an IRangesList each element providing the
+#' ## within-transcript coordinates for each input region
+#' genomeToTranscript(gnm, edbx)
+#'
+#' ## Some
+genomeToTranscript <- function(x, db) {
+    if (missing(x) || !is(x, "GRanges"))
+        stop("Argument 'x' is required and has to be a 'GRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    .genome_to_tx(x, db)
+}
+
+transcriptToProtein <- function(x, db, id = "name") {
+    ## Check input
+    ## x
+    ## db
+    ## id
+    
+    ## To calculate from within tx to protein coords I need:
+    ## 1) position within tx: IRanges
+    ## 2) length of 5' UTR, 3' UTR and CDS
+
+    ## Fetch all for all tx ids.
+    if (is(x, "IRanges"))
+        tx_ids <- NULL
+    ## use .transcriptLengths
+
+}
+
+#' @description
+#'
+#' Map positions along the genome to positions within the protein sequence if
+#' a protein is encoded at the location.
+#' 
+#' @md
+#' 
+#' @noRd
+genomeToProtein <- function(x, granges) {
+    
+    ## Need to have 5' UTR and 3' UTR - if we have that I can check:
+    ## a) is the within transcript position within the CDS
+    ## b) need the CDS to check that the protein and CDS sequences match.
+    ## 1) Use cdsBy to fetch cds regions overlapping the coords.
+    ## 2) Check if the full GRanges is within the CDS, throw error/return NULL if
+    ##    not
+    ## 3) splice the cds
+    ## 4) map the coords relative to the cds to AA sequence positions. Will have
+    ##    to manage the 3:1 mapping.
+}
+
+#' @description
+#'
+#' Takes a `GRanges` object, identifies all exons overlapping that region,
+#' checks if the region is completely included in an exons and returns
+#' the position within the transcript for that exon.
+#'
+#' @param db `EnsDb`.
+#'
+#' @param genome `GRanges`
+#'
+#' @author Johannes Rainer
+#'
+#' @md
+#' 
+#' @noRd
+#' 
+#' @examples
+#'
+#' ## Second example: nt 2 of exon 4 of ENST00000554971 (nt 637 of tx)
+#' genome <- GRanges("X", IRanges(start = 601735, end = 601735))
+#' db <- edbx
+#'
+#' ## + strand: Last two nt of CDS for ENST00000381578
+#' genome <- GRanges("X", IRanges(start = 605370, end = 605374))
+#' ## Length of result is 2.
+#' ## Position within ENST00000381578: 259 + 709 + 209 + 58 + 89 + 245 = 1569
+#'
+#' ## - strand: TSC22D3:
+#' ## 1) ENST00000486554 nt 1-3:
+#' genome <- GRanges("X", IRanges(end = 106959631, start = 106959629))
+#' ## Overlaps 2 tx: ENST00000372390, ENST00000486554
+#'
+#' ## 1) ENST00000486554 nts 5-8 in exon 2
+#' ## exon 1: 503nt: region is 508-511
+#' genome <- GRanges("X", IRanges(end = 106957975, width = 4))
+#' .genome_to_tx(genome, edbx)
+#'
+#' ## 3) ENST00000372397, last 3nt
+#' ## exon 3: 446 + 52 + 1529 total length: 2025-2027
+#' genome <- GRanges("X", IRanges(start = 106956451, width = 3))
+#' .genome_to_tx(genome, edbx)
+#'
+#' 
+#' ## Example with two genes, on two strands!
+.genome_to_tx <- function(genome, db) {
+    if (length(genome) > 1) {
+        return(IRangesList(lapply(genome, FUN = .genome_to_tx, db = db)))
+    }
+    exns <- exonsBy(db, by = "tx", filter = GRangesFilter(genome))
+    if (length(exns) == 0)
+        return(IRanges())
+    
+    ## Now go through each and intersect.
+    res <- lapply(exns, function(x) {
+        ints <- intersect(x, genome, ignore.strand = TRUE)
+        if (length(ints)) {
+            ## Only consider if the complete range is within an exon!
+            if (width(ints) == width(genome)) {
+                ## Identify the exon in which the region was found.
+                exon_idx <- findOverlaps(ints, x, select = "first")
+                if (exon_idx > 1)
+                    count_up <- sum(width(x)[1:(exon_idx - 1)])
+                else count_up <- 0
+                if (as.character(strand(x)[1]) == "+") {
+                    ## Forward strand:
+                    irng <- IRanges(start = count_up + start(genome) -
+                                        start(x[exon_idx]) + 1,
+                                    width = width(genome))
+                } else {
+                    irng <- IRanges(start = count_up + end(x[exon_idx]) -
+                                        end(genome) + 1,
+                                    width = width(genome))
+                }
+                ## Add metadata columns
+                exon_idx <- findOverlaps(ints, x, select = "first")
+                dfrm <- DataFrame(
+                    exon_id = x$exon_id[exon_idx],
+                    exon_rank = x$exon_rank[exon_idx],
+                    seq_start = start(genome),
+                    seq_end = end(genome),
+                    seq_name = as.character(seqnames(genome)),
+                    seq_strand = as.character(strand(genome))
+                )
+                mcols(irng) <- dfrm
+                irng
+            }
+        }
+    })
+    res <- res[lengths(res) > 0]
+    if (length(res))
+        unlist(IRangesList(res))
+    else
+        IRanges()
+}
+

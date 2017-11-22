@@ -4,10 +4,10 @@
 \alias{proteinToGenome}
 \title{Map within-protein coordinates to genomic coordinates}
 \usage{
-proteinToGenome(protein, db, id = "name", idType = "protein_id")
+proteinToGenome(x, db, id = "name", idType = "protein_id")
 }
 \arguments{
-\item{protein}{\code{IRanges} with the coordinates within the protein(s). The
+\item{x}{\code{IRanges} with the coordinates within the protein(s). The
 object has also to provide some means to identify the protein (see
 details).}
 
@@ -22,13 +22,13 @@ be one of \code{"protein_id"} (default), \code{"uniprot_id"} or \code{"tx_id"}.}
 }
 \value{
 \code{list}, each element being the mapping results for one of the input
-ranges in \code{protein} and names being the IDs used for the mapping. Each
+ranges in \code{x} and names being the IDs used for the mapping. Each
 element can be either a:
 \itemize{
 \item \code{GRanges} object with the genomic coordinates calculated on the
 protein-relative coordinates for the respective Ensembl protein (stored in
 the \code{"protein_id"} metadata column.
-\item \code{GRangesList} object, if the provided protein identifier in \code{protein} was
+\item \code{GRangesList} object, if the provided protein identifier in \code{x} was
 mapped to several Ensembl protein IDs (e.g. if Uniprot identifiers were
 used). Each element in this \code{GRangesList} is a \code{GRanges} with the genomic
 coordinates calculated for the protein-relative coordinates from the
@@ -69,8 +69,8 @@ and end coordinates are reported for each input range.
 }
 \details{
 Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
-be passed to the function as \code{names} of the \code{protein} \code{IRanges} object, or
-alternatively in any one of the metadata columns (\code{mcols}) of \code{protein}.
+be passed to the function as \code{names} of the \code{x} \code{IRanges} object, or
+alternatively in any one of the metadata columns (\code{mcols}) of \code{x}.
 }
 \note{
 While the mapping for Ensembl protein IDs to encoding transcripts (and
@@ -126,7 +126,8 @@ res[[1]]
 res[[2]]
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{proteinToTranscript}}
+Other coordinate mapping functions: \code{\link{genomeToTranscript}},
+  \code{\link{proteinToTranscript}}
 }
 \author{
 Johannes Rainer based on initial code from Laurent Gatto and

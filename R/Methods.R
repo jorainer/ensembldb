@@ -915,57 +915,41 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
 ##  For TxDb: calls just the function (not method!) from the GenomicFeatures
 ##            package.
 ##  For EnsDb: calls the .transcriptLengths function.
-####------------------------------------------------------------
-## setMethod("transcriptLengths", "TxDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-##                                                with.utr3_len=FALSE){
-##     return(GenomicFeatures::transcriptLengths(x, with.cds_len=with.cds_len,
-##                                               with.utr5_len=with.utr5_len,
-##                                               with.utr3_len=with.utr3_len))
-## })
-## setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-##                                                 with.utr3_len=FALSE, filter=list()){
-##     return(.transcriptLengths(x, with.cds_len=with.cds_len, with.utr5_len=with.utr3_len,
-##                               with.utr3_len=with.utr3_len, filter=filter))
-## })
-## implement the method from the GenomicFeatures package
-.transcriptLengths <- function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-                               with.utr3_len=FALSE,
-                               filter = AnnotationFilterList()){
-    ## First we're going to fetch the exonsBy.
-    ## Or use getWhat???
-    ## Dash, have to make two queries!
+.transcriptLengths <- function(x, with.cds_len = FALSE, with.utr5_len = FALSE,
+                               with.utr3_len = FALSE,
+                               filter = AnnotationFilterList()) {
     filter <- .processFilterParam(filter, x)
-    allTxs <- transcripts(x, filter=filter)
-    exns <- exonsBy(x, filter=filter)
+    allTxs <- transcripts(x, filter = filter)
+    exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
     ## Match ordering
     exns <- exns[match(allTxs$tx_id, names(exns))]
     ## Calculate length of transcripts.
-    txLengths <- sum(width(reduce(exns)))
+    txLengths <- sum(width(exns))
     ## Calculate no. of exons.
     ## build result data frame:
-    Res <- data.frame(tx_id=allTxs$tx_id, gene_id=allTxs$gene_id,
-                      nexon=lengths(exns), tx_len=txLengths,
-                      stringsAsFactors=FALSE)
-    if(!any(c(with.cds_len, with.utr5_len, with.utr3_len))){
+    Res <- data.frame(tx_id = allTxs$tx_id, gene_id = allTxs$gene_id,
+                      nexon = lengths(exns), tx_len = txLengths,
+                      stringsAsFactors = FALSE)
+    if(!any(c(with.cds_len, with.utr5_len, with.utr3_len))) {
         ## Return what we've got thus far.
         return(Res)
     }
-    if(with.cds_len)
-        Res <- cbind(Res, cds_len=rep(NA, nrow(Res)))
-    if(with.utr5_len)
-        Res <- cbind(Res, utr5_len=rep(NA, nrow(Res)))
-    if(with.utr3_len)
-        Res <- cbind(Res, utr3_len=rep(NA, nrow(Res)))
+    if (with.cds_len)
+        Res$cds_len <- NA
+    if (with.utr5_len)
+        Res$utr5_len <- NA
+    if (with.utr3_len)
+        Res$utr3_len <- NA
     ## Otherwise do the remaining stuff...
     txs <- allTxs[!is.na(allTxs$tx_cds_seq_start)]
-    if(length(txs) > 0){
+    if (length(txs) > 0) {
         cExns <- exns[txs$tx_id]
-        cReg <- GRanges(seqnames=seqnames(txs),
-                             ranges=IRanges(txs$tx_cds_seq_start,
-                                            txs$tx_cds_seq_end),
-                             strand=strand(txs),
-                             tx_id=txs$tx_id)
-        cReg <- split(cReg, f=cReg$tx_id)
+        cReg <- GRanges(seqnames = seqnames(txs),
+                        ranges = IRanges(start = txs$tx_cds_seq_start,
+                                         end = txs$tx_cds_seq_end),
+                        strand = strand(txs),
+                        tx_id = txs$tx_id)
+        cReg <- split(cReg, f = cReg$tx_id)
         ## Match order.
         cReg <- cReg[match(txs$tx_id, names(cReg))]
         cdsExns <- intersect(cReg, cExns)
@@ -973,35 +957,35 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
         ##        and translated region)
         ## cReg: just the start-end position of the coding region of the tx.
         ## cdsExns: the coding part of all exons of the tx.
-        if(with.cds_len){
+        if (with.cds_len) {
             ## Calculate CDS length
-            cdsLengths <- sum(width(reduce(cdsExns)))
+            cdsLengths <- sum(width(cdsExns))
             Res[names(cdsLengths), "cds_len"] <- cdsLengths
         }
-        if(with.utr3_len | with.utr5_len){
+        if (with.utr3_len | with.utr5_len) {
             ## ! UTR is the difference between the exons and the cds-exons
             ## Note: order of parameters is important!
             utrReg <- setdiff(cExns, cdsExns)
             leftOfCds <- utrReg[end(utrReg) < start(cReg)]
             rightOfCds <- utrReg[start(utrReg) > end(cReg)]
             ## Calculate lengths.
-            leftOfLengths <- sum(width(reduce(leftOfCds)))
-            rightOfLengths <- sum(width(reduce(rightOfCds)))
+            leftOfLengths <- sum(width(leftOfCds))
+            rightOfLengths <- sum(width(rightOfCds))
             minusTx <- which(as.character(strand(txs)) == "-" )
-            if(with.utr3_len){
+            if (with.utr3_len) {
                 ## Ordering of txs and all other stuff matches.
                 tmp <- rightOfLengths
                 tmp[minusTx] <- leftOfLengths[minusTx]
                 Res[names(tmp), "utr3_len"] <- tmp
             }
-            if(with.utr5_len){
+            if (with.utr5_len) {
                 tmp <- leftOfLengths
                 tmp[minusTx] <- rightOfLengths[minusTx]
                 Res[names(tmp), "utr5_len"] <- tmp
             }
         }
     }
-    return(Res)
+    Res
 }
 
 ############################################################
