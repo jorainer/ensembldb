@@ -920,6 +920,9 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
                                filter = AnnotationFilterList()) {
     filter <- .processFilterParam(filter, x)
     allTxs <- transcripts(x, filter = filter)
+    if (length(allTxs) == 0)
+        return(data.frame(tx_id = character(), gene_id = character(),
+                          nexon = integer(), tx_len = integer()))
     exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
     ## Match ordering
     exns <- exns[match(allTxs$tx_id, names(exns))]

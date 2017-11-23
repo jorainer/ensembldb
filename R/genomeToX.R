@@ -32,9 +32,9 @@
 #'
 #' + If `length(x) == 1`: an `IRanges` object with the relative coordinates in
 #'   any of the transcripts for which an exon is encoded at the provided
-#'   genomic location. An empty `IRanges` is returned, if the provided
-#'   genomic coordinates are not completely within the genomic coordinates
-#'   of an exon.
+#'   genomic location. An `IRanges` with negative start coordinates is
+#'   returned, if the provided genomic coordinates are not completely within
+#'   the genomic coordinates of an exon.
 #' + If `length(x) > 1`: an `IRangesList`, each element providing the mapping
 #'   for each input range (an `IRanges` object as described above).
 #'
@@ -64,44 +64,25 @@
 #' ## each transcript that has an exon at the genomic range.
 #' res
 #'
-#' ## An empty IRanges is returned if at the provided position no exon is
-#' ## present. Below we use the same coordinates but specify that the
-#' ## coordinates are on the forward (+) strand
+#' ## An IRanges with negative coordinates is returned if at the provided
+#' ## position no exon is present. Below we use the same coordinates but
+#' ## specify that the coordinates are on the forward (+) strand
 #' gnm <- GRanges("X:106959629-106959631:+")
 #' genomeToTranscript(gnm, edbx)
 #'
-#' ## Next we provide two genomic positions.
-#' gnm <- GRanges("X", IRanges(start = c(605370, 106959629),
-#'     end = c(605374, 106959631)))
+#' ## Next we provide multiple genomic positions.
+#' gnm <- GRanges("X", IRanges(start = c(605370, 106959629, 106959629),
+#'     end = c(605374, 106959631, 106959631)), strand = c("*", "*", "+"))
 #'
 #' ## The result of the mapping is an IRangesList each element providing the
 #' ## within-transcript coordinates for each input region
 #' genomeToTranscript(gnm, edbx)
-#'
-#' ## Some
 genomeToTranscript <- function(x, db) {
     if (missing(x) || !is(x, "GRanges"))
         stop("Argument 'x' is required and has to be a 'GRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
         stop("Argument 'db' is required and has to be an 'EnsDb' object")
     .genome_to_tx(x, db)
-}
-
-transcriptToProtein <- function(x, db, id = "name") {
-    ## Check input
-    ## x
-    ## db
-    ## id
-    
-    ## To calculate from within tx to protein coords I need:
-    ## 1) position within tx: IRanges
-    ## 2) length of 5' UTR, 3' UTR and CDS
-
-    ## Fetch all for all tx ids.
-    if (is(x, "IRanges"))
-        tx_ids <- NULL
-    ## use .transcriptLengths
-
 }
 
 #' @description
@@ -113,6 +94,7 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' 
 #' @noRd
 genomeToProtein <- function(x, granges) {
+    ## combine genomeToTranscript and transcriptToProtein.
     
     ## Need to have 5' UTR and 3' UTR - if we have that I can check:
     ## a) is the within transcript position within the CDS
@@ -173,9 +155,16 @@ genomeToProtein <- function(x, granges) {
     if (length(genome) > 1) {
         return(IRangesList(lapply(genome, FUN = .genome_to_tx, db = db)))
     }
+    metad <- DataFrame(exon_id = NA_character_, exon_rank = NA_integer_,
+                       seq_start = start(genome), seq_end = end(genome),
+                       seq_name = as.character(seqnames(genome)),
+                       seq_strand = as.character(strand(genome)))
+    empty_rng <- IRanges(start = -1, width = 1)
+    mcols(empty_rng) <- metad
     exns <- exonsBy(db, by = "tx", filter = GRangesFilter(genome))
-    if (length(exns) == 0)
-        return(IRanges())
+    if (length(exns) == 0) {
+        return(empty_rng)
+    }
     
     ## Now go through each and intersect.
     res <- lapply(exns, function(x) {
@@ -217,6 +206,6 @@ genomeToProtein <- function(x, granges) {
     if (length(res))
         unlist(IRangesList(res))
     else
-        IRanges()
+        empty_rng
 }
 

@@ -46,6 +46,25 @@ the annotated protein sequence. Coordinate mappings are performed by =ensembldb=
 even if the CDS and protein sequences do not match, but a warning is thrown in
 this cases.
 
+The available functions are:
++ [ ] =genomeToTranscript=: takes a =GRanges= and returns an =IRangesList= (genomic
+  positions can be mapped to several transcripts).
+
++ [ ] =genomeToProtein=: takes a =GRanges= and returns an =IRangesList= (genomic positions
+  can be mapped to several transcripts, each transcript then to one protein).
+
++ [ ] =transcriptToGenome=: takes a =IRanges= and returns a =GRangesList=
+  (within-transcript coordinates can be mapped to several exons and hence
+  genomic locations).
+
++ [X] =transcriptToProtein=: takes an =IRanges= and returns an =IRanges= (mapping of
+  transcript to protein is 1:1). If mapping could not be performed it returns an
+  =IRanges= with negative start coordinates.
+
++ [ ] =proteinToTranscript=: takes an =IRanges= and returns an =IRanges= if each protein
+  can only mapped to a single transcript. It returns a =list= of =IRanges= if a
+  protein is mapped to several transcripts... AAAAA
+
 * Mapping protein coordinates to the genome
 
 The =proteinToGenome= function allows to map coordinates within an amino acid of a

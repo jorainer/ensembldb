@@ -17,9 +17,9 @@ Depending on the length of the provided \code{GRanges} the function returns:
 \itemize{
 \item If \code{length(x) == 1}: an \code{IRanges} object with the relative coordinates in
 any of the transcripts for which an exon is encoded at the provided
-genomic location. An empty \code{IRanges} is returned, if the provided
-genomic coordinates are not completely within the genomic coordinates
-of an exon.
+genomic location. An \code{IRanges} with negative start coordinates is
+returned, if the provided genomic coordinates are not completely within
+the genomic coordinates of an exon.
 \item If \code{length(x) > 1}: an \code{IRangesList}, each element providing the mapping
 for each input range (an \code{IRanges} object as described above).
 }
@@ -62,21 +62,19 @@ res <- genomeToTranscript(gnm, edbx)
 ## each transcript that has an exon at the genomic range.
 res
 
-## An empty IRanges is returned if at the provided position no exon is
-## present. Below we use the same coordinates but specify that the
-## coordinates are on the forward (+) strand
+## An IRanges with negative coordinates is returned if at the provided
+## position no exon is present. Below we use the same coordinates but
+## specify that the coordinates are on the forward (+) strand
 gnm <- GRanges("X:106959629-106959631:+")
 genomeToTranscript(gnm, edbx)
 
-## Next we provide two genomic positions.
-gnm <- GRanges("X", IRanges(start = c(605370, 106959629),
-    end = c(605374, 106959631)))
+## Next we provide multiple genomic positions.
+gnm <- GRanges("X", IRanges(start = c(605370, 106959629, 106959629),
+    end = c(605374, 106959631, 106959631)), strand = c("*", "*", "+"))
 
 ## The result of the mapping is an IRangesList each element providing the
 ## within-transcript coordinates for each input region
 genomeToTranscript(gnm, edbx)
-
-## Some
 }
 \seealso{
 Other coordinate mapping functions: \code{\link{proteinToGenome}},
