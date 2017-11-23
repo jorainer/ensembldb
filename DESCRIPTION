@@ -73,6 +73,7 @@ Collate:
     'proteinToGenome.R'
     'select-methods.R'
     'seqname-utils.R'
+    'transcriptToX.R'
     'zzz.R'
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL

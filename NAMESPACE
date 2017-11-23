@@ -149,7 +149,8 @@ export("ensDbFromAH",
        "filter",
        "proteinToGenome",
        "proteinToTranscript",
-       "genomeToTranscript"
+       "genomeToTranscript",
+       "transcriptToProtein"
        )
 ## Classes
 exportClasses(
