@@ -21,9 +21,9 @@ found. Has to be either \code{"name"} or one of \code{colnames(mcols(prng))}.}
 \value{
 \code{IRanges} with the same length (and order) than the input \code{IRanges}
 \code{x}. Each element in \code{IRanges} provides the coordinates within the
-protein sequence, names being the names of the protein. The original
-transcript ID and the transcript-relative coordinates are provided as
-metadata columns. Metadata columns \code{"cds_ok"} indicates whether the
+protein sequence, names being the (Ensembl) IDs of the protein. The
+original transcript ID and the transcript-relative coordinates are provided
+as metadata columns. Metadata columns \code{"cds_ok"} indicates whether the
 length of the transcript's CDS matches the length of the encoded protein.
 \code{IRanges} with a start coordinate of \code{-1} is returned for transcript
 coordinates that can not be mapped to protein-relative coordinates
