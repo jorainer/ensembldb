@@ -1,3 +1,5 @@
+#' @include transcriptToX.R
+
 #' @title Map genomic coordinates to transcript coordinates
 #'
 #' @description
@@ -28,15 +30,11 @@
 #' 
 #' @return
 #'
-#' Depending on the length of the provided `GRanges` the function returns:
-#'
-#' + If `length(x) == 1`: an `IRanges` object with the relative coordinates in
-#'   any of the transcripts for which an exon is encoded at the provided
-#'   genomic location. An `IRanges` with negative start coordinates is
-#'   returned, if the provided genomic coordinates are not completely within
-#'   the genomic coordinates of an exon.
-#' + If `length(x) > 1`: an `IRangesList`, each element providing the mapping
-#'   for each input range (an `IRanges` object as described above).
+#' An `IRangesList` with length equal to `length(x)`. Each element providing
+#' the mapping(s) to position within any encoded transcripts at the respective
+#' genomic location as an `IRanges` object. An `IRanges` with negative start
+#' coordinates is returned, if the provided genomic coordinates are not
+#' completely within the genomic coordinates of an exon.
 #'
 #' The ID of the exon and its rank (index of the exon in the transcript) are
 #' provided in the result's `IRanges` metadata columns as well as the genomic
@@ -82,29 +80,134 @@ genomeToTranscript <- function(x, db) {
         stop("Argument 'x' is required and has to be a 'GRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
         stop("Argument 'db' is required and has to be an 'EnsDb' object")
-    .genome_to_tx(x, db)
+    res <- .genome_to_tx(x, db)
+    if (is(res, "IRanges"))
+        res <- IRangesList(res)
+    not_mapped <- sum(any(start(res) < 0))
+    if (not_mapped > 0)
+        warning(not_mapped, " genomic region(s) could not be annotated ",
+                 "to a transcript", call. = FALSE)
+    res
 }
 
+#' @title Map genomic coordinates to protein coordinates
+#'
 #' @description
 #'
 #' Map positions along the genome to positions within the protein sequence if
-#' a protein is encoded at the location.
+#' a protein is encoded at the location. The provided coordinates have to be
+#' completely within the genomic position of an exon of a protein coding
+#' transcript (see [genomeToTranscript()] for details). Also, the provided
+#' positions have to be within the genomic region encoding the CDS of a
+#' transcript (excluding its stop codon; soo [transcriptToProtein()] for
+#' details).
+#'
+#' For genomic positions for which the mapping failed an `IRanges` with
+#' negative coordinates (i.e. a start position of -1) is returned.
+#'
+#' @details
+#'
+#' `genomeToProtein` combines calls to [genomeToTranscript()] and
+#' [transcriptToProtein()].
+#'
+#' @param x `GRanges` with the genomic coordinates that should be mapped to
+#'     within-protein coordinates.
+#' 
+#' @param db `EnsDb` object.
+#'
+#' @return
+#'
+#' An `IRangesList` with each element representing the mapping of one of the
+#' `GRanges` in `x` (i.e. the length of the `IRangesList` is `length(x)`).
+#' Each element in `IRanges` provides the coordinates within the protein
+#' sequence, names being the (Ensembl) IDs of the protein. The ID of the
+#' transcript encoding the protein, the ID of the exon within which the
+#' genomic coordinates are located and its rank in the transcript are provided
+#' in metadata columns `"tx_id"`, `"exon_id"` and `"exon_rank"`. Metadata
+#' columns `"cds_ok"` indicates whether the length of the CDS matches the
+#' length of the encoded protein. Coordinates for which `cds_ok = FALSE` should
+#' be taken with caution, as they might not be correct. Metadata columns
+#' `"seq_start"`, `"seq_end"`, `"seq_name"` and `"seq_strand"` provide the
+#' provided genomic coordinates.
+#'
+#' For genomic coordinates that can not be mapped to within-protein sequences
+#' an `IRanges` with a start coordinate of -1 is returned.
+#'
+#' @family coordinate mapping functions
+#'
+#' @author Johannes Rainer
 #' 
 #' @md
+#'
+#' @examples
 #' 
-#' @noRd
-genomeToProtein <- function(x, granges) {
-    ## combine genomeToTranscript and transcriptToProtein.
-    
-    ## Need to have 5' UTR and 3' UTR - if we have that I can check:
-    ## a) is the within transcript position within the CDS
-    ## b) need the CDS to check that the protein and CDS sequences match.
-    ## 1) Use cdsBy to fetch cds regions overlapping the coords.
-    ## 2) Check if the full GRanges is within the CDS, throw error/return NULL if
-    ##    not
-    ## 3) splice the cds
-    ## 4) map the coords relative to the cds to AA sequence positions. Will have
-    ##    to manage the 3:1 mapping.
+#' library(EnsDb.Hsapiens.v75)
+#' ## Restrict all further queries to chromosome x to speed up the examples
+#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#'
+#' ## In the example below we define 4 genomic regions:
+#' ## 591633: corresponds to the first nt of the CDS of ENST00000381578
+#' ## 605371: last nt of the CDS of ENST00000381578
+#' ## 605368: last nt before the stop codon in ENST00000381578
+#' ## 595564: position within an intron.
+#' gnm <- GRanges("X", IRanges(start = c(591633, 605371, 605368, 595564),
+#'     width = c(5, 1, 1, 3)))
+#' res <- genomeToProtein(gnm, edbx)
+#'
+#' ## The result is an IRangesList with the same length as gnm
+#' length(res)
+#' length(gnm)
+#'
+#' ## The first element represents the mapping for the first GRanges:
+#' ## the coordinate is mapped to the first amino acid of the protein(s).
+#' ## The genomic coordinates can be mapped to several transcripts (and hence
+#' ## proteins).
+#' res[[1]]
+#'
+#' ## The stop codon is not translated, thus the mapping for the second
+#' ## GRanges fails
+#' res[[2]]
+#'
+#' ## The 3rd GRanges is mapped to the last amino acid.
+#' res[[3]]
+#'
+#' ## Mapping of intronic positions fail
+#' res[[4]]
+genomeToProtein <- function(x, db) {
+    if (missing(x) || !is(x, "GRanges"))
+        stop("Argument 'x' is required and has to be a 'GRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    txs <- genomeToTranscript(x, db)
+    ## if (is(txs, "IRangesList")) {
+        int_ids <- rep(1:length(txs), lengths(txs))
+        txs <- unlist(txs)
+    ## } else
+    ##     int_ids <- NULL
+    if (is.null(names(txs)))
+        names(txs) <- ""
+    prts <- transcriptToProtein(txs, db)
+    mcols(prts) <- cbind(mcols(prts)[, c("tx_id", "cds_ok")], mcols(txs))
+    ## Update the metadata columns...
+    ## if (!is.null(int_ids)) {
+        prts <- split(prts, int_ids)
+        names(prts) <- NULL
+    ## }
+    ## Prune the result by removing non-mappable regions from each element
+    ## for which we do have correct mappings.
+    ## if (is(prts, "IRangesList")) {
+        prts <- IRangesList(lapply(prts, function(x) {
+            strts <- start(x)
+            if (any(strts < 0) & any(strts > 0))
+                x <- x[strts > 0]
+            x
+        }))
+    ## } else {
+    ##     strts <- start(prts)
+    ##     if (any(strts < 0) & any(strts > 0))
+    ##         prts <- prts[strts > 0]
+    ## }
+    prts
 }
 
 #' @description

@@ -28,17 +28,19 @@
 #' @param id `character(1)` specifying where the transcript identifier can be
 #'     found. Has to be either `"name"` or one of `colnames(mcols(prng))`.
 #' 
-#' @return `IRanges` with the same length (and order) than the input `IRanges`
-#'     `x`. Each element in `IRanges` provides the coordinates within the
-#'     protein sequence, names being the names of the protein. The original
-#'     transcript ID and the transcript-relative coordinates are provided as
-#'     metadata columns. Metadata columns `"cds_ok"` indicates whether the
-#'     length of the transcript's CDS matches the length of the encoded protein.
-#'     `IRanges` with a start coordinate of `-1` is returned for transcript
-#'     coordinates that can not be mapped to protein-relative coordinates
-#'     (either no transcript was found for the provided ID, the transcript
-#'     does not encode a protein or the provided coordinates are not within
-#'     the coding region of the transcript).
+#' @return
+#'
+#' `IRanges` with the same length (and order) than the input `IRanges`
+#' `x`. Each element in `IRanges` provides the coordinates within the
+#' protein sequence, names being the (Ensembl) IDs of the protein. The
+#' original transcript ID and the transcript-relative coordinates are provided
+#' as metadata columns. Metadata columns `"cds_ok"` indicates whether the
+#' length of the transcript's CDS matches the length of the encoded protein.
+#' `IRanges` with a start coordinate of `-1` is returned for transcript
+#' coordinates that can not be mapped to protein-relative coordinates
+#' (either no transcript was found for the provided ID, the transcript
+#' does not encode a protein or the provided coordinates are not within
+#' the coding region of the transcript).
 #'
 #' @author Johannes Rainer
 #' 
@@ -170,7 +172,7 @@ transcriptToProtein <- function(x, db, id = "name") {
         ids <- names(x)
     else ids <- mcols(x)[, id]
     if (any(is.null(ids)))
-        stop("One or more of the provided IDs are NULL")
+        stop("One or more of the provided IDs are NULL", call. = FALSE)
     names(x) <- ids
     ## Define internal IDs - we'll need them to return the result in the
     ## correct order.

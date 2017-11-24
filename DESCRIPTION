@@ -69,11 +69,11 @@ Collate:
     'functions-Filter.R'
     'functions-create-EnsDb.R'
     'functions-utils.R'
-    'genomeToX.R'
     'proteinToGenome.R'
+    'transcriptToX.R'
+    'genomeToX.R'
     'select-methods.R'
     'seqname-utils.R'
-    'transcriptToX.R'
     'zzz.R'
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL

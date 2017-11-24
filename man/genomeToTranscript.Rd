@@ -13,16 +13,11 @@ mapped.}
 \item{db}{\code{EnsDb} object.}
 }
 \value{
-Depending on the length of the provided \code{GRanges} the function returns:
-\itemize{
-\item If \code{length(x) == 1}: an \code{IRanges} object with the relative coordinates in
-any of the transcripts for which an exon is encoded at the provided
-genomic location. An \code{IRanges} with negative start coordinates is
-returned, if the provided genomic coordinates are not completely within
-the genomic coordinates of an exon.
-\item If \code{length(x) > 1}: an \code{IRangesList}, each element providing the mapping
-for each input range (an \code{IRanges} object as described above).
-}
+An \code{IRangesList} with length equal to \code{length(x)}. Each element providing
+the mapping(s) to position within any encoded transcripts at the respective
+genomic location as an \code{IRanges} object. An \code{IRanges} with negative start
+coordinates is returned, if the provided genomic coordinates are not
+completely within the genomic coordinates of an exon.
 
 The ID of the exon and its rank (index of the exon in the transcript) are
 provided in the result's \code{IRanges} metadata columns as well as the genomic
@@ -77,7 +72,8 @@ gnm <- GRanges("X", IRanges(start = c(605370, 106959629, 106959629),
 genomeToTranscript(gnm, edbx)
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{proteinToGenome}},
+Other coordinate mapping functions: \code{\link{genomeToProtein}},
+  \code{\link{proteinToGenome}},
   \code{\link{proteinToTranscript}}
 }
 \author{

@@ -47,11 +47,13 @@ even if the CDS and protein sequences do not match, but a warning is thrown in
 this cases.
 
 The available functions are:
-+ [ ] =genomeToTranscript=: takes a =GRanges= and returns an =IRangesList= (genomic
-  positions can be mapped to several transcripts).
++ [X] =genomeToTranscript=: takes a =GRanges= and returns an =IRangesList= of length
+  equal to the length of the input object. Each =IRanges= provides the mapping to
+  any encoded transcripts at the position, which can be more than one.
 
-+ [ ] =genomeToProtein=: takes a =GRanges= and returns an =IRangesList= (genomic positions
-  can be mapped to several transcripts, each transcript then to one protein).
++ [X] =genomeToProtein=: takes a =GRanges= and returns an =IRangesList= (genomic
+  positions can be mapped to several transcripts, each transcript then to one
+  protein).
 
 + [ ] =transcriptToGenome=: takes a =IRanges= and returns a =GRangesList=
   (within-transcript coordinates can be mapped to several exons and hence
