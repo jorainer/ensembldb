@@ -96,7 +96,68 @@ test_that("transcriptToProtein works", {
     ## 
     x <- IRanges(start = 692, width = 2)
     mcols(x)$id <- "ENST00000381578"
+    expect_error(transcriptToProtein(x))
     res <- transcriptToProtein(x, edbx, id = "id")
     expect_equal(start(res), 1)
     expect_equal(end(res), 1)
+})
+
+test_that(".tx_to_genome works", {
+    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    ## ENST00000486554:501:505 106959129:106959131 106957979:106957979 -
+    ## ENST00000486554:1:5 106959627:106959631 -
+    ## ENST00000381578:1:5 585079:585083 +
+    ## ENST00000381578:259:260 585337:585337 591201:591201 +
+    ## some:1:4 NA
+    rng <- IRanges(start = c(501, 1, 1, 259, 1), end = c(505, 5, 5, 260, 4),
+                   names = c("ENST00000486554", "ENST00000486554",
+                             "ENST00000381578", "ENST00000381578", "some"))
+    res <- ensembldb:::.tx_to_genome(rng, edbx)
+    expect_equal(length(res), length(rng))
+    expect_equal(unname(lengths(res)), c(2, 1, 1, 2, 0))
+    ## 1
+    expect_equal(start(res[[1]]), c(106959129, 106957979))
+    expect_equal(end(res[[1]]), c(106959131, 106957979))
+    expect_equal(as.character(strand(res[[1]])), c("-", "-"))
+    ## 2
+    expect_equal(start(res[[2]]), 106959627)
+    expect_equal(end(res[[2]]), 106959631)
+    expect_equal(as.character(strand(res[[2]])), "-")
+    ## 3
+    expect_equal(start(res[[3]]), 585079)
+    expect_equal(end(res[[3]]), 585083)
+    expect_equal(as.character(strand(res[[3]])), "+")
+    ## 4
+    expect_equal(start(res[[4]]), c(585337, 591201))
+    expect_equal(end(res[[4]]), c(585337, 591201))
+    expect_equal(as.character(strand(res[[4]])), c("+", "+"))
+})
+
+test_that("transcriptToGenome works", {
+    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    
+    x <- IRanges(start = c(259, 1), end = c(260, 4),
+                 names = c("ENST00000381578", "some"))
+    ## Errors.
+    expect_error(transcriptToGenome())
+    expect_error(transcriptToGenome(db = edbx))
+    expect_error(transcriptToGenome(x))
+    
+    expect_warning(res <- transcriptToGenome(x, edbx))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == length(x))
+    expect_true(length(res[[2]]) == 0)
+
+    expect_warning(res <- transcriptToGenome(x[2], edbx))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 1)
+
+    expect_warning(res <- transcriptToGenome(x[c(2, 2)], edbx))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 2)
+
+    res <- transcriptToGenome(x[1], edbx)
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 1)
+    expect_true(length(res[[1]]) == 2)
 })

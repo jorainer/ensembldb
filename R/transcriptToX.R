@@ -42,6 +42,8 @@
 #' does not encode a protein or the provided coordinates are not within
 #' the coding region of the transcript).
 #'
+#' @family coordinate mapping functions
+#'
 #' @author Johannes Rainer
 #' 
 #' @md
@@ -273,4 +275,101 @@ transcriptToProtein <- function(x, db, id = "name") {
     res[match(internal_ids, paste0(mcols(res)$tx_id, ":",
                                    mcols(res)$tx_start, ":",
                                    mcols(res)$tx_end))]
+}
+
+#' @title Map transcript-relative coordinates to genomic coordinates
+#'
+#' @description
+#'
+#' `transcriptToGenome` maps transcript-relative coordinates to genomic
+#' coordinates.
+#'
+#' @inheritParams transcriptToProtein
+#' 
+#' @return
+#'
+#' `GRangesList` with the same length (and order) than the input `IRanges`
+#' `x`. Each `GRanges` in the `GRangesList` provides the genomic coordinates
+#' corresponding to the provided within-transcript coordinates. The
+#' original transcript ID and the transcript-relative coordinates are provided
+#' as metadata columns as well as the ID of the individual exon(s). An empty
+#' `GRanges` is returned for transcripts that can not be found in the database.
+#' 
+#' @md
+#' 
+#' @author Johannes Rainer
+#'
+#' @family coordinate mapping functions
+#'
+#' @examples
+#' 
+#' library(EnsDb.Hsapiens.v75)
+#' ## Restrict all further queries to chromosome x to speed up the examples
+#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#'
+#' ## Below we map positions 1 to 5 within the transcript ENST00000381578 to
+#' ## the genome. The ID of the transcript has to be provided either as names
+#' ## or in one of the IRanges' metadata columns
+#' txpos <- IRanges(start = 1, end = 5, names = "ENST00000381578")
+#'
+#' transcriptToGenome(txpos, edbx)
+#' ## The object returns a GRangesList with the genomic coordinates, in this
+#' ## example the coordinates are within the same exon and map to a single
+#' ## genomic region.
+#'
+#' ## Next we map nucleotides 501 to 505 of ENST00000486554 to the genome
+#' txpos <- IRanges(start = 501, end = 505, names = "ENST00000486554")
+#'
+#' transcriptToGenome(txpos, edbx)
+#' ## The positions within the transcript are located within two of the
+#' ## transcripts exons and thus a `GRanges` of length 2 is returned.
+#'
+#' ## Next we map multiple regions, two within the same transcript and one
+#' ## in a transcript that does not exist.
+#' txpos <- IRanges(start = c(501, 1, 5), end = c(505, 10, 6),
+#'     names = c("ENST00000486554", "ENST00000486554", "some"))
+#'
+#' res <- transcriptToGenome(txpos, edbx)
+#'
+#' ## The length of the result GRangesList has the same length than the
+#' ## input IRanges
+#' length(res)
+#'
+#' ## The result for the last region is an empty GRanges, because the
+#' ## transcript could not be found in the database
+#' res[[3]]
+#'
+#' res
+transcriptToGenome <- function(x, db, id = "name") {
+    if (missing(x) || !is(x, "IRanges"))
+        stop("Argument 'x' is required and has to be an 'IRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    res <- .tx_to_genome(x, db, id = id)
+    not_found <- sum(lengths(res) == 0)
+    if (not_found > 0)
+        warning(not_found, " transcript(s) could not be found in the database")
+    res
+}
+
+.tx_to_genome <- function(x, db, id = "name") {
+    id <- match.arg(id, c("name", colnames(mcols(x))))
+    if (id == "name")
+        ids <- names(x)
+    else ids <- mcols(x)[, id]
+    if (any(is.null(ids)))
+        stop("One or more of the provided IDs are NULL", call. = FALSE)
+    names(x) <- ids
+    exns <- exonsBy(db, filter = TxIdFilter(unique(ids)))
+    ## Loop over x
+    res <- lapply(split(x, f = 1:length(x)), function(z) {
+        if (any(names(exns) == names(z))) {
+            gen_map <- .to_genome(exns[[names(z)]], z)
+            mcols(gen_map) <- DataFrame(mcols(gen_map), tx_start = start(z),
+                                        tx_end = end(z))
+            gen_map[order(gen_map$exon_rank)]
+        } else GRanges()
+    })
+    names(res) <- names(x)
+    as(res, "GRangesList")
 }

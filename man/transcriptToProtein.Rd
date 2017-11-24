@@ -76,6 +76,13 @@ transcriptToProtein(IRanges(1, 1, names = "unknown"), edbx)
 ## Or because the provided coordinates are not within the CDS
 transcriptToProtein(IRanges(1, 1, names = "ENST00000381578"), edbx)
 }
+\seealso{
+Other coordinate mapping functions: \code{\link{genomeToProtein}},
+  \code{\link{genomeToTranscript}},
+  \code{\link{proteinToGenome}},
+  \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToGenome}}
+}
 \author{
 Johannes Rainer
 }

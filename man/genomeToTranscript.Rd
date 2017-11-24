@@ -74,7 +74,9 @@ genomeToTranscript(gnm, edbx)
 \seealso{
 Other coordinate mapping functions: \code{\link{genomeToProtein}},
   \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}}
+  \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToGenome}},
+  \code{\link{transcriptToProtein}}
 }
 \author{
 Johannes Rainer

@@ -3,7 +3,8 @@ CHANGES IN VERSION 2.3.2
 
 NEW FEATURES
     o Functionality to between genomic and transcript-relative or
-      protein-relative coordinates: proteinToTranscript, genomeToTranscript.
+      protein-relative coordinates: proteinToTranscript, genomeToTranscript,
+      transcriptToGenome, transcriptToProtein, genomeToProtein.
 
 
 CHANGES IN VERSION 2.3.1
