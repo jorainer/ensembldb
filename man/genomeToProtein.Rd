@@ -83,7 +83,9 @@ res[[4]]
 \seealso{
 Other coordinate mapping functions: \code{\link{genomeToTranscript}},
   \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}}
+  \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToGenome}},
+  \code{\link{transcriptToProtein}}
 }
 \author{
 Johannes Rainer

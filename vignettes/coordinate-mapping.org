@@ -55,9 +55,11 @@ The available functions are:
   positions can be mapped to several transcripts, each transcript then to one
   protein).
 
-+ [ ] =transcriptToGenome=: takes a =IRanges= and returns a =GRangesList=
++ [X] =transcriptToGenome=: takes a =IRanges= and returns a  =GRangesList=
   (within-transcript coordinates can be mapped to several exons and hence
-  genomic locations).
+  genomic locations). The returned =GRangesList= has the same length than the
+  input =IRanges=, with empty =GRanges= for transcripts that can not be found in the
+  database (and thus can not be mapped to the genome).
 
 + [X] =transcriptToProtein=: takes an =IRanges= and returns an =IRanges= (mapping of
   transcript to protein is 1:1). If mapping could not be performed it returns an
@@ -66,6 +68,12 @@ The available functions are:
 + [ ] =proteinToTranscript=: takes an =IRanges= and returns an =IRanges= if each protein
   can only mapped to a single transcript. It returns a =list= of =IRanges= if a
   protein is mapped to several transcripts... AAAAA
+
++ [ ] =proteinToGenome=: takes an =IRanges= and returns a =GRangesList=.
+
+* Mapping genomic coordinates to transcript-relative coordinates
+
+* Mapping genomic coordinates to protein-relative coordinates
 
 * Mapping protein coordinates to the genome
 
@@ -281,7 +289,11 @@ calculated for all 4 Ensembl protein IDs for /D6RDZ7_HUMAN/.
 #+END_SRC
 
 
-* Mapping genomic coordinates to proteins                          :noexport:
+* Mapping protein coordinates to transcript coordinates
+
+* Mapping transcript coordinates to genomic coordinates
+
+* Mapping transcript coordinates to protein coordinates
 
 * Session information
 

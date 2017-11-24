@@ -128,7 +128,9 @@ res[[2]]
 \seealso{
 Other coordinate mapping functions: \code{\link{genomeToProtein}},
   \code{\link{genomeToTranscript}},
-  \code{\link{proteinToTranscript}}
+  \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToGenome}},
+  \code{\link{transcriptToProtein}}
 }
 \author{
 Johannes Rainer based on initial code from Laurent Gatto and
