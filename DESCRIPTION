@@ -69,7 +69,7 @@ Collate:
     'functions-Filter.R'
     'functions-create-EnsDb.R'
     'functions-utils.R'
-    'proteinToGenome.R'
+    'proteinToX.R'
     'transcriptToX.R'
     'genomeToX.R'
     'select-methods.R'

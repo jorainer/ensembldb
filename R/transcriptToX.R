@@ -1,4 +1,4 @@
-#' @include proteinToGenome.R
+#' @include proteinToX.R
 
 #' @title Map transcript-relative coordinates to amino acid residues of the
 #'     encoded protein
