@@ -1,178 +1,5 @@
 #' @include Methods.R
 
-## Code related to mapping of coordinates within proteins to genomic
-## coordinates.
-
-#' @description Convert within-protein coordinates to transcript (CDS) relative
-#'    coordinates.
-#'
-#' @param x `IRanges` object with coordinates within a protein sequence.
-#'
-#' @return `IRanges` with the coordinates within the coding region (!) of the
-#'     encoding transcript.
-#'
-#' @author Johannes Rainer
-#'
-#' @md
-#'
-#' @noRd
-#'
-#' @examples
-#'
-#' prt <- IRanges(start = 23, end = 27)
-#' .proteinCoordsToTx(prt)
-.proteinCoordsToTx <- function(x) {
-    end(x) <- end(x) * 3
-    start(x) <- 1 + (start(x) - 1) * 3
-    x
-}
-
-#' @description
-#'
-#' Fetch the CDS for all transcripts encoding the specified protein.
-#'
-#' @param x `EnsDb` object.
-#'
-#' @param id `character` with the protein ID(s).
-#'
-#' @param idType `character(1)` defining what type of IDs are provided. Has to
-#'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
-#'
-#' @return a `list` with the CDS of the encoding transcript(s) for each provided
-#'     id (as a `GRangesList`). Names of the `list` are the ids, if no
-#'     transcript was found `NULL` is returned.
-#'
-#' @author Johannes Rainer
-#' 
-#' @md
-#'
-#' @noRd
-.cds_for_id <- function(x, id, idType = "protein_id") {
-    cds <- lapply(id,
-                  FUN = function(x_id) {
-                      suppressWarnings(
-                          res <-
-                              cdsBy(x, by = "tx",
-                                    filter = .filter_for_idType(x_id, idType),
-                                    columns = unique(c(idType,
-                                                       "tx_id",
-                                                       "protein_id")))
-                      )
-                      if (length(res) == 0)
-                          warning("No CDS found for '", x_id, "'",
-                                  call. = FALSE)
-                      res
-                  })
-    names(cds) <- id
-    cds
-}
-
-#' @description
-#'
-#' Uses .cds_for_id to fetch CDS for protein identifiers and in addition
-#' checks that the CDS has a length that fits the range.
-#'
-#' @param x `EndDb` object.
-#'
-#' @param range The `IRange` with the position within protein.
-#'
-#' @param id `character(1)` specifying where the protein identifier can be found.
-#'     Has to be either `"name"` or one of `colnames(mcols(prng))`.
-#'
-#' @param idType `character(1)` defining what type of IDs are provided. Has to
-#'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
-#'
-#' @return `list` of `GRangesList`.
-#' 
-#' @author Johannes Rainer
-#' 
-#' @md
-#'
-#' @noRd
-.cds_for_id_range <- function(x, range, id = "name", idType = "protein_id") {
-    idType <- match.arg(idType, c("protein_id", "uniprot_id", "tx_id"))
-    id <- match.arg(id, c("name", colnames(mcols(range))))
-    if (id == "name")
-        ids <- names(range)
-    else ids <- mcols(range)[, id]
-    cds <- .cds_for_id(x, ids, idType = idType)
-    ## check returned CDS if their width matches the provided protein ranges
-    mapply(cds, end(range) * 3,
-                  FUN = function(x, x_end) {
-                      if (!is.null(x))
-                          x[sum(width(x)) >= x_end]
-                  })
-}
-
-#' @description
-#'
-#' Fetches the protein sequence using the provided `"protein_id"` in `cds` and
-#' checks whether the cds lenghts match the protein sequence. The
-#' function returns all CDS for each protein/transcript that have the correct
-#' length) and throws a warning if none of the specified CDS matches the
-#' protein sequence. In the latter case a single CDS (the one with the CDS
-#' length closest to the expected length). Whether a CDS has the expected length
-#' or not is also reported in the metadata column `"cds_ok"`.
-#'
-#' @details
-#'
-#' Mismatch between the CDS and the AA sequence are in most instances caused by
-#' incomplete (3' or 5') CDS sequences.
-#'
-#' @param x `EnsDb` object.
-#'
-#' @param cds `GRangesList`
-#'
-#' @return `list` of `GRangesList`s with one list element per input protein,
-#'    and the `GRangesList` containing the CDS of all matching (or one not
-#'    matching) transcripts.
-#' 
-#' @author Johannes Rainer
-#' 
-#' @md
-#'
-#' @noRd
-.cds_matching_protein <- function(x, cds) {
-    ## Fetch the protein sequences, all in one go.
-    ## Loop through the cds
-    prot_ids <- unique(unlist(lapply(cds, function(z) {
-        lapply(z, function(y) y$protein_id)
-    }), use.names = FALSE))
-    prot_seqs <- proteins(x, filter = ProteinIdFilter(prot_ids),
-                          columns = c("protein_id", "protein_sequence"))
-    ## Calculate the expected CDS length (add +3 to add the stop codon).
-    exp_cds_len <- nchar(prot_seqs$protein_sequence) * 3 + 3
-    names(exp_cds_len) <- prot_seqs$protein_id
-    mapply(cds, names(cds), FUN = function(z, nm) {
-        if (!is.null(z)) {
-            cds_lens <- sum(width(z))
-            prt_ids <- unlist(lapply(z, function(y) unique(y$protein_id)))
-            diffs <- cds_lens - exp_cds_len[prt_ids]
-            ## Return all for which diff is 0, or otherwise the one with the
-            ## smallest diff.
-            if (any(diffs == 0)) {
-                z <- lapply(z, function(grng) {
-                    mcols(grng)$cds_ok <- TRUE
-                    grng
-                })
-                GRangesList(z[diffs == 0])
-            } else {
-                warning("Could not find a CDS whith the expected length for ",
-                        "protein: '", nm, "'. The returned genomic ",
-                        "coordinates might thus not be correct for this ",
-                        "protein.", call. = FALSE)
-                ## Alternatively we could align the RNA and AA sequences and
-                ## trim the protein sequence...
-                z <- lapply(z, function(grng) {
-                    mcols(grng)$cds_ok <- FALSE
-                    grng
-                })
-                GRangesList(z[which.min(abs(diffs))])
-            }
-        }
-    })
-}
-
 #' @title Map protein-relative coordinates to positions within the transcript
 #'
 #' @description
@@ -204,12 +31,15 @@
 #' 
 #' @return
 #'
-#' `list`, each element being the mapping results for one of the input
-#' ranges in `x` and names being the IDs used for the mapping. Each
-#' element is a `IRanges` object with the positions within the encoding
-#' transcript (relative to the start of the transcript, which includes the 5'
-#' UTR). The `IRanges` can be of length > 1 if the provided protein identifier
-#' is annotated to more than one Ensembl protein ID.
+#' `IRangesList`, each element being the mapping results for one of the input
+#' ranges in `x`. Each element is a `IRanges` object with the positions within
+#' the encoding transcript (relative to the start of the transcript, which
+#' includes the 5' UTR). The transcript ID is reported as the name of each
+#' `IRanges`. The `IRanges` can be of length > 1 if the provided
+#' protein identifier is annotated to more than one Ensembl protein ID (which
+#' can be the case if Uniprot IDs are provided). If the coordinates can not be
+#' mapped (because the protein identifier is unknown to the database) an
+#' `IRanges` with negative coordinates is returned.
 #' 
 #' The following metadata columns are available in each `IRanges` in the result:
 #' + `"protein_id"`: the ID of the Ensembl protein for which the within-protein
@@ -275,6 +105,7 @@ proteinToTranscript <- function(x, db, id = "name",
     message("Fetching CDS for ", length(x), " proteins ... ",
             appendLF = FALSE)
     cds_genome <- .cds_for_id_range(db, x, id = id, idType = idType)
+    ## Manage cases in which nothing could be mapped.LLLL
     ## have a list of GRangesList
     message(sum(lengths(cds_genome) > 0), " found")
     ## 2) ensure that the CDS matches the AA sequence length
@@ -290,30 +121,47 @@ proteinToTranscript <- function(x, db, id = "name",
     message(sum(are_ok), "/", length(are_ok), " OK")
     ## Get for each transcript it's 5' UTR and add its width to the coords_cds
     tx_ids <- unique(unlist(lapply(cds_genome, names), use.names = FALSE))
-    five_utr <- fiveUTRsByTranscript(db, filter = TxIdFilter(tx_ids))
-    ## Calculate 5' widths for these
-    five_width <- sum(width(five_utr))
-    mapply(
-        cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
+    if (length(tx_ids)) {
+        five_utr <- fiveUTRsByTranscript(db, filter = TxIdFilter(tx_ids))
+        ## Calculate 5' widths for these
+        five_width <- sum(width(five_utr))
+    }
+    as(mapply(
+        cds_genome, as(coords_cds, "IRangesList"), split(x, 1:length(x)),
         FUN = function(gnm, cds, prt) {
             if (is.null(gnm)) {
-                IRanges()
+                ## Define the metadata columns
+                mc <- DataFrame(protein_id = NA_character_,
+                                tx_id = NA_character_,
+                                cds_ok = NA,
+                                protein_start = start(prt),
+                                protein_end = end(prt))
+                if (idType == "uniprot_id")
+                    mc$uniprot_id <- names(prt)
+                else mc$protein_id <- names(prt)
+                ir <- IRanges(start = -1, width = 1)                
+                mcols(ir) <- mc
+                ir
             } else {
                 ids <- names(gnm)
                 res <- IRanges(start = start(cds) + five_width[ids],
                                end = end(cds) + five_width[ids],
                                names = ids)
                 ## Populate mcols
-                mcols(res)$protein_id <- unlist(lapply(gnm,
-                                                       function(z)
-                                                           z$protein_id[1]))
-                mcols(res)$tx_id <- ids
-                mcols(res)$cds_ok <- gnm[[1]]$cds_ok[1]
-                mcols(res)$protein_start <- start(prt)
-                mcols(res)$protein_end <- end(prt)
+                mc <- DataFrame(protein_id = unlist(lapply(gnm,
+                                                           function(z)
+                                                               z$protein_id[1])),
+                                tx_id = ids,
+                                cds_ok = gnm[[1]]$cds_ok[1],
+                                protein_start = start(prt),
+                                protein_end = end(prt)
+                                )
+                if (idType == "uniprot_id")
+                    mc$uniprot_id <- names(prt)
+                mcols(res) <- mc
                 res
             }
-        })
+        }), "IRangesList")
 }
 
 
@@ -489,6 +337,178 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
         if (length(unique(z$protein_id)) > 1)
             split(z, f = z$protein_id)
         else z
+    })
+}
+
+#' @description Convert within-protein coordinates to transcript (CDS) relative
+#'    coordinates.
+#'
+#' @param x `IRanges` object with coordinates within a protein sequence.
+#'
+#' @return `IRanges` with the coordinates within the coding region (!) of the
+#'     encoding transcript.
+#'
+#' @author Johannes Rainer
+#'
+#' @md
+#'
+#' @noRd
+#'
+#' @examples
+#'
+#' prt <- IRanges(start = 23, end = 27)
+#' .proteinCoordsToTx(prt)
+.proteinCoordsToTx <- function(x) {
+    end(x) <- end(x) * 3
+    start(x) <- 1 + (start(x) - 1) * 3
+    x
+}
+
+#' @description
+#'
+#' Fetch the CDS for all transcripts encoding the specified protein.
+#'
+#' @param x `EnsDb` object.
+#'
+#' @param id `character` with the protein ID(s).
+#'
+#' @param idType `character(1)` defining what type of IDs are provided. Has to
+#'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
+#'
+#' @return a `list` with the CDS of the encoding transcript(s) for each provided
+#'     id (as a `GRangesList`). Names of the `list` are the ids, if no
+#'     transcript was found `NULL` is returned.
+#'
+#' @author Johannes Rainer
+#' 
+#' @md
+#'
+#' @noRd
+.cds_for_id <- function(x, id, idType = "protein_id") {
+    cds <- lapply(id,
+                  FUN = function(x_id) {
+                      suppressWarnings(
+                          res <-
+                              cdsBy(x, by = "tx",
+                                    filter = .filter_for_idType(x_id, idType),
+                                    columns = unique(c(idType,
+                                                       "tx_id",
+                                                       "protein_id")))
+                      )
+                      if (length(res) == 0)
+                          warning("No CDS found for '", x_id, "'",
+                                  call. = FALSE)
+                      res
+                  })
+    names(cds) <- id
+    cds
+}
+
+#' @description
+#'
+#' Uses .cds_for_id to fetch CDS for protein identifiers and in addition
+#' checks that the CDS has a length that fits the range.
+#'
+#' @param x `EndDb` object.
+#'
+#' @param range The `IRange` with the position within protein.
+#'
+#' @param id `character(1)` specifying where the protein identifier can be found.
+#'     Has to be either `"name"` or one of `colnames(mcols(prng))`.
+#'
+#' @param idType `character(1)` defining what type of IDs are provided. Has to
+#'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
+#'
+#' @return `list` of `GRangesList`.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @md
+#'
+#' @noRd
+.cds_for_id_range <- function(x, range, id = "name", idType = "protein_id") {
+    idType <- match.arg(idType, c("protein_id", "uniprot_id", "tx_id"))
+    id <- match.arg(id, c("name", colnames(mcols(range))))
+    if (id == "name")
+        ids <- names(range)
+    else ids <- mcols(range)[, id]
+    cds <- .cds_for_id(x, ids, idType = idType)
+    ## check returned CDS if their width matches the provided protein ranges
+    mapply(cds, end(range) * 3,
+                  FUN = function(x, x_end) {
+                      if (!is.null(x))
+                          x[sum(width(x)) >= x_end]
+                  })
+}
+
+#' @description
+#'
+#' Fetches the protein sequence using the provided `"protein_id"` in `cds` and
+#' checks whether the cds lenghts match the protein sequence. The
+#' function returns all CDS for each protein/transcript that have the correct
+#' length) and throws a warning if none of the specified CDS matches the
+#' protein sequence. In the latter case a single CDS (the one with the CDS
+#' length closest to the expected length). Whether a CDS has the expected length
+#' or not is also reported in the metadata column `"cds_ok"`.
+#'
+#' @details
+#'
+#' Mismatch between the CDS and the AA sequence are in most instances caused by
+#' incomplete (3' or 5') CDS sequences.
+#'
+#' @param x `EnsDb` object.
+#'
+#' @param cds `GRangesList`
+#'
+#' @return `list` of `GRangesList`s with one list element per input protein,
+#'    and the `GRangesList` containing the CDS of all matching (or one not
+#'    matching) transcripts.
+#' 
+#' @author Johannes Rainer
+#' 
+#' @md
+#'
+#' @noRd
+.cds_matching_protein <- function(x, cds) {
+    ## Fetch the protein sequences, all in one go.
+    ## Loop through the cds
+    prot_ids <- unique(unlist(lapply(cds, function(z) {
+        lapply(z, function(y) y$protein_id)
+    }), use.names = FALSE))
+    if (length(prot_ids) == 0)
+        return(lapply(cds, function(z) NULL))
+    prot_seqs <- proteins(x, filter = ProteinIdFilter(prot_ids),
+                          columns = c("protein_id", "protein_sequence"))
+    ## Calculate the expected CDS length (add +3 to add the stop codon).
+    exp_cds_len <- nchar(prot_seqs$protein_sequence) * 3 + 3
+    names(exp_cds_len) <- prot_seqs$protein_id
+    mapply(cds, names(cds), FUN = function(z, nm) {
+        if (!is.null(z)) {
+            cds_lens <- sum(width(z))
+            prt_ids <- unlist(lapply(z, function(y) unique(y$protein_id)))
+            diffs <- cds_lens - exp_cds_len[prt_ids]
+            ## Return all for which diff is 0, or otherwise the one with the
+            ## smallest diff.
+            if (any(diffs == 0)) {
+                z <- lapply(z, function(grng) {
+                    mcols(grng)$cds_ok <- TRUE
+                    grng
+                })
+                GRangesList(z[diffs == 0])
+            } else {
+                warning("Could not find a CDS whith the expected length for ",
+                        "protein: '", nm, "'. The returned genomic ",
+                        "coordinates might thus not be correct for this ",
+                        "protein.", call. = FALSE)
+                ## Alternatively we could align the RNA and AA sequences and
+                ## trim the protein sequence...
+                z <- lapply(z, function(grng) {
+                    mcols(grng)$cds_ok <- FALSE
+                    grng
+                })
+                GRangesList(z[which.min(abs(diffs))])
+            }
+        }
     })
 }
 

@@ -68,7 +68,7 @@ test_that(".cds_for_id and .cds_matching_protein work", {
 
 test_that("proteinToGenome works", {
     ## Restrict to chromosome X - speeds up stuff
-    edbx <- filter(edb, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
     ## protein_id
     ids <- c("ENSP00000425155", "ENSP00000418169", "ENSP00000441743",
              "ENSP00000385415")
@@ -150,17 +150,18 @@ test_that("proteinToTranscript works", {
     expect_error(proteinToTranscript(prng))
     expect_error(proteinToTranscript(prng, db = 5))
 
-    tx_rel <- ensembldb:::proteinToTranscript(prng, edbx)
-    expect_true(is.list(tx_rel))
+    expect_warning(tx_rel <- proteinToTranscript(prng, edbx))
+    expect_true(is(tx_rel, "IRangesList"))
     expect_true(all(unlist(lapply(tx_rel, function(z) is(z, "IRanges")))))
-    expect_equal(unname(lengths(tx_rel)), c(1, 1, 1, 1, 0))
+    expect_equal(unname(lengths(tx_rel)), c(1, 1, 1, 1, 1))
+    expect_true(start(tx_rel[[5]]) == -1)
     ## All have cds OK, except 4
     expect_true(mcols(tx_rel[[1]])$cds_ok)
     expect_true(mcols(tx_rel[[2]])$cds_ok)
     expect_true(mcols(tx_rel[[3]])$cds_ok)
     expect_false(mcols(tx_rel[[4]])$cds_ok)
-    tx_rel <- IRangesList(tx_rel)
-    expect_equal(unlist(width(tx_rel), use.names = FALSE), c(3, 9, 21, 6))
+    expect_true(is.na(mcols(tx_rel[[5]])$cds_ok))
+    expect_equal(unlist(width(tx_rel), use.names = FALSE), c(3, 9, 21, 6, 1))
     expect_equal(start(tx_rel[["ENSP00000014935"]]), (622L + 85L + 87L + 1L))
     expect_equal(start(tx_rel[["ENSP00000173898"]]), (68L + 44L + 4L))
     expect_equal(start(tx_rel[["ENSP00000217901"]]), (197L + 7L))
@@ -170,14 +171,22 @@ test_that("proteinToTranscript works", {
     ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
     prngs <- IRanges(start = c(1, 13, 43, 100), end = c(2, 21, 80, 100))
     names(prngs) <- ids
-    tx_rel <- ensembldb:::proteinToTranscript(prngs, edbx, idType = "uniprot_id")
-    expect_equal(length(tx_rel), 4)
-    expect_equal(unname(lengths(tx_rel)), c(4, 4, 1, 0))
-    tx_rel <- IRangesList(tx_rel)
+    tx_rel <- proteinToTranscript(prngs, edbx, idType = "uniprot_id")
+    expect_equal(length(tx_rel), length(prngs))
+    expect_equal(unname(lengths(tx_rel)), c(4, 4, 1, 1))
     lens <- unlist(width(tx_rel))
     expect_equal(unique(lens[1:4]), width(prngs)[1] * 3)
     expect_equal(unique(lens[5:8]), width(prngs)[2] * 3)
-    expect_equal(unique(lens[9]), width(prngs)[3] * 3)    
+    expect_equal(unique(lens[9]), width(prngs)[3] * 3)
+
+    ## Mapping fails for all...
+    ids <- c("a", "unexistant")
+    prngs <- IRanges(start = c(1, 13), end = c(2, 21))
+    names(prngs) <- ids
+
+    expect_warning(res <- proteinToTranscript(prngs, edbx))
+    expect_true(is(res, "IRangesList"))
+    expect_equal(unlist(unname(start(res))), c(-1, -1))
 })
 
 test_that(".cds_for_id_range works", {
