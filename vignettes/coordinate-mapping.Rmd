@@ -1,5 +1,5 @@
 ---
-title: "Mapping between genome and protein coordinates"
+title: "Mapping between genome, transcript and protein coordinates"
 author: "Johannes Rainer"
 graphics: yes
 package: ensembldb
@@ -7,7 +7,7 @@ output:
   BiocStyle::html_document:
     toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Mapping between genome and protein coordinates}
+  %\VignetteIndexEntry{Mapping between genome, transcript and protein coordinates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,Gviz}
@@ -50,22 +50,23 @@ The available functions and their input and result objects are:
     in the input object) or `GRangesList` (if the protein identifier provided for
     the input range can be mapped to multiple Ensembl protein IDs).
 
--   [X] `transcriptToGenome`: takes a `IRanges` and returns a  `GRangesList`
+-   `transcriptToGenome`: maps coordinates within a transcript to genomic
+    coordinates. Takes an `IRanges` as input and returns a `GRangesList`
     (within-transcript coordinates can be mapped to several exons and hence
     genomic locations). The returned `GRangesList` has the same length than the
     input `IRanges`, with empty `GRanges` for transcripts that can not be found in the
     database (and thus can not be mapped to the genome).
 
--   [X] `transcriptToProtein`: takes an `IRanges` and returns an `IRanges` (mapping of
-    transcript to protein is 1:1). If mapping could not be performed it returns an
-    `IRanges` with negative start coordinates.
+-   `transcriptToProtein`: maps regions within a transcript to the respective amino
+    acid residues in the encoded protein's sequence. The function takes an `IRanges`
+    as input and returns an `IRanges` of the same length.
 
-All functions, except `proteinToGenome` and `transcriptToGenome` return an `IRanges`
-with negative coordinates, if the mapping failed (e.g. because the identifier is
+All functions, except `proteinToGenome` and `transcriptToGenome` return `IRanges` with
+negative coordinates if the mapping failed (e.g. because the identifier is
 unknown to the database, or, for mappings to and from protein coordinates, the
 input coordinates are not within the coding region of a
-transcript). `proteinToGenome` and `transcriptToGenome` return an empty `GRanges` in
-such cases.
+transcript). `proteinToGenome` and `transcriptToGenome` return empty `GRanges` if
+mappings fail.
 
 Each protein encoding transcript is annotated by Ensembl to an unique
 translation with an assigned Ensembl protein ID. In addition, Ensembl provides a
@@ -104,7 +105,7 @@ gnm <- GRanges("X:106959629-106959631")
 Before we map the coordinates we visualize the genomic region and all
 genes and transcripts overlapping it.
 
-```{r  genomeToTranscript-ex1-plot, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Overview of a genomic region on chromosome X. The red line represents the genomic region that we want to map to transcript-relative coordinates." }
+```{r  genomeToTranscript-ex1-plot, message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Overview of a genomic region on chromosome X. The red line represents the genomic region that we want to map to transcript-relative coordinates." }
 library(Gviz)
 ## Since we're using Ensembl chromosome names we have to set:
 options(ucscChromosomeNames = FALSE)
@@ -228,7 +229,7 @@ The third region can be mapped to the last nucleotide before the stop codon and
 can thus be mapped to the last amino acid of the encoded protein.
 
 ```{r  genomeToProtein-ex1-res3 }
-gnm_prt[3[]] 
+gnm_prt[[3]] 
 ```
 
 The region maps to coordinates within two transcripts each with their own
@@ -524,8 +525,69 @@ plotTracks(list(gat,
 
 # Mapping transcript coordinates to genomic coordinates
 
+Coordinates within transcript sequences can be mapped to genomic coordinates
+with the `transcriptToGenome` function. In the example below we map coordinates
+within 2 transcript to the genome.
+
+```{r  transcriptToGenome-map, message = FALSE }
+rng_tx <- IRanges(start = c(501, 1), width = c(5, 5),
+		  names = c("ENST00000486554", "ENST00000381578"))
+
+rng_gnm <- transcriptToGenome(rng_tx, edbx) 
+```
+
+The function returns a `GRangesList` with the `GRanges` in each element containing
+the genomic coordinates to which the positions could be mapped (or an empty
+`GRanges` if the transcript identifier can not be found in the database). The
+length of each `GRanges` depends on the number of exons the region in the
+transcript spans. 
+
+```{r  transcriptToGenome-res-1 }
+rng_gnm 
+```
+
+The region in the first transcript (*ENST00000486554*) is mapped to two genomic
+regions, because part of it is located in the first, and part in the second exon
+of the transcript. All 5 nucleotides of the second region are within the
+transcript's first exon and are thus mapped to only a single genomic region.
+
 
 # Mapping transcript coordinates to protein coordinates
+
+The `transcriptToProtein` function can be used to map coordinates within a
+transcript to the corresponding coordinates within the encoded protein. Note
+that only regions within protein coding transcripts can be mapped and that
+coordinates within the transcript are assumed to be relative to the first
+nucleotide of the transcript (not of the CDS).
+
+Below we define regions within several transcripts and map these to the
+corresponding amino acid residues in the protein.
+
+```{r  transcriptToPrptein-map, message = FALSE }
+rng_tx <- IRanges(start = c(501, 1, 200), width = c(5, 5, 4),
+		  names = c("ENST00000486554", "ENST00000381578",
+			    "ENST00000431238"))
+rng_prt <- transcriptToProtein(rng_tx, edbx) 
+```
+
+The mapping did throw several warnings. The region within transcript
+*ENST00000431238* can not be mapped to protein coordinates, because the transcript
+does not encode a protein. Transcript *ENST00000381578* encodes a protein, but the
+specified nucleotides 1 to 5 are located in the 5' UTR of the transcript and can
+therefore also not be mapped. Finally, the CDS of the transcript *ENST00000486554*
+is not complete and, while the coordinates were mapped to protein residues, they
+might not be correct.
+
+```{r  transcriptToProtein-res }
+rng_prt 
+```
+
+For transcript coordinates that could not be mapped regions with negative
+coordinates are returned (see lines/elements 2 and 3 above). The first region
+could be mapped, but the returned protein-relative coordinates might be wrong,
+because the CDS of the transcript is incomplete (hence a `FALSE` is reported in
+metadata column `"cds_ok"`). In fact, only the 3' end of the CDS is incomplete for
+this transcript and the returned coordinates are thus correct.
 
 
 # Session information
