@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.3.2
+Version: 2.3.3
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -24,11 +24,11 @@ Imports:
     AnnotationDbi (>= 1.31.19),
     rtracklayer,
     S4Vectors,
-    AnnotationHub,
     Rsamtools,
     IRanges (>= 2.11.16),
     ProtGenerics,
     Biostrings,
+    AnnotationHub,
     curl
 Depends:
     BiocGenerics (>= 0.15.10),
@@ -40,13 +40,14 @@ Suggests:
     knitr,
     rmarkdown,
     EnsDb.Hsapiens.v75 (>= 0.99.8),
-    shiny,
     testthat,
     BSgenome.Hsapiens.UCSC.hg19,
     ggbio (>= 1.24.0),
     Gviz (>= 1.20.0),
     magrittr
-Enhances: RMySQL
+Enhances:
+    RMySQL,
+    shiny
 VignetteBuilder: knitr
 Description: The package provides functions to create and use
     transcript centric annotation databases/packages. The
@@ -54,10 +55,14 @@ Description: The package provides functions to create and use
     using their Perl API. The functionality and data is similar to
     that of the TxDb packages from the GenomicFeatures package,
     but, in addition to retrieve all gene/transcript models and
-    annotations from the database, the ensembldb package provides
-    also a filter framework allowing to retrieve annotations for
-    specific entries like genes encoded on a chromosome region or
-    transcript models of lincRNA genes.
+    annotations from the database, ensembldb provides a filter
+    framework allowing to retrieve annotations for specific entries
+    like genes encoded on a chromosome region or transcript models
+    of lincRNA genes. EnsDb databases built with ensembldb contain
+    also protein annotations and mappings between proteins and
+    their encoding transcripts. Finally, ensembldb provides
+    functions to map between genomic, transcript and protein
+    coordinates.
 Collate: 
     'Classes.R'
     'Deprecated.R'

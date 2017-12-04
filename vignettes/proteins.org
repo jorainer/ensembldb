@@ -303,10 +303,8 @@ end coordinates within the amino acid sequence being reported in columns
 
 * Map peptide features within proteins to the genome
 
-A detailed description for the mapping of within-protein coordinates to the
-genome is given in the /coordinate-mapping/ vignette.
-
-
+The /coordinate-mapping.Rmd/ vignette provides a detailed description of all
+functions that allow to map between genomic, transcript and protein coordinates.
 
 * TODOs								   :noexport:
 
