@@ -428,8 +428,12 @@ fixCDStypeInEnsemblGTF <- function(x){
 ##  Retrieve a GTF file from AnnotationHub and build a EnsDb object from that.
 ##
 ####------------------------------------------------------------
-ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
-    options(useFancyQuotes=FALSE)
+ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version) {
+    if (!requireNamespace("AnnotationHub", quietly = TRUE)) {
+        stop("The 'AnnotationHub' package is needed for this function to ",
+             "work. Please install it.", call. = FALSE)
+    }
+    options(useFancyQuotes = FALSE)
     ## Input checking...
     if(!is(ah, "AnnotationHub"))
         stop("Argument 'ah' has to be a (single) AnnotationHub object.")
@@ -455,8 +459,10 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
 
     gff <- fixCDStypeInEnsemblGTF(gff)
     ## Proceed.
-    dbname <- ensDbFromGRanges(gff, outfile=outfile, path=path, organism=orgFromAH,
-                               genomeVersion=genFromAH, version=ensFromAH)
+    dbname <- ensDbFromGRanges(gff, outfile = outfile, path = path,
+                               organism = orgFromAH,
+                               genomeVersion = genFromAH,
+                               version = ensFromAH)
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname )

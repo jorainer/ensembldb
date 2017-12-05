@@ -46,13 +46,13 @@ import("GenomicRanges")
 import("GenomicFeatures")
 
 ## AnnotationHub
-importFrom("AnnotationHub",
-           "AnnotationHub")
-importClassesFrom("AnnotationHub",
-                  "AnnotationHub")
-importMethodsFrom("AnnotationHub",
-                  "query",
-                  "mcols")
+## importFrom("AnnotationHub",
+##            "AnnotationHub")
+## importClassesFrom("AnnotationHub",
+##                   "AnnotationHub")
+## importMethodsFrom("AnnotationHub",
+##                   "query",
+##                   "mcols")
 ## Rsamtools
 importClassesFrom("Rsamtools",
                   "FaFile",

@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.3.3
+Version: 2.3.4
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -28,7 +28,6 @@ Imports:
     IRanges (>= 2.11.16),
     ProtGenerics,
     Biostrings,
-    AnnotationHub,
     curl
 Depends:
     BiocGenerics (>= 0.15.10),
@@ -44,7 +43,8 @@ Suggests:
     BSgenome.Hsapiens.UCSC.hg19,
     ggbio (>= 1.24.0),
     Gviz (>= 1.20.0),
-    magrittr
+    magrittr,
+    AnnotationHub
 Enhances:
     RMySQL,
     shiny
