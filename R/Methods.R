@@ -160,13 +160,17 @@ setMethod("seqlevels", "EnsDb", function(x){
 ##
 ## queries the dna.toplevel.fa file from AnnotationHub matching the current
 ## Ensembl version
-## Update: if we can't find a FaFile matching the Ensembl version we suggest ones
-## that might match.
-setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
-    ah <- AnnotationHub()
+## Update: if we can't find a FaFile matching the Ensembl version we suggest
+## ones that might match.
+setMethod("getGenomeFaFile", "EnsDb", function(x, pattern = "dna.toplevel.fa") {
+    if (!requireNamespace("AnnotationHub", quietly = TRUE)) {
+        stop("The 'AnnotationHub' package is needed for this function to ",
+             "work. Please install it.", call. = FALSE)
+    }
+    ah <- AnnotationHub::AnnotationHub()
     ## Reduce the AnnotationHub to species, provider and genome version.
-    ah <- .reduceAH(ah, organism=organism(x), dataprovider="Ensembl",
-                    genome=unique(genome(x)))
+    ah <- .reduceAH(ah, organism = organism(x), dataprovider = "Ensembl",
+                    genome = unique(genome(x)))
     if(length(ah) == 0)
         stop("Can not find any ressources in AnnotationHub for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -179,8 +183,8 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
              unique(genome(x)), "! You might also try to use the",
              " 'getGenomeTwoBitFile' method instead.")
     ## Reduce to dna.toplevel or dna.primary_assembly.
-    idx <- c(grep(ah$title, pattern="dna.toplevel"),
-             grep(ah$title, pattern="dna.primary_assembly"))
+    idx <- c(grep(ah$title, pattern = "dna.toplevel"),
+             grep(ah$title, pattern = "dna.primary_assembly"))
     if(length(idx) == 0)
         stop("No genome assembly fasta file available for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -210,8 +214,8 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
 })
 ## Just restricting the Annotation Hub to entries matching the species and the
 ## genome; not yet the Ensembl version.
-.reduceAH <- function(ah, organism=NULL, dataprovider="Ensembl",
-                      genome=NULL){
+.reduceAH <- function(ah, organism = NULL, dataprovider = "Ensembl",
+                      genome = NULL){
     if(!is.null(dataprovider))
         ah <- ah[ah$dataprovider == dataprovider, ]
     if(!is.null(organism))
@@ -220,6 +224,7 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
         ah <- ah[ah$genome == genome, ]
     return(ah)
 }
+
 .ensVersionFromSourceUrl <- function(url){
     url <- strsplit(url, split="/", fixed=TRUE)
     ensVers <- unlist(lapply(url, function(z){
@@ -237,10 +242,10 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
 ##  Search and retrieve a genomic DNA resource through a TwoBitFile
 ##  from AnnotationHub.
 setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
-    ah <- AnnotationHub()
+    ah <- AnnotationHub::AnnotationHub()
     ## Reduce the AnnotationHub to species, provider and genome version.
-    ah <- .reduceAH(ah, organism=organism(x), dataprovider="Ensembl",
-                    genome=unique(genome(x)))
+    ah <- .reduceAH(ah, organism = organism(x), dataprovider = "Ensembl",
+                    genome = unique(genome(x)))
     if(length(ah) == 0)
         stop("Can not find any ressources in AnnotationHub for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -252,8 +257,8 @@ setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
              organism(x), ", data provider: Ensembl and genome version: ",
              unique(genome(x)), "!")
     ## Reduce to dna.toplevel or dna.primary_assembly.
-    idx <- c(grep(ah$title, pattern="dna.toplevel"),
-             grep(ah$title, pattern="dna.primary_assembly"))
+    idx <- c(grep(ah$title, pattern = "dna.toplevel"),
+             grep(ah$title, pattern = "dna.primary_assembly"))
     if(length(idx) == 0)
         stop("No genome assembly fasta file available for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -261,10 +266,10 @@ setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
     ah <- ah[idx, ]
     ## Get the Ensembl version from the source url.
     ensVers <- .ensVersionFromSourceUrl(ah$sourceurl)
-    if(any(ensVers == ensemblVersion(x))){
+    if(any(ensVers == ensemblVersion(x))) {
         ## Got it.
         itIs <- which(ensVers == ensemblVersion(x))
-    }else{
+    } else {
         ## Get the "closest" one.
         diffs <- abs(ensVers - as.numeric(ensemblVersion(x)))
         itIs <- which(diffs == min(diffs))[1]
