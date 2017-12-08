@@ -66,7 +66,8 @@ test_that(".genome_to_tx and genomeToTranscript works", {
     ## 7) Check with input being a GRanges of length > 1
     gnm <- GRanges("X", IRanges(start = c(605370, 106959629),
                                 end = c(605374, 106959631) ))
-    res <- .genome_to_tx(gnm, edbx)
+    names(gnm) <- c("a", "b")
+    res <- ensembldb:::.genome_to_tx(gnm, edbx)
     expect_true(is(res, "IRangesList"))
     expect_true(length(res) == 2)
     expect_equal(start(res[[1]]["ENST00000381578"]), 1569)
@@ -88,8 +89,10 @@ test_that(".genome_to_tx and genomeToTranscript works", {
 
     gnm <- GRanges("X", IRanges(start = c(605370, 106959629, 50),
                                 end = c(605374, 106959631, 50) ))
+    names(gnm) <- c("a", "b", "c")
     expect_warning(res <- genomeToTranscript(gnm, edbx))
     expect_equal(length(gnm), length(res))
+    expect_equal(names(res), names(gnm))
     expect_true(is(res, "IRangesList"))
     expect_true(start(res[[3]]) < 0)
 })
@@ -103,6 +106,7 @@ test_that("genomeToProtein works", {
     ## 595564: range that is within the intron
     gnm <- GRanges("X", IRanges(start = c(591633, 605371, 605368, 595564),
                                 width = c(5, 1, 1, 3)))
+    names(gnm) <- c("a", "b", "c", "d")
     expect_warning(res <- genomeToProtein(gnm, edbx))
     expect_true(is(res, "IRangesList"))
     expect_equal(length(res), 4)
