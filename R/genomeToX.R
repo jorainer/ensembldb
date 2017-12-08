@@ -179,34 +179,22 @@ genomeToProtein <- function(x, db) {
     if (missing(db) || !is(db, "EnsDb"))
         stop("Argument 'db' is required and has to be an 'EnsDb' object")
     txs <- genomeToTranscript(x, db)
-    ## if (is(txs, "IRangesList")) {
-        int_ids <- rep(1:length(txs), lengths(txs))
-        txs <- unlist(txs)
-    ## } else
-    ##     int_ids <- NULL
+    int_ids <- rep(1:length(txs), lengths(txs))
+    txs <- unlist(txs, use.names = FALSE)
     if (is.null(names(txs)))
         names(txs) <- ""
     prts <- transcriptToProtein(txs, db)
     mcols(prts) <- cbind(mcols(prts)[, c("tx_id", "cds_ok")], mcols(txs))
-    ## Update the metadata columns...
-    ## if (!is.null(int_ids)) {
-        prts <- split(prts, int_ids)
-        names(prts) <- NULL
-    ## }
+    prts <- split(prts, int_ids)
+    names(prts) <- NULL
     ## Prune the result by removing non-mappable regions from each element
     ## for which we do have correct mappings.
-    ## if (is(prts, "IRangesList")) {
-        prts <- IRangesList(lapply(prts, function(x) {
-            strts <- start(x)
-            if (any(strts < 0) & any(strts > 0))
-                x <- x[strts > 0]
-            x
-        }))
-    ## } else {
-    ##     strts <- start(prts)
-    ##     if (any(strts < 0) & any(strts > 0))
-    ##         prts <- prts[strts > 0]
-    ## }
+    prts <- IRangesList(lapply(prts, function(x) {
+        strts <- start(x)
+        if (any(strts < 0) & any(strts > 0))
+            x <- x[strts > 0]
+        x
+    }))
     prts
 }
 
