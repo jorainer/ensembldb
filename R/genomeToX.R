@@ -85,8 +85,9 @@ genomeToTranscript <- function(x, db) {
         res <- IRangesList(res)
     not_mapped <- sum(any(start(res) < 0))
     if (not_mapped > 0)
-        warning(not_mapped, " genomic region(s) could not be annotated ",
-                 "to a transcript", call. = FALSE)
+        warning(not_mapped, " genomic region(s) could not be mapped ",
+                "to a transcript; hint: see ?seqlevelsStyle if you used ",
+                "UCSC chromosome names", call. = FALSE)
     res
 }
 

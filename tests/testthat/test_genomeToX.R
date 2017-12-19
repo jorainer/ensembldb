@@ -159,4 +159,22 @@ test_that("genomeToProtein works", {
     expect_true(length(res) == length(gnm))
     expect_equal(start(res[[1]]["ENSP00000425414"]), 1)
     expect_false(mcols(res[[1]]["ENSP00000425414"])$cds_ok)
+
+    ## That's from issue #69
+    library(EnsDb.Hsapiens.v75)
+    library(testthat)
+    edb_2 <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "19")
+
+    grg <- GRanges(Rle(c("chr19")), IRanges(51920103, width=1, names = "good1"))
+    expect_warning(genomeToProtein(grg, db = edb_2))
+    edb_2 <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "chr19")
+    seqlevelsStyle(edb_2) <- "UCSC"
+    expect_warning(res <- genomeToProtein(grg, db = edb_2))
+    expect_true(length(res[[1]]) == 5)
+
+    grg <- GRanges("chr19", IRanges(c(51920103, 51919998), width = 1,
+                                    names = c("good1","bad1")))
+    res <- genomeToProtein(grg, edb_2)
+    expect_equal(length(res), length(grg))
 })
+
