@@ -62,7 +62,6 @@ importFrom("Rsamtools",
 importMethodsFrom("Rsamtools",
                   "getSeq",
                   "indexFa")
-                  ## "path")
 importFrom("Rsamtools",
            "index")
 
