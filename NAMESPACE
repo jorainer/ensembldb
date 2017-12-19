@@ -61,8 +61,7 @@ importFrom("Rsamtools",
            "FaFile")
 importMethodsFrom("Rsamtools",
                   "getSeq",
-                  "indexFa",
-                  "path")
+                  "indexFa")
 importFrom("Rsamtools",
            "index")
 
