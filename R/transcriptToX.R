@@ -179,7 +179,7 @@ transcriptToProtein <- function(x, db, id = "name") {
     ## Define internal IDs - we'll need them to return the result in the
     ## correct order.
     internal_ids <- paste0(names(x), ":", start(x), ":", end(x))
-    tx_lens <- .transcriptLengths(db,
+    tx_lens <- ensembldb:::.transcriptLengths(db,
                                   filter = TxIdFilter(unique(ids)),
                                   with.cds_len = TRUE,
                                   with.utr5_len = TRUE,
@@ -188,6 +188,8 @@ transcriptToProtein <- function(x, db, id = "name") {
     not_found <- !(ids %in% tx_lens$tx_id)
     fail_res <- IRanges()
     if (any(not_found)) {
+        ## issue #69 does not apply here, even if redundant ids are used,
+        ## all of them are considered.
         warning("Transcript(s) ", paste0("'", ids[not_found], "'",
                                          collapse = ", "),
                 " could not be found", call. = FALSE)
@@ -211,12 +213,14 @@ transcriptToProtein <- function(x, db, id = "name") {
         warning("Transcript(s) ", paste0("'", not_coding_id, "'",
                                          collapse = ", "),
                 " do/does not encode a protein", call. = FALSE)
-        not_coding_res <- IRanges(start = rep(-1, sum(not_coding)),
-                                  width = rep(1, sum(not_coding)))
+        ## Subset x to the non-coding ones (issue #69)
+        x_sub <- x[ids %in% not_coding_id]
+        not_coding_res <- IRanges(start = rep(-1, length(x_sub)),
+                                  width = rep(1, length(x_sub)))
         ## Add metadata columnds.
-        mcols(not_coding_res) <- DataFrame(tx_id = not_coding_id,
-                                           tx_start = start(x[not_coding_id]),
-                                           tx_end = end(x[not_coding_id]),
+        mcols(not_coding_res) <- DataFrame(tx_id = names(x_sub),
+                                           tx_start = start(x_sub),
+                                           tx_end = end(x_sub),
                                            cds_ok = NA)
         fail_res <- c(fail_res, not_coding_res)
         if (all(not_coding))
@@ -235,6 +239,7 @@ transcriptToProtein <- function(x, db, id = "name") {
     outside_cds <- start(x) <= tx_lens$utr5_len[id_idx] |
         end(x) > (tx_lens$utr5_len[id_idx] + tx_lens$cds_len[id_idx] - 3)
     if (any(outside_cds)) {
+        ## Also save against issue #69.
         outside_res <- IRanges(start = rep(-1, sum(outside_cds)),
                                width = rep(1, sum(outside_cds)))
         ## Add metadata columnds.
@@ -256,13 +261,13 @@ transcriptToProtein <- function(x, db, id = "name") {
     ## Now check if the CDS length matches the protein sequence length.
     prt <- proteins(db, filter = TxIdFilter(names(x)),
                     columns = "protein_sequence")
-    rownames(prt) <- prt$tx_id
-    prt <- prt[names(x), ]
+    id_idx_prt <- match(names(x), prt$tx_id)
     id_idx <- match(names(x), tx_lens$tx_id)
     res <- IRanges(start = ceiling((start(x) - tx_lens$utr5_len[id_idx]) / 3),
                    end = ceiling((end(x) - tx_lens$utr5_len[id_idx]) / 3),
-                   names = prt$protein_id)
-    cds_ok <- nchar(prt$protein_sequence) * 3 == (tx_lens$cds_len[id_idx] - 3)
+                   names = prt$protein_id[id_idx_prt])
+    cds_ok <- nchar(prt$protein_sequence[id_idx_prt]) * 3 ==
+        (tx_lens$cds_len[id_idx] - 3)
     if (any(!cds_ok))
         warning("The CDS of ", paste0("'", unique(names(x)[!cds_ok]), "'",
                                       collapse = ", "),
