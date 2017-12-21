@@ -59,9 +59,9 @@
 #'
 #' @examples
 #'
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
-#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 #'
 #' ## Define an IRange with protein-relative coordinates within a protein for
 #' ## the gene SYP
@@ -74,7 +74,7 @@
 #' 
 #' ## Perform the mapping for multiple proteins identified by their Uniprot
 #' ## IDs.
-#' ids <- c("SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+#' ids <- c("O15266", "Q9HBJ8", "unexistant")
 #' prngs <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
 #' names(prngs) <- ids
 #'
@@ -257,9 +257,9 @@ proteinToTranscript <- function(x, db, id = "name",
 #'
 #' @examples
 #'
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
-#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 #'
 #' ## Define an IRange with protein-relative coordinates within a protein for
 #' ## the gene SYP
@@ -272,7 +272,7 @@ proteinToTranscript <- function(x, db, id = "name",
 #' 
 #' ## Perform the mapping for multiple proteins identified by their Uniprot
 #' ## IDs.
-#' ids <- c("SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+#' ids <- c("O15266", "Q9HBJ8", "unexistant")
 #' prngs <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
 #' names(prngs) <- ids
 #'

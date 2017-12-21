@@ -50,9 +50,9 @@
 #'
 #' @examples
 #' 
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
-#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 #'
 #' ## Define an IRanges with the positions of the first 2 nucleotides of the
 #' ## coding region for the transcript ENST00000381578
@@ -179,7 +179,7 @@ transcriptToProtein <- function(x, db, id = "name") {
     ## Define internal IDs - we'll need them to return the result in the
     ## correct order.
     internal_ids <- paste0(names(x), ":", start(x), ":", end(x))
-    tx_lens <- ensembldb:::.transcriptLengths(db,
+    tx_lens <- .transcriptLengths(db,
                                   filter = TxIdFilter(unique(ids)),
                                   with.cds_len = TRUE,
                                   with.utr5_len = TRUE,
@@ -308,9 +308,9 @@ transcriptToProtein <- function(x, db, id = "name") {
 #'
 #' @examples
 #' 
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
-#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 #'
 #' ## Below we map positions 1 to 5 within the transcript ENST00000381578 to
 #' ## the genome. The ID of the transcript has to be provided either as names

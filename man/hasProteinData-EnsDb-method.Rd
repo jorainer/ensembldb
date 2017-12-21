@@ -20,9 +20,9 @@ Determines whether the \code{\linkS4class{EnsDb}}
     provides protein annotation data.
 }
 \examples{
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 ## Does this database/package have protein annotations?
-hasProteinData(EnsDb.Hsapiens.v75)
+hasProteinData(EnsDb.Hsapiens.v86)
 }
 \seealso{
 \code{\link{listTables}}

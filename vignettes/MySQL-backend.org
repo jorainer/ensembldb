@@ -17,7 +17,7 @@ vignette: >
   %\VignetteIndexEntry{Using a MySQL server backend}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle}
 ---
 
 #+END_EXPORT
@@ -26,7 +26,7 @@ vignette: >
 
 =ensembldb= uses by default, similar to other annotation packages in Bioconductor,
 a SQLite database backend, i.e. annotations are retrieved from file-based SQLite
-databases that are provided /via/ packages, such as the =EnsDb.Hsapiens.v75=
+databases that are provided /via/ packages, such as the =EnsDb.Hsapiens.v86=
 package. In addition, =ensembldb= allows to switch the backend from SQLite to
 MySQL and thus to retrieve annotations from a MySQL server instead. Such a setup
 might be useful for a lab running a well-configured MySQL server that would
@@ -44,12 +44,12 @@ that the user has write access to the server:
 #+BEGIN_SRC R :ravel eval = FALSE
   library(ensembldb)
   ## Load the EnsDb package that should be installed on the MySQL server
-  library(EnsDb.Hsapiens.v75)
+  library(EnsDb.Hsapiens.v86)
 
   ## Call the useMySQL method providing the required credentials to create
   ## databases and inserting data on the MySQL server
-  edb_mysql <- useMySQL(EnsDb.Hsapiens.v75, host = "localhost", user = "userwrite",
-                        pass = "userpass")
+  edb_mysql <- useMySQL(EnsDb.Hsapiens.v86, host = "localhost",
+			user = "userwrite", pass = "userpass")
 
   ## Use this EnsDb object
   genes(edb_mysql)
@@ -78,5 +78,12 @@ MySQL database.
   edb <- EnsDb(dbcon)
   edb
 
+#+END_SRC
+
+** Session information
+
+#+NAME: sessionInfo
+#+BEGIN_SRC R
+  sessionInfo()
 #+END_SRC
 

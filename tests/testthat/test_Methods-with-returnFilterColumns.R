@@ -15,7 +15,7 @@ test_that("returnFilterColumns works with_genes", {
 
     returnFilterColumns(edb) <- FALSE
     ## What happens if we use a GRangesFilter with return filter cols FALSE?
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    grf <- GRangesFilter(GRanges(17, IRanges(59106500, 59155300)),
                          type = "within")
     res <- genes(edb, filter = grf)
     expect_equal(res$gene_id,
@@ -53,7 +53,9 @@ test_that("returnFilterColumns works with_tx", {
     orig <- returnFilterColumns(edb)
     returnFilterColumns(edb) <- FALSE
     ## What happens if we use a GRangesFilter with return filter cols FALSE?
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ## grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ##                      type = "within")
+    grf <- GRangesFilter(GRanges(17, IRanges(59106500, 59155300)),
                          type = "within")
     res <- transcripts(edb, filter = grf)
     cols <- c("tx_id", "gene_name")
@@ -87,7 +89,9 @@ test_that("returnFilterColumns works with exons", {
     orig <- returnFilterColumns(edb)
     returnFilterColumns(edb) <- FALSE
     ## What happens if we use a GRangesFilter with return filter cols FALSE?
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ## grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ##                      type = "within")
+    grf <- GRangesFilter(GRanges(17, IRanges(58982600, 59155300)),
                          type = "within")
     res <- exons(edb, filter = grf)
     cols <- c("exon_id", "gene_name")
@@ -120,7 +124,7 @@ test_that("returnFilterColumns works with exonsBy", {
     orig <- returnFilterColumns(edb)
     returnFilterColumns(edb) <- FALSE
     ## What happens if we use a GRangesFilter with return filter cols FALSE?
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    grf <- GRangesFilter(GRanges(17, IRanges(58982600, 59155300)),
                          type = "within")
     ## By genes
     cols <- c("exon_id", "gene_name")
@@ -138,8 +142,9 @@ test_that("returnFilterColumns works with exonsBy", {
     gbt <- GeneBiotypeFilter("protein_coding")
     returnFilterColumns(edb) <- TRUE
     res <- unlist(exonsBy(edb, by = "gene", filter = list(gbt, grf), columns = cols))
-    expect_equal(unique(res$gene_name), c("SKA2"))
-    expect_equal(colnames(mcols(res)), c(cols, "gene_biotype", "gene_seq_start", "gene_seq_end"))
+    expect_equal(unique(res$gene_name), c("TRIM37", "SKA2"))
+    expect_equal(colnames(mcols(res)), c(cols, "gene_biotype", "gene_seq_start",
+                                         "gene_seq_end"))
     returnFilterColumns(edb) <- FALSE
     res <- unlist(exonsBy(edb, by = "gene", filter = list(gbt, grf), columns = cols))
     expect_equal(colnames(mcols(res)), cols)
@@ -161,7 +166,7 @@ test_that("returnFilterColumns works with exonsBy", {
     returnFilterColumns(edb) <- TRUE
     res <- unlist(exonsBy(edb, by = "tx", filter = list(gbt, grf),
                           columns = cols))
-    expect_equal(unique(res$gene_name), c("SKA2"))
+    expect_equal(unique(res$gene_name), c("TRIM37", "SKA2"))
     expect_equal(colnames(mcols(res)), c(cols, "gene_biotype", "tx_seq_start",
                                         "tx_seq_end", "exon_rank"))
     returnFilterColumns(edb) <- FALSE
@@ -175,7 +180,9 @@ test_that("returnFilterColumns works with transcriptsBy", {
     orig <- returnFilterColumns(edb)
     returnFilterColumns(edb) <- FALSE
     ## What happens if we use a GRangesFilter with return filter cols FALSE?
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ## grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ##                      type = "within")
+    grf <- GRangesFilter(GRanges(17, IRanges(59106500, 59155300)),
                          type = "within")
     ## By genes
     cols <- c("tx_id", "gene_name")
@@ -205,7 +212,9 @@ test_that("returnFilterColumns works with transcriptsBy", {
 
 test_that("returnFilterColumns works with_cdsBy", {
     orig <- returnFilterColumns(edb)
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ## grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ##                      type = "within")
+    grf <- GRangesFilter(GRanges(17, IRanges(59106500, 59155300)),
                          type = "within")
     ## By tx
     returnFilterColumns(edb) <- FALSE
@@ -237,7 +246,9 @@ test_that("returnFilterColumns works with_cdsBy", {
 
 test_that("returnFilterColumns works with threeUTRsByTranscript", {
     orig <- returnFilterColumns(edb)
-    grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ## grf <- GRangesFilter(GRanges(17, IRanges(57180000, 57233000)),
+    ##                      type = "within")
+    grf <- GRangesFilter(GRanges(17, IRanges(59106500, 59155300)),
                          type = "within")
     ## By tx
     returnFilterColumns(edb) <- FALSE

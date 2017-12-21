@@ -1,10 +1,10 @@
 
 test_that("extractTranscriptSeqs works with BSGenome", {
-    library(BSgenome.Hsapiens.UCSC.hg19)
-    bsg <- BSgenome.Hsapiens.UCSC.hg19
+    library(BSgenome.Hsapiens.NCBI.GRCh38)
+    bsg <- BSgenome.Hsapiens.NCBI.GRCh38
 
-    ## Changing the seqlevels tyle to UCSC
-    seqlevelsStyle(edb) <- "UCSC"
+    ## ## Changing the seqlevels tyle to UCSC
+    ## seqlevelsStyle(edb) <- "UCSC"
     ZBTB <- extractTranscriptSeqs(bsg, edb, filter=GenenameFilter("ZBTB16"))
     ## Load the sequences for one ZBTB16 transcript from FA.
     faf <- system.file("txt/ENST00000335953.fa.gz", package="ensembldb")

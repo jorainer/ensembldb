@@ -3,7 +3,7 @@
 test_that("seqlevelsStyle works", {
     orig <- getOption("ensembldb.seqnameNotFound")
     options(ensembldb.seqnameNotFound = NA)
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     SL <- seqlevels(edb)
     ucscs <- paste0("chr", c(1:22, "X", "Y", "M"))
     seqlevelsStyle(edb) <- "UCSC"
@@ -25,7 +25,7 @@ test_that("seqlevelsStyle works", {
 })
 
 test_that("seqinfo works with seqlevelsStyle", {
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     orig <- getOption("ensembldb.seqnameNotFound")
     options(ensembldb.seqnameNotFound="MISSING")
     seqlevelsStyle(edb) <- "UCSC"
@@ -39,7 +39,7 @@ test_that("seqinfo works with seqlevelsStyle", {
 
 test_that("getWhat works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ensRes <- ensembldb:::getWhat(edb, columns=c("seq_name", "seq_strand"))
     seqlevelsStyle(edb) <- "UCSC"
@@ -56,7 +56,7 @@ test_that("getWhat works with seqlevelsStyle", {
 test_that("SeqNameFilter works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
     options(ensembldb.seqnameNotFound="MISSING")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     snf <- SeqNameFilter("chrX")
     snfEns <- SeqNameFilter(c("X", "Y"))
@@ -100,7 +100,7 @@ test_that("SeqNameFilter works with seqlevelsStyle", {
 
 test_that("genes works with seqlevelsStyles", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     ## Here we want to test whether the result returned by the function does really
     ## work when changing the seqnames.
     seqlevelsStyle(edb) <- "Ensembl"
@@ -132,7 +132,7 @@ test_that("genes works with seqlevelsStyles", {
 
 test_that("transcripts works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- transcripts(edb, filter = SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -159,7 +159,7 @@ test_that("transcripts works with seqlevelsStyle", {
 
 test_that("transcriptsBy works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- transcriptsBy(edb, filter=SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -189,7 +189,7 @@ test_that("transcriptsBy works with seqlevelsStyle", {
 
 test_that("exons works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- exons(edb, filter=SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -215,7 +215,7 @@ test_that("exons works with seqlevelsStyle", {
 
 test_that("exonsBy works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- exonsBy(edb, filter=SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -244,7 +244,7 @@ test_that("exonsBy works with seqlevelsStyle", {
 
 test_that("cdsBy works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- cdsBy(edb, filter=SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -273,7 +273,7 @@ test_that("cdsBy works with seqlevelsStyle", {
 
 test_that("threeUTRsByTranscript works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- threeUTRsByTranscript(edb, filter=SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -302,7 +302,7 @@ test_that("threeUTRsByTranscript works with seqlevelsStyle", {
 
 test_that("fiveUTRsByTranscript works with seqlevelsStyle", {
     orig <- getOption("ensembldb.seqnameNotFound")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     seqlevelsStyle(edb) <- "Ensembl"
     ens21Y <- fiveUTRsByTranscript(edb, filter=SeqNameFilter(c("Y", "21")))
     expect_equal(sort(seqlevels(ens21Y)), c("21", "Y"))
@@ -330,7 +330,7 @@ test_that("fiveUTRsByTranscript works with seqlevelsStyle", {
 })
 
 test_that("seting and getting seqlevelsStyle works", {
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     ## Testing the getter/setter for the seqlevelsStyle.
     expect_equal(seqlevelsStyle(edb), "Ensembl")
     expect_equal(NA, ensembldb:::getProperty(edb, "seqlevelsStyle"))
@@ -358,7 +358,7 @@ test_that("formatting seqnames for query works with seqlevelsStyle", {
     ucscs <- c("chr1", "chr3", "chr1", "chr9", "chrM", "chr1", "chrX")
     enses <- c("1", "3", "1", "9", "MT", "1", "X")
     ## reset
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     ## Shouldn't do anything here.
     seqlevelsStyle(edb)
     ensembldb:::dbSeqlevelsStyle(edb)
@@ -395,7 +395,7 @@ test_that("formatting seqnames for query works with seqlevelsStyle", {
 test_that("formating seqnames from query works with seqlevelsStyle", {
     ucscs <- c("chr1", "chr3", "chr1", "chr9", "chrM", "chr1", "chrX")
     enses <- c("1", "3", "1", "9", "MT", "1", "X")
-    edb <- EnsDb.Hsapiens.v75
+    edb <- EnsDb.Hsapiens.v86
     ## Shouldn't do anything here.
     seqlevelsStyle(edb)
     ensembldb:::dbSeqlevelsStyle(edb)

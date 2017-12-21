@@ -1,5 +1,5 @@
 test_that("transcriptToProtein works",  {
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
     ## SHOX2, ENST00000381578
     ## exon 1: 259
@@ -86,7 +86,7 @@ test_that("transcriptToProtein works",  {
 })
 
 test_that("transcriptToProtein works", {
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     
     ## Errors.
     expect_error(transcriptToProtein())
@@ -103,7 +103,7 @@ test_that("transcriptToProtein works", {
 })
 
 test_that(".tx_to_genome works", {
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     ## ENST00000486554:501:505 106959129:106959131 106957979:106957979 -
     ## ENST00000486554:1:5 106959627:106959631 -
     ## ENST00000381578:1:5 585079:585083 +
@@ -116,25 +116,33 @@ test_that(".tx_to_genome works", {
     expect_equal(length(res), length(rng))
     expect_equal(unname(lengths(res)), c(2, 1, 1, 2, 0))
     ## 1
-    expect_equal(start(res[[1]]), c(106959129, 106957979))
-    expect_equal(end(res[[1]]), c(106959131, 106957979))
+    ## expect_equal(start(res[[1]]), c(106959129, 106957979))
+    ## expect_equal(end(res[[1]]), c(106959131, 106957979))
+    expect_equal(start(res[[1]]), c(107715899, 107714749))
+    expect_equal(end(res[[1]]), c(107715901, 107714749))
     expect_equal(as.character(strand(res[[1]])), c("-", "-"))
     ## 2
-    expect_equal(start(res[[2]]), 106959627)
-    expect_equal(end(res[[2]]), 106959631)
+    ## expect_equal(start(res[[2]]), 106959627)
+    ## expect_equal(end(res[[2]]), 106959631)
+    expect_equal(start(res[[2]]), 107716397)
+    expect_equal(end(res[[2]]), 107716401)
     expect_equal(as.character(strand(res[[2]])), "-")
     ## 3
-    expect_equal(start(res[[3]]), 585079)
-    expect_equal(end(res[[3]]), 585083)
+    ## expect_equal(start(res[[3]]), 585079)
+    ## expect_equal(end(res[[3]]), 585083)
+    expect_equal(start(res[[3]]), 624344)
+    expect_equal(end(res[[3]]), 624348)
     expect_equal(as.character(strand(res[[3]])), "+")
     ## 4
-    expect_equal(start(res[[4]]), c(585337, 591201))
-    expect_equal(end(res[[4]]), c(585337, 591201))
+    ## expect_equal(start(res[[4]]), c(585337, 591201))
+    ## expect_equal(end(res[[4]]), c(585337, 591201))
+    expect_equal(start(res[[4]]), c(624602, 630466))
+    expect_equal(end(res[[4]]), c(624602, 630466))
     expect_equal(as.character(strand(res[[4]])), c("+", "+"))
 })
 
 test_that("transcriptToGenome works", {
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     
     x <- IRanges(start = c(259, 1), end = c(260, 4),
                  names = c("ENST00000381578", "some"))

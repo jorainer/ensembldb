@@ -31,9 +31,9 @@ coordinates.
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 ## Restrict all further queries to chromosome x to speed up the examples
-edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
 ## Below we map positions 1 to 5 within the transcript ENST00000381578 to
 ## the genome. The ID of the transcript has to be provided either as names

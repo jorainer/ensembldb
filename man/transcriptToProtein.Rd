@@ -46,9 +46,9 @@ protein sequence (see examples for more details).
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 ## Restrict all further queries to chromosome x to speed up the examples
-edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
 ## Define an IRanges with the positions of the first 2 nucleotides of the
 ## coding region for the transcript ENST00000381578

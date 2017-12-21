@@ -10,7 +10,7 @@ vignette: >
   %\VignetteIndexEntry{Mapping between genome, transcript and protein coordinates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,Gviz}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,Gviz}
 ---
 
 ```{r  biocstyle, echo = FALSE, results = "asis" }
@@ -85,9 +85,9 @@ all queries considerably.
 
 ```{r  load-libs, message = FALSE }
 library(ensembldb)
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 
-edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X") 
+edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X") 
 ```
 
 
@@ -99,7 +99,7 @@ respective coordinates of the genomic region within these (relative to their
 first nucleotide).
 
 ```{r  genomeToTranscript-define }
-gnm <- GRanges("X:106959629-106959631") 
+gnm <- GRanges("X:107716399-107716401") 
 ```
 
 Before we map the coordinates we visualize the genomic region and all
@@ -186,7 +186,7 @@ region maps to the last nt before the stop codon of ENST00000381578 and the last
 region is located within an intron of the same transcript.
 
 ```{r  genomeToProtein-ex1, message = FALSE }
-gnm <- GRanges("X", IRanges(start = c(591633, 605371, 605368, 595564),
+gnm <- GRanges("X", IRanges(start = c(630898, 644636, 644633, 634829),
 			    width = c(5, 1, 1, 3)))
 gnm_prt <- genomeToProtein(gnm, edbx)
  
@@ -305,7 +305,7 @@ sequences identified by Uniprot IDs. In addition, to illustrate a failing
 mapping, we add a region with an invalid ID.
 
 ```{r  proteinToTranscript-ex2, message = FALSE }
-ids <- c("SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+ids <- c("O15266", "Q9HBJ8", "unexistant")
 prt <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
 names(prt) <- ids
 
@@ -389,14 +389,14 @@ identifiers to genomic regions.
 ```{r  proteinToGenome-uniprot-ids, message = FALSE }
 ## Define the IRanges providing Uniprot IDs.
 uni_rng <- IRanges(start = c(2, 12, 8), end = c(2, 15, 17),
-		   names = c("D6RDZ7_HUMAN", "SHOX_HUMAN", "H7C2F2_HUMAN"))
+		   names = c("D6RDZ7", "O15266", "H7C2F2"))
 
 ## We have to specify that the IDs are Uniprot IDs
 uni_gnm <- proteinToGenome(uni_rng, edbx, idType = "uniprot_id") 
 ```
 
-The length of the protein coding region of the encoding transcript for one of
-the 3 proteins (*H7C2F2\_HUMAN*) does not match the length of the protein
+The length of the protein coding region of the encoding transcript for two of
+the 3 proteins (*D6RDZ7* and *H7C2F2*) do not match the length of the protein
 sequence. For some transcripts the CDS is not complete (either at the 3', 5' or
 both ends). Mapped coordinates might not be correct in such cases and it is
 strongly suggested to manually check the mapped coordinates. The result from the
@@ -419,10 +419,10 @@ lengths(uni_gnm)
 ```
 
 Below we show the genomic coordinates for the within-protein positions
-calculated for all 4 Ensembl protein IDs for *D6RDZ7\_HUMAN*.
+calculated for all 4 Ensembl protein IDs for *O15266*.
 
 ```{r  proteinToGenome-uniprot-multi }
-uni_gnm[["D6RDZ7_HUMAN"]] 
+uni_gnm[["O15266"]] 
 ```
 
 As a last example we fetch all protein domains for the gene SYP and map all of

@@ -85,8 +85,8 @@ The \code{proteins} method performs the query starting from the
 }
 \examples{
 library(ensembldb)
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 ## Get all proteins from tha database for the gene ZBTB16, if protein
 ## annotations are available
 if (hasProteinData(edb))
@@ -105,8 +105,8 @@ if (hasProteinData(edb))
 
 
 ## List all columns containing protein annotations
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 if (hasProteinData(edb))
     listProteinColumns(edb)
 }

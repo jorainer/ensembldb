@@ -30,18 +30,18 @@ By providing the connection to a MySQL database, it is possible
 }
 \examples{
 ## "Standard" way to create an EnsDb object:
-library(EnsDb.Hsapiens.v75)
-EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+EnsDb.Hsapiens.v86
 
 ## Alternatively, provide the full file name of a SQLite database file
-dbfile <- system.file("extdata/EnsDb.Hsapiens.v75.sqlite", package = "EnsDb.Hsapiens.v75")
+dbfile <- system.file("extdata/EnsDb.Hsapiens.v86.sqlite", package = "EnsDb.Hsapiens.v86")
 edb <- EnsDb(dbfile)
 edb
 
 ## Third way: connect to a MySQL database
 \dontrun{
 library(RMySQL)
-dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v75")
+dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v86")
 edb <- EnsDb(dbcon)
 }
 }

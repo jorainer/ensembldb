@@ -32,13 +32,13 @@ test_that("genes method works", {
     Gns <- genes(edb,
                  filter = AnnotationFilterList(SeqNameFilter("Y"),
                                                GenenameFilter("BCL2"),
-                                               logOp = "|"),
+                                               logicOp = "|"),
                  return.type = "DataFrame")
     expect_true(all(Gns$seq_name %in% c("18", "Y")))
 
     afl <- AnnotationFilterList(GenenameFilter(c("BCL2", "BCL2L11")),
-                                SeqNameFilter(18), logOp = "&")
-    afl2 <- AnnotationFilterList(SeqNameFilter("Y"), afl, logOp = "|")
+                                SeqNameFilter(18), logicOp = "&")
+    afl2 <- AnnotationFilterList(SeqNameFilter("Y"), afl, logicOp = "|")
     Gns <- genes(edb, filter = afl2, columns = "gene_name",
                  return.type = "DataFrame")
     expect_identical(colnames(Gns), c("gene_name", "gene_id", "seq_name"))
@@ -441,7 +441,7 @@ test_that("lengthOf works", {
                  unname(rowSums(res[names(tx),
                                     c("utr5_len", "cds_len", "utr3_len")])))
     ## Compare 3' and 5' lengths
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     res <- ensembldb:::.transcriptLengths(edbx, with.cds_len = TRUE,
                                           with.utr5_len = TRUE,
                                           with.utr3_len = TRUE)
@@ -523,10 +523,9 @@ test_that("getGeneRegionTrackForGviz works", {
     res <- getGeneRegionTrackForGviz(edb, filter = GenenameFilter("ZBTB16"))
     expect_true(all(res$feature %in% c("protein_coding", "utr5", "utr3")))
     ## Do the same without a filter:
-    ## LLLLL
-    res2 <- getGeneRegionTrackForGviz(edb, chromosome = "11", start = 113930000,
-                                      end = 113935000)
-    expect_true(all(res2$symbol == "ZBTB16"))
+    res2 <- getGeneRegionTrackForGviz(edb, chromosome = "11", start = 114059593,
+                                      end = 114250676)
+    expect_true(all(res2$symbol %in% c("ZBTB16", "RP11-64D24.2")))
 })
 
 test_that("filter columns are correctly added in methods", {
@@ -576,7 +575,7 @@ test_that("GRangesFilter works in queries", {
     exs2 <- exons(edb, filter = GRangesFilter(zbtb))
     expect_equal(exs$exon_id, exs2$exon_id)
     ## Now check the filter with "overlapping".
-    intr <- GRanges("11", ranges = IRanges(114000000, 114000050), strand = "+")
+    intr <- GRanges("11", ranges = IRanges(114129278, 114129318), strand = "+")
     gns <- genes(edb, filter = GRangesFilter(intr, type = "any"))
     expect_equal(gns$gene_name, "ZBTB16")
     ##
@@ -598,19 +597,18 @@ test_that("GRangesFilter works in queries", {
     }
 
     ## OK, now for a GRangesFilter with more than one GRanges.
-    ir2 <- IRanges(start=c(2654890, 2709520, 28111770),
-                   end=c(2654900, 2709550, 28111790))
+    ir2 <- IRanges(start=c(2786849, 2841479, 25965623),
+                   end=c(2786859, 2841509, 25965643))
     grf2 <- GRangesFilter(GRanges(rep("Y", length(ir2)), ir2),
                           type = "any")
     Test <- transcripts(edb, filter = grf2)
-    expect_equal(names(Test), c("ENST00000383070", "ENST00000250784",
-                                "ENST00000598545"))
+    expect_equal(names(Test), c("ENST00000383070", "ENST00000250784"))
 })
 
 test_that("show works", {
     res <- capture.output(show(edb))
     expect_equal(res[1], "EnsDb for Ensembl:")
-    expect_equal(res[9], "|ensembl_version: 75")
+    expect_equal(res[9], "|ensembl_version: 86")
 })
 
 test_that("organism method works", {
@@ -624,7 +622,7 @@ test_that("metadata method works", {
 })
 
 test_that("ensemblVersion works", {
-    expect_equal(ensemblVersion(edb), "75")
+    expect_equal(ensemblVersion(edb), "86")
 })
 
 test_that("getMetadataValue works", {

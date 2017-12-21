@@ -42,8 +42,8 @@ At present the function does not evaluate whether the versions
 }
 \examples{
 ## Load the EnsDb database (SQLite backend).
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 ## Now change the backend to MySQL; my_user and my_pass should
 ## be the user name and password to access the MySQL server.
 \dontrun{

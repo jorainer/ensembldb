@@ -242,10 +242,10 @@ setClass("EnsDb",
 #' 
 #' ## Example for GRangesFilter:
 #' ## retrieve all genes overlapping the specified region
-#' grf <- GRangesFilter(GRanges("11", ranges = IRanges(114000000, 114000050),
+#' grf <- GRangesFilter(GRanges("11", ranges = IRanges(114129278, 114129328),
 #'                              strand = "+"), type = "any")
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #' genes(edb, filter = grf)
 #' 
 #' ## Get also all transcripts overlapping that region.

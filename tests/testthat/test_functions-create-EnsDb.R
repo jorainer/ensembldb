@@ -5,7 +5,7 @@ test_that(".organismName, .abbrevOrganismName and .makePackageName works", {
     res <- ensembldb:::.abbrevOrganismName("homo_sapiens")
     expect_equal(res, "hsapiens")
     res <- ensembldb:::.makePackageName(dbconn(edb))
-    expect_equal(res, "EnsDb.Hsapiens.v75")
+    expect_equal(res, "EnsDb.Hsapiens.v86")
 })
 
 test_that("ensDbFromGRanges works", {
@@ -222,7 +222,7 @@ test_that("getSeqlengthsFromMysqlFolder works", {
         ## ones.
         seq_info <- seqinfo(edb)
         seq_lengths <- ensembldb:::.getSeqlengthsFromMysqlFolder(
-            organism = "Homo sapiens", ensembl = 75,
+            organism = "Homo sapiens", ensembl = 86,
             seqnames = seqlevels(seq_info))
         sl <- seqlengths(seq_info)
         sl_2 <- seq_lengths$length
