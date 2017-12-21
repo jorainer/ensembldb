@@ -86,8 +86,8 @@ test_that("multiFilterReturnCols works also with symbolic filters", {
 })
 
 test_that("SQLiteName2MySQL works", {
-    have <- "EnsDb.Hsapiens.v75"
-    want <- "ensdb_hsapiens_v75"
+    have <- "EnsDb.Hsapiens.v86"
+    want <- "ensdb_hsapiens_v86"
     expect_equal(ensembldb:::SQLiteName2MySQL(have), want)
 })
 

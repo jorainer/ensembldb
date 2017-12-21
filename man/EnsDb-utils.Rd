@@ -96,20 +96,15 @@
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 ######   getGeneRegionTrackForGviz
 ##
 ## Get all genes encoded on chromosome Y in the specifyed region.
-AllY <- getGeneRegionTrackForGviz(edb, chromosome = "Y", start = 5000000,
-                                  end = 7000000)
+AllY <- getGeneRegionTrackForGviz(edb, chromosome = "Y", start = 5131959,
+                                  end = 7131959)
 ## We could plot this now using plotTracks(GeneRegionTrack(AllY))
 
-## We can also use filters to further restrict the query to e.g.
-## all lincRNA genes encoded in that region.
-lincsY <- getGeneRegionTrackForGviz(edb, chromosome = "Y", start = 5000000,
-                                    end = 7000000,
-                                    filter = GeneBiotypeFilter("lincRNA"))
 
 }
 \keyword{classes}

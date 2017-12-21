@@ -2,9 +2,6 @@
 packs <- installed.packages()
 epacks <- packs[grep(packs, pattern="^Ens")]
 
-## library(EnsDb.Hsapiens.v75)
-## edb <- EnsDb.Hsapiens.v75
-
 TheFilter <- function(input){
     Cond <- input$condition
     ## check if we've got something to split...

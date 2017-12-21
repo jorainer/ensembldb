@@ -47,16 +47,16 @@ negative coordinates (i.e. a start position of -1) is returned.
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 ## Restrict all further queries to chromosome x to speed up the examples
-edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
 ## In the example below we define 4 genomic regions:
-## 591633: corresponds to the first nt of the CDS of ENST00000381578
-## 605371: last nt of the CDS of ENST00000381578
-## 605368: last nt before the stop codon in ENST00000381578
-## 595564: position within an intron.
-gnm <- GRanges("X", IRanges(start = c(591633, 605371, 605368, 595564),
+## 630898: corresponds to the first nt of the CDS of ENST00000381578
+## 644636: last nt of the CDS of ENST00000381578
+## 644633: last nt before the stop codon in ENST00000381578
+## 634829: position within an intron.
+gnm <- GRanges("X", IRanges(start = c(630898, 644636, 644633, 634829),
     width = c(5, 1, 1, 3)))
 res <- genomeToProtein(gnm, edbx)
 

@@ -48,14 +48,14 @@
 #'
 #' @examples
 #'
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #'
 #' ## Subsetting the EnsDb object to chromosome X only to speed up execution
 #' ## time of examples
-#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 #'
 #' ## Define a genomic region and calculate within-transcript coordinates
-#' gnm <- GRanges("X:106959629-106959631")
+#' gnm <- GRanges("X:107716399-107716401")
 #'
 #' res <- genomeToTranscript(gnm, edbx)
 #' ## Result is an IRanges object with the start and end coordinates within
@@ -65,12 +65,12 @@
 #' ## An IRanges with negative coordinates is returned if at the provided
 #' ## position no exon is present. Below we use the same coordinates but
 #' ## specify that the coordinates are on the forward (+) strand
-#' gnm <- GRanges("X:106959629-106959631:+")
+#' gnm <- GRanges("X:107716399-107716401:+")
 #' genomeToTranscript(gnm, edbx)
 #'
 #' ## Next we provide multiple genomic positions.
-#' gnm <- GRanges("X", IRanges(start = c(605370, 106959629, 106959629),
-#'     end = c(605374, 106959631, 106959631)), strand = c("*", "*", "+"))
+#' gnm <- GRanges("X", IRanges(start = c(644635, 107716399, 107716399),
+#'     end = c(644639, 107716401, 107716401)), strand = c("*", "*", "+"))
 #'
 #' ## The result of the mapping is an IRangesList each element providing the
 #' ## within-transcript coordinates for each input region
@@ -142,16 +142,16 @@ genomeToTranscript <- function(x, db) {
 #'
 #' @examples
 #' 
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
-#' edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+#' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 #'
 #' ## In the example below we define 4 genomic regions:
-#' ## 591633: corresponds to the first nt of the CDS of ENST00000381578
-#' ## 605371: last nt of the CDS of ENST00000381578
-#' ## 605368: last nt before the stop codon in ENST00000381578
-#' ## 595564: position within an intron.
-#' gnm <- GRanges("X", IRanges(start = c(591633, 605371, 605368, 595564),
+#' ## 630898: corresponds to the first nt of the CDS of ENST00000381578
+#' ## 644636: last nt of the CDS of ENST00000381578
+#' ## 644633: last nt before the stop codon in ENST00000381578
+#' ## 634829: position within an intron.
+#' gnm <- GRanges("X", IRanges(start = c(630898, 644636, 644633, 634829),
 #'     width = c(5, 1, 1, 3)))
 #' res <- genomeToProtein(gnm, edbx)
 #'

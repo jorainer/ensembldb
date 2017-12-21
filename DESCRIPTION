@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.3.6
+Version: 2.3.7
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -43,9 +43,9 @@ Suggests:
     BiocStyle,
     knitr,
     rmarkdown,
-    EnsDb.Hsapiens.v75 (>= 0.99.8),
+    EnsDb.Hsapiens.v86 (>= 0.99.8),
     testthat,
-    BSgenome.Hsapiens.UCSC.hg19,
+    BSgenome.Hsapiens.NCBI.GRCh38,
     ggbio (>= 1.24.0),
     Gviz (>= 1.20.0),
     magrittr,

@@ -452,9 +452,9 @@ setMethod("tablesByDegree", "EnsDb", function(x,
 #' @seealso \code{\link{listTables}}
 #' 
 #' @examples
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Does this database/package have protein annotations?
-#' hasProteinData(EnsDb.Hsapiens.v75)
+#' hasProteinData(EnsDb.Hsapiens.v86)
 setMethod("hasProteinData", "EnsDb", function(x) {
     tabs <- listTables(x)
     return(all(c("protein", "uniprot", "protein_domain") %in%
@@ -1733,8 +1733,8 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 #'
 #' @examples
 #' ## Load the EnsDb database (SQLite backend).
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #' ## Now change the backend to MySQL; my_user and my_pass should
 #' ## be the user name and password to access the MySQL server.
 #' \dontrun{
@@ -1860,8 +1860,8 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 #'
 #' @examples
 #' library(ensembldb)
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #' ## Get all proteins from tha database for the gene ZBTB16, if protein
 #' ## annotations are available
 #' if (hasProteinData(edb))
@@ -2043,8 +2043,8 @@ setMethod("supportedFilters", "EnsDb", function(object, ...) {
 #' @seealso \code{\link{Filter-classes}} for a list of all supported filters.
 #' 
 #' @examples
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #'
 #' ## Add a global SeqNameFilter to the database such that all subsequent
 #' ## queries will be applied on the filtered database.

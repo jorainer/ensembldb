@@ -35,8 +35,9 @@ test_that(".cds_for_id and .cds_matching_protein work", {
 
     ## Use uniprot...
     ## want a uniprot that is mapped to two tx.
-    unis <- c("E7EMD7_HUMAN", "ALAT2_HUMAN", "H0YIP2_HUMAN")
-    unis_counts <- c(7, 2, 1)
+    ## unis <- c("E7EMD7_HUMAN", "ALAT2_HUMAN", "H0YIP2_HUMAN")
+    unis <- c("Q9NPH5", "Q8TD30", "H0YIP2")
+    unis_counts <- c(10, 2, 1)
     dbsub2 <- filter(edb, filter = ~ seq_name %in% c("11", "12", "16"))
     res2 <- .cds_for_id(dbsub2, unis, idType = "uniprot_id")
     expect_equal(unname(lengths(res2)), unis_counts)
@@ -52,7 +53,7 @@ test_that(".cds_for_id and .cds_matching_protein work", {
     ## Run .cds_matching_protein on the results to avoid re-querying.
     ## H0YIP2_HUMAN has incomplete 5' and 3' CDS.
     expect_warning(clnd <- .cds_matching_protein(dbsub2, res2))
-    expect_equal(unname(lengths(clnd)), c(7, 2, 1))
+    expect_equal(unname(lengths(clnd)), c(10, 2, 1))
     expect_true(is.list(clnd))
     expect_true(is(clnd[[1]], "GRangesList"))
     expect_true(all(clnd[[1]][[1]]$cds_ok))
@@ -68,7 +69,7 @@ test_that(".cds_for_id and .cds_matching_protein work", {
 
 test_that("proteinToGenome works", {
     ## Restrict to chromosome X - speeds up stuff
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     ## protein_id
     ids <- c("ENSP00000425155", "ENSP00000418169", "ENSP00000441743",
              "ENSP00000385415")
@@ -90,8 +91,8 @@ test_that("proteinToGenome works", {
     ## exon 1 width 49, 5' UTR: 13nt long. 36 nt
     ## exon 2 width 66. relative pos is 31nt in exon 2
     ## exon 2 starts: 49,055,492 [nt1], [nt31] is 49055492 - 30 = 49055462
-    expect_equal(end(res[[2]]), 49055462)
-    expect_equal(start(res[[2]]), 49055462 - 5)
+    expect_equal(end(res[[2]]), 49199003)
+    expect_equal(start(res[[2]]), 49199003 - 5)
     expect_equal(res[[2]]$protein_id, "ENSP00000418169")
     expect_equal(res[[2]]$tx_id, "ENST00000479808")
     expect_equal(res[[2]]$exon_rank, 2)
@@ -105,21 +106,24 @@ test_that("proteinToGenome works", {
     ## exon 3 width 121nt, 131 left.
     ## exon 4 width 126, 5 left
     ## exon 5 width 117, start 49176207: cds end maps at 49176211
-    strts <- c(49161405, 49161883, 49173642, 49176207)
-    ends <- c(49161419, 49162003, 49173767, 49176211)
+    ## strts <- c(49161405, 49161883, 49173642, 49176207)
+    ## ends <- c(49161419, 49162003, 49173767, 49176211)
+    strts <- c(49304926, 49305404, 49317163, 49319728)
+    ends <- c(49304940, 49305524, 49317288, 49319732)
     expect_equal(start(res[[4]]), strts)
     expect_equal(end(res[[4]]), ends)
     expect_equal(res[[4]]$exon_rank, c(2, 3, 4, 5))
     expect_true(all(res[[4]]$cds_ok))
         
     ## Uniprot identifier
-    ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+    ## ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+    ids <- c("D6RDZ7", "O15266", "Q9HBJ8", "unexistant")
     prngs <- IRanges(start = c(1, 13, 43, 100), end = c(2, 21, 80, 100))
     names(prngs) <- ids
     
-    res <- proteinToGenome(prngs, edbx, idType = "uniprot_id")
+    expect_warning(res <- proteinToGenome(prngs, edbx, idType = "uniprot_id"))
     ## Now, expect elements 1 and 2 to be a GRangesList and not a GRanges.
-    expect_true(is(res[[1]], "GRangesList"))
+    expect_true(is(res[[1]], "GRanges"))
     expect_true(is(res[[2]], "GRangesList"))
     expect_true(is(res[[3]], "GRanges"))
     expect_true(is(res[[4]], "GRanges"))
@@ -127,7 +131,7 @@ test_that("proteinToGenome works", {
     res <- res[1:3]
     expect_true(all(unlist(lapply(res, function(z) sum(width(z)))) %% 3 == 0))
     ## We've got multi-mapping here
-    expect_equal(unname(lengths(res)), c(4, 4, 2))
+    expect_equal(unname(lengths(res)), c(1, 4, 2))
     ## Although we have different proteins, all coords are the same
     strts <- unlist(start(res[[1]]))
     expect_true(all(strts == strts[1]))
@@ -140,7 +144,7 @@ test_that("proteinToGenome works", {
 })
 
 test_that("proteinToTranscript works", {
-    edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     prng <- IRanges(start = c(1, 2, 3, 11, 12), end = c(1, 4, 9, 12, 12),
                     names = c("ENSP00000014935", "ENSP00000173898",
                               "ENSP00000217901", "ENSP00000425155", "ffff"))
@@ -168,16 +172,18 @@ test_that("proteinToTranscript works", {
     expect_equal(start(tx_rel[["ENSP00000425155"]]), (86L + 92L + 31L))
 
     ## Now for Uniprot...
-    ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+    ## ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
+    ids <- c("D6RDZ7", "O15266", "Q9HBJ8", "unexistant")
     prngs <- IRanges(start = c(1, 13, 43, 100), end = c(2, 21, 80, 100))
     names(prngs) <- ids
-    tx_rel <- proteinToTranscript(prngs, edbx, idType = "uniprot_id")
+    expect_warning(tx_rel <- proteinToTranscript(prngs, edbx,
+                                                 idType = "uniprot_id"))
     expect_equal(length(tx_rel), length(prngs))
-    expect_equal(unname(lengths(tx_rel)), c(4, 4, 1, 1))
+    expect_equal(unname(lengths(tx_rel)), c(1, 4, 1, 1))
     lens <- unlist(width(tx_rel))
-    expect_equal(unique(lens[1:4]), width(prngs)[1] * 3)
-    expect_equal(unique(lens[5:8]), width(prngs)[2] * 3)
-    expect_equal(unique(lens[9]), width(prngs)[3] * 3)
+    expect_equal(unique(lens[1]), width(prngs)[1] * 3)
+    expect_equal(unique(lens[2:5]), width(prngs)[2] * 3)
+    expect_equal(unique(lens[6]), width(prngs)[3] * 3)
 
     ## Mapping fails for all...
     ids <- c("a", "unexistant")

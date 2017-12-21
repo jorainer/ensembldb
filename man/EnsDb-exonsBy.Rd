@@ -452,8 +452,8 @@
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ######   genes
 ##

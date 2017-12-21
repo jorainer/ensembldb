@@ -43,14 +43,14 @@ genomic coordinates can not be mapped to a transcript.
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 
 ## Subsetting the EnsDb object to chromosome X only to speed up execution
 ## time of examples
-edbx <- filter(EnsDb.Hsapiens.v75, filter = ~ seq_name == "X")
+edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
 ## Define a genomic region and calculate within-transcript coordinates
-gnm <- GRanges("X:106959629-106959631")
+gnm <- GRanges("X:107716399-107716401")
 
 res <- genomeToTranscript(gnm, edbx)
 ## Result is an IRanges object with the start and end coordinates within
@@ -60,12 +60,12 @@ res
 ## An IRanges with negative coordinates is returned if at the provided
 ## position no exon is present. Below we use the same coordinates but
 ## specify that the coordinates are on the forward (+) strand
-gnm <- GRanges("X:106959629-106959631:+")
+gnm <- GRanges("X:107716399-107716401:+")
 genomeToTranscript(gnm, edbx)
 
 ## Next we provide multiple genomic positions.
-gnm <- GRanges("X", IRanges(start = c(605370, 106959629, 106959629),
-    end = c(605374, 106959631, 106959631)), strand = c("*", "*", "+"))
+gnm <- GRanges("X", IRanges(start = c(644635, 107716399, 107716399),
+    end = c(644639, 107716401, 107716401)), strand = c("*", "*", "+"))
 
 ## The result of the mapping is an IRangesList each element providing the
 ## within-transcript coordinates for each input region

@@ -1,3 +1,9 @@
+CHANGES IN VERSION 2.3.7
+------------------------
+
+- Switch to EnsDb.Hsapiens.v86 in examples, unit tests and vignettes.
+
+
 CHANGES IN VERSION 2.3.6
 ------------------------
 

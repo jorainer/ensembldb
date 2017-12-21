@@ -93,9 +93,9 @@
 }
 \examples{
 
-## Loading an EnsDb for Ensembl version 75 (genome GRCh37):
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+## Loading an EnsDb for Ensembl version 86 (genome GRCh38):
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 \dontrun{
     ## Retrieve a FaFile with the gneomic DNA sequence matching the organism,

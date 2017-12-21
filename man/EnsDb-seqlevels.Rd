@@ -98,8 +98,8 @@
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ## Get the internal, default seqlevel style.
 seqlevelsStyle(edb)
@@ -122,24 +122,6 @@ seqlevels(edb)
 
 ## Restoring the original setting.
 options(ensembldb.seqnameNotFound = "ORIGINAL")
-
-
-## Integrate Ensembl based annotations with a BSgenome package that is based on
-## UCSC style seqnames.
-library(BSgenome.Hsapiens.UCSC.hg19)
-bsg <- BSgenome.Hsapiens.UCSC.hg19
-
-## Get the genome version
-unique(genome(bsg))
-unique(genome(edb))
-## Although differently named, both represent genome build GRCh37.
-
-## Extract the full transcript sequences of all lincRNAs encoded on chromsome Y.
-yTxSeqs <- extractTranscriptSeqs(bsg,
-                                 exonsBy(edb, "tx",
-                                         filter = ~ seq_name == "chrY" &
-                                             gene_biotype == "lincRNA"))
-yTxSeqs
 
 }
 \keyword{classes}

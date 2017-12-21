@@ -38,8 +38,8 @@ This method is used internally to create the SQL calls to the database.
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ## Define a filter
 flt <- AnnotationFilter(~ genename == "BCL2")
