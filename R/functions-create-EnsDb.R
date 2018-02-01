@@ -921,8 +921,15 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     ##
     ## process exons
     message("Processing exons ... ", appendLF=FALSE)
+    ## Fix for issue #72: seems there are GTFs without an exon_id!
+    if (!any(gotColumns == "exon_id") & any(gotColumns == "exon_number")) {
+        mcols(x)$exon_id <- paste0(x$transcript_id, ":", x$exon_number)
+        warning("No column 'exon_id' present, created artificial exon IDs by ",
+                "concatenating the transcript ID and the exon number.")
+        gotColumns <- c(gotColumns, "exon_id")
+    }
     reqCols <- c("exon_id", "transcript_id", "exon_number")
-    if(!any(reqCols %in% gotColumns))
+    if(!all(reqCols %in% gotColumns))
         stop(paste0("One or more required fields are not defined in",
                     " the submitted GRanges object! Need ",
                     paste(reqCols, collapse=","), " but got only ",
