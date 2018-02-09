@@ -9,12 +9,15 @@
 #' coordinates within the encoded protein sequence. The provided coordinates
 #' have to be within the coding region of the transcript (excluding the stop
 #' codon) but are supposed to be relative to the first nucleotide of the
-#' transcript (including the 5' UTR).
+#' transcript (which includes the 5' UTR). Positions relative to the CDS of a
+#' transcript (e.g. /PKP2 c.1643delg/) have to be first converted to
+#' transcript-relative coordinates. This can be done with the
+#' [cdsToTranscript()] function. 
 #'
 #' @details
 #'
 #' Transcript-relative coordinates are mapped to the amino acid residues they
-#' encode. As an example, positions within the transcript that corrspond to
+#' encode. As an example, positions within the transcript that correspond to
 #' nucleotides 1 to 3 in the CDS are mapped to the first position in the
 #' protein sequence (see examples for more details).
 #'
@@ -44,6 +47,9 @@
 #'
 #' @family coordinate mapping functions
 #'
+#' @seealso [cdsToTranscript()] and [transcriptToCds()] for conversion between
+#' CDS- and transcript-relative coordinates.
+#' 
 #' @author Johannes Rainer
 #' 
 #' @md
@@ -287,7 +293,10 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' @description
 #'
 #' `transcriptToGenome` maps transcript-relative coordinates to genomic
-#' coordinates.
+#' coordinates. Provided coordinates are expected to be relative to the first
+#' nucleotide of the **transcript**, not the **CDS**. CDS-relative coordinates
+#' have to be converted to transcript-relative positions first with the
+#' [cdsToTranscript()] function.
 #'
 #' @inheritParams transcriptToProtein
 #' 
@@ -306,6 +315,9 @@ transcriptToProtein <- function(x, db, id = "name") {
 #'
 #' @family coordinate mapping functions
 #'
+#' @seealso [cdsToTranscript()] and [transcriptToCds()] for the mapping between
+#' CDS- and transcript-relative coordinates.
+#' 
 #' @examples
 #' 
 #' library(EnsDb.Hsapiens.v86)
@@ -377,4 +389,205 @@ transcriptToGenome <- function(x, db, id = "name") {
     })
     names(res) <- names(x)
     as(res, "GRangesList")
+}
+
+#' @title Map transcript-relative coordinates to positions within the CDS
+#'
+#' @description
+#'
+#' Converts transcript-relative coordinates to positions within the CDS (if the
+#' transcript encodes a protein).
+#'
+#' @param x `IRanges` with the coordinates within the transcript. Coordinates
+#'     are expected to be relative to the transcription start (the first
+#'     nucleotide of the transcript). The Ensembl IDs of the corresponding
+#'     transcripts have to be provided either as `names` of the `IRanges`, or
+#'     in one of its metadata columns.
+#'
+#' @inheritParams transcriptToProtein
+#'
+#' @return
+#'
+#' `IRanges` with the same length (and order) than the input `IRanges`
+#' `x`. Each element in `IRanges` provides the coordinates within the
+#' transcripts CDS. The transcript-relative coordinates are provided
+#' as metadata columns.
+#' `IRanges` with a start coordinate of `-1` is returned for transcripts
+#' that are not known in the database, non-coding transcripts or if the
+#' provided start and/or end coordinates are not within the coding region.
+#'
+#' @family coordinate mapping functions
+#'
+#' @author Johannes Rainer
+#' 
+#' @md
+#'
+#' @examples
+#'
+#' library(EnsDb.Hsapiens.v86)
+#' ## Defining transcript-relative coordinates for 4 transcripts of the gene
+#' ## BCL2
+#' txcoords <- IRanges(start = c(1463, 3, 143, 147), width = 1,
+#'     names = c("ENST00000398117", "ENST00000333681",
+#'     "ENST00000590515", "ENST00000589955"))
+#'
+#' ## Map the coordinates.
+#' transcriptToCds(txcoords, EnsDb.Hsapiens.v86)
+#'
+#' ## ENST00000590515 does not encode a protein and thus -1 is returned
+#' ## The coordinates within ENST00000333681 are outside the CDS and thus also
+#' ## -1 is reported.
+transcriptToCds <- function(x, db, id = "name") {
+    if (missing(x) || !is(x, "IRanges"))
+        stop("Argument 'x' is required and has to be an 'IRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    id <- match.arg(id, c("name", colnames(mcols(x))))
+    if (id == "name")
+	ids <- names(x)
+    else ids <- mcols(x)[, id]
+    tx_lens <- .transcriptLengths(db, with.utr5_len = TRUE,
+                                  with.cds_len = TRUE,
+                                  filter = ~ tx_id %in% ids)
+    mcols(x)$tx_start <- start(x)
+    mcols(x)$tx_end <- end(x)
+    start(x) <- -1
+    end(x) <- -1
+    if (nrow(tx_lens)) {
+        ## IDs not found
+        nf <- !(ids %in% tx_lens$tx_id)
+        if (any(nf))
+            warning("Could not find ", sum(nf), " of ", length(ids),
+                    " transcript(s): ", .ids_message(ids[nf]))
+        new_start <- mcols(x)$tx_start - tx_lens[ids, "utr5_len"]
+        new_end <- mcols(x)$tx_end - tx_lens[ids, "utr5_len"]
+        ## non-coding
+        isna <- !nf & is.na(new_start)
+        if (any(isna))
+            warning(sum(isna), " of ", length(ids), " transcript(s) are non-",
+                    "coding: ", .ids_message(ids[isna]))
+        ## coordinate not in CDS?
+        notcds <- !nf & !isna & (new_start <= 0 | new_end <= 0)
+        if (any(notcds))
+            warning("Coordinates for ", sum(notcds), " of ", length(ids),
+                    " transcript(s) are not in the coding region: ",
+                    .ids_message(ids[notcds]))
+        endout <- !nf & !isna & !notcds & new_end > tx_lens[ids, "cds_len"]
+        if (any(endout))
+            warning("End coordinate for ", sum(endout), " of ", length(ids),
+                    " transcript(s) are outside of the coding region: ",
+                    .ids_message(ids[endout]))
+        ## Now update coordinates
+        end(x[!nf &!isna & !notcds & !endout]) <-
+            new_end[!nf &!isna & !notcds & !endout]
+        start(x[!nf & !isna & !notcds & !endout]) <-
+            new_start[!nf & !isna & !notcds & !endout]
+    } else
+        warning("Could not find any of the provided transcript IDs")
+    x
+}
+
+#' @title Map positions within the CDS to coordinates relative to the start of
+#'     the transcript
+#'
+#' @description
+#'
+#' Converts CDS-relative coordinates to positions within the transcript, i.e.
+#' relative to the start of the transcript and hence including its 5' UTR.
+#'
+#' @param x `IRanges` with the coordinates within the CDS. Coordinates
+#'     are expected to be relative to the transcription start (the first
+#'     nucleotide of the transcript). The Ensembl IDs of the corresponding
+#'     transcripts have to be provided either as `names` of the `IRanges`, or
+#'     in one of its metadata columns.
+#'
+#' @inheritParams transcriptToProtein
+#'
+#' @return
+#'
+#' `IRanges` with the same length (and order) than the input `IRanges`
+#' `x`. Each element in `IRanges` provides the coordinates within the
+#' transcripts CDS. The transcript-relative coordinates are provided
+#' as metadata columns.
+#' `IRanges` with a start coordinate of `-1` is returned for transcripts
+#' that are not known in the database, non-coding transcripts or if the
+#' provided start and/or end coordinates are not within the coding region.
+#'
+#' @family coordinate mapping functions
+#'
+#' @author Johannes Rainer
+#' 
+#' @md
+#'
+#' @examples
+#'
+#' library(EnsDb.Hsapiens.v86)
+#' ## Defining transcript-relative coordinates for 4 transcripts of the gene
+#' ## BCL2
+#' txcoords <- IRanges(start = c(4, 3, 143, 147), width = 1,
+#'     names = c("ENST00000398117", "ENST00000333681",
+#'     "ENST00000590515", "ENST00000589955"))
+#'
+#' cdsToTranscript(txcoords, EnsDb.Hsapiens.v86)
+#'
+#' ## Next we map the coordinate for variants within the gene PKP2 to the
+#' ## genome. The variants is PKP2 c.1643DelG and the provided
+#' ## position is thus relative to the CDS. We have to convert the
+#' ## position first to transcript-relative coordinates.
+#' pkp2 <- IRanges(start = 1643, width = 1, name = "ENST00000070846")
+#'
+#' ## Map the coordinates by first converting the CDS- to transcript-relative
+#' ## coordinates
+#' transcriptToGenome(cdsToTranscript(pkp2, EnsDb.Hsapiens.v86),
+#'     EnsDb.Hsapiens.v86)
+cdsToTranscript <- function(x, db, id = "name") {
+    if (missing(x) || !is(x, "IRanges"))
+        stop("Argument 'x' is required and has to be an 'IRanges' object")
+    if (missing(db) || !is(db, "EnsDb"))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    id <- match.arg(id, c("name", colnames(mcols(x))))
+    if (id == "name")
+	ids <- names(x)
+    else ids <- mcols(x)[, id]
+    tx_lens <- .transcriptLengths(db, with.utr5_len = TRUE,
+                                  with.cds_len = TRUE,
+                                  filter = ~ tx_id %in% ids)
+    mcols(x)$cds_start <- start(x)
+    mcols(x)$cds_end <- end(x)
+    start(x) <- -1
+    end(x) <- -1
+    if (nrow(tx_lens)) {
+        ## IDs not found
+        nf <- !(ids %in% tx_lens$tx_id)
+        if (any(nf))
+            warning("Could not find ", sum(nf), " of ", length(ids),
+                    " transcript(s): ", .ids_message(ids[nf]))
+        new_start <- mcols(x)$cds_start + tx_lens[ids, "utr5_len"]
+        new_end <- mcols(x)$cds_end + tx_lens[ids, "utr5_len"]
+        isna <- !nf & is.na(new_start)
+        if (any(isna))
+            warning(sum(isna), " of ", length(ids), " transcript(s) are non-",
+                    "coding: ", .ids_message(ids[isna]))
+        ## coordinate not in CDS?
+        notcds <- !nf & !isna &
+            (mcols(x)$cds_start > tx_lens[ids, "cds_len"] |
+                     mcols(x)$cds_end >= tx_lens[ids, "cds_len"])
+        if (any(notcds))
+            warning("Coordinates for ", sum(notcds), " of ", length(ids),
+                    " transcript(s) are not in the coding region: ",
+                    .ids_message(ids[notcds]))
+        ## Now update coordinates
+        end(x[!nf & !isna & !notcds]) <- new_end[!nf & !isna & !notcds]
+        start(x[!nf & !isna & !notcds]) <- new_start[!nf & !isna & !notcds]
+    } else
+        warning("Could not find any of the provided transcript IDs")
+    x
+}
+
+.ids_message <- function(x) {
+    mess <- paste(x[1:min(3, length(x))], collapse = ", ")
+    if (length(x) > 3) {
+        mess <- paste0(mess, " ... (", length(x) - 3, " more)")
+    }
+    mess
 }

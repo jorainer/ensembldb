@@ -151,7 +151,9 @@ export("ensDbFromAH",
        "genomeToTranscript",
        "transcriptToProtein",
        "genomeToProtein",
-       "transcriptToGenome"
+       "transcriptToGenome",
+       "transcriptToCds",
+       "cdsToTranscript"
        )
 ## Classes
 exportClasses(
