@@ -245,7 +245,8 @@ genomeToProtein <- function(x, db) {
 #' ## Example with two genes, on two strands!
 .genome_to_tx <- function(genome, db) {
     if (length(genome) > 1) {
-        return(IRangesList(lapply(genome, FUN = .genome_to_tx, db = db)))
+        return(IRangesList(lapply(as(genome, "GRangesList"),
+                                  FUN = .genome_to_tx, db = db)))
     }
     metad <- DataFrame(exon_id = NA_character_, exon_rank = NA_integer_,
                        seq_start = start(genome), seq_end = end(genome),

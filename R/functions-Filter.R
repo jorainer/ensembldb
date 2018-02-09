@@ -290,7 +290,7 @@ buildWhereForGRanges <- function(grf, columns, db = NULL){
         stop("'columns' has to be a named vector with names being ",
              "'start', 'end', 'seqname', 'strand'!")
     ## Build the query to fetch all features that are located within the range
-    quers <- sapply(value(grf), function(z) {
+    quers <- sapply(as(value(grf), "GRangesList"), function(z) {
         if (!is.null(db)) {
             seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
         } else {
