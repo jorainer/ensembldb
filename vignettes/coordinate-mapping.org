@@ -633,10 +633,10 @@ With the coordinates being relative to the transcript we can use the
   pkp2_gnm
 #+END_SRC
 
-To verify that the nucleotide at the position is indeed a /G/ as stated in the
-definition of the variant (/c.1643delG/) we extract below the nucleotide at the
-identified genomic position. We thus load the package providing the genome
-sequence for GRCh38 on which Ensembl release 86 is based.
+To verify that the nucleotides at the positions are indeed /G/ and /C/ as stated in
+the definition of the variant (/c.1643DelG/ and /c.1881DelC/) we extract below the
+nucleotide at the identified genomic position. We thus load the package
+providing the genome sequence for GRCh38 on which Ensembl release 86 is based.
 
 #+NAME: pkp2-variant-pos-validate
 #+BEGIN_SRC R

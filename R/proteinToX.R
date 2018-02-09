@@ -578,7 +578,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
         stop("'g_coords' is supposed to be a 'GRanges' object")
     cds_rel <- .splice(g_coords)
     strnd <- unique(as.character(strand(g_coords)))
-    seqlvl <- unique(seqlevels(g_coords))
+    seqlvl <- unique(seqnames(g_coords))
     if (length(strnd) > 1)
         stop("All exons are expected to be located on the same strand")
     if (length(seqlvl) > 1)

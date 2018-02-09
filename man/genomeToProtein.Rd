@@ -81,9 +81,11 @@ res[[3]]
 res[[4]]
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{genomeToTranscript}},
+Other coordinate mapping functions: \code{\link{cdsToTranscript}},
+  \code{\link{genomeToTranscript}},
   \code{\link{proteinToGenome}},
   \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToCds}},
   \code{\link{transcriptToGenome}},
   \code{\link{transcriptToProtein}}
 }
