@@ -18,7 +18,7 @@ vignette: >
   %\VignetteIndexEntry{Mapping between genome, transcript and protein coordinates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,Gviz}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,Gviz,BSgenome.Hsapiens.NCBI.GRCh38}
 ---
 
 #+END_EXPORT
@@ -71,6 +71,12 @@ The available functions and their input and result objects are:
   acid residues in the encoded protein's sequence. The function takes an =IRanges=
   as input and returns an =IRanges= of the same length.
 
++ =transcriptToCds=: maps between transcript-relative and CDS-relative
+  coordinates (for protein-coding genes only).
+
++ =cdsToTranscript=: maps between CDS-relative and transcript-relative coordinates
+  (for protein-coding genes only).
+
 All functions, except =proteinToGenome= and =transcriptToGenome= return =IRanges= with
 negative coordinates if the mapping failed (e.g. because the identifier is
 unknown to the database, or, for mappings to and from protein coordinates, the
@@ -87,6 +93,11 @@ complete for some transcripts and either their 3' or 5' ends (or both) are not
 defined (or can not be mapped to the genome). The length of the CDS does in such
 cases not match the length of the annotated protein sequence and position
 mappings between proteins and transcripts might hence not be correct.
+
+The =cdsToTranscript= and =transcriptToCds= functions are helpful to enable the
+mapping of variants in genes that are usually provided as positions within the
+gene's (actually transcript's) coding sequence. An example for such a mapping is
+provided in section /Mapping transcript coordinates to genomic coordinates/ below.
 
 Below we load all required libraries and filter the =EnsDb= database containing
 the annotations from Ensembl release 75 to chromosome X. All genes in this
@@ -589,6 +600,50 @@ The region in the first transcript (/ENST00000486554/) is mapped to two genomic
 regions, because part of it is located in the first, and part in the second exon
 of the transcript. All 5 nucleotides of the second region are within the
 transcript's first exon and are thus mapped to only a single genomic region.
+
+Next we map a variants in the gene PKP2 to the corresponding genomic
+coordinates. The variants are /PKP2 c.1643DelG/ and /c.1881DelC/ and the positions
+we are looking for are thus nucleotides 1643 and 1881 within the *CDS* of the
+gene/transcript. Looking up the available transcripts for this gene we
+identified /ENST00000070846/ as the representative transcript for the gene. Since
+the positions are not relative to the transcription start side we can not use
+the =transcriptToGenome= function for the mapping, but we have to map the
+cds-relative positions first to transcript-relative coordinates. We do this
+below using the =cdsToTranscript= function.
+
+#+NAME: pkp2-cdsToTranscript
+#+BEGIN_SRC R
+  ## Define the position within the CDS of the transcript
+  pkp2_cds <- IRanges(start = c(1643, 1881), width = c(1, 1),
+		      name = rep("ENST00000070846", 2))
+
+  ## Convert cds-relative to transcript-relative coordinates
+  pkp2 <- cdsToTranscript(pkp2_cds, EnsDb.Hsapiens.v86)
+
+  pkp2
+#+END_SRC
+
+With the coordinates being relative to the transcript we can use the
+=transcriptToGenome= function for the final mapping of the position to the genome.
+
+#+NAME: pkp2-transcriptToGenome
+#+BEGIN_SRC R
+  pkp2_gnm <- transcriptToGenome(pkp2, EnsDb.Hsapiens.v86)
+
+  pkp2_gnm
+#+END_SRC
+
+To verify that the nucleotide at the position is indeed a /G/ as stated in the
+definition of the variant (/c.1643delG/) we extract below the nucleotide at the
+identified genomic position. We thus load the package providing the genome
+sequence for GRCh38 on which Ensembl release 86 is based.
+
+#+NAME: pkp2-variant-pos-validate
+#+BEGIN_SRC R
+  library(BSgenome.Hsapiens.NCBI.GRCh38)
+
+  getSeq(BSgenome.Hsapiens.NCBI.GRCh38, pkp2_gnm)
+#+END_SRC
 
 * Mapping transcript coordinates to protein coordinates
 

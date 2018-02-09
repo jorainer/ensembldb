@@ -1,4 +1,4 @@
-test_that("transcriptToProtein works",  {
+test_that(".tx_to_protein works",  {
     edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
     ## SHOX2, ENST00000381578
@@ -144,8 +144,8 @@ test_that(".tx_to_genome works", {
 test_that("transcriptToGenome works", {
     edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     
-    x <- IRanges(start = c(259, 1), end = c(260, 4),
-                 names = c("ENST00000381578", "some"))
+    x <- IRanges(start = c(259, 1, 259), end = c(260, 4, 261),
+                 names = c("ENST00000381578", "some", "ENST00000381578"))
     ## Errors.
     expect_error(transcriptToGenome())
     expect_error(transcriptToGenome(db = edbx))
@@ -155,7 +155,11 @@ test_that("transcriptToGenome works", {
     expect_true(is(res, "GRangesList"))
     expect_true(length(res) == length(x))
     expect_true(length(res[[2]]) == 0)
-
+    expect_equal(names(res), names(x))
+    expect_equal(start(res[[1]]), start(res[[3]]))
+    expect_equal(end(res[[1]])[1], end(res[[3]])[1])
+    expect_equal(end(res[[1]])[2] + 1, end(res[[3]])[2])
+    
     expect_warning(res <- transcriptToGenome(x[2], edbx))
     expect_true(is(res, "GRangesList"))
     expect_true(length(res) == 1)
@@ -168,4 +172,72 @@ test_that("transcriptToGenome works", {
     expect_true(is(res, "GRangesList"))
     expect_true(length(res) == 1)
     expect_true(length(res[[1]]) == 2)
+})
+
+test_that("transcriptToCds works", {
+    expect_error(transcriptToCds())
+
+    edb18 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "18")
+    expect_error(transcriptToCds(db = edb18))
+    ## 1) unknown tx ids
+    txcoords <- IRanges(start = c(4, 3), width = c(1, 1), names = c("a", "b"))
+    expect_error(transcriptToCds(x = txcoords))
+    expect_warning(res <- transcriptToCds(txcoords, edb18))
+    expect_true(all(start(res) == -1))
+    expect_true(all(end(res) == -1))
+    ## 2) all tx not coding
+    txcoords <- IRanges(start = c(132, 133), end = c(323, 323),
+                        names = rep("ENST00000590515", 2))
+    expect_warning(res <- transcriptToCds(txcoords, edb18))
+    expect_true(all(start(res) == -1))
+    expect_true(all(end(res) == -1))
+    ## 3) some tx not coding
+    ## 4) coordinate not within coding
+    txcoords <- IRanges(start = c(1463, 3, 143, 147, 1463), width = 1,
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955",
+                                  "ENST00000398117"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18))
+    expect_equal(start(res), c(1, -1, -1, 1, 1))
+    expect_equal(end(res), c(1, -1, -1, 1, 1))
+    expect_equal(res[1], res[5])
+    ## End position outside of CDS
+    txcoords <- IRanges(start = c(1463, 3, 143, 147), width = c(4, 1, 1, 765),
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18))
+    expect_equal(start(res), c(1, -1, -1, -1))
+    expect_equal(end(res), c(4, -1, -1, -1))
+    txcoords <- IRanges(start = c(3, 143, 147), width = c(1, 1, 765),
+                        names = c("ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18))
+    expect_true(all(start(res) < 0))
+    expect_true(all(end(res) < 0))
+})
+
+test_that("cdsToTranscript works", {
+    edb18 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "18")
+    expect_error(cdsToTranscript())
+    expect_error(cdsToTranscript(db = edb18))
+    txcoords <- IRanges(start = c(4, 3, 143, 147), width = 1,
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_error(cdsToTranscript(x = txcoords))
+    expect_warning(res <- cdsToTranscript(txcoords, edb18))
+    expect_equal(start(res), c(1466, 902, -1, 293))
+
+    txcoords <- IRanges(start = c(4, 3, 50000, 147), width = 1,
+                        names = c("ENST00000398117", "ENST00000398117",
+                                  "ENST00000398117", "b"))
+    expect_warning(res <- cdsToTranscript(txcoords, edb18))
+    expect_equal(start(res), c(1466, 1465, -1, -1))
+})
+
+test_that(".ids_message works", {
+    res <- .ids_message(c("a", "b"))
+    expect_equal(res, paste(c("a", "b"), collapse = ", "))
+    res <- .ids_message(c("a", "b", "c", "d", "e", "f"))
+    expect_equal(res, "a, b, c ... (3 more)")
+    expect_equal(.ids_message(c("c", "b", "c", "d")), "c, b, c ... (1 more)")
 })
