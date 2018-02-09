@@ -126,9 +126,11 @@ res[[1]]
 res[[2]]
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{genomeToProtein}},
+Other coordinate mapping functions: \code{\link{cdsToTranscript}},
+  \code{\link{genomeToProtein}},
   \code{\link{genomeToTranscript}},
   \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToCds}},
   \code{\link{transcriptToGenome}},
   \code{\link{transcriptToProtein}}
 }

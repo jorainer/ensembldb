@@ -27,7 +27,10 @@ as metadata columns as well as the ID of the individual exon(s). An empty
 }
 \description{
 \code{transcriptToGenome} maps transcript-relative coordinates to genomic
-coordinates.
+coordinates. Provided coordinates are expected to be relative to the first
+nucleotide of the \strong{transcript}, not the \strong{CDS}. CDS-relative coordinates
+have to be converted to transcript-relative positions first with the
+\code{\link[=cdsToTranscript]{cdsToTranscript()}} function.
 }
 \examples{
 
@@ -70,10 +73,15 @@ res[[3]]
 res
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{genomeToProtein}},
+\code{\link[=cdsToTranscript]{cdsToTranscript()}} and \code{\link[=transcriptToCds]{transcriptToCds()}} for the mapping between
+CDS- and transcript-relative coordinates.
+
+Other coordinate mapping functions: \code{\link{cdsToTranscript}},
+  \code{\link{genomeToProtein}},
   \code{\link{genomeToTranscript}},
   \code{\link{proteinToGenome}},
   \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToCds}},
   \code{\link{transcriptToProtein}}
 }
 \author{

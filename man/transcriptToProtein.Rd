@@ -36,11 +36,14 @@ the coding region of the transcript).
 coordinates within the encoded protein sequence. The provided coordinates
 have to be within the coding region of the transcript (excluding the stop
 codon) but are supposed to be relative to the first nucleotide of the
-transcript (including the 5' UTR).
+transcript (which includes the 5' UTR). Positions relative to the CDS of a
+transcript (e.g. /PKP2 c.1643delg/) have to be first converted to
+transcript-relative coordinates. This can be done with the
+\code{\link[=cdsToTranscript]{cdsToTranscript()}} function.
 }
 \details{
 Transcript-relative coordinates are mapped to the amino acid residues they
-encode. As an example, positions within the transcript that corrspond to
+encode. As an example, positions within the transcript that correspond to
 nucleotides 1 to 3 in the CDS are mapped to the first position in the
 protein sequence (see examples for more details).
 }
@@ -77,10 +80,15 @@ transcriptToProtein(IRanges(1, 1, names = "unknown"), edbx)
 transcriptToProtein(IRanges(1, 1, names = "ENST00000381578"), edbx)
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{genomeToProtein}},
+\code{\link[=cdsToTranscript]{cdsToTranscript()}} and \code{\link[=transcriptToCds]{transcriptToCds()}} for conversion between
+CDS- and transcript-relative coordinates.
+
+Other coordinate mapping functions: \code{\link{cdsToTranscript}},
+  \code{\link{genomeToProtein}},
   \code{\link{genomeToTranscript}},
   \code{\link{proteinToGenome}},
   \code{\link{proteinToTranscript}},
+  \code{\link{transcriptToCds}},
   \code{\link{transcriptToGenome}}
 }
 \author{

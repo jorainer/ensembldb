@@ -30,13 +30,13 @@ Imports:
     rtracklayer,
     S4Vectors,
     Rsamtools,
-    IRanges (>= 2.11.16),
+    IRanges (>= 2.13.24),
     ProtGenerics,
-    Biostrings,
+    Biostrings (>= 2.47.9),
     curl
 Depends:
     BiocGenerics (>= 0.15.10),
-    GenomicRanges (>= 1.23.21),
+    GenomicRanges (>= 1.31.18),
     GenomicFeatures (>= 1.29.10),
     AnnotationFilter (>= 1.1.9)
 Suggests:
