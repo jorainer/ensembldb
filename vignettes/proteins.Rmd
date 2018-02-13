@@ -13,6 +13,12 @@ vignette: >
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle}
 ---
 
+```{r  biocstyle, echo = FALSE, results = "asis", message = FALSE }
+library(BiocStyle)
+library(ensembldb)
+BiocStyle::markdown() 
+```
+
 
 # Introduction
 
@@ -53,6 +59,7 @@ databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
 ## Globally switch off execution of code chunks
 evalMe <- TRUE
 haveProt <- FALSE
+evalMe <- .Platform$OS.type == "unix"
  
 ```
 

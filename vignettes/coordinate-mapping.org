@@ -24,7 +24,8 @@ vignette: >
 #+END_EXPORT
 
 #+NAME: biocstyle
-#+BEGIN_SRC R :ravel echo = FALSE, results = "asis"
+#+BEGIN_SRC R :ravel echo = FALSE, results = "asis", message = FALSE
+  library(BiocStyle)
   BiocStyle::markdown()
 #+END_SRC
 
@@ -100,9 +101,9 @@ gene's (actually transcript's) coding sequence. An example for such a mapping is
 provided in section /Mapping transcript coordinates to genomic coordinates/ below.
 
 Below we load all required libraries and filter the =EnsDb= database containing
-the annotations from Ensembl release 75 to chromosome X. All genes in this
-vignette are encoded on chromosome X. subsetting the =EnsDb= improves the speed of
-all queries considerably.
+the annotations from Ensembl release 86 to chromosome X. All genes of the
+examples in this vignette are encoded on chromosome X and subsetting the =EnsDb=
+to this chromosome speeds up all queries to the database.
 
 #+NAME: load-libs
 #+BEGIN_SRC R :ravel message = FALSE
@@ -601,12 +602,12 @@ regions, because part of it is located in the first, and part in the second exon
 of the transcript. All 5 nucleotides of the second region are within the
 transcript's first exon and are thus mapped to only a single genomic region.
 
-Next we map a variants in the gene PKP2 to the corresponding genomic
+Next we map variants in the gene PKP2 to the corresponding genomic
 coordinates. The variants are /PKP2 c.1643DelG/ and /c.1881DelC/ and the positions
 we are looking for are thus nucleotides 1643 and 1881 within the *CDS* of the
 gene/transcript. Looking up the available transcripts for this gene we
 identified /ENST00000070846/ as the representative transcript for the gene. Since
-the positions are not relative to the transcription start side we can not use
+the positions are not relative to the transcription start site we can not use
 the =transcriptToGenome= function for the mapping, but we have to map the
 cds-relative positions first to transcript-relative coordinates. We do this
 below using the =cdsToTranscript= function.
@@ -623,8 +624,9 @@ below using the =cdsToTranscript= function.
   pkp2
 #+END_SRC
 
-With the coordinates being relative to the transcript we can use the
-=transcriptToGenome= function for the final mapping of the position to the genome.
+With the coordinates being now relative to the first nucleotide of the
+transcript we can use the =transcriptToGenome= function for the final mapping of
+the position to the genome.
 
 #+NAME: pkp2-transcriptToGenome
 #+BEGIN_SRC R
