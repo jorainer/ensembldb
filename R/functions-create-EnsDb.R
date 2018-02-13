@@ -372,13 +372,24 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     organism <- Parms["organism"]
     genomeVersion <- Parms["genomeVersion"]
 
-    if (haveHeader)
-        if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"])
-            stop("The GTF file name is not as expected: <Organism>.<genome ",
-                 "version>.<Ensembl version>.gtf! I've got genome version ",
-                 genomeVersion, " but in the header of the GTF file ",
-                 Header[Header[, "name"] == "genome-version", "value"],
-                 " is specified!")
+    if (haveHeader) {
+        header.version <- Header[Header[, "name"] == "genome-version", "value"]
+        if(length(header.version)==0) {
+            if (missing(genomeVersion))
+              stop(paste("Could not find field 'genome-version' in header of GTF-file\n",
+                         "but one supplied by user either\n"))
+            else
+              warning(paste0("Could not find field 'genome-version' in header of GTF-file\n",
+                            "using the one supplied by user: ",genomeVersion,"\n"))
+        } else if (genomeVersion!= header.version ) {
+            warning(paste0("The GTF file name is not as expected: <Organism>.",
+                        "<genome version>.<Ensembl version>.gtf!",
+                        " I've got genome version ", genomeVersion,
+                        " but in the header of the GTF file ",
+                        Header[Header[, "name"] == "genome-version", "value"],
+                           " is specified!"))
+        }
+    }
 
     GTF <- fixCDStypeInEnsemblGTF(GTF)
     ## here on -> call ensDbFromGRanges.
