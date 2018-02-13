@@ -157,11 +157,11 @@ test_that(".processFilterParam works", {
     expect_equal(res@logOp, "&")
     
     ## - AnnotationFilterList
-    afl <- AnnotationFilterList(gif, snf, logOp = "|")
+    afl <- AnnotationFilterList(gif, snf, logicOp = "|")
     res <- ensembldb:::.processFilterParam(afl, edb)
     expect_true(is(res, "AnnotationFilterList"))
     expect_equal(afl, res)
-    afl <- AnnotationFilterList(gif, snf, logOp = "&")
+    afl <- AnnotationFilterList(gif, snf, logicOp = "&")
     res <- ensembldb:::.processFilterParam(afl, edb)
     expect_true(is(res, "AnnotationFilterList"))
     expect_equal(afl, res)
@@ -170,11 +170,11 @@ test_that(".processFilterParam works", {
     res <- ensembldb:::.processFilterParam(~ gene_id != "BCL2" |
                                                seq_name == "X", edb)
     expect_true(is(res, "AnnotationFilterList"))
-    expect_equal(res, AnnotationFilterList(gif, snf, logOp = "|"))
+    expect_equal(res, AnnotationFilterList(gif, snf, logicOp = "|"))
     flt <- ~ gene_id != "BCL2" | seq_name == "X"
     res <- ensembldb:::.processFilterParam(flt, edb)
     expect_true(is(res, "AnnotationFilterList"))
-    expect_equal(res, AnnotationFilterList(gif, snf, logOp = "|"))
+    expect_equal(res, AnnotationFilterList(gif, snf, logicOp = "|"))
     res <- ensembldb:::.processFilterParam(~ gene_id != "BCL2", edb)
     expect_true(is(res, "AnnotationFilterList"))
     expect_equal(res, AnnotationFilterList(gif))

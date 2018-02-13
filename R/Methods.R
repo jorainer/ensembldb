@@ -160,13 +160,17 @@ setMethod("seqlevels", "EnsDb", function(x){
 ##
 ## queries the dna.toplevel.fa file from AnnotationHub matching the current
 ## Ensembl version
-## Update: if we can't find a FaFile matching the Ensembl version we suggest ones
-## that might match.
-setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
-    ah <- AnnotationHub()
+## Update: if we can't find a FaFile matching the Ensembl version we suggest
+## ones that might match.
+setMethod("getGenomeFaFile", "EnsDb", function(x, pattern = "dna.toplevel.fa") {
+    if (!requireNamespace("AnnotationHub", quietly = TRUE)) {
+        stop("The 'AnnotationHub' package is needed for this function to ",
+             "work. Please install it.", call. = FALSE)
+    }
+    ah <- AnnotationHub::AnnotationHub()
     ## Reduce the AnnotationHub to species, provider and genome version.
-    ah <- .reduceAH(ah, organism=organism(x), dataprovider="Ensembl",
-                    genome=unique(genome(x)))
+    ah <- .reduceAH(ah, organism = organism(x), dataprovider = "Ensembl",
+                    genome = unique(genome(x)))
     if(length(ah) == 0)
         stop("Can not find any ressources in AnnotationHub for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -179,8 +183,8 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
              unique(genome(x)), "! You might also try to use the",
              " 'getGenomeTwoBitFile' method instead.")
     ## Reduce to dna.toplevel or dna.primary_assembly.
-    idx <- c(grep(ah$title, pattern="dna.toplevel"),
-             grep(ah$title, pattern="dna.primary_assembly"))
+    idx <- c(grep(ah$title, pattern = "dna.toplevel"),
+             grep(ah$title, pattern = "dna.primary_assembly"))
     if(length(idx) == 0)
         stop("No genome assembly fasta file available for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -210,8 +214,8 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
 })
 ## Just restricting the Annotation Hub to entries matching the species and the
 ## genome; not yet the Ensembl version.
-.reduceAH <- function(ah, organism=NULL, dataprovider="Ensembl",
-                      genome=NULL){
+.reduceAH <- function(ah, organism = NULL, dataprovider = "Ensembl",
+                      genome = NULL){
     if(!is.null(dataprovider))
         ah <- ah[ah$dataprovider == dataprovider, ]
     if(!is.null(organism))
@@ -220,6 +224,7 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
         ah <- ah[ah$genome == genome, ]
     return(ah)
 }
+
 .ensVersionFromSourceUrl <- function(url){
     url <- strsplit(url, split="/", fixed=TRUE)
     ensVers <- unlist(lapply(url, function(z){
@@ -237,10 +242,10 @@ setMethod("getGenomeFaFile", "EnsDb", function(x, pattern="dna.toplevel.fa"){
 ##  Search and retrieve a genomic DNA resource through a TwoBitFile
 ##  from AnnotationHub.
 setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
-    ah <- AnnotationHub()
+    ah <- AnnotationHub::AnnotationHub()
     ## Reduce the AnnotationHub to species, provider and genome version.
-    ah <- .reduceAH(ah, organism=organism(x), dataprovider="Ensembl",
-                    genome=unique(genome(x)))
+    ah <- .reduceAH(ah, organism = organism(x), dataprovider = "Ensembl",
+                    genome = unique(genome(x)))
     if(length(ah) == 0)
         stop("Can not find any ressources in AnnotationHub for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -252,8 +257,8 @@ setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
              organism(x), ", data provider: Ensembl and genome version: ",
              unique(genome(x)), "!")
     ## Reduce to dna.toplevel or dna.primary_assembly.
-    idx <- c(grep(ah$title, pattern="dna.toplevel"),
-             grep(ah$title, pattern="dna.primary_assembly"))
+    idx <- c(grep(ah$title, pattern = "dna.toplevel"),
+             grep(ah$title, pattern = "dna.primary_assembly"))
     if(length(idx) == 0)
         stop("No genome assembly fasta file available for organism: ",
              organism(x), ", data provider: Ensembl and genome version: ",
@@ -261,10 +266,10 @@ setMethod("getGenomeTwoBitFile", "EnsDb", function(x){
     ah <- ah[idx, ]
     ## Get the Ensembl version from the source url.
     ensVers <- .ensVersionFromSourceUrl(ah$sourceurl)
-    if(any(ensVers == ensemblVersion(x))){
+    if(any(ensVers == ensemblVersion(x))) {
         ## Got it.
         itIs <- which(ensVers == ensemblVersion(x))
-    }else{
+    } else {
         ## Get the "closest" one.
         diffs <- abs(ensVers - as.numeric(ensemblVersion(x)))
         itIs <- which(diffs == min(diffs))[1]
@@ -447,9 +452,9 @@ setMethod("tablesByDegree", "EnsDb", function(x,
 #' @seealso \code{\link{listTables}}
 #' 
 #' @examples
-#' library(EnsDb.Hsapiens.v75)
+#' library(EnsDb.Hsapiens.v86)
 #' ## Does this database/package have protein annotations?
-#' hasProteinData(EnsDb.Hsapiens.v75)
+#' hasProteinData(EnsDb.Hsapiens.v86)
 setMethod("hasProteinData", "EnsDb", function(x) {
     tabs <- listTables(x)
     return(all(c("protein", "uniprot", "protein_domain") %in%
@@ -915,57 +920,44 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
 ##  For TxDb: calls just the function (not method!) from the GenomicFeatures
 ##            package.
 ##  For EnsDb: calls the .transcriptLengths function.
-####------------------------------------------------------------
-## setMethod("transcriptLengths", "TxDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-##                                                with.utr3_len=FALSE){
-##     return(GenomicFeatures::transcriptLengths(x, with.cds_len=with.cds_len,
-##                                               with.utr5_len=with.utr5_len,
-##                                               with.utr3_len=with.utr3_len))
-## })
-## setMethod("transcriptLengths", "EnsDb", function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-##                                                 with.utr3_len=FALSE, filter=list()){
-##     return(.transcriptLengths(x, with.cds_len=with.cds_len, with.utr5_len=with.utr3_len,
-##                               with.utr3_len=with.utr3_len, filter=filter))
-## })
-## implement the method from the GenomicFeatures package
-.transcriptLengths <- function(x, with.cds_len=FALSE, with.utr5_len=FALSE,
-                               with.utr3_len=FALSE,
-                               filter = AnnotationFilterList()){
-    ## First we're going to fetch the exonsBy.
-    ## Or use getWhat???
-    ## Dash, have to make two queries!
+.transcriptLengths <- function(x, with.cds_len = FALSE, with.utr5_len = FALSE,
+                               with.utr3_len = FALSE,
+                               filter = AnnotationFilterList()) {
     filter <- .processFilterParam(filter, x)
-    allTxs <- transcripts(x, filter=filter)
-    exns <- exonsBy(x, filter=filter)
+    allTxs <- transcripts(x, filter = filter)
+    if (length(allTxs) == 0)
+        return(data.frame(tx_id = character(), gene_id = character(),
+                          nexon = integer(), tx_len = integer()))
+    exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
     ## Match ordering
     exns <- exns[match(allTxs$tx_id, names(exns))]
     ## Calculate length of transcripts.
-    txLengths <- sum(width(reduce(exns)))
+    txLengths <- sum(width(exns))
     ## Calculate no. of exons.
     ## build result data frame:
-    Res <- data.frame(tx_id=allTxs$tx_id, gene_id=allTxs$gene_id,
-                      nexon=lengths(exns), tx_len=txLengths,
-                      stringsAsFactors=FALSE)
-    if(!any(c(with.cds_len, with.utr5_len, with.utr3_len))){
+    Res <- data.frame(tx_id = allTxs$tx_id, gene_id = allTxs$gene_id,
+                      nexon = lengths(exns), tx_len = txLengths,
+                      stringsAsFactors = FALSE)
+    if(!any(c(with.cds_len, with.utr5_len, with.utr3_len))) {
         ## Return what we've got thus far.
         return(Res)
     }
-    if(with.cds_len)
-        Res <- cbind(Res, cds_len=rep(NA, nrow(Res)))
-    if(with.utr5_len)
-        Res <- cbind(Res, utr5_len=rep(NA, nrow(Res)))
-    if(with.utr3_len)
-        Res <- cbind(Res, utr3_len=rep(NA, nrow(Res)))
+    if (with.cds_len)
+        Res$cds_len <- NA
+    if (with.utr5_len)
+        Res$utr5_len <- NA
+    if (with.utr3_len)
+        Res$utr3_len <- NA
     ## Otherwise do the remaining stuff...
     txs <- allTxs[!is.na(allTxs$tx_cds_seq_start)]
-    if(length(txs) > 0){
+    if (length(txs) > 0) {
         cExns <- exns[txs$tx_id]
-        cReg <- GRanges(seqnames=seqnames(txs),
-                             ranges=IRanges(txs$tx_cds_seq_start,
-                                            txs$tx_cds_seq_end),
-                             strand=strand(txs),
-                             tx_id=txs$tx_id)
-        cReg <- split(cReg, f=cReg$tx_id)
+        cReg <- GRanges(seqnames = seqnames(txs),
+                        ranges = IRanges(start = txs$tx_cds_seq_start,
+                                         end = txs$tx_cds_seq_end),
+                        strand = strand(txs),
+                        tx_id = txs$tx_id)
+        cReg <- split(cReg, f = cReg$tx_id)
         ## Match order.
         cReg <- cReg[match(txs$tx_id, names(cReg))]
         cdsExns <- intersect(cReg, cExns)
@@ -973,35 +965,35 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
         ##        and translated region)
         ## cReg: just the start-end position of the coding region of the tx.
         ## cdsExns: the coding part of all exons of the tx.
-        if(with.cds_len){
+        if (with.cds_len) {
             ## Calculate CDS length
-            cdsLengths <- sum(width(reduce(cdsExns)))
+            cdsLengths <- sum(width(cdsExns))
             Res[names(cdsLengths), "cds_len"] <- cdsLengths
         }
-        if(with.utr3_len | with.utr5_len){
+        if (with.utr3_len | with.utr5_len) {
             ## ! UTR is the difference between the exons and the cds-exons
             ## Note: order of parameters is important!
             utrReg <- setdiff(cExns, cdsExns)
             leftOfCds <- utrReg[end(utrReg) < start(cReg)]
             rightOfCds <- utrReg[start(utrReg) > end(cReg)]
             ## Calculate lengths.
-            leftOfLengths <- sum(width(reduce(leftOfCds)))
-            rightOfLengths <- sum(width(reduce(rightOfCds)))
+            leftOfLengths <- sum(width(leftOfCds))
+            rightOfLengths <- sum(width(rightOfCds))
             minusTx <- which(as.character(strand(txs)) == "-" )
-            if(with.utr3_len){
+            if (with.utr3_len) {
                 ## Ordering of txs and all other stuff matches.
                 tmp <- rightOfLengths
                 tmp[minusTx] <- leftOfLengths[minusTx]
                 Res[names(tmp), "utr3_len"] <- tmp
             }
-            if(with.utr5_len){
+            if (with.utr5_len) {
                 tmp <- leftOfLengths
                 tmp[minusTx] <- rightOfLengths[minusTx]
                 Res[names(tmp), "utr5_len"] <- tmp
             }
         }
     }
-    return(Res)
+    Res
 }
 
 ############################################################
@@ -1741,8 +1733,8 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 #'
 #' @examples
 #' ## Load the EnsDb database (SQLite backend).
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #' ## Now change the backend to MySQL; my_user and my_pass should
 #' ## be the user name and password to access the MySQL server.
 #' \dontrun{
@@ -1868,8 +1860,8 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 #'
 #' @examples
 #' library(ensembldb)
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #' ## Get all proteins from tha database for the gene ZBTB16, if protein
 #' ## annotations are available
 #' if (hasProteinData(edb))
@@ -2051,8 +2043,8 @@ setMethod("supportedFilters", "EnsDb", function(object, ...) {
 #' @seealso \code{\link{Filter-classes}} for a list of all supported filters.
 #' 
 #' @examples
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #'
 #' ## Add a global SeqNameFilter to the database such that all subsequent
 #' ## queries will be applied on the filtered database.

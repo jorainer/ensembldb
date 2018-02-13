@@ -78,8 +78,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
         stop("Something went wrong! I'm missing some of the txt files the",
              " perl script should have generated.")
 
-    haveCounts <- file.exists(paste0(path,
-                                     .Platform$file.sep, "ens_counts.txt"))
+    haveCounts <- file.exists(paste0(path,.Platform$file.sep, "ens_counts.txt"))
     ## read the counts - use these numbers to validate that we did read
     ## everything
     if (haveCounts)
@@ -91,15 +90,14 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     species <- .organismName(info[ info$name=="Organism", "value" ])
     ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
     if(missing(dbname)){
-        dbname <- paste0("EnsDb.",substring(species, 1, 1),
-                         unlist(strsplit(species, split="_"))[ 2 ], ".v",
-                         info[ info$name=="ensembl_version", "value" ], ".sqlite")
+        dbname <- paste0(
+            "EnsDb.",substring(species, 1, 1),
+            unlist(strsplit(species, split="_"))[ 2 ], ".v",
+            info[ info$name=="ensembl_version", "value" ], ".sqlite")
     }
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
-
     ## write information table
     dbWriteTable(con, name="metadata", info, row.names=FALSE)
-
     ## process chromosome
     message("Processing 'chromosome' table ... ", appendLF = FALSE)
     tmp <- read.table(paste0(path, .Platform$file.sep ,"ens_chromosome.txt"),
@@ -108,7 +106,6 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     dbWriteTable(con, name="chromosome", tmp, row.names=FALSE)
     rm(tmp)
     message("OK")
-
     message("Processing 'gene' table ... ", appendLF = FALSE)
     ## process genes: some gene names might have fancy names...
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_gene.txt"),
@@ -336,13 +333,11 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     message("OK")
     ## check what we've got...
     ## all wanted features?
-    if (any(!(wanted.features %in% levels(GTF$type)))) {
-        stop(paste0("One or more required types are not in the gtf file. Need ",
-                    paste(wanted.features, collapse=","), " but got only ",
-                    paste(wanted.features[wanted.features %in% levels(GTF$type)],
-                          collapse=","),
-                    "."))
-    }
+    if (any(!(wanted.features %in% levels(GTF$type))))
+        stop("One or more required types are not in the gtf file. Need ",
+             paste(wanted.features, collapse=","), " but got only ",
+             paste(wanted.features[wanted.features %in% levels(GTF$type)],
+                   collapse=","), ".")
     ## transcript biotype?
     if (any(colnames(mcols(GTF)) == "transcript_biotype")) {
         txBiotypeCol <- "transcript_biotype"
@@ -436,8 +431,12 @@ fixCDStypeInEnsemblGTF <- function(x){
 ##  Retrieve a GTF file from AnnotationHub and build a EnsDb object from that.
 ##
 ####------------------------------------------------------------
-ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
-    options(useFancyQuotes=FALSE)
+ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version) {
+    if (!requireNamespace("AnnotationHub", quietly = TRUE)) {
+        stop("The 'AnnotationHub' package is needed for this function to ",
+             "work. Please install it.", call. = FALSE)
+    }
+    options(useFancyQuotes = FALSE)
     ## Input checking...
     if(!is(ah, "AnnotationHub"))
         stop("Argument 'ah' has to be a (single) AnnotationHub object.")
@@ -463,8 +462,10 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version){
 
     gff <- fixCDStypeInEnsemblGTF(gff)
     ## Proceed.
-    dbname <- ensDbFromGRanges(gff, outfile=outfile, path=path, organism=orgFromAH,
-                               genomeVersion=genFromAH, version=ensFromAH)
+    dbname <- ensDbFromGRanges(gff, outfile = outfile, path = path,
+                               organism = orgFromAH,
+                               genomeVersion = genFromAH,
+                               version = ensFromAH)
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname )
@@ -719,10 +720,9 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
         ## is there a seqinfo in x that I could use???
         if(!fetchSeqinfo){
             genomeVersion <- unique(genome(Seqinfo))
-            if(is.na(genomeVersion) | length(genomeVersion) > 1){
-                stop(paste0("The genome version has to be specified as",
-                            " it can not be extracted from the seqinfo!"))
-            }
+            if(is.na(genomeVersion) | length(genomeVersion) > 1)
+                stop("The genome version has to be specified as",
+                     " it can not be extracted from the seqinfo!")
         }else{
             stop("The genome version has to be specified!")
         }
@@ -781,8 +781,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     reqCols <- c("gene_id")
     if(length(dontHave) > 0){
         mess <- paste0(" I'm missing column(s): ", paste0(sQuote(dontHave),
-                                                          collapse=","),
-                       ".")
+                                                          collapse=","), ".")
         warning(mess, " The corresponding database column(s) will be empty!")
     }
     message(" Attribute availability:", appendLF=TRUE)
@@ -791,11 +790,9 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
                 ifelse(any(gotColumns == wouldBeNice[i]), yes="OK", no="Nope"))
     }
     if(!any(reqCols %in% haveGot))
-        stop(paste0("One or more required fields are not defined in the",
-                    " submitted GRanges object! Need ",
-                    paste(sQuote(reqCols), collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% gotColumns], collapse=","),
-                    "."))
+        stop("Missing or more required fields in the submitted GRanges object!",
+             " Need ", paste(sQuote(reqCols), collapse=",")," but got only ",
+             paste(reqCols[reqCols %in% gotColumns], collapse=","),".")
     ## Now gets tricky; special case Ensembl < 75: we've got NO gene type.
     if(any(gotTypes == "gene")){
         ## All is fine.
@@ -858,11 +855,9 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     }
     reqCols <- c("transcript_id", "gene_id")
     if(!any(reqCols %in% gotColumns))
-        stop(paste0("One or more required fields are not defined in",
-                    " the submitted GRanges object! Need ",
-                    paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% gotColumns], collapse=","),
-                    "."))
+        stop("One or more required fields are not defined in the submitted ",
+             "GRanges object! Need ", paste(reqCols, collapse=","), " but got",
+             " only ",paste(reqCols[reqCols %in% gotColumns], collapse=","),".")
     if(any(gotTypes == "transcript")){
         tx <- as.data.frame(x[x$type == "transcript" , haveGot])
     }else{
@@ -885,8 +880,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
         colnames(tx) <- c(cn, dontHave)
     }
     ## Add columns for UTR
-    tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)),
-                tx_cds_seq_end=rep(NA, nrow(tx)))
+    tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)), tx_cds_seq_end=rep(NA, nrow(tx)))
     ## Process CDS...
     if(any(gotTypes == "CDS")){
         ## Only do that if we've got type == "CDS"!
@@ -929,13 +923,18 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     ##
     ## process exons
     message("Processing exons ... ", appendLF=FALSE)
+    ## Fix for issue #72: seems there are GTFs without an exon_id!
+    if (!any(gotColumns == "exon_id") & any(gotColumns == "exon_number")) {
+        mcols(x)$exon_id <- paste0(x$transcript_id, ":", x$exon_number)
+        warning("No column 'exon_id' present, created artificial exon IDs by ",
+                "concatenating the transcript ID and the exon number.")
+        gotColumns <- c(gotColumns, "exon_id")
+    }
     reqCols <- c("exon_id", "transcript_id", "exon_number")
-    if(!any(reqCols %in% gotColumns))
-        stop(paste0("One or more required fields are not defined in",
-                    " the submitted GRanges object! Need ",
-                    paste(reqCols, collapse=","), " but got only ",
-                    paste(reqCols[reqCols %in% gotColumns], collapse=","),
-                    "."))
+    if (!all(reqCols %in% gotColumns))
+        stop("One or more required fields are not defined in the submitted ",
+             "GRanges object! Need ", paste(reqCols, collapse=","), " but got",
+             " only ",paste(reqCols[reqCols %in% gotColumns], collapse=","),".")
     exons <- as.data.frame(x[x$type == "exon", reqCols])[, -c(1, 4, 5)]
     ## for table tx2exon we want to have:
     ##    tx_id, exon_id, exon_idx
@@ -1032,24 +1031,21 @@ checkValidEnsDb <- function(x){
     Different <- unlist(lapply(extmp.split, FUN=function(z){
                                    return(any(z != seq(1, length(z))))
                                }))
-    if(any(Different)){
-        stop(paste0("Provided exon index in transcript does not match with",
-                    " ordering of the exons by chromosomal coordinates for ",
-                    sum(Different), " of the ", length(Different),
-                    " transcripts encoded on the + strand!"))
-    }
+    if(any(Different))
+        stop("Provided exon index in transcript does not match with ordering ",
+             "of the exons by chromosomal coordinates for ", sum(Different),
+             " of the ", length(Different), " txs encoded on the + strand!")
     extmp <- ex[ex$seq_strand==-1, c("exon_idx", "tx_id", "exon_seq_end")]
     extmp <- extmp[order(extmp$exon_seq_end, decreasing=TRUE), ]
     extmp.split <- split(extmp[ , c("exon_idx")], f=factor(extmp$tx_id))
     Different <- unlist(lapply(extmp.split, FUN=function(z){
                                    return(any(z != seq(1, length(z))))
                                }))
-    if(any(Different)){
-        stop(paste0("Provided exon index in transcript does not match with",
-                    " ordering of the exons by chromosomal coordinates for ",
-                    sum(Different), " of the ", length(Different),
-                    " transcripts encoded on the - strand!"))
-    }
+    if(any(Different))
+        stop("Provided exon index in transcript does not match with",
+             " ordering of the exons by chromosomal coordinates for ",
+             sum(Different), " of the ", length(Different),
+             " transcripts encoded on the - strand!")
     message("OK")
     return(TRUE)
 }

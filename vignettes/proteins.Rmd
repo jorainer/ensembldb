@@ -10,8 +10,17 @@ vignette: >
   %\VignetteIndexEntry{Querying protein features}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle}
 ---
+
+```{r  biocstyle, echo = FALSE, results = "asis", message = FALSE }
+library(BiocStyle)
+library(ensembldb)
+BiocStyle::markdown() 
+```
+
+
+# Introduction
 
 From Bioconductor release 3.5 on, `EnsDb` databases/packages created by the
 `ensembldb` package contain also, for transcripts with a coding regions, mappings
@@ -48,15 +57,16 @@ databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
 
 ```{r  doeval, echo = FALSE, results = "hide" }
 ## Globally switch off execution of code chunks
-evalMe <- FALSE
+evalMe <- TRUE
 haveProt <- FALSE
+evalMe <- .Platform$OS.type == "unix"
  
 ```
 
 ```{r  loadlib, message = FALSE, eval = evalMe }
 library(ensembldb)
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 ## Evaluate whether we have protein annotation available
 hasProteinData(edb)
  
@@ -90,7 +100,7 @@ or `transcripts` methods.
 ```{r  a_transcripts, eval = haveProt }
 ## Get also protein information for ZBTB16 transcripts
 txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
-                   columns = c("protein_id", "uniprot_id", "tx_biotype"))
+		   columns = c("protein_id", "uniprot_id", "tx_biotype"))
 txs
  
 ```
@@ -103,7 +113,7 @@ associated with it, but no Uniprot ID.
 ```{r  a_transcripts_coding_noncoding, eval = haveProt }
 ## Subset to transcripts with tx_biotype other than protein_coding.
 txs[txs$tx_biotype != "protein_coding", c("uniprot_id", "tx_biotype",
-                                          "protein_id")]
+					  "protein_id")]
  
 ```
 
@@ -118,7 +128,7 @@ such cases a redundant list of transcripts is returned.
 ```{r  a_transcripts_coding, eval = haveProt }
 ## List the protein IDs and uniprot IDs for the coding transcripts
 mcols(txs[txs$tx_biotype == "protein_coding",
-          c("tx_id", "protein_id", "uniprot_id")])
+	  c("tx_id", "protein_id", "uniprot_id")])
  
 ```
 
@@ -138,7 +148,7 @@ listUniprotMappingTypes(edb)
 ## on "DIRECT" mapping methods.
 txs <- transcripts(edb, filter = list(GenenameFilter("ZBTB16"),
 				      UniprotMappingTypeFilter("DIRECT")),
-                   columns = c("protein_id", "uniprot_id", "uniprot_db"))
+		   columns = c("protein_id", "uniprot_id", "uniprot_db"))
 mcols(txs)
  
 ```
@@ -228,7 +238,7 @@ In the code chunk below we fetch all protein annotations for the gene *ZBTB16*.
 ```{r  b_proteins, message = FALSE, eval = haveProt }
 ## Get all proteins and return them as an AAStringSet
 prts <- proteins(edb, filter = GenenameFilter("ZBTB16"),
-                 return.type = "AAStringSet")
+		 return.type = "AAStringSet")
 prts
  
 ```
@@ -254,8 +264,8 @@ present in a redundant list of proteins as shown in the code block below.
 ```{r  b_proteins_prot_doms, message = FALSE, eval = haveProt }
 ## Get also protein domain annotations in addition to the protein annotations.
 pd <- proteins(edb, filter = GenenameFilter("ZBTB16"),
-               columns = c("tx_id", listColumns(edb, "protein_domain")),
-               return.type = "AAStringSet")
+	       columns = c("tx_id", listColumns(edb, "protein_domain")),
+	       return.type = "AAStringSet")
 pd
  
 ```
@@ -281,9 +291,13 @@ end coordinates within the amino acid sequence being reported in columns
 
 # Map peptide features within proteins to the genome
 
-Functionality to map peptide features (i.e. ranges within the amino acid
-sequence of the protein) to genomic coordinates are provided by the `Pbase`
-Bioconductor package. These rely in part on the protein annotations provided by
-`EnsDb` databases. See the corresponding vignette *Pbase-with-ensembldb* in that
-package.
+The *coordinate-mapping.Rmd* vignette provides a detailed description of all
+functions that allow to map between genomic, transcript and protein coordinates.
+
+
+# Session information
+
+```{r  sessionInfo }
+sessionInfo() 
+```
 

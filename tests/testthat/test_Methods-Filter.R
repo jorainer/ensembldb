@@ -206,13 +206,13 @@ test_that("ensDbQuery works for AnnotationFilterList", {
     gnf <- GenenameFilter("BCL2", condition = "!=")
     snf <- SeqNameFilter(4)
     ssf <- SeqStrandFilter("+")
-    afl <- AnnotationFilterList(gnf, snf, ssf, logOp = c("|", "&"))
+    afl <- AnnotationFilterList(gnf, snf, ssf, logicOp = c("|", "&"))
     Q <- ensembldb:::ensDbQuery(afl)
     expect_equal(Q, "(gene_name != 'BCL2' or seq_name = '4' and seq_strand = 1)")
     
     ## Nested AnnotationFilterLists.
     afl1 <- AnnotationFilterList(GenenameFilter("BCL2"),
-                                 GenenameFilter("BCL2L11"), logOp = "|")
+                                 GenenameFilter("BCL2L11"), logicOp = "|")
     afl2 <- AnnotationFilterList(afl1, SeqNameFilter(18))
     Q <- ensembldb:::ensDbQuery(afl2, db = edb)
     expect_equal(Q, paste0("((gene.gene_name = 'BCL2' or gene.gene_name = ",
@@ -227,12 +227,12 @@ test_that("ensDbQuery works for AnnotationFilterList", {
                                                 SeqNameFilter(18)))
     expect_equal(res$gene_name, res2$gene_name)
     ## Same with a GRangesFilter.
-    grf <- GRangesFilter(GRanges(18, IRanges(60790600, 60790700)))
+    grf <- GRangesFilter(GRanges(18, IRanges(63123367, 63123467)))
     afl2 <- AnnotationFilterList(afl1, grf)
     Q <- ensembldb:::ensDbQuery(afl2, db = edb)
     expect_equal(Q, paste0("((gene.gene_name = 'BCL2' or gene.gene_name = ",
-                           "'BCL2L11') and (gene.gene_seq_start<=60790700",
-                           " and gene.gene_seq_end>=60790600 and gene.seq_name",
+                           "'BCL2L11') and (gene.gene_seq_start<=63123467",
+                           " and gene.gene_seq_end>=63123367 and gene.seq_name",
                            "='18'))"))
     res <- dbGetQuery(dbconn(edb), paste0("select distinct gene_name from gene",
                                           " where ", Q))

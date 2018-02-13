@@ -28,7 +28,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.1";
+my $script_version = "0.3.2";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
@@ -293,6 +293,7 @@ foreach my $gene_id (@gene_ids){
 	if (scalar(@unip) > 0) {
 	  foreach my $uniprot (@unip) {
 	    my $unip_id = $uniprot->display_id();
+	    # my $unip_acc = $uniprot->primary_id();
 	    my $dbn = $uniprot->dbname();
 	    $dbn =~ s/Uniprot\///g;
 	    my $maptype = $uniprot->info_type();

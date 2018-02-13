@@ -1,3 +1,54 @@
+CHANGES IN VERSION 2.3.9
+------------------------
+
+- Add transcriptToCds and cdsToTranscript functions (issue #73).
+
+
+CHANGES IN VERSION 2.3.8
+------------------------
+
+- Fix problem creating EnsDb from GTF file lacking exon IDs (issue #72,
+  https://support.bioconductor.org/p/105536/).
+
+
+CHANGES IN VERSION 2.3.7
+------------------------
+
+- Switch to EnsDb.Hsapiens.v86 in examples, unit tests and vignettes.
+
+
+CHANGES IN VERSION 2.3.6
+------------------------
+
+BUG FIXES:
+    o Fix issue #69 failing to map genomic coordinates to proteins if different
+      genomic coordinates are mapped to the same transcripts/proteins.
+
+
+CHANGES IN VERSION 2.3.5
+------------------------
+
+BUG FIXES:
+    o Fix problem mapping genomic coordinates on named GRanges.
+    
+
+CHANGES IN VERSION 2.3.2
+------------------------
+
+NEW FEATURES
+    o Functionality to between genomic and transcript-relative or
+      protein-relative coordinates: proteinToTranscript, genomeToTranscript,
+      transcriptToGenome, transcriptToProtein, genomeToProtein.
+
+
+CHANGES IN VERSION 2.3.1
+------------------------
+
+NEW FEATURES
+    o Functionality to map within-protein coordinates to genomic coordinates:
+      proteinToGenome function.
+
+
 CHANGES IN VERSION 2.1.12
 ------------------------
 

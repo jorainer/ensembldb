@@ -146,7 +146,7 @@ test_that("genes works with protein filters", {
         expect_equal(gns$gene_name, "ZBTB16")
     }
     ## o UniprotFilter
-    uif <- UniprotFilter("Q71UL7_HUMAN")
+    uif <- UniprotFilter("Q05516")
     if (hasProteinData(edb)) {
         gns <- genes(edb, filter = uif, return.type = "data.frame",
                      columns = c("protein_id", "gene_name", "tx_id"))

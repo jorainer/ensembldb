@@ -61,8 +61,8 @@ Adding a filter to an \code{EnsDb} object causes this filter to be
     such as \code{\link{genes}}.
 }
 \examples{
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ## Add a global SeqNameFilter to the database such that all subsequent
 ## queries will be applied on the filtered database.

@@ -269,49 +269,49 @@
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 
 ## Display some information:
-EnsDb.Hsapiens.v75
+EnsDb.Hsapiens.v86
 
 ## Show the tables along with its columns
-listTables(EnsDb.Hsapiens.v75)
+listTables(EnsDb.Hsapiens.v86)
 
 ## For what species is this database?
-organism(EnsDb.Hsapiens.v75)
+organism(EnsDb.Hsapiens.v86)
 
 ## What Ensembl version if the database based on?
-ensemblVersion(EnsDb.Hsapiens.v75)
+ensemblVersion(EnsDb.Hsapiens.v86)
 
 ## Get some more information from the database
-metadata(EnsDb.Hsapiens.v75)
+metadata(EnsDb.Hsapiens.v86)
 
 ## Get all the sequence names.
-seqlevels(EnsDb.Hsapiens.v75)
+seqlevels(EnsDb.Hsapiens.v86)
 
 ## List all available gene biotypes from the database:
-listGenebiotypes(EnsDb.Hsapiens.v75)
+listGenebiotypes(EnsDb.Hsapiens.v86)
 
 ## List all available transcript biotypes:
-listTxbiotypes(EnsDb.Hsapiens.v75)
+listTxbiotypes(EnsDb.Hsapiens.v86)
 
 ## Update the EnsDb; this is in most instances not necessary at all.
-updateEnsDb(EnsDb.Hsapiens.v75)
+updateEnsDb(EnsDb.Hsapiens.v86)
 
 ######    returnFilterColumns
-returnFilterColumns(EnsDb.Hsapiens.v75)
+returnFilterColumns(EnsDb.Hsapiens.v86)
 
 ## Get protein coding genes on chromosome X, specifying to return
 ## only columns gene_name as additional column.
-genes(EnsDb.Hsapiens.v75, filter=list(SeqNameFilter("X"),
+genes(EnsDb.Hsapiens.v86, filter=list(SeqNameFilter("X"),
                                       GeneBiotypeFilter("protein_coding")),
       columns=c("gene_name"))
 ## By default we get also the gene_biotype column as the data was filtered
 ## on this column.
 
 ## This can be changed using the returnFilterColumns option
-returnFilterColumns(EnsDb.Hsapiens.v75) <- FALSE
-genes(EnsDb.Hsapiens.v75, filter=list(SeqNameFilter("X"),
+returnFilterColumns(EnsDb.Hsapiens.v86) <- FALSE
+genes(EnsDb.Hsapiens.v86, filter=list(SeqNameFilter("X"),
                                       GeneBiotypeFilter("protein_coding")),
       columns=c("gene_name"))
 

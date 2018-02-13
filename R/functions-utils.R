@@ -119,8 +119,8 @@ anyProteinColumns <- function(x){
 #' @examples
 #'
 #' ## List all columns containing protein annotations
-#' library(EnsDb.Hsapiens.v75)
-#' edb <- EnsDb.Hsapiens.v75
+#' library(EnsDb.Hsapiens.v86)
+#' edb <- EnsDb.Hsapiens.v86
 #' if (hasProteinData(edb))
 #'     listProteinColumns(edb)
 listProteinColumns <- function(object) {

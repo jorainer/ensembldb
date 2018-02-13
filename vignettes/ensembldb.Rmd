@@ -10,8 +10,13 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v75,BiocStyle,AnnotationHub,ggbio,Gviz,magrittr}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,AnnotationHub,ggbio,Gviz,magrittr}
 ---
+
+```{r  biocstyle, echo = FALSE, results = "asis", message = FALSE }
+library(BiocStyle)
+BiocStyle::markdown() 
+```
 
 
 # Introduction
@@ -25,28 +30,28 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org5bd9a97) for the database layout and an overview of
+(see Section [11](#org0dc6e2b) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
 Another main goal of this package is to generate *versioned* annotation
 packages, i.e. annotation packages that are build for a specific Ensembl
-release, and are also named according to that (e.g. `EnsDb.Hsapiens.v75` for
-human gene definitions of the Ensembl code database version 75). This ensures
+release, and are also named according to that (e.g. `EnsDb.Hsapiens.v86` for
+human gene definitions of the Ensembl code database version 86). This ensures
 reproducibility, as it allows to load annotations from a specific Ensembl
 release also if newer versions of annotation packages/releases are available. It
 also allows to load multiple annotation packages at the same time in order to
 e.g. compare gene models between Ensembl releases.
 
 In the example below we load an Ensembl based annotation package for Homo
-sapiens, Ensembl version 75. The `EnsDb` object providing access to the underlying
-SQLite database is bound to the variable name `EnsDb.Hsapiens.v75`.
+sapiens, Ensembl version 86. The `EnsDb` object providing access to the underlying
+SQLite database is bound to the variable name `EnsDb.Hsapiens.v86`.
 
 ```{r  load-libs, warning=FALSE, message=FALSE }
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 
 ## Making a "short cut"
-edb <- EnsDb.Hsapiens.v75
+edb <- EnsDb.Hsapiens.v86
 ## print some informations for this package
 edb
 
@@ -88,12 +93,12 @@ supportedFilters(edb)
 These filters can be divided into 3 main filter types:
 
 -   `IntegerFilter`: filter classes extending this basic object can take a single
-    numeric value as input and support the conditions `=, !`, >, <, >= and <=. All
+    numeric value as input and support the conditions *==*, *!=*, *>*, *<*, *>=* and *<=*. All
     filters that work on chromosomal coordinates, such as the `GeneEndFilter` extend
     `IntegerFilter`.
 -   `CharacterFilter`: filter classes extending this object can take a single or
-    multiple character values as input and allow conditions: `=, !`, "startsWith"
-    and "endsWith". All filters working on IDs extend this class.
+    multiple character values as input and allow conditions: *==*, *!=*, *"startsWith"*
+    , *"endsWith"* and *"contains"*. All filters working on IDs extend this class.
 -   `GRangesFilter`: takes a `GRanges` object as input and supports all conditions
     that `findOverlaps` from the `IRanges` package supports ("any", "start", "end",
     "within", "equal"). Note that these have to be passed using the parameter `type`
@@ -209,10 +214,11 @@ function. In the example below we use the `filter` function to filter the `EnsDb
 object and pass that filtered database to the `transcripts` method using the `%>%`
 from the `magrittr` package.
 
-```{r  transcripts-filter }
+```{r  transcripts-filter, message = FALSE }
 library(magrittr)
 
-filter(edb, ~ symbol == "BCL2" & tx_biotype != "protein_coding") %>% transcripts
+edb %>% filter(~ symbol == "BCL2" & tx_biotype != "protein_coding") %>%
+    transcripts
  
 ```
 
@@ -254,9 +260,9 @@ results instead of the default `GRanges`.
 
 ```{r  transcripts-example2 }
 Tx <- transcripts(edb,
-                  columns = c(listColumns(edb , "tx"), "gene_name"),
-                  filter = TxBiotypeFilter("nonsense_mediated_decay"),
-                  return.type = "DataFrame")
+		  columns = c(listColumns(edb , "tx"), "gene_name"),
+		  filter = TxBiotypeFilter("nonsense_mediated_decay"),
+		  return.type = "DataFrame")
 nrow(Tx)
 Tx
  
@@ -280,8 +286,8 @@ intron is partially overlapping with the region.
 
 ```{r  genes-GRangesFilter }
 ## Define the filter
-grf <- GRangesFilter(GRanges("11", ranges = IRanges(114000000, 114000050),
-                             strand = "+"), type = "any")
+grf <- GRangesFilter(GRanges("11", ranges = IRanges(114129278, 114129328),
+			     strand = "+"), type = "any")
 
 ## Query genes:
 gn <- genes(edb, filter = grf)
@@ -292,7 +298,7 @@ txs <- transcripts(edb, filter = GenenameFilter(gn$gene_name))
  
 ```
 
-```{r  tx-for-zbtb16, message=FALSE, fig.align='center', fig.width=7.5, fig.height=5 }
+```{r  granges-zbtb16, message = FALSE, fig.align = 'center', echo = FALSE }
 plot(3, 3, pch = NA, xlim = c(start(gn), end(gn)), ylim = c(0, length(txs)),
      yaxt = "n", ylab = "")
 ## Highlight the GRangesFilter region
@@ -343,9 +349,7 @@ methods. In the example below we retrieve `gene_name`, `entrezid` and the
 `gene_biotype` of all genes in the database which names start with "BCL2".
 
 ```{r  genes-BCL2 }
-## We're going to fetch all genes which names start with BCL. To this end
-## we define a GenenameFilter with partial matching, i.e. condition "like"
-## and a % for any character/string.
+## We're going to fetch all genes which names start with BCL.
 BCLs <- genes(edb,
 	      columns = c("gene_name", "entrezid", "gene_biotype"),
 	      filter = GenenameFilter("BCL", condition = "startsWith"),
@@ -366,14 +370,16 @@ filter expression.
 ```{r  example-AnnotationFilterList }
 ## determine the average length of snRNA, snoRNA and rRNA genes encoded on
 ## chromosomes X and Y.
-mean(lengthOf(edb, of = "tx", filter = AnnotationFilterList(
-                                  GeneBiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
-                                  SeqNameFilter(c("X", "Y")))))
+mean(lengthOf(edb, of = "tx",
+	      filter = AnnotationFilterList(
+		  GeneBiotypeFilter(c("snRNA", "snoRNA", "rRNA")),
+		  SeqNameFilter(c("X", "Y")))))
 
 ## determine the average length of protein coding genes encoded on the same
 ## chromosomes.
-mean(lengthOf(edb, of = "tx", filter = ~ gene_biotype == "protein_coding" &
-                                  seq_name %in% c("X", "Y")))
+mean(lengthOf(edb, of = "tx",
+	      filter = ~ gene_biotype == "protein_coding" &
+		  seq_name %in% c("X", "Y")))
  
 ```
 
@@ -429,8 +435,8 @@ Ensembl genes.
 ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
 ## Note: want to get rid of the "LRG" genes!!!
 EnsGenes <- exonsBy(edb, by = "gene", filter = AnnotationFilterList(
-                                          SeqNameFilter(c(1:22, "X", "Y")),
-                                          GeneIdFilter("ENSG", "startsWith")))
+					  SeqNameFilter(c(1:22, "X", "Y")),
+					  GeneIdFilter("ENSG", "startsWith")))
  
 ```
 
@@ -441,7 +447,7 @@ Alternatively, the above `GRangesList` can be transformed to a `data.frame` in
 *SAF* format that can be used as an input to the `featureCounts` function of the
 `Rsubread` package <sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup>.
 
-```{r  toSAF-RNAseq, message = FALSE, eval=FALSE }
+```{r  toSAF-RNAseq, message = FALSE, eval = FALSE }
 ## Transforming the GRangesList into a data.frame in SAF format
 EnsGenes.SAF <- toSAF(EnsGenes)
  
@@ -456,7 +462,7 @@ In addition, the `disjointExons` function (similar to the one defined in
 `GenomicFeatures`) can be used to generate a `GRanges` of non-overlapping exon
 parts which can be used in the `DEXSeq` package.
 
-```{r  disjointExons, message = FALSE, eval=FALSE }
+```{r  disjointExons, message = FALSE, eval = FALSE }
 ## Create a GRanges of non-overlapping exon parts.
 DJE <- disjointExons(edb, filter = AnnotationFilterList(
 			      SeqNameFilter(c(1:22, "X", "Y")),
@@ -487,9 +493,9 @@ extract all of their sequences. Note: these sequences represent the sequence
 between the chromosomal start and end coordinates of the gene.
 
 ```{r  transcript-sequence-AnnotationHub, message = FALSE, eval = FALSE }
-library(EnsDb.Hsapiens.v75)
+library(EnsDb.Hsapiens.v86)
 library(Rsamtools)
-edb <- EnsDb.Hsapiens.v75
+edb <- EnsDb.Hsapiens.v86
 
 ## Get the FaFile with the genomic sequence matching the Ensembl version
 ## using the AnnotationHub package.
@@ -530,11 +536,34 @@ extractTranscriptSeqs(Dna, cdsY)
  
 ```
 
-Note: in the next section we describe how transcript sequences can be retrieved
-from a `BSgenome` package that is based on UCSC, not Ensembl.
+Next we retrieve transcript sequences from genes encoded on chromosome Y using
+the `BSGenome` package for the human genome. Ensembl version 86 based on
+the `GRCh38` genome build and we thus load the corresponding `BSGenome` package.
+
+```{r  extractTranscriptSeqs-BSGenome, warning = FALSE, message = FALSE }
+library(BSgenome.Hsapiens.NCBI.GRCh38)
+bsg <- BSgenome.Hsapiens.NCBI.GRCh38
+
+## Get the genome version
+unique(genome(bsg))
+unique(genome(edb))
+
+## Extract the full transcript sequences.
+yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx",
+					      filter = SeqNameFilter("Y")))
+
+yTxSeqs
+
+## Extract just the CDS
+Test <- cdsBy(edb, "tx", filter = SeqNameFilter("Y"))
+yTxCds <- extractTranscriptSeqs(bsg, cdsBy(edb, "tx",
+					   filter = SeqNameFilter("Y")))
+yTxCds
+ 
+```
 
 
-# Integrating annotations from Ensembl based  `EnsDb` packages with UCSC based annotations
+# Integrating annotations from Ensembl based `EnsDb` packages with UCSC based annotations
 
 Sometimes it might be useful to combine (Ensembl based) annotations from `EnsDb`
 packages/objects with annotations from other Bioconductor packages, that might
@@ -587,35 +616,6 @@ options(ensembldb.seqnameNotFound = "ORIGINAL")
  
 ```
 
-Next we retrieve transcript sequences from genes encoded on chromosome Y using
-the `BSGenome` package for the human genome from UCSC. The specified version
-`hg19` matches the genome build of Ensembl version 75, i.e. `GRCh37`. Note that
-while we changed the style of the seqnames to UCSC we did not change the naming
-of the genome release.
-
-```{r  extractTranscriptSeqs-BSGenome, warning = FALSE, message = FALSE }
-library(BSgenome.Hsapiens.UCSC.hg19)
-bsg <- BSgenome.Hsapiens.UCSC.hg19
-
-## Get the genome version
-unique(genome(bsg))
-unique(genome(edb))
-## Although differently named, both represent genome build GRCh37.
-
-## Extract the full transcript sequences.
-yTxSeqs <- extractTranscriptSeqs(bsg, exonsBy(edb, "tx",
-					      filter = SeqNameFilter("chrY")))
-
-yTxSeqs
-
-## Extract just the CDS
-Test <- cdsBy(edb, "tx", filter = SeqNameFilter("chrY"))
-yTxCds <- extractTranscriptSeqs(bsg, cdsBy(edb, "tx",
-                                           filter = SeqNameFilter("chrY")))
-yTxCds
- 
-```
-
 At last changing the seqname style to the default value `"Ensembl"`.
 
 ```{r  seqlevelsStyle-restore }
@@ -651,16 +651,16 @@ not necessary if we just want to retrieve gene models from an `EnsDb` object, as
 the `ensembldb` package internally checks the `ucscChromosomeNames` option and,
 depending on that, maps Ensembl chromosome names to UCSC chromosome names.
 
-```{r  gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.3 }
+```{r  gviz-plot, gviz-plot, message=FALSE, fig.align = 'center', fig.width=7.5, fig.height=2.3 }
 ## Loading the Gviz library
 library(Gviz)
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ## Retrieving a Gviz compatible GRanges object with all genes
 ## encoded on chromosome Y.
 gr <- getGeneRegionTrackForGviz(edb, chromosome = "Y",
-                                start = 20400000, end = 21400000)
+				start = 20400000, end = 21400000)
 ## Define a genome axis track
 gat <- GenomeAxisTrack()
 
@@ -678,7 +678,7 @@ Above we had to change the option `ucscChromosomeNames` to `FALSE` in order to
 use it with non-UCSC chromosome names. Alternatively, we could however also
 change the `seqnamesStyle` of the `EnsDb` object to `UCSC`. Note that we have to
 use now also chromosome names in the *UCSC style* in the `SeqNameFilter`
-(i.e. "chrY" instead of `Y`).
+(i.e. "chrY" instead of "Y").
 
 ```{r  message=FALSE }
 seqlevelsStyle(edb) <- "UCSC"
@@ -698,25 +698,25 @@ different gene region tracks, one for protein coding genes and one for lincRNAs.
 
 ```{r  gviz-separate-tracks, message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25 }
 protCod <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
-                                     start = 20400000, end = 21400000,
-                                     filter = GeneBiotypeFilter("protein_coding"))
+				     start = 20400000, end = 21400000,
+				     filter = GeneBiotypeFilter("protein_coding"))
 lincs <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
-                                   start = 20400000, end = 21400000,
-                                   filter = GeneBiotypeFilter("lincRNA"))
+				   start = 20400000, end = 21400000,
+				   filter = GeneBiotypeFilter("lincRNA"))
 
 plotTracks(list(gat, GeneRegionTrack(protCod, name = "protein coding"),
-                GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
+		GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
 
 ## At last we change the seqlevels style again to Ensembl
 seqlevelsStyle <- "Ensembl"
  
 ```
 
-Alternatively, we can also use `ggbio` for plotting. For `ggplot` we can directly
+Alternatively, we can also use `ggbio` for plotting. For `ggbio` we can directly
 pass the `EnsDb` object along with optional filters (or as in the example below a
 filter expression as a `formula`).
 
-```{r  pplot-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4 }
+```{r  pplot-plot, message = FALSE, fig.align='center', fig.width=7.5, fig.height=4 }
 library(ggbio)
 
 ## Create a plot for all transcripts of the gene SKA2
@@ -727,7 +727,7 @@ autoplot(edb, ~ genename == "SKA2")
 To plot the genomic region and plot genes from both strands we can use a
 `GRangesFilter`.
 
-```{r  pplot-plot-2, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4 }
+```{r  pplot-plot-2, message = FALSE, fig.align='center', fig.width=7.5, fig.height=4 }
 ## Get the chromosomal region in which the gene is encoded
 ska2 <- genes(edb, filter = ~ genename == "SKA2")
 strand(ska2) <- "*"
@@ -749,8 +749,8 @@ the database and extract then the gene names for all genes encoded on chromosome
 X.
 
 ```{r  AnnotationDbi, message = FALSE }
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ## List all available columns in the database.
 columns(edb)
@@ -787,7 +787,7 @@ select(edb, keys = c("BCL2", "BCL2L11"), keytype = "GENENAME",
 
 ## Use the filtering system of ensembldb
 select(edb, keys = ~ genename %in% c("BCL2", "BCL2L11") &
-                tx_biotype == "protein_coding",
+		tx_biotype == "protein_coding",
        columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
  
 ```
@@ -1049,10 +1049,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org5bd9a97"></a>
+# Database layout<a id="org0dc6e2b"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [165](#orgfd622d5)). Note that the protein-specific annotations
+shown in Figure [164](#org9d6c074)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
@@ -1150,6 +1150,13 @@ The database layout: as already described above, protein related annotations
 (green) might not be available in each `EnsDb` database.
 
 ![img](images/dblayout.png "Database layout.")
+
+
+# Session information
+
+```{r  sessionInfo }
+sessionInfo() 
+```
 
 
 # Footnotes

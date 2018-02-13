@@ -76,6 +76,9 @@ test_that("keys works", {
 test_that("select method works", {
     .comprehensiveCheckForGene <- function(x) {
         ##   Check if we've got all of the transcripts.
+        idx_rem <- grep("LRG", x$TXID)
+        if (length(idx_rem))
+            x <- x[-idx_rem, ]
         txs <- dbGetQuery(
             dbconn(edb),
             paste0("select tx_id from tx where gene_id = '",
@@ -129,6 +132,7 @@ test_that("select method works", {
     }
 
     library(RSQLite)
+    edb <- filter(edb, filter = ~ seq_name %in% c(18, 11, 2, 5, 7, 21))
     ## 1) Test:
     ##   Provide GenenameFilter.
     gf <- GenenameFilter("BCL2")
@@ -234,6 +238,7 @@ test_that("select method works", {
         res <- select(edb, keys = upids, keytype = "UNIPROTID",
                       columns = c("PROTEINID", "UNIPROTID", "PROTEINDOMAINID"))
     }
+    edb <- dropFilter(edb)
 })
 
 test_that("mapIds works", {
@@ -362,7 +367,7 @@ test_that("select works with symbol as keytype", {
     expect_equal(colnames(res), c("TXNAME", "SYMBOL", "GENEID", "GENENAME"))
     res <- select(edb, keys = ~ symbol == ks, columns=c("GENEID"))
     expect_equal(colnames(res), c("GENEID", "SYMBOL"))
-    expect_equal(res$SYMBOL, ks)
+    expect_equal(unique(res$SYMBOL), ks)
     res <- select(edb, keys = list(SeqNameFilter("Y"),
                                    GeneBiotypeFilter("lincRNA")),
                   columns = c("GENEID", "SYMBOL"))

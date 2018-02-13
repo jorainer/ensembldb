@@ -57,7 +57,8 @@
         minoverlap = 0L, type = c("any", "start", "end"),
         columns = listColumns(x, "tx"), filter = AnnotationFilterList())
 
-\S4method{promoters}{EnsDb}(x, upstream = 2000, downstream = 200, ...)
+\S4method{promoters}{EnsDb}(x, upstream = 2000, downstream = 200,
+        use.names = TRUE, ...)
 
 \S4method{genes}{EnsDb}(x, columns = c(listColumns(x, "gene"), "entrezid"),
         filter = AnnotationFilterList(), order.by, order.type = "asc",
@@ -201,8 +202,8 @@
   }
 
   \item{use.names}{
-    For \code{cdsBy} and \code{exonsBy}: only for \code{by="gene"}: use the names of the
-    genes instead of their IDs as names of the resulting
+    For \code{cdsBy} and \code{exonsBy}: only for \code{by="gene"}: use
+    the names of the genes instead of their IDs as names of the resulting
     \code{GRangesList}.
   }
 
@@ -452,8 +453,8 @@
 }
 \examples{
 
-library(EnsDb.Hsapiens.v75)
-edb <- EnsDb.Hsapiens.v75
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
 
 ######   genes
 ##
