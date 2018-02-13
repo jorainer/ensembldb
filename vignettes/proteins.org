@@ -23,6 +23,13 @@ vignette: >
 
 #+END_EXPORT
 
+#+NAME: biocstyle
+#+BEGIN_SRC R :ravel echo = FALSE, results = "asis", message = FALSE
+  library(BiocStyle)
+  library(ensembldb)
+  BiocStyle::markdown()
+#+END_SRC
+
 * Introduction
 
 From Bioconductor release 3.5 on, =EnsDb= databases/packages created by the
@@ -62,6 +69,7 @@ databases created using =ensDbFromAH=, =ensDbFromGff=, =ensDbFromGRanges= and
   ## Globally switch off execution of code chunks
   evalMe <- TRUE
   haveProt <- FALSE
+  evalMe <- .Platform$OS.type == "unix"
 
 #+END_SRC
 

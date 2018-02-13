@@ -29,6 +29,11 @@ vignette: >
 
 #+END_EXPORT
 
+#+NAME: biocstyle
+#+BEGIN_SRC R :ravel echo = FALSE, results = "asis", message = FALSE
+  library(BiocStyle)
+  BiocStyle::markdown()
+#+END_SRC
 
 * How to export this to a =Rnw= vignette			   :noexport:
 
@@ -301,9 +306,9 @@ results instead of the default =GRanges=.
 #+NAME: transcripts-example2
 #+BEGIN_SRC R
   Tx <- transcripts(edb,
-                    columns = c(listColumns(edb , "tx"), "gene_name"),
-                    filter = TxBiotypeFilter("nonsense_mediated_decay"),
-                    return.type = "DataFrame")
+		    columns = c(listColumns(edb , "tx"), "gene_name"),
+		    filter = TxBiotypeFilter("nonsense_mediated_decay"),
+		    return.type = "DataFrame")
   nrow(Tx)
   Tx
 
@@ -341,7 +346,8 @@ intron is partially overlapping with the region.
 
 #+END_SRC
 
-#+BEGIN_SRC R :ravel tx-for-zbtb16, message=FALSE, fig.align='center', fig.width=7.5, fig.height=5
+#+NAME: granges-zbtb16
+#+BEGIN_SRC R :ravel message = FALSE, fig.align = 'center', echo = FALSE
   plot(3, 3, pch = NA, xlim = c(start(gn), end(gn)), ylim = c(0, length(txs)),
        yaxt = "n", ylab = "")
   ## Highlight the GRangesFilter region
@@ -484,8 +490,8 @@ Ensembl genes.
   ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
   ## Note: want to get rid of the "LRG" genes!!!
   EnsGenes <- exonsBy(edb, by = "gene", filter = AnnotationFilterList(
-                                            SeqNameFilter(c(1:22, "X", "Y")),
-                                            GeneIdFilter("ENSG", "startsWith")))
+					    SeqNameFilter(c(1:22, "X", "Y")),
+					    GeneIdFilter("ENSG", "startsWith")))
 
 #+END_SRC
 
@@ -497,7 +503,7 @@ Alternatively, the above =GRangesList= can be transformed to a =data.frame= in
 =Rsubread= package [fn:5].
 
 #+NAME: toSAF-RNAseq
-#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval = FALSE
   ## Transforming the GRangesList into a data.frame in SAF format
   EnsGenes.SAF <- toSAF(EnsGenes)
 
@@ -513,7 +519,7 @@ In addition, the =disjointExons= function (similar to the one defined in
 parts which can be used in the =DEXSeq= package.
 
 #+NAME: disjointExons
-#+BEGIN_SRC R :ravel message = FALSE, eval=FALSE
+#+BEGIN_SRC R :ravel message = FALSE, eval = FALSE
   ## Create a GRanges of non-overlapping exon parts.
   DJE <- disjointExons(edb, filter = AnnotationFilterList(
 				SeqNameFilter(c(1:22, "X", "Y")),
@@ -616,7 +622,7 @@ the =GRCh38= genome build and we thus load the corresponding =BSGenome= package.
 
 #+END_SRC
 
-* Integrating annotations from Ensembl based  =EnsDb= packages with UCSC based annotations
+* Integrating annotations from Ensembl based =EnsDb= packages with UCSC based annotations
 
 Sometimes it might be useful to combine (Ensembl based) annotations from =EnsDb=
 packages/objects with annotations from other Bioconductor packages, that might
@@ -705,7 +711,9 @@ not necessary if we just want to retrieve gene models from an =EnsDb= object, as
 the =ensembldb= package internally checks the =ucscChromosomeNames= option and,
 depending on that, maps Ensembl chromosome names to UCSC chromosome names.
 
-#+BEGIN_SRC R :ravel gviz-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=2.3
+
+#+NAME: gviz-plot
+#+BEGIN_SRC R :ravel gviz-plot, message=FALSE, fig.align = 'center', fig.width=7.5, fig.height=2.3
   ## Loading the Gviz library
   library(Gviz)
   library(EnsDb.Hsapiens.v86)
@@ -750,16 +758,17 @@ We can also use the filters from the =ensembldb= package to further refine what
 transcripts are fetched, like in the example below, in which we create two
 different gene region tracks, one for protein coding genes and one for lincRNAs.
 
-#+BEGIN_SRC R :ravel gviz-separate-tracks, message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
+#+NAME: gviz-separate-tracks
+#+BEGIN_SRC R :ravel message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
   protCod <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
-                                       start = 20400000, end = 21400000,
-                                       filter = GeneBiotypeFilter("protein_coding"))
+				       start = 20400000, end = 21400000,
+				       filter = GeneBiotypeFilter("protein_coding"))
   lincs <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
-                                     start = 20400000, end = 21400000,
-                                     filter = GeneBiotypeFilter("lincRNA"))
+				     start = 20400000, end = 21400000,
+				     filter = GeneBiotypeFilter("lincRNA"))
 
   plotTracks(list(gat, GeneRegionTrack(protCod, name = "protein coding"),
-                  GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
+		  GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
 
   ## At last we change the seqlevels style again to Ensembl
   seqlevelsStyle <- "Ensembl"
@@ -770,7 +779,8 @@ Alternatively, we can also use =ggbio= for plotting. For =ggbio= we can directly
 pass the =EnsDb= object along with optional filters (or as in the example below a
 filter expression as a =formula=).
 
-#+BEGIN_SRC R :ravel pplot-plot, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4
+#+NAME: pplot-plot
+#+BEGIN_SRC R :ravel message = FALSE, fig.align='center', fig.width=7.5, fig.height=4
   library(ggbio)
 
   ## Create a plot for all transcripts of the gene SKA2
@@ -781,14 +791,15 @@ filter expression as a =formula=).
 To plot the genomic region and plot genes from both strands we can use a
 =GRangesFilter=.
 
-#+BEGIN_SRC R :ravel pplot-plot-2, message=FALSE, fig.align='center', fig.width=7.5, fig.height=4
+
+#+NAME: pplot-plot-2
+#+BEGIN_SRC R :ravel message = FALSE, fig.align='center', fig.width=7.5, fig.height=4
   ## Get the chromosomal region in which the gene is encoded
   ska2 <- genes(edb, filter = ~ genename == "SKA2")
   strand(ska2) <- "*"
   autoplot(edb, GRangesFilter(ska2), names.expr = "gene_name")
 
 #+END_SRC
-
 
 * Using =EnsDb= objects in the =AnnotationDbi= framework
 
@@ -843,7 +854,7 @@ only the protein coding transcripts for these genes.
 
   ## Use the filtering system of ensembldb
   select(edb, keys = ~ genename %in% c("BCL2", "BCL2L11") &
-                  tx_biotype == "protein_coding",
+		  tx_biotype == "protein_coding",
 	 columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
 
 #+END_SRC
@@ -1197,7 +1208,6 @@ might not be available in all =EnsDB= databases (e.g. such ones created with
   - =name=
   - =value=
 
-
 + /virtual/ columns:
   - =symbol=: the database does not have such a database column, but it is still
     possible to use it in the =columns= parameter. This column is /symlinked/ to the
@@ -1208,7 +1218,6 @@ might not be available in all =EnsDB= databases (e.g. such ones created with
 The database layout: as already described above, protein related annotations
 (green) might not be available in each =EnsDb= database.
 
-#+ATTR_LATEX: :center :placement [h!] :width 14cm
 #+NAME: fig.database.layout
 #+CAPTION: Database layout.
 [[file:images/dblayout.png]]
