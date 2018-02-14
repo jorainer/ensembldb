@@ -371,23 +371,17 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     ensemblVersion <- Parms["version"]
     organism <- Parms["organism"]
     genomeVersion <- Parms["genomeVersion"]
-
+    ## Fix for issue #75: validate versions I got with versions extracted from
+    ## the GTF header but don't stop if something is wrong, just show a warning
     if (haveHeader) {
         header.version <- Header[Header[, "name"] == "genome-version", "value"]
-        if(length(header.version)==0) {
-            if (missing(genomeVersion))
-              stop(paste("Could not find field 'genome-version' in header of GTF-file\n",
-                         "but one supplied by user either\n"))
-            else
-              warning(paste0("Could not find field 'genome-version' in header of GTF-file\n",
-                            "using the one supplied by user: ",genomeVersion,"\n"))
-        } else if (genomeVersion!= header.version ) {
-            warning(paste0("The GTF file name is not as expected: <Organism>.",
-                        "<genome version>.<Ensembl version>.gtf!",
-                        " I've got genome version ", genomeVersion,
-                        " but in the header of the GTF file ",
-                        Header[Header[, "name"] == "genome-version", "value"],
-                           " is specified!"))
+        if (length(header.version)) {
+            if (genomeVersion != header.version)
+                warning("Genome version extracted from the gtf file name ('",
+                        genomeVersion, "') and genome version specified in the",
+                        " gtf file ('", header.version, "') do not match. ",
+                        "Ensure you pass the correct genome version along ",
+                        "with parameter 'genomeVersion'")
         }
     }
 
@@ -476,24 +470,25 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version) {
 }
 
 .checkExtractVersions <- function(filename, organism, genomeVersion, version){
-    if(isEnsemblFileName(filename)){
+    if (isEnsemblFileName(filename)) {
         ensFromFile <- ensemblVersionFromGtfFileName(filename)
         orgFromFile <- organismFromGtfFileName(filename)
         genFromFile <- genomeVersionFromGtfFileName(filename)
-    }else{
+    } else {
         ensFromFile <- NA
         orgFromFile <- NA
         genFromFile <- NA
-        if(missing(organism) | missing(genomeVersion) | missing(version))
+        if (missing(organism) | missing(genomeVersion) | missing(version))
             stop("The file name does not match the expected naming scheme",
-                 " of Ensembl files hence I cannot extract any information",
+                 " of Ensembl files (<organism>.<genome version>.<Ensembl ",
+                 "version>) hence I cannot extract any information",
                  " from it! Parameters 'organism', 'genomeVersion' and",
                  " 'version' are thus required!")
     }
     ## Do some more testing with versions provided from the user.
-    if(!missing(organism)){
-        if(!is.na(orgFromFile)){
-            if(organism != orgFromFile){
+    if (!missing(organism)) {
+        if (!is.na(orgFromFile)) {
+            if (organism != orgFromFile) {
                 warning("User specified organism (", organism,
                         ") is different to the one extracted",
                         " from the file name (", orgFromFile,
@@ -502,9 +497,9 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version) {
         }
         orgFromFile <- organism
     }
-    if(!missing(genomeVersion)){
-        if(!is.na(genFromFile)){
-            if(genomeVersion != genFromFile){
+    if (!missing(genomeVersion)) {
+        if (!is.na(genFromFile)) {
+            if (genomeVersion != genFromFile) {
                 warning("User specified genome version (", genomeVersion,
                         ") is different to the one extracted",
                         " from the file name (", genFromFile,
@@ -513,9 +508,9 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version) {
         }
         genFromFile <- genomeVersion
     }
-    if(!missing(version)){
-        if(!is.na(ensFromFile)){
-            if(version != ensFromFile){
+    if (!missing(version)) {
+        if (!is.na(ensFromFile)) {
+            if (version != ensFromFile) {
                 warning("User specified Ensembl version (", version,
                         ") is different to the one extracted",
                         " from the file name (", ensFromFile,
