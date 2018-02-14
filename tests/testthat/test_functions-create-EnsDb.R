@@ -25,9 +25,9 @@ test_that("ensDbFromGRanges works", {
 
 test_that("ensDbFromGtf and Gff works", {
     gff <- system.file("gff/Devosia_geojensis.ASM96941v1.32.gff3.gz",
-                       package="ensembldb")
+                       package = "ensembldb")
     gtf <- system.file("gtf/Devosia_geojensis.ASM96941v1.32.gtf.gz",
-                       package="ensembldb")
+                       package = "ensembldb")
     suppressWarnings(
         db_gff <- EnsDb(ensDbFromGff(gff, outfile = tempfile(), skip = TRUE))
     )
@@ -115,11 +115,13 @@ test_that("checkExtractVersions works", {
     expect_equal(unname(res["organism"]), "Devosia_geojensis")
     expect_equal(unname(res["genomeVersion"]), "ASM96941v1")
     expect_equal(unname(res["version"]), "32")
-    suppressWarnings(
-        res <- ensembldb:::.checkExtractVersions(fn, organism = "Homo_sapiens")
-        )
+    expect_warning(
+        res <- ensembldb:::.checkExtractVersions(fn, organism = "Homo_sapiens"))
     expect_equal(unname(res["organism"]), "Homo_sapiens")
     expect_error(ensembldb:::.checkExtractVersions("afdfhjd"))
+    expect_warning(ensembldb:::.checkExtractVersions(fn, version = 13))
+    expect_warning(
+        ensembldb:::.checkExtractVersions(fn, genomeVersion = "something"))
 })
 
 test_that("buildMetadata works", {
