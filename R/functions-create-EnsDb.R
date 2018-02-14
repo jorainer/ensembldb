@@ -377,14 +377,17 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     organism <- Parms["organism"]
     genomeVersion <- Parms["genomeVersion"]
 
+    ## Fix for issue #75: validate versions I got with versions extracted from
+    ## the GTF header but don't stop if something is wrong, just show a warning
     if (haveHeader) {
-        if(genomeVersion!=Header[Header[, "name"] == "genome-version", "value"]){
-            stop(paste0("The GTF file name is not as expected: <Organism>.",
-                        "<genome version>.<Ensembl version>.gtf!",
-                        " I've got genome version ", genomeVersion,
-                        " but in the header of the GTF file ",
-                        Header[Header[, "name"] == "genome-version", "value"],
-                        " is specified!"))
+        header.version <- Header[Header[, "name"] == "genome-version", "value"]
+        if (length(header.version)) {
+            if (genomeVersion != header.version)
+                warning("Genome version extracted from the gtf file name ('",
+                        genomeVersion, "') and genome version specified in the",
+                        " gtf file ('", header.version, "') do not match. ",
+                        "Ensure you pass the correct genome version along ",
+                        "with parameter 'genomeVersion'")
         }
     }
 
