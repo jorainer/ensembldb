@@ -35,27 +35,6 @@ vignette: >
   BiocStyle::markdown()
 #+END_SRC
 
-* How to export this to a =Rnw= vignette			   :noexport:
-
-Use =ox-ravel= from the =orgmode-accessories= package to export this file to a =Rnw= file. After export edit the generated =Rnw= in the following way:
-
-1) Delete all =\usepackage= commands.
-2) Move the =<<style>>= code chunk before the =\begin{document}= and before =\author=.
-3) Move all =%\Vignette...= lines at the start of the file (even before =\documentclass=).
-4) Replace =\date= with =\date{Modified: 21 October, 2013. Compiled: \today}=
-5) Eventually search for all problems with =texttt=, i.e. search for pattern ="==.
-
-Note: use =:ravel= followed by the properties for the code chunk headers, e.g. =:ravel results='hide'=. Other options for knitr style options are:
-+ =results=: ='hide'= (hides all output, not warnings or messages), ='asis'=, ='markup'= (the default).
-+ =warning=: =TRUE= or =FALSE= whether warnings should be displayed.
-+ =message=: =TRUE= or =FALSE=, same as above.
-+ =include=: =TRUE= or =FALSE=, whether the output should be included into the final document (code is still evaluated).
-
-* How to export this to a =Rmd= vignette			   :noexport:
-
-Use =ox-ravel= to export this file as an R markdown file (=C-c C-e m
-r=). That way we don't need to edit the resulting =Rmd= file.
-
 * Introduction
 
 The =ensembldb= package provides functions to create and use transcript centric
@@ -347,7 +326,7 @@ intron is partially overlapping with the region.
 #+END_SRC
 
 #+NAME: granges-zbtb16
-#+BEGIN_SRC R :ravel message = FALSE, fig.align = 'center', echo = FALSE
+#+BEGIN_SRC R :ravel message = FALSE, echo = FALSE
   plot(3, 3, pch = NA, xlim = c(start(gn), end(gn)), ylim = c(0, length(txs)),
        yaxt = "n", ylab = "")
   ## Highlight the GRangesFilter region
@@ -713,7 +692,7 @@ depending on that, maps Ensembl chromosome names to UCSC chromosome names.
 
 
 #+NAME: gviz-plot
-#+BEGIN_SRC R :ravel gviz-plot, message=FALSE, fig.align = 'center', fig.width=7.5, fig.height=2.3
+#+BEGIN_SRC R :ravel message=FALSE
   ## Loading the Gviz library
   library(Gviz)
   library(EnsDb.Hsapiens.v86)
@@ -759,7 +738,7 @@ transcripts are fetched, like in the example below, in which we create two
 different gene region tracks, one for protein coding genes and one for lincRNAs.
 
 #+NAME: gviz-separate-tracks
-#+BEGIN_SRC R :ravel message=FALSE, warning=FALSE, fig.align='center', fig.width=7.5, fig.height=2.25
+#+BEGIN_SRC R :ravel message=FALSE, warning=FALSE
   protCod <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
 				       start = 20400000, end = 21400000,
 				       filter = GeneBiotypeFilter("protein_coding"))
@@ -780,7 +759,7 @@ pass the =EnsDb= object along with optional filters (or as in the example below 
 filter expression as a =formula=).
 
 #+NAME: pplot-plot
-#+BEGIN_SRC R :ravel message = FALSE, fig.align='center', fig.width=7.5, fig.height=4
+#+BEGIN_SRC R :ravel message = FALSE
   library(ggbio)
 
   ## Create a plot for all transcripts of the gene SKA2
@@ -793,7 +772,7 @@ To plot the genomic region and plot genes from both strands we can use a
 
 
 #+NAME: pplot-plot-2
-#+BEGIN_SRC R :ravel message = FALSE, fig.align='center', fig.width=7.5, fig.height=4
+#+BEGIN_SRC R :ravel message = FALSE
   ## Get the chromosomal region in which the gene is encoded
   ska2 <- genes(edb, filter = ~ genename == "SKA2")
   strand(ska2) <- "*"

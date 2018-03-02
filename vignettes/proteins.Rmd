@@ -59,7 +59,7 @@ databases created using `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and
 ## Globally switch off execution of code chunks
 evalMe <- TRUE
 haveProt <- FALSE
-evalMe <- .Platform$OS.type == "unix"
+## evalMe <- .Platform$OS.type == "unix"
  
 ```
 
@@ -70,6 +70,11 @@ edb <- EnsDb.Hsapiens.v86
 ## Evaluate whether we have protein annotation available
 hasProteinData(edb)
  
+```
+
+```{r  restrict9, message = FALSE, echo = FALSE }
+## silently subsetting to chromosome 11
+edb <- filter(edb, filter = ~ seq_name == "11") 
 ```
 
 If protein annotation is available, the additional tables and columns are also
@@ -170,9 +175,9 @@ all genes from the database that have a certain protein domain in the protein
 encoded by any of its transcripts.
 
 ```{r  a_genes_protdomid_filter, eval = haveProt }
-## Get all genes that encode a transcript encoding for a protein that contains
+## Get all genes encoded on chromosome 11 which protein contains 
 ## a certain protein domain.
-gns <- genes(edb, filter = ProtDomIdFilter("PS50097"))
+gns <- genes(edb, filter = ~ prot_dom_id == "PS50097" & seq_name == "11")
 length(gns)
 
 sort(gns$gene_name)
