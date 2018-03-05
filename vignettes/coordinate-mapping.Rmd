@@ -117,7 +117,7 @@ gnm <- GRanges("X:107716399-107716401")
 Before we map the coordinates we visualize the genomic region and all
 genes and transcripts overlapping it.
 
-```{r  genomeToTranscript-ex1-plot, message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Overview of a genomic region on chromosome X. The red line represents the genomic region that we want to map to transcript-relative coordinates." }
+```{r  genomeToTranscript-ex1-plot, message = FALSE }
 library(Gviz)
 ## Since we're using Ensembl chromosome names we have to set:
 options(ucscChromosomeNames = FALSE)
@@ -498,7 +498,7 @@ within the transcript.
 At last we plot the encoding transcript and all of the mapped protein domains
 for the protein *ENSP00000263233* of SYP.
 
-```{r  proteinToGenome-SYP-plot, message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Transcript encoding the protein ENSP00000263233 of SYP with all protein domains." }
+```{r  proteinToGenome-SYP-plot, message = FALSE }
 library(Gviz)
 
 ## Define a genome axis track

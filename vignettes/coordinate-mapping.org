@@ -128,8 +128,10 @@ first nucleotide).
 Before we map the coordinates we visualize the genomic region and all
 genes and transcripts overlapping it.
 
+# #+BEGIN_SRC R :ravel message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Overview of a genomic region on chromosome X. The red line represents the genomic region that we want to map to transcript-relative coordinates."
+
 #+NAME: genomeToTranscript-ex1-plot
-#+BEGIN_SRC R :ravel message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Overview of a genomic region on chromosome X. The red line represents the genomic region that we want to map to transcript-relative coordinates."
+#+BEGIN_SRC R :ravel message = FALSE
   library(Gviz)
   ## Since we're using Ensembl chromosome names we have to set:
   options(ucscChromosomeNames = FALSE)
@@ -535,8 +537,10 @@ within the transcript.
 At last we plot the encoding transcript and all of the mapped protein domains
 for the protein /ENSP00000263233/ of SYP.
 
+# #+BEGIN_SRC R :ravel message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Transcript encoding the protein ENSP00000263233 of SYP with all protein domains."
+
 #+NAME: proteinToGenome-SYP-plot
-#+BEGIN_SRC R :ravel message = FALSE, fig.align = "center", fig.width = 8, fig.height = 7, fig.cap = "Transcript encoding the protein ENSP00000263233 of SYP with all protein domains."
+#+BEGIN_SRC R :ravel message = FALSE
   library(Gviz)
 
   ## Define a genome axis track
