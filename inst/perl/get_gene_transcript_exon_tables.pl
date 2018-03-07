@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## versuin 0.3.3: * Add refseq mappings (add new table ens_refseq.txt).
 ## version 0.3.1: * Add ens_counts.txt with the total counts of genes, tx, exons
 ##                  and proteins for validation that all entries were added to
 ##                  the database.
@@ -28,7 +29,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.2";
+my $script_version = "0.3.3";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
@@ -65,6 +66,7 @@ if($option{ h }){
   print("- ens_gene.txt: contains all genes defined in Ensembl.\n");
   print("- ens_entrezgene.txt: contains mapping between ensembl gene_id and entrezgene ID.\n");
   print("- ens_transcript.txt: contains all transcripts of all genes.\n");
+  print("- ens_refseq.txt: mapping from Ensembl transcript IDs to NCBI RefSeq IDs.\n");
   print("- ens_exon.txt: contains all (unique) exons, along with their genomic alignment.\n");
   print("- ens_tx2exon.txt: relates transcript ids to exon ids (m:n), along with the index of the exon in the respective transcript (since the same exon can be part of different transcripts and have a different index in each transcript).\n");
   print("- ens_chromosome.txt: the information of all chromosomes (chromosome/sequence/contig names). \n");
@@ -141,6 +143,9 @@ print ENTREZGENE "gene_id\tentrezid\n";
 
 open(T2E , ">ens_tx2exon.txt");
 print T2E "tx_id\texon_id\texon_idx\n";
+
+open(REFSEQ , ">ens_refseq.txt");
+print REFSEQ "tx_id\trefseq_id\n";
 
 open(PROTEIN, ">ens_protein.txt");
 ## print PROTEIN "tx_id\tprotein_id\tuniprot_id\tprotein_sequence\n";
@@ -275,6 +280,16 @@ foreach my $gene_id (@gene_ids){
 	}
       }
       my $tx_description = $transcript->description;
+      ## Get all references...
+      my @tx_dbe = @{$transcript->get_all_DBEntries('RefSeq%')};
+      if (scalar(@tx_dbe) > 0) {
+	foreach my $tx_ext (@tx_dbe) {
+	  my $ext_id = $tx_ext->primary_id();
+	  # my $ext_disp = $tx_ext->display_id();
+	  # my $dbn = $tx_ext->dbname();
+	  print REFSEQ "$tx_id\t$ext_id\n";
+	}
+      }
       # if (!defined($tx_description)) {
       # 	$tx_description = "NULL";
       # }
@@ -376,3 +391,4 @@ close(PROTEIN);
 close(PROTDOM);
 close(UNIPROT);
 close(COUNTS);
+close(REFSEQ);

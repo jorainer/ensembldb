@@ -220,6 +220,11 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
         message("OK")
     }
 
+    ## process refseq.
+    refseq_file <- paste0(path, .Platform$file.sep, "ens_refseq.txt")
+    tmp <- read.table(refseq_file, sep = "\t", as.is = TRUE, header = TRUE)
+    dbWriteTable(con, name = "refseq", tmp, row.names = FALSE)
+    
     ## Create indices
     message("Creating indices ... ", appendLF = FALSE)
     .createEnsDbIndices(con, proteins = file.exists(prot_file))

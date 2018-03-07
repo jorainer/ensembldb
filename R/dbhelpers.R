@@ -655,7 +655,8 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
 .createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) {
     indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
                    gene = "seq_name", tx = "tx_id", tx = "gene_id",
-                   exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
+                   exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id",
+                   refseq = "tx_id")
     if (as.numeric(dbSchemaVersion(con)) > 1)
         indexCols <- c(indexCols,
                        entrezgene = "gene_id", entrezgene = "entrezid")
