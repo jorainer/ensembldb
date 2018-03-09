@@ -176,9 +176,14 @@ setClass("EnsDb",
 #'     to assign Uniprot IDs to Ensembl protein IDs.
 #' }
 #'
-#' \item{ProtDomIdFilter}{
+#' \item{ProtDomIdFilter, ProteinDomainIdFilter}{
 #'     allows to retrieve entries from the database matching the provided filter
-#'     criteria based on their protein  domain ID (\emph{protein_domain_id}).
+#'     criteria based on their protein domain ID (\emph{protein_domain_id}).
+#' }
+#'
+#' \item{ProteinDomainSourceFilter}{
+#'     filter results based on the source (database/method) defining the protein
+#'     domain (e.g. \code{"pfam"}).
 #' }
 #'
 #' \item{OnlyCodingTxFilter}{
@@ -347,6 +352,33 @@ setClass("ProtDomIdFilter", contains = "CharacterFilter",
 #' @rdname Filter-classes
 ProtDomIdFilter <- function(value, condition = "==") {
     new("ProtDomIdFilter", condition = condition,
+        value = as.character(value))
+}
+#' @rdname Filter-classes
+setClass("ProteinDomainIdFilter", contains = "CharacterFilter",
+         prototype = list(
+             condition = "==",
+             value = "",
+             field = "protein_domain_id"
+         ))
+#' @return For \code{ProteinDomainIdFilter}: A \code{ProteinDomainIdFilter} object.
+#' @rdname Filter-classes
+ProteinDomainIdFilter <- function(value, condition = "==") {
+    new("ProteinDomainIdFilter", condition = condition,
+        value = as.character(value))
+}
+
+#' @rdname Filter-classes
+setClass("ProteinDomainSourceFilter", contains = "CharacterFilter",
+         prototype = list(
+             condition = "==",
+             value = "",
+             field = "protein_domain_source"
+         ))
+#' @return For \code{ProteinDomainSourceFilter}: A \code{ProteinDomainSourceFilter} object.
+#' @rdname Filter-classes
+ProteinDomainSourceFilter <- function(value, condition = "==") {
+    new("ProteinDomainSourceFilter", condition = condition,
         value = as.character(value))
 }
 

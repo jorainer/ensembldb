@@ -162,7 +162,9 @@ The supported filters are:
 In addition to the above listed /DNA-RNA-based/ filters, /protein-specific/
 filters are also available: 
 
-+ =ProtDomIdFilter=: filter by the protein domain ID.
++ =ProtDomIdFilter=, =ProteinDomainIdFilter=: filter by the protein domain ID.
++ =ProteinDomainSourceFilter=: filter by the source of the protein domain
+  (database or method, e.g. /pfam/).
 + =ProteinIdFilter=: filter by Ensembl protein ID filters.
 + =UniprotDbFilter=: filter by the name of the Uniprot database.
 + =UniprotFilter=: filter by the Uniprot ID.

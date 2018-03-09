@@ -12,6 +12,24 @@ test_that("ProtDomIdFilter constructor works", {
     expect_equal(condition(fl), "==")
 })
 
+test_that("ProteinDomainIdFilter constructor works", {
+    fl <- ProteinDomainIdFilter("a")
+    expect_true(is(fl, "ProteinDomainIdFilter"))
+    fl <- AnnotationFilter(~ protein_domain_id %in% 1:4)
+    expect_true(is(fl, "ProteinDomainIdFilter"))
+    expect_equal(value(fl), c("1", "2", "3", "4"))
+    expect_equal(condition(fl), "==")
+})
+
+test_that("ProteinDomainSourceFilter constructor works", {
+    fl <- ProteinDomainSourceFilter("a")
+    expect_true(is(fl, "ProteinDomainSourceFilter"))
+    fl <- AnnotationFilter(~ protein_domain_source %in% 1:4)
+    expect_true(is(fl, "ProteinDomainSourceFilter"))
+    expect_equal(value(fl), c("1", "2", "3", "4"))
+    expect_equal(condition(fl), "==")
+})
+
 test_that("UniprotDbFilter constructor works", {
     fl <- UniprotDbFilter("a")
     expect_true(is(fl, "UniprotDbFilter"))

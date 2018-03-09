@@ -7,6 +7,10 @@
 \alias{OnlyCodingTxFilter}
 \alias{ProtDomIdFilter-class}
 \alias{ProtDomIdFilter}
+\alias{ProteinDomainIdFilter-class}
+\alias{ProteinDomainIdFilter}
+\alias{ProteinDomainSourceFilter-class}
+\alias{ProteinDomainSourceFilter}
 \alias{UniprotDbFilter-class}
 \alias{UniprotDbFilter}
 \alias{UniprotMappingTypeFilter-class}
@@ -21,6 +25,10 @@
 OnlyCodingTxFilter()
 
 ProtDomIdFilter(value, condition = "==")
+
+ProteinDomainIdFilter(value, condition = "==")
+
+ProteinDomainSourceFilter(value, condition = "==")
 
 UniprotDbFilter(value, condition = "==")
 
@@ -55,6 +63,10 @@ for \code{integer}-based filters (such as
 }
 \value{
 For \code{ProtDomIdFilter}: A \code{ProtDomIdFilter} object.
+
+For \code{ProteinDomainIdFilter}: A \code{ProteinDomainIdFilter} object.
+
+For \code{ProteinDomainSourceFilter}: A \code{ProteinDomainSourceFilter} object.
 
 For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
 
@@ -235,9 +247,14 @@ In addition, the following filters are defined by \code{ensembldb}:
     to assign Uniprot IDs to Ensembl protein IDs.
 }
 
-\item{ProtDomIdFilter}{
+\item{ProtDomIdFilter, ProteinDomainIdFilter}{
     allows to retrieve entries from the database matching the provided filter
-    criteria based on their protein  domain ID (\emph{protein_domain_id}).
+    criteria based on their protein domain ID (\emph{protein_domain_id}).
+}
+
+\item{ProteinDomainSourceFilter}{
+    filter results based on the source (database/method) defining the protein
+    domain (e.g. \code{"pfam"}).
 }
 
 \item{OnlyCodingTxFilter}{

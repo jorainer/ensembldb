@@ -92,7 +92,9 @@ setMethod("keytypes", "EnsDb",
         filters <- c(filters,
                      PROTEINID = "ProteinIdFilter",
                      UNIPROTID = "UniprotFilter",
-                     PROTEINDOMAINID = "ProtDomIdFilter")
+                     PROTEINDOMAINID = "ProteinDomainIdFilter",
+                     PROTDOMID = "ProtDomIdFilter",
+                     PROTEINDOMAINSOURCE = "ProteinDomainSourceFilter")
     }
     return(filters)
 }

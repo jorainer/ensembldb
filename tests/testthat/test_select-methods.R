@@ -401,7 +401,8 @@ test_that("keytypes works", {
     res <- keytypes(edb)
     if (hasProteinData(edb)) {
         expect_equal(res, sort(c(keyt, "PROTEINID", "UNIPROTID",
-                                 "PROTEINDOMAINID")))
+                                 "PROTDOMID",
+                                 "PROTEINDOMAINID", "PROTEINDOMAINSOURCE")))
     } else {
         expect_equal(res, sort(keyt))
     }
@@ -412,6 +413,8 @@ test_that("filterForKeytype works", {
     expect_true(is(res, "SymbolFilter"))
     if (hasProteinData(edb)) {
         res <- ensembldb:::filterForKeytype("PROTEINDOMAINID", edb)
+        expect_true(is(res, "ProteinDomainIdFilter"))
+        res <- ensembldb:::filterForKeytype("PROTDOMID", edb)
         expect_true(is(res, "ProtDomIdFilter"))
     }
     res <- ensembldb:::filterForKeytype("TXID")

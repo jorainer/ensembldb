@@ -31,7 +31,9 @@
     uniprot = "uniprot_id",
     uniprot_db = "uniprot_db",
     uniprot_mapping_type = "uniprot_mapping_type",
-    prot_dom_id = "protein_domain_id"
+    prot_dom_id = "protein_domain_id",
+    protein_domain_id = "protein_domain_id",
+    protein_domain_source = "protein_domain_source"
 )
 
 ## .supportedFilters <- function(x) {
@@ -64,7 +66,9 @@
               "exon_rank", "exon_start", "exon_end")
     if (hasProteinData(x))
         flds <- c(flds, "protein_id", "uniprot", "uniprot_db",
-                  "uniprot_mapping_type", "prot_dom_id")
+                  "uniprot_mapping_type", "prot_dom_id",
+                  "protein_domain_id",
+                  "protein_domain_source")
     if (any(listColumns(x) == "tx_support_level"))
         flds <- c(flds, "tx_support_level")
     sort(flds)

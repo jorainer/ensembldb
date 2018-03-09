@@ -251,3 +251,12 @@ test_that("isProteinFilter works", {
     expect_true(!ensembldb:::isProteinFilter("dfdf"))
 })
 
+test_that("ProteinDomainId and ProtDomId work", {
+    pdid <- "PS50063"
+    res <- proteins(edb, filter = ~ protein_domain_id == pdid)
+    res_2 <- proteins(edb, filter = ~ prot_dom_id == pdid)
+    expect_equal(res, res_2)
+    res <- proteins(edb, filter = ~ genename == "BCL2" &
+                             protein_domain_source == "pfam")
+    expect_equal(nrow(res), 3)
+})

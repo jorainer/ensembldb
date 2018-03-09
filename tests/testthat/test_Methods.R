@@ -554,12 +554,12 @@ test_that("supportedFilters works", {
     if (!hasProteinData(edb))
         expect_equal(nrow(res), 19)
     else 
-        expect_equal(nrow(res), 24)
+        expect_equal(nrow(res), 26)
     res <- supportedFilters(edb)
     if (!hasProteinData(edb))
         expect_equal(nrow(res), 19)
     else 
-        expect_equal(nrow(res), 24)
+        expect_equal(nrow(res), 26)
 })
 
 ## Here we check if we fetch what we expect from the database.

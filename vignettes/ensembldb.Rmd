@@ -30,7 +30,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org520407a) for the database layout and an overview of
+(see Section [11](#org201f522) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -144,7 +144,9 @@ The supported filters are:
 In addition to the above listed *DNA-RNA-based* filters, *protein-specific*
 filters are also available: 
 
--   `ProtDomIdFilter`: filter by the protein domain ID.
+-   `ProtDomIdFilter`, `ProteinDomainIdFilter`: filter by the protein domain ID.
+-   `ProteinDomainSourceFilter`: filter by the source of the protein domain
+    (database or method, e.g. *pfam*).
 -   `ProteinIdFilter`: filter by Ensembl protein ID filters.
 -   `UniprotDbFilter`: filter by the name of the Uniprot database.
 -   `UniprotFilter`: filter by the Uniprot ID.
@@ -1049,10 +1051,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org520407a"></a>
+# Database layout<a id="org201f522"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [164](#org1bef1c7)). Note that the protein-specific annotations
+shown in Figure [165](#org3eef309)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
