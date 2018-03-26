@@ -154,14 +154,14 @@
 
   \item{maxgap}{
     For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: see
-    \code{\link[GenomicFeatures]{exonsByOverlaps}} help page in the
-    \code{GenomicFeatures} package.
+    \code{exonsByOverlaps} in \code{GenomicFeatures} for more
+    information.
   }
 
   \item{minoverlap}{
     For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: see
-    \code{\link[GenomicFeatures]{exonsByOverlaps}} help page in the
-    \code{GenomicFeatures} package.
+    \code{exonsByOverlaps} in \code{GenomicFeatures} for more
+    information.
   }
 
   \item{order.by}{
@@ -192,8 +192,8 @@
 
   \item{type}{
     For \code{exonsByOverlaps} and \code{transcriptsByOverlaps}: see
-    \code{\link[GenomicFeatures]{exonsByOverlaps}} help page in the
-    \code{GenomicFeatures} package.
+    \code{exonsByOverlaps} in \code{GenomicFeatures} for more
+    information.
   }
 
   \item{upstream}{
@@ -240,8 +240,8 @@
 
     \item{exonsByOverlaps}{
       Retrieve exons overlapping specified genomic ranges. For
-      more information see
-      \code{\link[GenomicFeatures]{exonsByOverlaps}} method in the
+      more information see the
+      \code{exonsByOverlaps} method in the
       \code{GenomicFeatures} package. The functionality is to some
       extent similar and redundant to the \code{exons} method in
       combination with \code{\link{GRangesFilter}} filter.

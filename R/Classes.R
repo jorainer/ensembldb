@@ -22,7 +22,7 @@ setClass("EnsDb",
 #'     \code{EnsDb} object.
 #'
 #' @note For users of \code{ensembldb} version < 2.0: in the
-#'     \code{\link[AnnotationFilter]{GRangesFilter}} from the
+#'     \code{GRangesFilter} from the
 #'     \code{AnnotationFilter} package the \code{condition} parameter was
 #'     renamed to \code{type} (to be consistent with the \code{IRanges} package)
 #'     . In addition, the \code{condition = "overlapping"} is no longer
@@ -104,12 +104,12 @@ setClass("EnsDb",
 #'
 #' \item{GRangesFilter}{
 #'     Allows to fetch features within or overlapping specified genomic region(s)/
-#'     range(s). This filter takes a \code{\link[GenomicRanges]{GRanges}} object
+#'     range(s). This filter takes a \code{GRanges} object
 #'     as input and, if \code{type = "any"} (the default) will restrict
 #'     results to features (genes, transcripts or exons) that are partially
 #'     overlapping the region. Alternatively, by specifying
 #'     \code{condition = "within"} it will return features located within the
-#'     range. In addition, the \code{\link[AnnotationFilter]{GRangesFilter}}
+#'     range. In addition, the \code{GRangesFilter}
 #'     supports \code{condition = "start"}, \code{condition = "end"} and
 #'     \code{condition = "equal"} filtering for features with the same start or
 #'     end coordinate or that are equal to the \code{GRanges}.
@@ -195,15 +195,15 @@ setClass("EnsDb",
 #'
 #' @param condition \code{character(1)} specifying the \emph{condition} of the
 #'     filter. For \code{character}-based filters (such as
-#'     \code{\link[AnnotationFilter]{GeneIdFilter}}) \code{"=="}, \code{"!="},
+#'     \code{GeneIdFilter}) \code{"=="}, \code{"!="},
 #'     \code{"startsWith"} and \code{"endsWith"} are supported. Allowed values
 #'     for \code{integer}-based filters (such as
-#'     \code{\link[AnnotationFilter]{GeneStartFilter}}) are \code{"=="},
+#'     \code{GeneStartFilter}) are \code{"=="},
 #'     \code{"!="}, \code{"<"}. \code{"<="}, \code{">"} and \code{">="}.
 #' 
 #' @param value The value(s) for the filter. For
-#'     \code{\link[AnnotationFilter]{GRangesFilter}} it has to be a
-#'     \code{\link[GenomicRanges]{GRanges}} object.
+#'     \code{GRangesFilter} it has to be a
+#'     \code{GRanges} object.
 #' 
 #' @note Protein annotation based filters can only be used if the
 #'     \code{\linkS4class{EnsDb}} database contains protein annotations, i.e.
@@ -221,8 +221,8 @@ setClass("EnsDb",
 #'     list all Uniprot database names respectively mapping method types from
 #'     the database.
 #'
-#'     \code{\link[AnnotationFilter]{GeneIdFilter}} for more details on the
-#'     filter objects.
+#'     \code{GeneIdFilter} in the \code{AnnotationFilter} package for more
+#'     details on the filter objects.
 #'
 #'     \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
 #'     \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.

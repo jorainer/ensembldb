@@ -72,7 +72,7 @@
     What should \code{mapIds} do when there are multiple values that
     could be returned? Options are: \code{"first"} (default), \code{"list"},
     \code{"filter"}, \code{"asNA"}. See
-    \code{\link[AnnotationDbi]{mapIds}} 
+    \code{mapIds} in the \code{AnnotationDbi} package  
     for a detailed description.
   }
 

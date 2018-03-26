@@ -15,7 +15,7 @@ NULL
 #> NULL
 
 #' @description \code{GeneidFilter} creates a \code{GeneIdFilter}. Use
-#' \code{\link[AnnotationFilter]{GeneIdFilter}} instead.
+#' \code{GeneIdFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 GeneidFilter <- function(value, condition = "==") {
@@ -33,7 +33,7 @@ GeneidFilter <- function(value, condition = "==") {
 }
 
 #' @description \code{GenebiotypeFilter} creates a \code{GeneBiotypeFilter}. Use
-#' \code{\link[AnnotationFilter]{GeneBiotypeFilter}} instead.
+#' \code{GeneBiotypeFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 GenebiotypeFilter <- function(value, condition = "=="){
@@ -45,7 +45,7 @@ GenebiotypeFilter <- function(value, condition = "=="){
 }
 
 #' @description \code{EntrezidFilter} creates a \code{EntrezFilter}. Use
-#' \code{\link[AnnotationFilter]{EntrezFilter}} instead.
+#' \code{EntrezFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 EntrezidFilter <- function(value, condition = "=="){
@@ -57,7 +57,7 @@ EntrezidFilter <- function(value, condition = "=="){
 }
 
 #' @description \code{TxidFilter} creates a \code{TxIdFilter}. Use
-#' \code{\link[AnnotationFilter]{TxIdFilter}} instead.
+#' \code{TxIdFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 TxidFilter <- function(value, condition = "=="){
@@ -69,7 +69,7 @@ TxidFilter <- function(value, condition = "=="){
 }
 
 #' @description \code{TxbiotypeFilter} creates a \code{TxBiotypeFilter}. Use
-#' \code{\link[AnnotationFilter]{TxBiotypeFilter}} instead.
+#' \code{TxBiotypeFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 TxbiotypeFilter <- function(value, condition="=="){
@@ -81,7 +81,7 @@ TxbiotypeFilter <- function(value, condition="=="){
 }
 
 #' @description \code{ExonidFilter} creates a \code{ExonIdFilter}. Use
-#' \code{\link[AnnotationFilter]{ExonIdFilter}} instead.
+#' \code{ExonIdFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 ExonidFilter <- function(value, condition="=="){
@@ -93,7 +93,7 @@ ExonidFilter <- function(value, condition="=="){
 }
 
 #' @description \code{ExonrankFilter} creates a \code{ExonRankFilter}. Use
-#' \code{\link[AnnotationFilter]{ExonRankFilter}} instead.
+#' \code{ExonRankFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 ExonrankFilter <- function(value, condition="=="){
@@ -105,7 +105,7 @@ ExonrankFilter <- function(value, condition="=="){
 }
 
 #' @description \code{SeqNameFilter} creates a \code{SeqNameFilter}. Use
-#' \code{\link[AnnotationFilter]{SeqNameFilter}} instead.
+#' \code{SeqNameFilter} from the \code{AnnotationFilter} package instead.
 #' 
 #' @rdname Deprecated
 SeqnameFilter <- function(value, condition="=="){
@@ -117,7 +117,7 @@ SeqnameFilter <- function(value, condition="=="){
 }
 
 #' @description \code{SeqstrandFilter} creates a \code{SeqStrandFilter}. Use
-#' \code{\link[AnnotationFilter]{SeqStrandFilter}} instead.
+#' \code{SeqStrandFilter} from the \code{AnnotationFilter} instead.
 #' 
 #' @rdname Deprecated
 SeqstrandFilter <- function(value, condition="=="){
@@ -141,11 +141,12 @@ SeqstrandFilter <- function(value, condition="=="){
                field = "seq_strand"))
 }
 
-#' @description \code{SeqstartFilter} creates a \code{GeneStartFilter},
-#' \code{TxStartFilter} or \code{ExonStartFilter} depending on the value of the
-#' parameter \code{feature}. Use \code{\link[AnnotationFilter]{GeneStartFilter}},
-#' \code{\link[AnnotationFilter]{TxStartFilter}} and
-#' \code{\link[AnnotationFilter]{ExonStartFilter}} instead.
+#' @description
+#'
+#' \code{SeqstartFilter} creates a \code{GeneStartFilter}, \code{TxStartFilter}
+#' or \code{ExonStartFilter} depending on the value of the parameter
+#' \code{feature}. Use \code{GeneStartFilter}, \code{TxStartFilter} and
+#' \code{ExonStartFilter} instead.
 #'
 #' @param feature For \code{SeqstartFilter} and \code{SeqendFilter}: on what type
 #' of feature should the filter be applied? Supported are \code{"gene"},
@@ -163,11 +164,12 @@ SeqstartFilter <- function(value, condition=">", feature="gene"){
                field = paste0(feature, "_start")))
 }
 
-#' @description \code{SeqendFilter} creates a \code{GeneEndFilter},
-#' \code{TxEndFilter} or \code{ExonEndFilter} depending on the value of the
-#' parameter \code{feature}. Use \code{\link[AnnotationFilter]{GeneEndFilter}},
-#' \code{\link[AnnotationFilter]{TxEndFilter}} and
-#' \code{\link[AnnotationFilter]{ExonEndFilter}} instead.
+#' @description
+#'
+#' \code{SeqendFilter} creates a \code{GeneEndFilter}, \code{TxEndFilter}
+#' or \code{ExonEndFilter} depending on the value of the parameter
+#' \code{feature}. Use \code{GeneEndFilter}, \code{TxEndFilter} and
+#' \code{ExonEndFilter} instead.
 #'
 #' @rdname Deprecated
 SeqendFilter <- function(value, condition="<", feature="gene"){

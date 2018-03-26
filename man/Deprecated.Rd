@@ -52,41 +52,39 @@ All functions, methods and classes listed on this page are
 deprecated and might be removed in future releases.
 
 \code{GeneidFilter} creates a \code{GeneIdFilter}. Use
-\code{\link[AnnotationFilter]{GeneIdFilter}} instead.
+\code{GeneIdFilter} from the \code{AnnotationFilter} package instead.
 
 \code{GenebiotypeFilter} creates a \code{GeneBiotypeFilter}. Use
-\code{\link[AnnotationFilter]{GeneBiotypeFilter}} instead.
+\code{GeneBiotypeFilter} from the \code{AnnotationFilter} package instead.
 
 \code{EntrezidFilter} creates a \code{EntrezFilter}. Use
-\code{\link[AnnotationFilter]{EntrezFilter}} instead.
+\code{EntrezFilter} from the \code{AnnotationFilter} package instead.
 
 \code{TxidFilter} creates a \code{TxIdFilter}. Use
-\code{\link[AnnotationFilter]{TxIdFilter}} instead.
+\code{TxIdFilter} from the \code{AnnotationFilter} package instead.
 
 \code{TxbiotypeFilter} creates a \code{TxBiotypeFilter}. Use
-\code{\link[AnnotationFilter]{TxBiotypeFilter}} instead.
+\code{TxBiotypeFilter} from the \code{AnnotationFilter} package instead.
 
 \code{ExonidFilter} creates a \code{ExonIdFilter}. Use
-\code{\link[AnnotationFilter]{ExonIdFilter}} instead.
+\code{ExonIdFilter} from the \code{AnnotationFilter} package instead.
 
 \code{ExonrankFilter} creates a \code{ExonRankFilter}. Use
-\code{\link[AnnotationFilter]{ExonRankFilter}} instead.
+\code{ExonRankFilter} from the \code{AnnotationFilter} package instead.
 
 \code{SeqNameFilter} creates a \code{SeqNameFilter}. Use
-\code{\link[AnnotationFilter]{SeqNameFilter}} instead.
+\code{SeqNameFilter} from the \code{AnnotationFilter} package instead.
 
 \code{SeqstrandFilter} creates a \code{SeqStrandFilter}. Use
-\code{\link[AnnotationFilter]{SeqStrandFilter}} instead.
+\code{SeqStrandFilter} from the \code{AnnotationFilter} instead.
 
-\code{SeqstartFilter} creates a \code{GeneStartFilter},
-\code{TxStartFilter} or \code{ExonStartFilter} depending on the value of the
-parameter \code{feature}. Use \code{\link[AnnotationFilter]{GeneStartFilter}},
-\code{\link[AnnotationFilter]{TxStartFilter}} and
-\code{\link[AnnotationFilter]{ExonStartFilter}} instead.
+\code{SeqstartFilter} creates a \code{GeneStartFilter}, \code{TxStartFilter}
+or \code{ExonStartFilter} depending on the value of the parameter
+\code{feature}. Use \code{GeneStartFilter}, \code{TxStartFilter} and
+\code{ExonStartFilter} instead.
 
-\code{SeqendFilter} creates a \code{GeneEndFilter},
-\code{TxEndFilter} or \code{ExonEndFilter} depending on the value of the
-parameter \code{feature}. Use \code{\link[AnnotationFilter]{GeneEndFilter}},
-\code{\link[AnnotationFilter]{TxEndFilter}} and
-\code{\link[AnnotationFilter]{ExonEndFilter}} instead.
+\code{SeqendFilter} creates a \code{GeneEndFilter}, \code{TxEndFilter}
+or \code{ExonEndFilter} depending on the value of the parameter
+\code{feature}. Use \code{GeneEndFilter}, \code{TxEndFilter} and
+\code{ExonEndFilter} instead.
 }
