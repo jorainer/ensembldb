@@ -1455,6 +1455,8 @@ setMethod(
         notThere <- is.na(idx)
         idx <- idx[!notThere]
         colnames(txs)[idx] <- names(needCols)[!notThere]
+        txs <- txs[, !(colnames(txs) %in% c("tx_seq_start", "tx_seq_end",
+                                            "seq_name"))]
         ## now processing the 5utr
         fUtr <- fiveUTRsByTranscript(x, filter = filter, columns=needCols)
         if(length(fUtr) > 0){
@@ -1510,6 +1512,9 @@ setMethod(
                 txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
             }
         }
+        ## If there are any txs, they are noncoding...
+        if (nrow(txs))
+            txs$feature <- "utr"
         if(length(fUtr) > 0){
             txs <- rbind(txs, fUtr)
         }

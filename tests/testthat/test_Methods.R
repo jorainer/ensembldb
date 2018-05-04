@@ -521,7 +521,8 @@ test_that("disjointExons works", {
 
 test_that("getGeneRegionTrackForGviz works", {
     res <- getGeneRegionTrackForGviz(edb, filter = GenenameFilter("ZBTB16"))
-    expect_true(all(res$feature %in% c("protein_coding", "utr5", "utr3")))
+    expect_true(all(res$feature %in%
+                    c("protein_coding", "utr5", "utr3", "utr")))
     ## Do the same without a filter:
     res2 <- getGeneRegionTrackForGviz(edb, chromosome = "11", start = 114059593,
                                       end = 114250676)
