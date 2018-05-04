@@ -1449,16 +1449,18 @@ setMethod(
                              "feature", "gene", "exon", "exon_rank", "transcript",
                              "symbol")
         txs <- transcripts(x, filter = filter,
-                           columns = needCols, return.type="data.frame")
+                           columns = needCols, return.type = "data.frame")
         ## Rename columns
         idx <- match(needCols, colnames(txs))
         notThere <- is.na(idx)
         idx <- idx[!notThere]
         colnames(txs)[idx] <- names(needCols)[!notThere]
+        txs <- txs[, !(colnames(txs) %in% c("tx_seq_start", "tx_seq_end",
+                                            "seq_name"))]
         ## now processing the 5utr
-        fUtr <- fiveUTRsByTranscript(x, filter = filter, columns=needCols)
+        fUtr <- fiveUTRsByTranscript(x, filter = filter, columns = needCols)
         if(length(fUtr) > 0){
-            fUtr <- as(unlist(fUtr, use.names=FALSE), "data.frame")
+            fUtr <- as(unlist(fUtr, use.names = FALSE), "data.frame")
             fUtr <- fUtr[, !(colnames(fUtr) %in% c("width", "seq_name",
                                                    "exon_seq_start",
                                                    "exon_seq_end", "strand"))]
@@ -1475,7 +1477,7 @@ setMethod(
         }
         tUtr <- threeUTRsByTranscript(x, filter = filter, columns=needCols)
         if(length(tUtr) > 0){
-            tUtr <- as(unlist(tUtr, use.names=FALSE), "data.frame")
+            tUtr <- as(unlist(tUtr, use.names = FALSE), "data.frame")
             tUtr <- tUtr[, !(colnames(tUtr) %in% c("width", "seq_name",
                                                    "exon_seq_start",
                                                    "exon_seq_end", "strand"))]
@@ -1510,6 +1512,9 @@ setMethod(
                 txs <- txs[!(txs$transcript %in% cds$transcript), , drop=FALSE]
             }
         }
+        ## If there are any txs, they are noncoding...
+        if (nrow(txs))
+            txs$feature <- "utr"
         if(length(fUtr) > 0){
             txs <- rbind(txs, fUtr)
         }
