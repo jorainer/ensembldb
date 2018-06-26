@@ -38,7 +38,7 @@ setClass("EnsDb",
 #'     filter based on the Ensembl gene ID.
 #' }
 #'
-#' \item{GenenameFilter}{
+#' \item{GeneNameFilter}{
 #'     filter based on the name of the gene as provided by Ensembl. In most cases
 #'     this will correspond to the official gene symbol.
 #' }
@@ -258,7 +258,7 @@ setClass("EnsDb",
 #' 
 #' ## Retrieve all transcripts for the above gene
 #' gn <- genes(edb, filter = grf)
-#' txs <- transcripts(edb, filter = GenenameFilter(gn$gene_name))
+#' txs <- transcripts(edb, filter = GeneNameFilter(gn$gene_name))
 #' ## Next we simply plot their start and end coordinates.
 #' plot(3, 3, pch=NA, xlim=c(start(gn), end(gn)), ylim=c(0, length(txs)),
 #' yaxt="n", ylab="")
@@ -287,7 +287,7 @@ setClass("EnsDb",
 #' 
 #' 
 #' ## Get all transcripts for the gene SKA2
-#' transcripts(edb, filter = GenenameFilter("SKA2"))
+#' transcripts(edb, filter = GeneNameFilter("SKA2"))
 #' 
 #' ## Which is the same as using a SymbolFilter
 #' transcripts(edb, filter = SymbolFilter("SKA2"))

@@ -9,9 +9,10 @@ test_that("orderDataFrameBy works", {
 })
 
 test_that("addFilterColumns works for AnnotationFilterList", {
-    afl <- AnnotationFilterList(GenenameFilter(2), SymbolFilter(23))
+    afl <- AnnotationFilterList(GeneNameFilter(2), SymbolFilter(23))
     afl2 <- AnnotationFilterList(SeqNameFilter(4), afl)
-    res <- ensembldb:::addFilterColumns(cols = "gene_biotype", filter = afl, edb)
+    res <- ensembldb:::addFilterColumns(cols = "gene_biotype",
+                                        filter = afl, edb)
     expect_equal(res, c("gene_biotype", "gene_name", "symbol"))
     res <- ensembldb:::addFilterColumns(cols = "gene_biotype", filter = afl2,
                                         edb)

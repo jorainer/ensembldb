@@ -1870,7 +1870,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 #' ## Get all proteins from tha database for the gene ZBTB16, if protein
 #' ## annotations are available
 #' if (hasProteinData(edb))
-#'     proteins(edb, filter = GenenameFilter("ZBTB16"))
+#'     proteins(edb, filter = GeneNameFilter("ZBTB16"))
 setMethod("proteins", "EnsDb", function(object,
                                         columns = listColumns(object, "protein"),
                                         filter = AnnotationFilterList(),

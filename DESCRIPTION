@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.5.1
+Version: 2.5.2
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -38,7 +38,7 @@ Depends:
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.31.18),
     GenomicFeatures (>= 1.29.10),
-    AnnotationFilter (>= 1.1.9)
+    AnnotationFilter (>= 1.5.2)
 Suggests:
     BiocStyle,
     knitr,

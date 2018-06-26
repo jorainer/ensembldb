@@ -5,6 +5,7 @@ test_that(".fieldInEnsDb works", {
     expect_equal(unname(ensembldb:::.fieldInEnsDb("entrez")), "entrezid")
     expect_equal(unname(ensembldb:::.fieldInEnsDb("gene_id")), "gene_id")
     expect_equal(unname(ensembldb:::.fieldInEnsDb("genename")), "gene_name")
+    expect_equal(unname(ensembldb:::.fieldInEnsDb("gene_name")), "gene_name")
     expect_equal(unname(ensembldb:::.fieldInEnsDb("seq_name")), "seq_name")
     expect_equal(unname(ensembldb:::.fieldInEnsDb("tx_id")), "tx_id")
     expect_equal(unname(ensembldb:::.fieldInEnsDb("tx_biotype")), "tx_biotype")
@@ -244,21 +245,26 @@ test_that(".AnnottionFilterClassNames works", {
 test_that(".anyIs works", {
     sf <- SymbolFilter("d")
     expect_true(ensembldb:::.anyIs(sf, "SymbolFilter"))
-    expect_false(ensembldb:::.anyIs(GenenameFilter(3), "SymbolFilter"))
+    expect_false(ensembldb:::.anyIs(GeneNameFilter(3), "SymbolFilter"))
 
     flts <- AnnotationFilterList(sf, TxIdFilter("b"))
     expect_true(any(ensembldb:::.anyIs(flts, "SymbolFilter")))
     expect_false(any(ensembldb:::.anyIs(flts, "BLa")))
 
     ## Additional nesting.
-    flts <- AnnotationFilterList(flts, GenenameFilter("2"))
+    flts <- AnnotationFilterList(flts, GeneNameFilter("2"))
     expect_true(any(ensembldb:::.anyIs(flts, "SymbolFilter")))
+    expect_true(any(ensembldb:::.anyIs(flts, "GeneNameFilter")))
+    expect_true(any(ensembldb:::.anyIs(flts, "TxIdFilter")))
+    ## Check if we still have support for GenenameFilter
+    expect_warning(flts <- AnnotationFilterList(flts, GenenameFilter("3")))
     expect_true(any(ensembldb:::.anyIs(flts, "GenenameFilter")))
-    expect_true(any(ensembldb:::.anyIs(flts, "TxIdFilter")))    
 })
 
 test_that(".fieldToClass works", {
     expect_equal(ensembldb:::.fieldToClass("gene_id"), "GeneIdFilter")
+    expect_equal(ensembldb:::.fieldToClass("gene_name"), "GeneNameFilter")
+    expect_equal(ensembldb:::.fieldToClass("genename"), "GenenameFilter")
 })
 
 test_that(".filterFields works", {
@@ -267,6 +273,9 @@ test_that(".filterFields works", {
         expect_true(any(res == "uniprot"))
     }
     expect_true(!any(res == "g_ranges"))
+    expect_true(any(res == "gene_name"))
+    ## Still support for GenenameFilter
+    expect_true(any(res == "genename"))    
 })
 
 test_that(".supportedFilters works", {
@@ -275,4 +284,5 @@ test_that(".supportedFilters works", {
     expect_equal(res[res$filter == "GRangesFilter", "field"], as.character(NA))
     expect_equal(res[res$filter == "ExonIdFilter", "field"], "exon_id")
     expect_equal(res[res$filter == "GenenameFilter", "field"], "genename")
+    expect_equal(res[res$filter == "GeneNameFilter", "field"], "gene_name")
 })

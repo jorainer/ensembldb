@@ -42,13 +42,13 @@ library(EnsDb.Hsapiens.v86)
 edb <- EnsDb.Hsapiens.v86
 
 ## Define a filter
-flt <- AnnotationFilter(~ genename == "BCL2")
+flt <- AnnotationFilter(~ gene_name == "BCL2")
 
 ## Use the method from the AnnotationFilter package:
 convertFilter(flt)
 
 ## Create a combination of filters
-flt_list <- AnnotationFilter(~ genename \%in\% c("BCL2", "BCL2L11") &
+flt_list <- AnnotationFilter(~ gene_name \%in\% c("BCL2", "BCL2L11") &
     tx_biotype == "protein_coding")
 flt_list
 

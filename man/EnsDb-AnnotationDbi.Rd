@@ -198,16 +198,16 @@ maps <- mapIds(edb, keys = c("BCL2", "BCL2L11"), column = "TXID",
                keytype = "GENENAME", multiVals = "list")
 maps
 
-## Perform the same query using a combination of a GenenameFilter and a
+## Perform the same query using a combination of a GeneNameFilter and a
 ## TxBiotypeFilter to just retrieve protein coding transcripts for these
 ## two genes.
-mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+mapIds(edb, keys = list(GeneNameFilter(c("BCL2", "BCL2L11")),
                         TxBiotypeFilter("protein_coding")), column = "TXID",
        multiVals = "list")
 
 ## select:
 ## Retrieve all transcript and gene related information for the above example.
-select(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+select(edb, keys = list(GeneNameFilter(c("BCL2", "BCL2L11")),
                         TxBiotypeFilter("protein_coding")),
        columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE", "TXSEQSTART",
                    "TXSEQEND", "SEQNAME", "SEQSTRAND"))

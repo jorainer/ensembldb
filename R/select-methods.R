@@ -80,7 +80,7 @@ setMethod("keytypes", "EnsDb",
     filters <- c(ENTREZID = "EntrezFilter",
                  GENEID = "GeneIdFilter",
                  GENEBIOTYPE = "GeneBiotypeFilter",
-                 GENENAME = "GenenameFilter",
+                 GENENAME = "GeneNameFilter",
                  TXID = "TxIdFilter",
                  TXBIOTYPE = "TxBiotypeFilter",
                  EXONID = "ExonIdFilter",
@@ -160,7 +160,7 @@ setMethod("keys", "EnsDb",
 ##  left outer join) is crucial, as well as the table with which we start the
 ##  query!
 ##  What if we provide more than one filter?
-##  a) GenenameFilter and ProteinidFilter: doesn't really matter from which table
+##  a) GeneNameFilter and ProteinidFilter: doesn't really matter from which table
 ##     we start, because the query will only return results with protein
 ##     annotions. -> if there is one DNA/RNA related filter: don't do anything.
 ##  b) Only protein filters: start from the highest protein table.
@@ -245,10 +245,10 @@ setMethod("select", "EnsDb",
     ## Order results if length of filters is 1.
     if (length(keys) == 1) {
         ## Define the filters on which we could sort.
-        sortFilts <- c("GenenameFilter", "GeneIdFilter", "EntrezFilter",
-                       "GeneBiotypeFilter", "SymbolFilter", "TxIdFilter",
-                       "TxBiotypeFilter", "ExonIdFilter", "ExonRankFilter",
-                       "SeqNameFilter")
+        sortFilts <- c("GenenameFilter", "GeneNameFilter", "GeneIdFilter",
+                       "EntrezFilter", "GeneBiotypeFilter", "SymbolFilter",
+                       "TxIdFilter", "TxBiotypeFilter", "ExonIdFilter",
+                       "ExonRankFilter", "SeqNameFilter")
         if (class(keys[[1]]) %in% sortFilts) {
             keyvals <- value(keys[[1]])
             ## Handle symlink Filter differently:

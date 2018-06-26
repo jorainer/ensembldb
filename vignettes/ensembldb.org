@@ -137,7 +137,7 @@ The supported filters are:
   database; use the =listGenebiotypes= method to list all available biotypes.
 + =GeneEndFilter=: filter using the chromosomal end coordinate of gene.
 + =GeneIdFilter=: filter based on the Ensembl gene IDs.
-+ =GenenameFilter=: filter based on the names (symbols) of the genes.
++ =GeneNameFilter=: filter based on the names (symbols) of the genes.
 + =GeneStartFilter=: filter using the chromosomal start coordinate of gene.
 + =GRangesFilter=: allows to retrieve all features (genes, transcripts or exons)
   that are either within (setting parameter =type= to "within") or partially
@@ -180,7 +180,7 @@ database column. Such databases support also a =TxSupportLevelFilter= filter to
 use this columns for filtering.
 
 A simple use case for the filter framework would be to get all transcripts for
-the gene /BCL2L11/. To this end we specify a =GenenameFilter= with the value
+the gene /BCL2L11/. To this end we specify a =GeneNameFilter= with the value
 /BCL2L11/. As a result we get a =GRanges= object with =start=, =end=, =strand= and =seqname=
 being the start coordinate, end coordinate, chromosome name and strand for the
 respective transcripts. All additional annotations are available as metadata
@@ -190,7 +190,7 @@ the method would return a =DataFrame= or =data.frame= object instead of the defa
 
 #+NAME: transcripts
 #+BEGIN_SRC R
-  Tx <- transcripts(edb, filter = list(GenenameFilter("BCL2L11")))
+  Tx <- transcripts(edb, filter = list(GeneNameFilter("BCL2L11")))
 
   Tx
 
@@ -209,7 +209,7 @@ retrieved. The =exons= method returns by default all exon-related columns, the
 from the gene table. Note however that in the example above we got also a column
 =gene_name= although this column is not present in the transcript database
 table. By default the methods return also all columns that are used by any of
-the filters submitted with the =filter= argument (thus, because a =GenenameFilter=
+the filters submitted with the =filter= argument (thus, because a =GeneNameFilter=
 was used, the column =gene_name= is also returned). Setting
 =returnFilterColumns(edb) <- FALSE= disables this option and only the columns
 specified by the =columns= parameter are retrieved.
@@ -224,7 +224,7 @@ corresponding to each filter class.
 #+NAME: transcripts-filter-expression
 #+BEGIN_SRC R
   ## Use a filter expression to perform the filtering.
-  transcripts(edb, filter = ~ genename == "ZBTB16")
+  transcripts(edb, filter = ~ gene_name == "ZBTB16")
 
 #+END_SRC
 
@@ -323,7 +323,7 @@ intron is partially overlapping with the region.
   gn
 
   ## Next we retrieve all transcripts for that gene so that we can plot them.
-  txs <- transcripts(edb, filter = GenenameFilter(gn$gene_name))
+  txs <- transcripts(edb, filter = GeneNameFilter(gn$gene_name))
 
 #+END_SRC
 
@@ -385,7 +385,7 @@ methods. In the example below we retrieve =gene_name=, =entrezid= and the
   ## We're going to fetch all genes which names start with BCL.
   BCLs <- genes(edb,
 		columns = c("gene_name", "entrezid", "gene_biotype"),
-		filter = GenenameFilter("BCL", condition = "startsWith"),
+		filter = GeneNameFilter("BCL", condition = "startsWith"),
 		return.type = "DataFrame")
   nrow(BCLs)
   BCLs
@@ -765,7 +765,7 @@ filter expression as a =formula=).
   library(ggbio)
 
   ## Create a plot for all transcripts of the gene SKA2
-  autoplot(edb, ~ genename == "SKA2")
+  autoplot(edb, ~ gene_name == "SKA2")
 
 #+END_SRC
 
@@ -776,7 +776,7 @@ To plot the genomic region and plot genes from both strands we can use a
 #+NAME: pplot-plot-2
 #+BEGIN_SRC R :ravel message = FALSE
   ## Get the chromosomal region in which the gene is encoded
-  ska2 <- genes(edb, filter = ~ genename == "SKA2")
+  ska2 <- genes(edb, filter = ~ gene_name == "SKA2")
   strand(ska2) <- "*"
   autoplot(edb, GRangesFilter(ska2), names.expr = "gene_name")
 
@@ -834,7 +834,7 @@ only the protein coding transcripts for these genes.
 	 columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
 
   ## Use the filtering system of ensembldb
-  select(edb, keys = ~ genename %in% c("BCL2", "BCL2L11") &
+  select(edb, keys = ~ gene_name %in% c("BCL2", "BCL2L11") &
 		  tx_biotype == "protein_coding",
 	 columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
 
@@ -854,7 +854,7 @@ example above.
 	 multiVals = "list")
 
   ## And, just like before, we can use filters to map only to protein coding transcripts.
-  mapIds(edb, keys = list(GenenameFilter(c("BCL2", "BCL2L11")),
+  mapIds(edb, keys = list(GeneNameFilter(c("BCL2", "BCL2L11")),
                           TxBiotypeFilter("protein_coding")), column = "TXID",
 	 multiVals = "list")
 

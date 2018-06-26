@@ -553,14 +553,14 @@ test_that("filter columns are correctly added in methods", {
 test_that("supportedFilters works", {
     res <- ensembldb:::.supportedFilters(edb)
     if (!hasProteinData(edb))
-        expect_equal(nrow(res), 19)
+        expect_equal(nrow(res), 20)
     else 
-        expect_equal(nrow(res), 26)
+        expect_equal(nrow(res), 27)
     res <- supportedFilters(edb)
     if (!hasProteinData(edb))
-        expect_equal(nrow(res), 19)
+        expect_equal(nrow(res), 20)
     else 
-        expect_equal(nrow(res), 26)
+        expect_equal(nrow(res), 27)
 })
 
 ## Here we check if we fetch what we expect from the database.

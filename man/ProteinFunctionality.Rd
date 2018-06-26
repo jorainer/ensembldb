@@ -90,7 +90,7 @@ edb <- EnsDb.Hsapiens.v86
 ## Get all proteins from tha database for the gene ZBTB16, if protein
 ## annotations are available
 if (hasProteinData(edb))
-    proteins(edb, filter = GenenameFilter("ZBTB16"))
+    proteins(edb, filter = GeneNameFilter("ZBTB16"))
 
 ## List the names of all Uniprot databases from which Uniprot IDs are
 ## available in the EnsDb

@@ -104,7 +104,7 @@ or `transcripts` methods.
 
 ```{r  a_transcripts, eval = haveProt }
 ## Get also protein information for ZBTB16 transcripts
-txs <- transcripts(edb, filter = GenenameFilter("ZBTB16"),
+txs <- transcripts(edb, filter = GeneNameFilter("ZBTB16"),
 		   columns = c("protein_id", "uniprot_id", "tx_biotype"))
 txs
  
@@ -151,7 +151,7 @@ listUniprotMappingTypes(edb)
 ## Get all protein_coding transcripts of ZBTB16 along with their protein_id
 ## and Uniprot IDs, restricting to protein_id to uniprot_id mappings based
 ## on "DIRECT" mapping methods.
-txs <- transcripts(edb, filter = list(GenenameFilter("ZBTB16"),
+txs <- transcripts(edb, filter = list(GeneNameFilter("ZBTB16"),
 				      UniprotMappingTypeFilter("DIRECT")),
 		   columns = c("protein_id", "uniprot_id", "uniprot_db"))
 mcols(txs)
@@ -220,13 +220,13 @@ returned by the above call). As we see below, this transcript is targeted for
 non sense mediated mRNA decay.
 
 ```{r  a_2_select_nmd, message = FALSE, eval = haveProt }
-## Call select, this time providing a GenenameFilter.
-select(edb, keys = GenenameFilter("ZBTB16"),
+## Call select, this time providing a GeneNameFilter.
+select(edb, keys = GeneNameFilter("ZBTB16"),
        columns = c("TXBIOTYPE", "UNIPROTID", "PROTEINID"))
  
 ```
 
-Note also that we passed this time a `GenenameFilter` with the `keys` parameter.
+Note also that we passed this time a `GeneMameFilter` with the `keys` parameter.
 
 
 # Retrieve proteins from the database
@@ -242,7 +242,7 @@ In the code chunk below we fetch all protein annotations for the gene *ZBTB16*.
 
 ```{r  b_proteins, message = FALSE, eval = haveProt }
 ## Get all proteins and return them as an AAStringSet
-prts <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+prts <- proteins(edb, filter = GeneNameFilter("ZBTB16"),
 		 return.type = "AAStringSet")
 prts
  
@@ -268,7 +268,7 @@ present in a redundant list of proteins as shown in the code block below.
 
 ```{r  b_proteins_prot_doms, message = FALSE, eval = haveProt }
 ## Get also protein domain annotations in addition to the protein annotations.
-pd <- proteins(edb, filter = GenenameFilter("ZBTB16"),
+pd <- proteins(edb, filter = GeneNameFilter("ZBTB16"),
 	       columns = c("tx_id", listColumns(edb, "protein_domain")),
 	       return.type = "AAStringSet")
 pd

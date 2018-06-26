@@ -8,6 +8,7 @@
     gene_biotype = "gene_biotype",
     gene_id = "gene_id",
     genename = "gene_name",
+    gene_name = "gene_name",
     symbol = "gene_name",
     seq_name = "seq_name",
     seq_strand = "seq_strand",
@@ -38,7 +39,7 @@
 
 ## .supportedFilters <- function(x) {
 ##     flts <- c(
-##         "EntrezFilter", "GeneBiotypeFilter", "GeneIdFilter", "GenenameFilter",
+##         "EntrezFilter", "GeneBiotypeFilter", "GeneIdFilter", "GeneNameFilter",
 ##         "SymbolFilter", "SeqNameFilter", "SeqStrandFilter", "GeneStartFilter",
 ##         "GeneEndFilter", "TxIdFilter", "TxBiotypeFilter", "TxNameFilter",
 ##         "TxStartFilter", "TxEndFilter", "ExonIdFilter", "ExonRankFilter",
@@ -60,10 +61,10 @@
 }
 
 .filterFields <- function(x) {
-    flds <- c("entrez", "gene_biotype", "gene_id", "genename", "symbol",
-              "seq_name", "seq_strand", "gene_start", "gene_end", "tx_id",
-              "tx_biotype", "tx_name", "tx_start", "tx_end", "exon_id",
-              "exon_rank", "exon_start", "exon_end")
+    flds <- c("entrez", "gene_biotype", "gene_id", "gene_name", "genename",
+              "symbol", "seq_name", "seq_strand", "gene_start", "gene_end",
+              "tx_id", "tx_biotype", "tx_name", "tx_start", "tx_end",
+              "exon_id", "exon_rank", "exon_start", "exon_end")
     if (hasProteinData(x))
         flds <- c(flds, "protein_id", "uniprot", "uniprot_db",
                   "uniprot_mapping_type", "prot_dom_id",
