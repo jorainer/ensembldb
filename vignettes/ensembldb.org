@@ -902,7 +902,7 @@ build.
 ** Getting =EnsDb= databases
 
 Some =EnsDb= databases are available as =R= packages from Bioconductor and can be
-simply installed with the =biocLite= function from the =BiocInstaller= package. The
+simply installed with the =install= function from the =BiocManager= package. The
 name of such annotation packages starts with /EnsDb/ followed by the abbreviation
 of the organism and the Ensembl version on which the annotation
 bases. =EnsDb.Hsapiens.v86= provides thus an =EnsDb= database for homo sapiens with
