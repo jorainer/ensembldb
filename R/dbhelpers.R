@@ -7,17 +7,19 @@
 #'     specified with argument \code{x} and returns a corresponding
 #'     \code{\linkS4class{EnsDb}} object.
 #'
-#' @details By providing the connection to a MySQL database, it is possible
-#'     to use MySQL as the database backend and queries will be performed on
-#'     that database. Note however that this requires the package \code{RMySQL}
-#'     to be installed. In addition, the user needs to have access to a MySQL
-#'     server providing already an EnsDb database, or must have write
-#'     privileges on a MySQL server, in which case the \code{\link{useMySQL}}
-#'     method can be used to insert the annotations from an EnsDB package into
-#'     a MySQL database.
+#' @details
+#'
+#' By providing the connection to a MariaDB/MySQL database, it is possible
+#' to use MariaDB/MySQL as the database backend and queries will be performed on
+#' that database. Note however that this requires the package \code{RMariaDB}
+#' to be installed. In addition, the user needs to have access to a MySQL
+#' server providing already an EnsDb database, or must have write
+#' privileges on a MySQL server, in which case the \code{\link{useMySQL}}
+#' method can be used to insert the annotations from an EnsDB package into
+#' a MySQL database.
 #' 
 #' @param x Either a character specifying the \emph{SQLite} database file, or
-#'     a \code{DBIConnection} to e.g. a MySQL database.
+#'     a \code{DBIConnection} to e.g. a MariaDB/MySQL database.
 #' 
 #' @return A \code{\linkS4class{EnsDb}} object.
 #' 
@@ -35,8 +37,9 @@
 #'
 #' ## Third way: connect to a MySQL database
 #' \dontrun{
-#' library(RMySQL)
-#' dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v86")
+#' library(RMariaDB)
+#' dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass,
+#'     host = my_host, dbname = "ensdb_hsapiens_v86")
 #' edb <- EnsDb(dbcon)
 #' }
 EnsDb <- function(x){
@@ -65,9 +68,10 @@ EnsDb <- function(x){
     tables <- dbListTables(con)
     ## read the columns for these tables.
     Tables <- vector(length=length(tables), "list")
-    for(i in 1:length(Tables)){
-        Tables[[ i ]] <- colnames(dbGetQuery(con, paste0("select * from ",
-                                                         tables[ i ], " limit 1")))
+    for (i in 1:length(Tables)) {
+        Tables[[i]] <- colnames(dbGetQuery(con,
+                                           paste0("select * from ",
+                                                  tables[ i ], " limit 1")))
     }
     names(Tables) <- tables
     EDB <- new("EnsDb", ensdb = con, tables = Tables)
@@ -614,7 +618,7 @@ dbHasValidTables <- function(con, returnError = TRUE,
 ##
 ##
 feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
-    if (!inherits(mysql, "MySQLConnection"))
+    if (!inherits(mysql, "MariaDBConnection"))
         stop("'mysql' is supposed to be a connection to a MySQL database.")
     ## Fetch the tables and feed them to MySQL.
     sqlite_con <- dbconn(x)
@@ -645,14 +649,23 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     indexLength <- max(nchar(
         dbGetQuery(sqlite_con, "select distinct gene_id from gene")$gene_id
     ))
-    .createEnsDbIndices(mysql, indexLength = paste0("(", indexLength, ")"),
-                        proteins = hasProteinData(x))
+    .createEnsDbIndices(mysql, mysql = TRUE, proteins = hasProteinData(x))
     if (verbose)
         message("OK")
     return(TRUE)
 }
-## Small helper function to cfeate all the indices.
-.createEnsDbIndices <- function(con, indexLength = "", proteins = FALSE) {
+#' Small helper function to cfeate all the indices.
+#'
+#' @param con database connection.
+#'
+#' @param mysql `logical(1)` indicating whether indices specific for
+#'     MariaDB/MySQL databases should be created.
+#'
+#' @param proteins `logical(1)` whether indices for protein tables should be
+#'     created too.
+#'
+#' @noRd
+.createEnsDbIndices <- function(con, mysql = FALSE, proteins = FALSE) {
     indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
                    gene = "seq_name", tx = "tx_id", tx = "gene_id",
                    exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
@@ -660,31 +673,24 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
         indexCols <- c(indexCols,
                        entrezgene = "gene_id", entrezgene = "entrezid")
     if (proteins) {
-        indexCols <- c(indexCols,
-                       protein = "tx_id",
-                       protein = "protein_id",
-                       uniprot = "protein_id",
-                       uniprot = "uniprot_id",
+        indexCols <- c(indexCols, protein = "tx_id", protein = "protein_id",
+                       uniprot = "protein_id", uniprot = "uniprot_id",
                        protein_domain = "protein_domain_id",
                        protein_domain = "protein_id")
     }
     for (i in 1:length(indexCols)) {
         tabname <- names(indexCols)[i]
         colname <- indexCols[i]
-        ## Check if we've got any values at all. if not we're not creating the
-        ## index.
         ids <- dbGetQuery(con, paste0("select distinct ", colname,
                                       " from ", tabname))[, colname]
-        if (length(ids) == 0 | all(is.na(ids))) {
-            ## No need to make an index here!
-        } else {
-            if (indexLength != "")
-                idxL <- paste0("(", min(c(max(nchar(ids)), 20)), ")")
+        if (length(ids) & !all(is.na(ids))) {
+            if (mysql)
+                idxL <- paste0("(", min(c(min(nchar(ids)), 20)), ")")
             else
                 idxL <- ""
-            aff_rows <- dbExecute(
-                con, paste0("create index ", tabname, "_", colname, "_idx ",
-                            "on ", tabname, " (",colname, idxL,")"))
+            tmp <- dbExecute(
+                con, paste0("create index ", tabname, "_", colname, "_idx on ",
+                            tabname, " (", colname, idxL, ")"))
         }
     }
     ## Add the one on the numeric index:
@@ -695,31 +701,35 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
 ############################################################
 ## listEnsDbs
 ## list databases
-#' @title List EnsDb databases in a MySQL server
+#' @title List EnsDb databases in a MariaDB/MySQL server
 #'
-#' @description The \code{listEnsDbs} function lists EnsDb databases in a
-#'     MySQL server.
+#' @description
 #'
-#' @details The use of this function requires that the \code{RMySQL} package
-#'     is installed and that the user has either access to a MySQL server with
-#'     already installed EnsDb databases, or write access to a MySQL server in
-#'     which case EnsDb databases could be added with the \code{\link{useMySQL}}
-#'     method. EnsDb databases follow the same naming conventions than the EnsDb
-#'     packages, with the exception that the name is all lower case and that
-#'     \code{"."} is replaced by \code{"_"}.
+#' The \code{listEnsDbs} function lists EnsDb databases in a
+#' MariaDB/MySQL server.
+#'
+#' @details
+#'
+#' The use of this function requires the \code{RMariaDB} package
+#' to be installed. In addition user credentials to access a MySQL server
+#' (with already installed EnsDb databases), or with write access are required.
+#' For the latter EnsDb databases can be added with the \code{\link{useMySQL}}
+#' method. EnsDb databases in a MariaDB/MySQL server follow the same naming
+#' conventions than EnsDb packages, with the exception that the name is all
+#' lower case and that each \code{"."} is replaced by \code{"_"}.
 #' 
-#' @param dbcon A \code{DBIConnection} object providing access to a MySQL
-#'     database. Either \code{dbcon} or all of the other arguments have to be
-#'     specified.
+#' @param dbcon A \code{DBIConnection} object providing access to a
+#'     MariaDB/MySQL database. Either \code{dbcon} or all of the other
+#'     arguments have to be specified.
 #' 
 #' @param host Character specifying the host on which the MySQL server is
 #'     running.
 #' 
-#' @param port The port of the MySQL server (usually \code{3306}).
+#' @param port The port of the MariaDB/MySQL server (usually \code{3306}).
 #' 
-#' @param user The username for the MySQL server.
+#' @param user The username for the MariaDB/MySQL server.
 #' 
-#' @param pass The password for the MySQL server.
+#' @param pass The password for the MariaDB/MySQL server.
 #' 
 #' @return A \code{data.frame} listing the database names, organism name
 #'     and Ensembl version of the EnsDb databases found on the server.
@@ -730,18 +740,18 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
 #' 
 #' @examples
 #' \dontrun{
-#' library(RMySQL)
-#' dbcon <- dbConnect(MySQL(), host = "localhost", user = my_user, pass = my_pass)
+#' library(RMariaDB)
+#' dbcon <- dbConnect(MariaDB(), host = "localhost", user = my_user, pass = my_pass)
 #' listEnsDbs(dbcon)
 #' }
 listEnsDbs <- function(dbcon, host, port, user, pass) {
-    if(requireNamespace("RMySQL", quietly = TRUE)) {
+    if(requireNamespace("RMariaDB", quietly = TRUE)) {
         if (missing(dbcon)) {
             if (missing(host) | missing(user) | missing(port) | missing(host))
                 stop("Arguments 'host', 'port', 'user' and 'pass' are required",
                      " if 'dbcon' is not specified.")
-            dbcon <- dbConnect(RMySQL::MySQL(), host = host, port = port, user = user,
-                               pass = pass)
+            dbcon <- dbConnect(RMariaDB::MariaDB(), host = host, port = port,
+                               user = user, pass = pass)
         }
         dbs <- dbGetQuery(dbcon, "show databases;")
         edbs <- dbs[grep(dbs$Database, pattern = "^ensdb_"), "Database"]
@@ -757,7 +767,7 @@ listEnsDbs <- function(dbcon, host, port, user, pass) {
         }
         return(edbTable)
     } else {
-        stop("Required package 'RMySQL' is not installed.")
+        stop("Required package 'RMariaDB' is not installed.")
     }
 }
 

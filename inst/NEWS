@@ -1,3 +1,9 @@
+CHANGES IN VERSION 2.5.5
+------------------------
+
+- Switch from RMySQL to RMariaDB.
+
+
 CHANGES IN VERSION 2.5.2
 ------------------------
 

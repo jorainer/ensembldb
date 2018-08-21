@@ -138,3 +138,4 @@ Other coordinate mapping functions: \code{\link{cdsToTranscript}},
 Johannes Rainer based on initial code from Laurent Gatto and
 Sebastian Gibb
 }
+\concept{coordinate mapping functions}

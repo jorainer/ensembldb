@@ -8,7 +8,7 @@ EnsDb(x)
 }
 \arguments{
 \item{x}{Either a character specifying the \emph{SQLite} database file, or
-a \code{DBIConnection} to e.g. a MySQL database.}
+a \code{DBIConnection} to e.g. a MariaDB/MySQL database.}
 }
 \value{
 A \code{\linkS4class{EnsDb}} object.
@@ -19,14 +19,14 @@ The \code{EnsDb} constructor function connects to the database
     \code{\linkS4class{EnsDb}} object.
 }
 \details{
-By providing the connection to a MySQL database, it is possible
-    to use MySQL as the database backend and queries will be performed on
-    that database. Note however that this requires the package \code{RMySQL}
-    to be installed. In addition, the user needs to have access to a MySQL
-    server providing already an EnsDb database, or must have write
-    privileges on a MySQL server, in which case the \code{\link{useMySQL}}
-    method can be used to insert the annotations from an EnsDB package into
-    a MySQL database.
+By providing the connection to a MariaDB/MySQL database, it is possible
+to use MariaDB/MySQL as the database backend and queries will be performed on
+that database. Note however that this requires the package \code{RMariaDB}
+to be installed. In addition, the user needs to have access to a MySQL
+server providing already an EnsDb database, or must have write
+privileges on a MySQL server, in which case the \code{\link{useMySQL}}
+method can be used to insert the annotations from an EnsDB package into
+a MySQL database.
 }
 \examples{
 ## "Standard" way to create an EnsDb object:
@@ -40,8 +40,9 @@ edb
 
 ## Third way: connect to a MySQL database
 \dontrun{
-library(RMySQL)
-dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass, host = my_host, dbname = "ensdb_hsapiens_v86")
+library(RMariaDB)
+dbcon <- dbConnect(MySQL(), user = my_user, pass = my_pass,
+    host = my_host, dbname = "ensdb_hsapiens_v86")
 edb <- EnsDb(dbcon)
 }
 }

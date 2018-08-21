@@ -66,3 +66,4 @@ Other coordinate mapping functions: \code{\link{genomeToProtein}},
 \author{
 Johannes Rainer
 }
+\concept{coordinate mapping functions}

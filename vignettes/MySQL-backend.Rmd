@@ -6,7 +6,7 @@ output:
   BiocStyle::html_document:
     toc_float: true
 vignette: >
-  %\VignetteIndexEntry{Using a MySQL server backend}
+  %\VignetteIndexEntry{Using a MariaDB/MySQL server backend}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle}
@@ -19,10 +19,10 @@ vignette: >
 a SQLite database backend, i.e. annotations are retrieved from file-based SQLite
 databases that are provided *via* packages, such as the `EnsDb.Hsapiens.v86`
 package. In addition, `ensembldb` allows to switch the backend from SQLite to
-MySQL and thus to retrieve annotations from a MySQL server instead. Such a setup
-might be useful for a lab running a well-configured MySQL server that would
-require installation of EnsDb databases only on the database server and not on
-the individual clients.
+MariaDB/MySQL and thus to retrieve annotations from a MySQL server instead. Such
+a setup might be useful for a lab running a well-configured MySQL server that
+would require installation of EnsDb databases only on the database server and
+not on the individual clients.
 
 **Note** the code in this document is not executed during vignette generation as
 this would require access to a MySQL server.
@@ -55,17 +55,17 @@ MySQL database.
 
 ```{r  eval = FALSE }
 library(ensembldb)
-library(RMySQL)
+library(RMariaDB)
 
 ## Connect to the MySQL database to list the databases.
-dbcon <- dbConnect(MySQL(), host = "localhost", user = "readonly",
+dbcon <- dbConnect(MariaDB(), host = "localhost", user = "readonly",
                    pass = "readonly")
 
 ## List the available databases
 listEnsDbs(dbcon)
 
 ## Connect to one of the databases and use that one.
-dbcon <- dbConnect(MySQL(), host = "localhost", user = "readonly",
+dbcon <- dbConnect(MariaDB(), host = "localhost", user = "readonly",
                    pass = "readonly", dbname = "ensdb_hsapiens_v75")
 edb <- EnsDb(dbcon)
 edb

@@ -94,3 +94,4 @@ Other coordinate mapping functions: \code{\link{cdsToTranscript}},
 \author{
 Johannes Rainer
 }
+\concept{coordinate mapping functions}

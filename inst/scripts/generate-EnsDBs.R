@@ -1,7 +1,7 @@
 ## Functions related to create EnsDbs by downloading and installing MySQL
 ## databases from Ensembl.
 library(RCurl)
-library(RMySQL)
+library(RMariaDB)
 library(ensembldb)
 
 #' @description Get core database names from the specified folder.
@@ -38,16 +38,16 @@ listCoreDbsInFolder <- function(ftp_folder) {
 #' 
 #' @param species The name of the species (e.g. "homo_sapiens").
 #' 
-#' @param user The user name for the MySQL database (write access).
+#' @param user The user name for the MySQL/MariaDB database (write access).
 #' 
-#' @param host The host on which the MySQL database is running.
+#' @param host The host on which the MySQL/MariaDB database is running.
 #' 
-#' @param pass The password for the MySQL database.
+#' @param pass The password for the MySQL/MariaDB database.
 #' 
-#' @param port The port of the MySQL database.
+#' @param port The port of the MySQL/MariaDB database.
 #' 
 #' @param local_tmp Local directory that will be used to temporarily store the
-#'     downloaded MySQL database files.
+#'     downloaded MySQL/MariaDB database files.
 #' 
 #' @param dropDb Whether the Ensembl core database should be deleted once the
 #'     EnsDb has been created.
@@ -125,16 +125,16 @@ createEnsDbForSpecies <- function(ftp_folder,
 #' 
 #' @param species The name of the species (e.g. "homo_sapiens").
 #' 
-#' @param user The user name for the MySQL database (write access).
+#' @param user The user name for the MySQL/MariaDB database (write access).
 #' 
-#' @param host The host on which the MySQL database is running.
+#' @param host The host on which the MySQL/MariaDB database is running.
 #' 
-#' @param pass The password for the MySQL database.
+#' @param pass The password for the MySQL/MariaDB database.
 #' 
-#' @param port The port of the MySQL database.
+#' @param port The port of the MySQL/MariaDB database.
 #' 
 #' @param local_tmp Local directory that will be used to temporarily store the
-#'     downloaded MySQL database files.
+#'     downloaded MySQL/MariaDB database files.
 #' 
 #' @param dropDb Whether the Ensembl core database should be deleted once the
 #'     EnsDb has been created.
@@ -169,9 +169,9 @@ processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
     unlink("*.txt")
     ## (5) Delete the database.
     if (dropDb) {
-        con <- dbConnect(MySQL(), host = host, user = user, pass = pass,
+        con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
                          port = port, dbname = "mysql")
-        res <- dbGetQuery(con, paste("drop database ", db_name))
+        dbSendStatement(con, paste("drop database ", db_name))
         dbDisconnect(con)
     }
 }
@@ -249,9 +249,9 @@ installEnsemblDb <- function(dir, host = "localhost", dbname, user, pass,
     ## Eventually unzip the files...
     tmp <- system(paste0("gunzip ", dir, "/*.gz"))
     ## Create the database
-    con <- dbConnect(MySQL(), host = host, user = user, pass = pass, port = port,
+    con <- dbConnect(MariaDB(), host = host, user = user, pass = pass, port = port,
                      dbname = "mysql")
-    res <- dbGetQuery(con, paste0("create database ", dbname))
+    dbSendStatement(con, paste0("create database ", dbname))
     dbDisconnect(con)
     ## Now create the tables and stuff.
     tmp <- system(paste0("mysql -h ", host, " -u ", user, " --password=", pass,

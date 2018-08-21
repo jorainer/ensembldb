@@ -11,9 +11,9 @@
 \alias{listProteinColumns}
 \title{Protein related functionality}
 \usage{
-\S4method{proteins}{EnsDb}(object, columns = listColumns(object, "protein"),
-  filter = AnnotationFilterList(), order.by = "", order.type = "asc",
-  return.type = "DataFrame")
+\S4method{proteins}{EnsDb}(object, columns = listColumns(object,
+  "protein"), filter = AnnotationFilterList(), order.by = "",
+  order.type = "asc", return.type = "DataFrame")
 
 \S4method{listUniprotDbs}{EnsDb}(object)
 

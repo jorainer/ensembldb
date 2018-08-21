@@ -1702,8 +1702,8 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 ############################################################
 ## useMySQL
 ##
-## Switch from RSQlite backend to a MySQL backend.
-#' @title Use a MySQL backend
+## Switch from RSQlite backend to a MariaDB/MySQL backend.
+#' @title Use a MariaDB/MySQL backend
 #' 
 #' @aliases useMySQL
 #'
@@ -1712,24 +1712,24 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 #'     tries to create and save all of the data into a MySQL database. All
 #'     subsequent calls will connect to the already existing MySQL database.
 #'
-#' @details This functionality requires that the \code{RMySQL} package is
+#' @details This functionality requires that the \code{RMariaDB} package is
 #'     installed and that the user has (write) access to a running MySQL server.
 #'     If the corresponding database does already exist users without write
 #'     access can use this functionality.
 #'
 #' @note At present the function does not evaluate whether the versions
-#'     between the SQLite and MySQL database differ.
+#'     between the SQLite and MariaDB/MySQL database differ.
 #'
 #' @param x The \code{\linkS4class{EnsDb}} object.
 #' 
-#' @param host Character vector specifying the host on which the MySQL
+#' @param host Character vector specifying the host on which the MariaDB/MySQL
 #'     server runs.
 #' 
-#' @param port The port on which the MySQL server can be accessed.
+#' @param port The port on which the MariaDB/MySQL server can be accessed.
 #'
-#' @param user The user name for the MySQL server.
+#' @param user The user name for the MariaDB/MySQL server.
 #'
-#' @param pass The password for the MySQL server.
+#' @param pass The password for the MariaDB/MySQL server.
 #'
 #' @return A \code{\linkS4class{EnsDb}} object providing access to the
 #'      data stored in the MySQL backend.
@@ -1751,10 +1751,10 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
         stop("'user' has to be specified.")
     if (missing(pass))
         stop("'pass' has to be specified.")
-    ## Check if RMySQL package is available.
-    if(requireNamespace("RMySQL", quietly = TRUE)) {
+    ## Check if RMariaDB package is available.
+    if(requireNamespace("RMariaDB", quietly = TRUE)) {
         ## Check if we can connect to MySQL.
-        driva <- dbDriver("MySQL")
+        driva <- dbDriver("MariaDB")
         con <- dbConnect(driva, host = host, user = user, pass = pass,
                          port = port)
         ## Check if database is available.
@@ -1768,7 +1768,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
         if (nrow(dbs) == 0 | !any(dbs$Database == mysqlName)) {
             message("Database not available, trying to create it...",
                     appendLF = FALSE)
-            dbGetQuery(con, paste0("create database ", mysqlName))
+            dbExecute(con, paste0("create database ", mysqlName))
             message("OK")
         }
         dbDisconnect(con)
@@ -1802,7 +1802,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
         }
         return(x)
     } else {
-        stop("Package 'RMySQL' not available.")
+        stop("Package 'RMariaDB' not available.")
     }
 })
 

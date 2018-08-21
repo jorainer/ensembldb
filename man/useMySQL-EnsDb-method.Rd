@@ -4,21 +4,22 @@
 \name{useMySQL,EnsDb-method}
 \alias{useMySQL,EnsDb-method}
 \alias{useMySQL}
-\title{Use a MySQL backend}
+\title{Use a MariaDB/MySQL backend}
 \usage{
-\S4method{useMySQL}{EnsDb}(x, host = "localhost", port = 3306, user, pass)
+\S4method{useMySQL}{EnsDb}(x, host = "localhost", port = 3306, user,
+  pass)
 }
 \arguments{
 \item{x}{The \code{\linkS4class{EnsDb}} object.}
 
-\item{host}{Character vector specifying the host on which the MySQL
+\item{host}{Character vector specifying the host on which the MariaDB/MySQL
 server runs.}
 
-\item{port}{The port on which the MySQL server can be accessed.}
+\item{port}{The port on which the MariaDB/MySQL server can be accessed.}
 
-\item{user}{The user name for the MySQL server.}
+\item{user}{The user name for the MariaDB/MySQL server.}
 
-\item{pass}{The password for the MySQL server.}
+\item{pass}{The password for the MariaDB/MySQL server.}
 }
 \value{
 A \code{\linkS4class{EnsDb}} object providing access to the
@@ -31,14 +32,14 @@ Change the SQL backend from \emph{SQLite} to \emph{MySQL}.
     subsequent calls will connect to the already existing MySQL database.
 }
 \details{
-This functionality requires that the \code{RMySQL} package is
+This functionality requires that the \code{RMariaDB} package is
     installed and that the user has (write) access to a running MySQL server.
     If the corresponding database does already exist users without write
     access can use this functionality.
 }
 \note{
 At present the function does not evaluate whether the versions
-    between the SQLite and MySQL database differ.
+    between the SQLite and MariaDB/MySQL database differ.
 }
 \examples{
 ## Load the EnsDb database (SQLite backend).

@@ -4,7 +4,6 @@
 \name{convertFilter,AnnotationFilter,EnsDb-method}
 \alias{convertFilter,AnnotationFilter,EnsDb-method}
 \alias{convertFilter,AnnotationFilterList,EnsDb-method}
-\alias{convertFilter,AnnotationFilterList,EnsDb-method}
 \title{Convert an AnnotationFilter to a SQL WHERE condition for EnsDb}
 \usage{
 \S4method{convertFilter}{AnnotationFilter,EnsDb}(object, db,
