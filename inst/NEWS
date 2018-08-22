@@ -1,3 +1,10 @@
+CHANGES IN VERSION 2.5.6
+------------------------
+
+- Add additional (integer) ID columns to the tables for the MySQL backend to
+  improve performance.
+
+
 CHANGES IN VERSION 2.5.5
 ------------------------
 

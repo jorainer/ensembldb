@@ -41,7 +41,7 @@ library(EnsDb.Hsapiens.v86)
 ## Call the useMySQL method providing the required credentials to create
 ## databases and inserting data on the MySQL server
 edb_mysql <- useMySQL(EnsDb.Hsapiens.v86, host = "localhost",
-		      user = "userwrite", pass = "userpass")
+                      user = "userwrite", pass = "userpass")
 
 ## Use this EnsDb object
 genes(edb_mysql)
