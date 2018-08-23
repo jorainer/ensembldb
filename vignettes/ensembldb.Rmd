@@ -30,7 +30,7 @@ database, the `ensembldb` package provides also a filter framework allowing to
 retrieve annotations for specific entries like genes encoded on a chromosome
 region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
 databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org0ae2da6) for the database layout and an overview of
+(see Section [11](#org139b93a) for the database layout and an overview of
 available attributes/columns). For more information on the use of the protein
 annotations refer to the *proteins* vignette.
 
@@ -171,7 +171,7 @@ the method would return a `DataFrame` or `data.frame` object instead of the defa
 `GRanges`.
 
 ```{r  transcripts }
-Tx <- transcripts(edb, filter = list(GeneNameFilter("BCL2L11")))
+Tx <- transcripts(edb, filter = GeneNameFilter("BCL2L11"))
 
 Tx
 
@@ -718,7 +718,7 @@ Alternatively, we can also use `ggbio` for plotting. For `ggbio` we can directly
 pass the `EnsDb` object along with optional filters (or as in the example below a
 filter expression as a `formula`).
 
-```{r  pplot-plot, message = FALSE, eval = FALSE}
+```{r  pplot-plot, message = FALSE, eval = FALSE }
 library(ggbio)
 
 ## Create a plot for all transcripts of the gene SKA2
@@ -729,7 +729,7 @@ autoplot(edb, ~ gene_name == "SKA2")
 To plot the genomic region and plot genes from both strands we can use a
 `GRangesFilter`.
 
-```{r  pplot-plot-2, message = FALSE, eval = FALSE}
+```{r  pplot-plot-2, message = FALSE, eval = FALSE }
 ## Get the chromosomal region in which the gene is encoded
 ska2 <- genes(edb, filter = ~ gene_name == "SKA2")
 strand(ska2) <- "*"
@@ -857,12 +857,12 @@ build.
 
 ## Getting `EnsDb` databases
 
-Some `EnsDb` databases are available as `R` packages from Bioconductor and can
-be simply installed with the `install` function from the `BiocManager`
-package. The name of such annotation packages starts with *EnsDb* followed by
-the abbreviation of the organism and the Ensembl version on which the annotation
-bases. `EnsDb.Hsapiens.v86` provides thus an `EnsDb` database for homo sapiens
-with annotations from Ensembl version 86.
+Some `EnsDb` databases are available as `R` packages from Bioconductor and can be
+simply installed with the `install` function from the `BiocManager` package. The
+name of such annotation packages starts with *EnsDb* followed by the abbreviation
+of the organism and the Ensembl version on which the annotation
+bases. `EnsDb.Hsapiens.v86` provides thus an `EnsDb` database for homo sapiens with
+annotations from Ensembl version 86.
 
 Since Bioconductor version 3.5 `EnsDb` databases can also be retrieved directly
 from `AnnotationHub`.
@@ -1051,10 +1051,10 @@ makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
 ```
 
 
-# Database layout<a id="org0ae2da6"></a>
+# Database layout<a id="org139b93a"></a>
 
 The database consists of the following tables and attributes (the layout is also
-shown in Figure [165](#orgf275dcb)). Note that the protein-specific annotations
+shown in Figure [165](#org5531bf3)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 

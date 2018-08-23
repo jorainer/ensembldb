@@ -195,17 +195,38 @@ prefixColumnsKeepOrder <- function(x, columns, clean = TRUE, with.tables) {
     c("uniprot", "protein_domain",
       "on (uniprot.protein_id=protein_domain.protein_id)", "left outer join")
 )
+.MYSQL_JOINS <- rbind(
+    c("gene", "tx", "on (gene.internal_gene_id=tx.internal_gene_id)", "join"),
+    c("gene", "chromosome", "on (gene.internal_chr_id=chromosome.internal_chr_id)",
+      "join"),
+    c("tx", "tx2exon", "on (tx.internal_tx_id=tx2exon.internal_tx_id)", "join"),
+    c("tx2exon", "exon", "on (tx2exon.internal_exon_id=exon.internal_exon_id)",
+      "join"),
+    c("tx", "protein", "on (tx.internal_tx_id=protein.internal_tx_id)",
+      "left outer join"),
+    c("gene", "entrezgene", "on (gene.internal_gene_id=entrezgene.internal_gene_id)",
+      "left outer join"),
+    c("protein", "protein_domain",
+      "on (protein.internal_protein_id=protein_domain.internal_protein_id)",
+      "left outer join"),
+    c("protein", "uniprot", "on (protein.internal_protein_id=uniprot.internal_protein_id)",
+      "left outer join"),
+    c("uniprot", "protein_domain",
+      "on (uniprot.internal_protein_id=protein_domain.internal_protein_id)",
+      "left outer join")
+)
 ## Takes the names of two tables, determines how to join them and returns the
 ## join query row, if found.
-joinTwoTables <- function(a, b) {
-    gotIt <- which((.JOINS2[, 1] %in% a & .JOINS2[, 2] %in% b) |
-                   (.JOINS2[, 2] %in% a & .JOINS2[, 1] %in% b))
-    if (length(gotIt) == 0) {
+joinTwoTables <- function(a, b, mysql = FALSE) {
+    if (mysql) jns <- .MYSQL_JOINS
+    else jns <- .JOINS2
+    gotIt <- which((jns[, 1] %in% a & jns[, 2] %in% b) |
+                   (jns[, 2] %in% a & jns[, 1] %in% b))
+    if (length(gotIt))
+        jns[gotIt[1], ]
+    else
         stop("Table(s) ", paste(a, collapse = ", "), " can not be joined with ",
              paste(b, collapse = ", "), "!")
-    } else {
-        return(.JOINS2[gotIt[1], ])
-    }
 }
 ## x: EnsDb.
 ## tab: tables to join.
@@ -237,9 +258,10 @@ joinQueryOnTables2 <- function(x, tab, join = "suggested", startWith = NULL) {
         tab <- tab[-1]
     }
     Query <- alreadyUsed
+    mysql <- is(dbconn(x), "MariaDBConnection")
     ## Iteratively build the query.
     while (length(tab) > 0) {
-        res <- joinTwoTables(a = alreadyUsed, b = tab)
+        res <- joinTwoTables(a = alreadyUsed, b = tab, mysql = mysql)
         newTab <- res[1:2][!(res[1:2] %in% alreadyUsed)]
         ## Could also use the suggested join which is in element 4.
         Query <- paste(Query, ifelse(join == "suggested", res[4], join),
@@ -756,18 +778,18 @@ feedEnsDb2MySQL2 <- function(x, mysql, verbose = TRUE) {
                                    ")"))
     }
     if (mysql) {
-        dbExecute(con, "create index gn_int_gn_idx on gene (internal_gene_id)")
+        dbExecute(con, "create unique index gn_int_gn_idx on gene (internal_gene_id)")
         dbExecute(con, "create index gn_chr_idx on gene (internal_chr_id)")
-        dbExecute(con, "create index chr_chr_idx on chromosome (internal_chr_id)")
+        dbExecute(con, "create unique index chr_chr_idx on chromosome (internal_chr_id)")
         dbExecute(con, "create index eg_int_gn_idx on entrezgene (internal_gene_id)")
         dbExecute(con, "create index tx_int_gn_idx on tx (internal_gene_id)")
-        dbExecute(con, "create index tx_int_tx_idx on tx (internal_tx_id)")
+        dbExecute(con, "create unique index tx_int_tx_idx on tx (internal_tx_id)")
         dbExecute(con, "create index t2e_int_tx_idx on tx2exon (internal_tx_id)")
         dbExecute(con, "create index t2e_int_ex_idx on tx2exon (internal_exon_id)")
-        dbExecute(con, "create index ex_int_ex_idx on exon (internal_exon_id)")
+        dbExecute(con, "create unique index ex_int_ex_idx on exon (internal_exon_id)")
         if (proteins) {
             dbExecute(con, "create index pr_int_tx_idx on protein (internal_tx_id)")
-            dbExecute(con, "create index pr_int_pr_idx on protein (internal_protein_id)")
+            dbExecute(con, "create unique index pr_int_pr_idx on protein (internal_protein_id)")
             dbExecute(con, "create index up_int_pr_idx on uniprot (internal_protein_id)")
             dbExecute(con, "create index pd_int_pr_idx on protein_domain (internal_protein_id)")
         }

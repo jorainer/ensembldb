@@ -73,6 +73,25 @@ test_that("joinTwoTables works", {
                          b = c("exon", "protein", "tx2exon"))
     expect_equal(sort(res[1:2]), c("tx", "tx2exon"))
     expect_equal(res[3], "on (tx.tx_id=tx2exon.tx_id)")
+    ## MySQL
+    res <- joinTwoTables(a = c("a", "gene"), b = "tx", TRUE)
+    expect_equal(sort(res[1:2]), c("gene", "tx"))
+    expect_equal(res[3], "on (gene.internal_gene_id=tx.internal_gene_id)")
+    res <- joinTwoTables("gene", "chromosome", TRUE)
+    expect_equal(res[3], "on (gene.internal_chr_id=chromosome.internal_chr_id)")
+    res <- joinTwoTables("gene", "tx", TRUE)
+    expect_equal(res[3], "on (gene.internal_gene_id=tx.internal_gene_id)")
+    res <- joinTwoTables("exon", "tx2exon", TRUE)
+    expect_equal(res[3], "on (tx2exon.internal_exon_id=exon.internal_exon_id)")
+    res <- joinTwoTables("tx", "tx2exon", TRUE)
+    expect_equal(res[3], "on (tx.internal_tx_id=tx2exon.internal_tx_id)")
+    res <- joinTwoTables("gene", "entrezgene", TRUE)
+    expect_equal(res[3], "on (gene.internal_gene_id=entrezgene.internal_gene_id)")
+    res <- joinTwoTables("tx", "protein", TRUE)
+    expect_equal(res[3], "on (tx.internal_tx_id=protein.internal_tx_id)")
+    res <- joinTwoTables("uniprot", "protein", TRUE)
+    expect_equal(
+        res[3], "on (protein.internal_protein_id=uniprot.internal_protein_id)")
 })
 
 test_that("joinQueryOnTables2 and joinQueryOnColumns2 work", {

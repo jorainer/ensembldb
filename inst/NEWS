@@ -3,6 +3,8 @@ CHANGES IN VERSION 2.5.6
 
 - Add additional (integer) ID columns to the tables for the MySQL backend to
   improve performance.
+- Use integer primary key columns for join queries in MySQL/MariaDB EnsDb
+  databases.
 
 
 CHANGES IN VERSION 2.5.5

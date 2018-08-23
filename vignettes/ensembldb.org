@@ -190,7 +190,7 @@ the method would return a =DataFrame= or =data.frame= object instead of the defa
 
 #+NAME: transcripts
 #+BEGIN_SRC R
-  Tx <- transcripts(edb, filter = list(GeneNameFilter("BCL2L11")))
+  Tx <- transcripts(edb, filter = GeneNameFilter("BCL2L11"))
 
   Tx
 
