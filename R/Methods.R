@@ -1777,7 +1777,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
                          dbname = mysqlName)
         ## If we've got no tables we try to feed the SQLite database
         if (length(dbListTables(con)) == 0)
-            feedEnsDb2MySQL2(x, mysql = con)
+            feedEnsDb2MySQL(x, mysql = con)
         ## Check if we've got all required tables.
         OK <- dbHasRequiredTables(con)
         if (is.character(OK))

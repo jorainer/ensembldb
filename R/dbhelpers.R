@@ -195,31 +195,10 @@ prefixColumnsKeepOrder <- function(x, columns, clean = TRUE, with.tables) {
     c("uniprot", "protein_domain",
       "on (uniprot.protein_id=protein_domain.protein_id)", "left outer join")
 )
-.MYSQL_JOINS <- rbind(
-    c("gene", "tx", "on (gene.internal_gene_id=tx.internal_gene_id)", "join"),
-    c("gene", "chromosome", "on (gene.internal_chr_id=chromosome.internal_chr_id)",
-      "join"),
-    c("tx", "tx2exon", "on (tx.internal_tx_id=tx2exon.internal_tx_id)", "join"),
-    c("tx2exon", "exon", "on (tx2exon.internal_exon_id=exon.internal_exon_id)",
-      "join"),
-    c("tx", "protein", "on (tx.internal_tx_id=protein.internal_tx_id)",
-      "left outer join"),
-    c("gene", "entrezgene", "on (gene.internal_gene_id=entrezgene.internal_gene_id)",
-      "left outer join"),
-    c("protein", "protein_domain",
-      "on (protein.internal_protein_id=protein_domain.internal_protein_id)",
-      "left outer join"),
-    c("protein", "uniprot", "on (protein.internal_protein_id=uniprot.internal_protein_id)",
-      "left outer join"),
-    c("uniprot", "protein_domain",
-      "on (uniprot.internal_protein_id=protein_domain.internal_protein_id)",
-      "left outer join")
-)
 ## Takes the names of two tables, determines how to join them and returns the
 ## join query row, if found.
 joinTwoTables <- function(a, b, mysql = FALSE) {
-    if (mysql) jns <- .MYSQL_JOINS
-    else jns <- .JOINS2
+    jns <- .JOINS2
     gotIt <- which((jns[, 1] %in% a & jns[, 2] %in% b) |
                    (jns[, 2] %in% a & jns[, 1] %in% b))
     if (length(gotIt))
@@ -647,10 +626,10 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     tabs <- dbListTables(sqlite_con)
     for (the_table in tabs) {
         if (verbose)
-            message("Fetch table ", the_table, "...", appendLF = FALSE)
+            message("Fetch table ", the_table, " ... ", appendLF = FALSE)
         tmp <- dbGetQuery(sqlite_con, paste0("select * from ", the_table, ";"))
         if (verbose)
-            message("OK\nStoring the table in MySQL...", appendLF = FALSE)
+            message("OK\nStoring the table in MySQL ... ", appendLF = FALSE)
         ## Fix tx_cds_seq_start being a character in old databases
         if (any(colnames(tmp) == "tx_cds_seq_start")) {
             suppressWarnings(
@@ -660,87 +639,48 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
                 tmp[, "tx_cds_seq_end"] <- as.integer(tmp[, "tx_cds_seq_end"])
             )
         }
-        dbWriteTable(mysql, tmp, name = the_table, row.names = FALSE)
+        dbWriteTable(mysql, tmp, name = the_table, row.names = FALSE,
+                     field.types = vapply(tmp, .mysql_datatype, character(1)))
         if (verbose)
             message("OK")
     }
     ## Create the indices.
     if (verbose)
         message("Creating indices...", appendLF = FALSE)
-    ## Guess index length on the maximal number of characters of an ID.
-    indexLength <- max(nchar(
-        dbGetQuery(sqlite_con, "select distinct gene_id from gene")$gene_id
-    ))
-    .createEnsDbIndices(mysql, mysql = TRUE, proteins = hasProteinData(x))
+    .createEnsDbIndices(mysql, proteins = hasProteinData(x))
     if (verbose)
         message("OK")
     return(TRUE)
 }
 
-feedEnsDb2MySQL2 <- function(x, mysql, verbose = TRUE) {
-    if (!inherits(mysql, "MariaDBConnection"))
-        stop("'mysql' is supposed to be a connection to a MySQL database.")
-    ## Fetch the tables and feed them to MySQL.
-    sqlite_con <- dbconn(x)
-    ## Manually get tables.
-    if (verbose) message("Processing table 'chromosome' ...")
-    chrs <- dbGetQuery(sqlite_con, "select * from chromosome")
-    chrs$internal_chr_id <- 1:nrow(chrs)
-    dbWriteTable(mysql, chrs, name = "chromosome", row.names = FALSE)
-    if (verbose) message("Processing table 'gene' ...")
-    gn <- dbGetQuery(sqlite_con, "select * from gene;")
-    gn$internal_gene_id <- 1:nrow(gn)
-    gn$internal_chr_id <- match(gn$seq_name, chrs$seq_name)
-    dbWriteTable(mysql, gn, name = "gene", row.names = FALSE)
-    if (verbose) message("Processing table 'tx' ...")
-    tx <- dbGetQuery(sqlite_con, "select * from tx;")
-    tx$internal_tx_id <- 1:nrow(tx)
-    tx$internal_gene_id <- match(tx$gene_id, gn$gene_id)
-    tx$tx_cds_seq_start <- as.integer(tx$tx_cds_seq_start)
-    tx$tx_cds_seq_end <- as.integer(tx$tx_cds_seq_end)
-    dbWriteTable(mysql, tx, name = "tx", row.names = FALSE)
-    if (verbose) message("Processing table 'exon' ...")
-    exn <- dbGetQuery(sqlite_con, "select * from exon;")
-    exn$internal_exon_id <- 1:nrow(exn)
-    dbWriteTable(mysql, exn, name = "exon", row.names = FALSE)
-    if (verbose) message("Processing table 'tx2exon' ...")
-    tx2exn <- dbGetQuery(sqlite_con, "select * from tx2exon;")
-    tx2exn$internal_exon_id <- match(tx2exn$exon_id, exn$exon_id)
-    tx2exn$internal_tx_id <- match(tx2exn$tx_id, tx$tx_id)
-    dbWriteTable(mysql, tx2exn, name = "tx2exon", row.names = FALSE)
-    rm(tx2exn)
-    rm(exn)
-    if (verbose) message("Processing table 'entrezgene' ...")
-    eg <- dbGetQuery(sqlite_con, "select * from entrezgene;")
-    eg$internal_gene_id <- match(eg$gene_id, gn$gene_id)
-    dbWriteTable(mysql, eg, name = "entrezgene", row.names = FALSE)
-    rm(eg)
-    if (hasProteinData(x)) {
-        if (verbose) message("Processing table 'protein' ...")
-        prt <- dbGetQuery(sqlite_con, "select * from protein")
-        prt$internal_tx_id <- match(prt$tx_id, tx$tx_id)
-        prt$internal_protein_id <- 1:nrow(prt)
-        dbWriteTable(mysql, prt, name = "protein", row.names = FALSE)
-        rm(tx)
-        if (verbose) message("Processing table 'uniprot' ...")
-        uprt <- dbGetQuery(sqlite_con, "select * from uniprot")
-        uprt$internal_protein_id <- match(uprt$protein_id, prt$protein_id)
-        dbWriteTable(mysql, uprt, name = "uniprot", row.names = FALSE)
-        if (verbose) message("Processing table 'protein_domain' ...")
-        prtdom <- dbGetQuery(sqlite_con, "select * from protein_domain")
-        prtdom$internal_protein_id <- match(prtdom$protein_id, prt$protein_id)
-        dbWriteTable(mysql, prtdom, name = "protein_domain", row.names = FALSE)
+#' Instead of using the default dbDataType function we define here a more
+#' fine-grained data type definition.
+.mysql_datatype <- function(x) {
+    res <- "TEXT"
+    if (any(is.na(x)) & any(!is.na(x)))
+        x <- x[!is.na(x)]
+    if (is.character(x)) {
+        nc <- max(nchar(x))
+        if (nc < 65535)
+            res <- paste0("VARCHAR(", nc, ")")
+        else res <- "MEDIUMTEXT"
     }
-    if (verbose) message("Processing table 'metadata' ...")
-    mtd <- dbGetQuery(sqlite_con, "select * from metadata")
-    dbWriteTable(mysql, mtd, name = "metadata", row.names = FALSE)
-    ## Create the indices.
-    if (verbose)
-        message("Creating indices...", appendLF = FALSE)
-    .createEnsDbIndices2(mysql, mysql = TRUE, proteins = hasProteinData(x))
-    if (verbose)
-        message("OK")
-    return(TRUE)
+    if (is.logical(x))
+        res <- "TINYINT"
+    if (is.numeric(x)) {
+        if (is.integer(x)) {
+            res <- "INT"
+            if (any(x < -2147483648 | x > 2147483647))
+                res <- "BIGINT"
+            if (all(x > -8388608 & x < 8388607))
+                res <- "MEDIUMINT"
+            if (all(x > -32768 & x < 32767))
+                res <- "SMALLINT"
+            if (all(x > -128 & x < 127))
+                res <- "TINYINT"
+        } else res <- "DOUBLE"
+    }
+    res
 }
 
 #' Small helper function to create all the indices.
@@ -754,89 +694,33 @@ feedEnsDb2MySQL2 <- function(x, mysql, verbose = TRUE) {
 #'     created too.
 #'
 #' @noRd
-.createEnsDbIndices2 <- function(con, mysql = FALSE, proteins = FALSE) {
+.createEnsDbIndices <- function(con, proteins = FALSE) {
     indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
                    gene = "seq_name", tx = "tx_id", tx = "gene_id",
                    exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
+    idxType <- c(chromosome = "unique", gene = "unique", gene = "", gene = "",
+                 tx = "unique", tx = "", exon = "unique", tx2exon = "",
+                 tx2exon = "")
     if (as.numeric(dbSchemaVersion(con)) > 1) {
-        indexCols <- c(indexCols, entrezgene = "gene_id")
-        dbExecute(con, "create index eg_idx on entrezgene (entrezid)")
-    }
-    if (proteins) {
-        indexCols <- c(indexCols, protein = "tx_id", protein = "protein_id",
-                       uniprot = "protein_id", uniprot = "uniprot_id",
-                       protein_domain = "protein_domain_id",
-                       protein_domain = "protein_id")
-    }
-    for (i in 1:length(indexCols)) {
-        tabname <- names(indexCols)[i]
-        colname <- indexCols[i]
-        if (mysql) idx <- "fulltext "
-        else idx <- ""
-        b <- dbExecute(con, paste0("create ",  idx, "index ", tabname, "_",
-                                   colname, "_idx on ", tabname, " (", colname,
-                                   ")"))
-    }
-    if (mysql) {
-        dbExecute(con, "create unique index gn_int_gn_idx on gene (internal_gene_id)")
-        dbExecute(con, "create index gn_chr_idx on gene (internal_chr_id)")
-        dbExecute(con, "create unique index chr_chr_idx on chromosome (internal_chr_id)")
-        dbExecute(con, "create index eg_int_gn_idx on entrezgene (internal_gene_id)")
-        dbExecute(con, "create index tx_int_gn_idx on tx (internal_gene_id)")
-        dbExecute(con, "create unique index tx_int_tx_idx on tx (internal_tx_id)")
-        dbExecute(con, "create index t2e_int_tx_idx on tx2exon (internal_tx_id)")
-        dbExecute(con, "create index t2e_int_ex_idx on tx2exon (internal_exon_id)")
-        dbExecute(con, "create unique index ex_int_ex_idx on exon (internal_exon_id)")
-        if (proteins) {
-            dbExecute(con, "create index pr_int_tx_idx on protein (internal_tx_id)")
-            dbExecute(con, "create unique index pr_int_pr_idx on protein (internal_protein_id)")
-            dbExecute(con, "create index up_int_pr_idx on uniprot (internal_protein_id)")
-            dbExecute(con, "create index pd_int_pr_idx on protein_domain (internal_protein_id)")
-        }
-    }
-    ## Add the one on the numeric index:
-    aff_rows <- dbExecute(con, paste0("create index tx2exon_exon_idx_idx on ",
-                                      "tx2exon (exon_idx);"))
-}
-
-#' Small helper function to create all the indices.
-#'
-#' @param con database connection.
-#'
-#' @param mysql `logical(1)` indicating whether indices specific for
-#'     MariaDB/MySQL databases should be created.
-#'
-#' @param proteins `logical(1)` whether indices for protein tables should be
-#'     created too.
-#'
-#' @noRd
-.createEnsDbIndices <- function(con, mysql = FALSE, proteins = FALSE) {
-    indexCols <- c(chromosome = "seq_name", gene = "gene_id", gene = "gene_name",
-                   gene = "seq_name", tx = "tx_id", tx = "gene_id",
-                   exon = "exon_id", tx2exon = "tx_id", tx2exon = "exon_id")
-    if (as.numeric(dbSchemaVersion(con)) > 1)
         indexCols <- c(indexCols,
                        entrezgene = "gene_id", entrezgene = "entrezid")
+        idxType <- c(idxType, entrezgene = "", entrezgene = "")
+    }
     if (proteins) {
         indexCols <- c(indexCols, protein = "tx_id", protein = "protein_id",
                        uniprot = "protein_id", uniprot = "uniprot_id",
                        protein_domain = "protein_domain_id",
                        protein_domain = "protein_id")
+        idxType <- c(idxType, protein = "", protein = "", uniprot = "",
+                     uniprot = "", protein_domain = "", protein_domain = "")
     }
     for (i in 1:length(indexCols)) {
         tabname <- names(indexCols)[i]
         colname <- indexCols[i]
-        ids <- dbGetQuery(con, paste0("select distinct ", colname,
-                                      " from ", tabname))[, colname]
-        if (length(ids) & !all(is.na(ids))) {
-            if (mysql)
-                idxL <- paste0("(", min(c(min(nchar(ids)), 20)), ")")
-            else
-                idxL <- ""
-            tmp <- dbExecute(
-                con, paste0("create index ", tabname, "_", colname, "_idx on ",
-                            tabname, " (", colname, idxL, ")"))
-        }
+        idx_tp <- idxType[i]
+        tmp <- dbExecute(con, paste0("create ", idx_tp, " index ",
+                                     tabname, "_", colname, "_idx on ",
+                                     tabname, " (", colname, ")"))
     }
     ## Add the one on the numeric index:
     aff_rows <- dbExecute(con, paste0("create index tx2exon_exon_idx_idx on ",

@@ -80,7 +80,7 @@ addFilterColumns <- function(cols, filter = AnnotationFilterList(), edb) {
 ## Convert the SQLite database name (file name) to the corresponding
 ## MySQL database name.
 SQLiteName2MySQL <- function(x) {
-    return(tolower(gsub(x, pattern = ".", replacement = "_", fixed = TRUE)))
+    tolower(gsub(x, pattern = ".", replacement = "_", fixed = TRUE))
 }
 
 

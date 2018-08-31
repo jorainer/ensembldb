@@ -1244,9 +1244,13 @@ compareGenes <- function(x, y){
     cat(paste0( " Gene names: (",same,
                ") identical, (", different, ") different.\n" ))
     ## entrezid
-    same <- length(
-        which(genesX[inboth]$entrezid == genesY[inboth]$entrezid)
-        )
+    funny <- function(z) {
+        if (all(is.na(z))) ""
+        else paste(sort(z))
+    }
+    eidsX <- unlist(lapply(genesX[inboth]$entrezid, funny))
+    eidsY <- unlist(lapply(genesY[inboth]$entrezid, funny))
+    same <- length(which(eidsX == eidsY))
     different <- length(inboth) - same
     if(different > 0 & Ret!="ERROR")
         Ret <- "WARN"
