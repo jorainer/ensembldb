@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.3: * Write the species' scientific name to the Organism metadata
+##                  field.
 ## version 0.3.1: * Add ens_counts.txt with the total counts of genes, tx, exons
 ##                  and proteins for validation that all entries were added to
 ##                  the database.
@@ -28,7 +30,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.2";
+my $script_version = "0.3.3";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
@@ -119,6 +121,8 @@ my $species_ens = $gene_adaptor->db->species;
 ## Determine the taxonomy ID:
 my $taxonomy_id = 0;
 $taxonomy_id = $meta_container->get_taxonomy_id();
+my $common_name = $meta_container->get_common_name();
+my $scientific_name = $meta_container->get_scientific_name();
 
 my $infostring = "# get_gene_transcript_exon_tables.pl version $script_version:\nRetrieve gene models for Ensembl version $ensembl_version, species $species from Ensembl database at host: $host\n";
 
@@ -356,7 +360,7 @@ print INFO "script_version\t$script_version\n";
 print INFO "Creation time\t".localtime()."\n";
 print INFO "ensembl_version\t$ensembl_version\n";
 print INFO "ensembl_host\t$host\n";
-print INFO "Organism\t$species_ens\n";
+print INFO "Organism\t$scientific_name\n";
 print INFO "taxonomy_id\t$taxonomy_id\n";
 print INFO "genome_build\t$coord_system_version\n";
 print INFO "DBSCHEMAVERSION\t2.1\n";
