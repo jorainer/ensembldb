@@ -9,7 +9,7 @@
 }
 
 .abbrevOrganismName <- function(organism){
-  spc <- unlist(strsplit(organism, "_"))
+  spc <- unlist(strsplit(organism, "_|[[:space:]]"))
   ## this assumes a binomial nomenclature has been maintained.
   return(paste0(substr(spc[[1]], 1, 1), spc[[2]]))
 }
@@ -25,7 +25,7 @@
 
 .makeObjectName <- function(pkgName){
   strs <- unlist(strsplit(pkgName, "\\."))
-  paste(c(strs[2:length(strs)],strs[1]), collapse="_")
+  paste(c(strs[2:length(strs)], strs[1]), collapse="_")
 }
 
 
@@ -91,8 +91,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
     if(missing(dbname)){
         dbname <- paste0(
-            "EnsDb.",substring(species, 1, 1),
-            unlist(strsplit(species, split="_"))[ 2 ], ".v",
+            "EnsDb.", .abbrevOrganismName(species), ".v",
             info[ info$name=="ensembl_version", "value" ], ".sqlite")
     }
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
