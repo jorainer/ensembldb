@@ -365,7 +365,9 @@ transcriptToGenome <- function(x, db, id = "name") {
     res <- .tx_to_genome(x, db, id = id)
     not_found <- sum(lengths(res) == 0)
     if (not_found > 0)
-        warning(not_found, " transcript(s) could not be found in the database")
+        warning(not_found, " transcript(s) could either not be found in the ",
+                "database or the specified range is outside the transcript's ",
+                "sequence")
     res
 }
 
@@ -382,9 +384,11 @@ transcriptToGenome <- function(x, db, id = "name") {
     res <- lapply(split(x, f = 1:length(x)), function(z) {
         if (any(names(exns) == names(z))) {
             gen_map <- .to_genome(exns[[names(z)]], z)
-            mcols(gen_map) <- DataFrame(mcols(gen_map), tx_start = start(z),
-                                        tx_end = end(z))
-            gen_map[order(gen_map$exon_rank)]
+            if (length(gen_map)) {
+                mcols(gen_map) <- DataFrame(mcols(gen_map), tx_start = start(z),
+                                            tx_end = end(z))
+                gen_map[order(gen_map$exon_rank)]
+            } else GRanges()
         } else GRanges()
     })
     names(res) <- names(x)

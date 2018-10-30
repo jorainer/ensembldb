@@ -593,9 +593,11 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
                         end(cds_rel) >= start(cds_coords))
     end_exon <- which(start(cds_rel) <= end(cds_coords) &
                       end(cds_rel) >= end(cds_coords))
-    if (length(start_exon) == 0 | length(end_exon) == 0)
-        stop("The within transcript/CDS coordinates are outside the region ",
-             "defined by the provided exons")
+    if (length(start_exon) == 0 | length(end_exon) == 0) {
+        warning("The within transcript/CDS coordinates are outside the region ",
+                "defined by the provided exons", call. = FALSE)
+        return(GRanges())
+    }
     ## Convert within CDS coordinates into within exon coordinates.
     exon_rel_start <- start(cds_coords) + width(cds_rel)[start_exon] -
         cums[start_exon]

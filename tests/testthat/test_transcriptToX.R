@@ -139,6 +139,17 @@ test_that(".tx_to_genome works", {
     expect_equal(end(res[[6]]), 2935479)
     expect_equal(as.character(strand(res[[6]])), "+")
     expect_equal(as.character(seqnames(res[[6]])), "Y")
+
+    ## wrong ID and range outside tx
+    rng <- IRanges(start = c(501, 200, 1), end = c(505, 1200, 5),
+                   names = c("ENST00000486554", "ENST00000486554", "B"))
+    expect_warning(res_2 <- ensembldb:::.tx_to_genome(rng, edbx))
+    a <- res[1]
+    b <- res_2[1]
+    seqlevels(a) <- seqlevels(b)
+    expect_equal(a, b)
+    expect_equal(lengths(res_2), c(ENST00000486554 = 2, ENST00000486554 = 0,
+                                   B = 0))
 })
 
 test_that("transcriptToGenome works", {
@@ -172,6 +183,11 @@ test_that("transcriptToGenome works", {
     expect_true(is(res, "GRangesList"))
     expect_true(length(res) == 1)
     expect_true(length(res[[1]]) == 2)
+
+    x <- IRanges(start = c(256, 2), end = c(265, 12000),
+                 names = c("ENST00000381578", "ENST00000381578"))
+    res <- transcriptToGenome(x, edbx)
+    expect_equal(lengths(res), c(ENST00000381578 = 2, ENST00000381578 = 0))
 })
 
 test_that("transcriptToCds works", {

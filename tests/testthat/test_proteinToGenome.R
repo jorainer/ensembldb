@@ -258,6 +258,11 @@ test_that(".to_genome works", {
     expect_equal(end(res[[1]]), c(17, 25))
     expect_equal(start(res[[2]]), c(11, 16, 21))
     expect_equal(end(res[[2]]), c(12, 17, 22))
+
+    ## outside throws warning not error.
+    c_coords_2 <- IRanges(start = 1, end = 1200)
+    res <- expect_warning(.to_genome(g_coords, c_coords_2))
+    expect_equal(lengths(res), c(0, 0))
     
     ## Check errors.
     expect_error(.to_genome(c_coords, c_coords))
@@ -265,8 +270,8 @@ test_that(".to_genome works", {
                                      end = c(5, 12, 16, 21)),
                         strand = "+")
     c_coords <- IRanges(start = 5, end = 40)
-    expect_error(.to_genome(g_coords, c_coords))
+    expect_warning(.to_genome(g_coords, c_coords))
     c_coords <- IRanges(start = 40, end = 50)
-    expect_error(.to_genome(g_coords, c_coords))
+    expect_warning(.to_genome(g_coords, c_coords))
 })
 
