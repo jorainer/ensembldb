@@ -1,3 +1,4 @@
+.editorconfig
 readme.org
 .git
 ^\.travis\.yml$
