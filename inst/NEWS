@@ -1,3 +1,9 @@
+Changes in version
+
+- transcriptToGenome returns an empty GRanges if the input range is outside
+  of the transcript's sequence instead of throwing an error.
+
+
 Changes in version 2.5.9
 
 - Write the official scientific name into the "Organism" metadata field.
