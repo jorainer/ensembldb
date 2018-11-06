@@ -57,7 +57,8 @@ The available functions and their input and result objects are:
   (within-transcript coordinates can be mapped to several exons and hence
   genomic locations). The returned `GRangesList` has the same length than the
   input `IRanges`, with empty `GRanges` for transcripts that can not be found in
-  the database (and thus can not be mapped to the genome).
+  the database (and thus can not be mapped to the genome) or for `IRanges` that
+  define regions outside of the transcript's sequence.
 
 - `transcriptToProtein`: maps regions within a transcript to the respective
   amino acid residues in the encoded protein's sequence. The function takes an
@@ -559,9 +560,9 @@ rng_gnm <- transcriptToGenome(rng_tx, edbx)
 
 The function returns a `GRangesList` with the `GRanges` in each element
 containing the genomic coordinates to which the positions could be mapped (or an
-empty `GRanges` if the transcript identifier can not be found in the
-database). The length of each `GRanges` depends on the number of exons the
-region in the transcript spans.
+empty `GRanges` if the transcript identifier can not be found in the database or
+the input range is not within the transcript's sequence). The length of each
+`GRanges` depends on the number of exons the region in the transcript spans.
 
 ```{r transcriptToGenome-res-1}
 rng_gnm
