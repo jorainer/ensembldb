@@ -28,7 +28,6 @@
   paste(c(strs[2:length(strs)], strs[1]), collapse="_")
 }
 
-
 ## retrieve Ensembl data
 ## save all files to local folder.
 ## returns the path where files have been saved to.
@@ -63,7 +62,6 @@ fetchTablesFromEnsembl <- function(version, ensemblapi, user="anonymous",
     if(sum(in_files %in% all_files)!=length(in_files))
         stop("Something went wrong! I'm missing some of the txt files the perl script should have generated.")
 }
-
 
 ####
 ##
@@ -252,7 +250,6 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     return(TRUE)
 }
 
-
 ####
 ## the function that creates the annotation package.
 ## ensdb should be a connection to an SQLite database, or a character string...
@@ -309,7 +306,6 @@ makeEnsembldbPackage <- function(ensdb,
                          paste(pkgName,"sqlite",sep="."))
     file.copy(ensdbfile, to=db_path)
 }
-
 
 ####
 ## function to create a EnsDb object (or rather the SQLite database) from
@@ -523,8 +519,6 @@ ensDbFromAH <- function(ah, outfile, path, organism, genomeVersion, version) {
     return(res)
 }
 
-
-
 ####============================================================
 ##
 ##  ensDbFromGff
@@ -678,8 +672,6 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion,
     dbDisconnect(con)
     return(dbname)
 }
-
-
 
 #### build a EnsDb SQLite database from the GRanges.
 ## we can however not get all of the information from the GRanges (yet), for example,
@@ -984,7 +976,6 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     return(dbname)
 }
 
-
 ## helper function that checks that the gene, transcript and exon data in the
 ## EnsDb database is correct (i.e. transcript within gene coordinates, exons within
 ## transcript coordinates, cds within transcript)
@@ -1044,7 +1035,6 @@ checkValidEnsDb <- function(x){
     return(TRUE)
 }
 
-
 ############################################################
 ##' Fetch chromosome sequence lengths from Ensembl.
 ##' @param organism The organism. Has to be in the form "Homo sapiens"
@@ -1070,7 +1060,6 @@ tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames,
     colnames(tmp) <- c("name", "length")
     return(tmp)
 }
-
 
 buildMetadata <- function(organism="", ensemblVersion="", genomeVersion="",
                           host="", sourceFile=""){
@@ -1149,7 +1138,6 @@ compareEnsDbs <- function(x, y){
     }
     return(Messages)
 }
-
 
 compareChromosomes <- function(x, y){
     Ret <- "OK"
@@ -1476,9 +1464,11 @@ isEnsemblFileName <- function(x){
     ## Well, can not think of any other torture... let's assume it's OK.
     return(TRUE)
 }
+
 organismFromGtfFileName <- function(x){
     return(elementFromEnsemblFilename(x, 1))
 }
+
 ####============================================================
 ##  ensemblVersionFromGtfFileName
 ##
@@ -1498,6 +1488,7 @@ ensemblVersionFromGtfFileName <- function(x){
     }
     return(NA)
 }
+
 ####============================================================
 ##  genomeVersionFromGtfFileName
 ##

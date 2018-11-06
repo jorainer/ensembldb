@@ -655,6 +655,8 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
 
 #' Instead of using the default dbDataType function we define here a more
 #' fine-grained data type definition.
+#'
+#' @noRd
 .mysql_datatype <- function(x) {
     res <- "TEXT"
     if (any(is.na(x)) & any(!is.na(x)))
