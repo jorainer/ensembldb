@@ -1,4 +1,4 @@
-Changes in version
+Changes in version 2.6.1
 
 - transcriptToGenome returns an empty GRanges if the input range is outside
   of the transcript's sequence instead of throwing an error.
