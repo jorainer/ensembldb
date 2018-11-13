@@ -1,0 +1,319 @@
+---
+title: "Use cases for coordinate mapping with ensembldb"
+author: "Johannes Rainer, Laurent Gatto and Christian X. Weichenberger"
+graphics: yes
+package: ensembldb
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: >
+  %\VignetteIndexEntry{Use cases for coordinate mapping with ensembldb}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,Gviz}
+bibliography: references.bib
+---
+
+```{r  biocstyle, echo = FALSE, results = "asis", message = FALSE }
+library(BiocStyle)
+BiocStyle::markdown()
+```
+
+This documents describes two use cases for the coordinate system mapping
+functionality of `ensembldb`: mapping of regions within protein sequences to the
+genome and mapping of genomic to protein sequence-relative coordinates. In
+addition, it showcases the advanced filtering capabilities implemented in
+`ensembldb`.
+
+# Query for *helix-loop-helix* transcription factors on chromosome 21
+
+Down syndrome is a genetic disorder characterized by the presence of all or
+parts of a third copy of chromosome 21. It is associated, among other, with
+characteristic facial features and mild to moderate intellectual disability. The
+phenotypes are most likely the result from a gene dosage-dependent increased
+expression of the genes encoded on chromosome 21 [@LanaElola:2011fl]. Compared
+to other gene classes, transcription factors are more likely to have an
+immediate impact, even due to a moderate over-expression (which might be the
+result from gene duplication). One of the largest dimerizing transcription
+factor families is characterized by a *basic helix-loop-helix* domain
+[@Massari:2000um], a protein structural motif facilitating DNA binding.
+
+The example below aims at identifying transcription factors with a basic
+helix-loop-helix domain (Pfam ID PF00010) that are encoded on chromosome 21. To
+this end we first load an R-library providing human annotations from Ensembl
+release 86 and pass the loaded `EnsDb` object along with a filter expression to
+the `genes` method that retrieves the corresponding genes. Filter expressions
+have to be written in the form `~ <field> <condition> <value>` with `<field>`
+representing the database column to be used for the filter. Several such filter
+expressions can be concatenated with standard R logical expressions (such as `&`
+or `|`). To get a list of all available filters and their corresponding fields,
+the `supportedFilters(edb)` function could be used.
+
+```{r load-libs, message = FALSE}
+library(ensembldb)
+library(EnsDb.Hsapiens.v86)
+edb <- EnsDb.Hsapiens.v86
+
+## Retrieve the genes
+gns <- genes(edb, filter = ~ protein_domain_id == "PF00010" & seq_name == "21")
+```
+
+The function returned a `GRanges` object with the genomic position of the genes
+and additional gene-related annotations stored in *metadata* columns.
+
+```{r gene-GRanges}
+gns
+```
+
+Three transcription factors with a helix-loop-helix domain are encoded on
+chromosome 21: *SIM2*, which is a master regulator of neurogenesis and is
+thought to contribute to some specific phenotypes of Down syndrome
+[@Gardiner:2006uj] and the two genes _OLIG1_ and _OLIG2_ for which genetic
+triplication was shown to cause developmental brain defects
+[@Chakrabarti:2010dt]. To visualize the exonic regions encoding the
+helix-loop-helix domain of these genes we next retrieve their transcript models
+and the positions of all Pfam protein domains within the amino acid sequences of
+encoded by these transcripts. We process _SIM2_ separately from _OLIG1_ and
+_OLIG2_ because the latter are encoded in a narrow region on chromosome 21 and
+can thus be visualized easily within the same plot. We extract the transcript
+models for _OLIG1_ and _OLIG2_ that encode the protein domain using the
+`getGeneRegionTrackForGviz` function which returns the data in a format that can
+be directly passed to functions from the `Gviz` Bioconductor package
+[@Hahne:2016ha] for plotting. Since `Gviz` expects UCSC-style chromosome names
+instead of the Ensembl chromosome names (e.g. `chr21` instead of `21`), we
+change the format in which chromosome names are returned by `ensembldb` with the
+`seqlevelsStyle` method. All subsequent queries to the `EnsDb` database will
+return chromosome names in UCSC format.
+
+```{r olig-tx-models, message = FALSE}
+## Change chromosome naming style to UCSC
+seqlevelsStyle(edb) <- "UCSC"
+
+```
+
+```{r edb-subset, message = FALSE, echo = FALSE}
+## Subset the EnsDb to speed up vignette processing
+edb <- filter(edb, filter = ~ seq_name %in% c("chr21", "chr16"))
+```
+
+```{r retrieve-olig-tx-models, message = FALSE}
+## Retrieve the transcript models for OLIG1 and OLIG2 that encode the
+## the protein domain
+txs <- getGeneRegionTrackForGviz(
+    edb, filter = ~ genename %in% c("OLIG1", "OLIG2") &
+             protein_domain_id == "PF00010")
+```
+
+Next we fetch the coordinates of all Pfam protein domains encoded by these
+transcripts with the `proteins` method, asking for columns `"prot_dom_start"`,
+`"prot_dom_end"` and `"protein_domain_id"` to be returned by the function. Note
+that we restrict the results in addition to protein domains defined in Pfam.
+
+```{r olig-prot-doms, message = FALSE}
+pdoms <- proteins(edb, filter = ~ tx_id %in% txs$transcript &
+                           protein_domain_source == "pfam",
+                  columns = c("protein_domain_id", "prot_dom_start",
+                              "prot_dom_end"))
+pdoms
+```
+
+We next map these protein-relative positions to the genome. We define first an
+`IRanges` object with the coordinates and submit this to the `proteinToGenome`
+function for mapping. Besides coordinates, the function requires also the
+respective protein identifiers which we supply as names.
+
+```{r olig-proteinToGenome, message = FALSE}
+pdoms_rng <- IRanges(start = pdoms$prot_dom_start, end = pdoms$prot_dom_end,
+                     names = pdoms$protein_id)
+
+pdoms_gnm <- proteinToGenome(pdoms_rng, edb)
+```
+
+The result is a `list` of `GRanges` objects with the genomic coordinates at
+which the protein domains are encoded, one for each of the input protein
+domains. Additional information such as the protein ID, the encoding transcript
+and the exons of the respective transcript in which the domain is encoded are
+provided as metadata columns.
+
+```{r olig-proteinToGenome-result, message = FALSE}
+pdoms_gnm
+
+```
+
+Column `cds_ok` in the result object indicates whether the length of the CDS of
+the encoding transcript matches the length of the protein sequence. For
+transcripts with unknown 3' and/or 5' CDS ends these will differ. The mapping
+result has to be re-organized before being plotted: `Gviz` expects a single
+`GRanges` object, with specific metadata columns for the grouping of the
+individual genomic regions. This is performed in the code block below.
+
+```{r olig-proteinToGenome-reorganize, message = FALSE}
+## Convert the list to a GRanges with grouping information
+pdoms_gnm_grng <- unlist(GRangesList(pdoms_gnm))
+pdoms_gnm_grng$id <- rep(pdoms$protein_domain_id, lengths(pdoms_gnm))
+pdoms_gnm_grng$grp <- rep(1:nrow(pdoms), lengths(pdoms_gnm))
+
+pdoms_gnm_grng
+```
+
+We next define the individual tracks we want to visualize and plot them with the
+`plotTracks` function from the `Gviz` package.
+
+```{r olig-plot, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 2, fig.cap = "Transcripts of genes OLIG1 and OLIG2 encoding a helix-loop-helix protein domain. Shown are all transcripts of the genes OLIG1 and OLIG2 that encode a protein with a helix-loop-helix protein domain (PF00010). Genomic positions encoding protein domains defined in Pfam are shown in light blue.", fig.pos = "h!"}
+library(Gviz)
+
+## Define the individual tracks:
+## - Ideagram
+ideo_track <- IdeogramTrack(genome = "hg38", chromosome = "chr21")
+## - Genome axis
+gaxis_track <- GenomeAxisTrack()
+## - Transcripts
+gene_track <- GeneRegionTrack(txs, showId = TRUE, just.group = "right",
+                              name = "", geneSymbol = TRUE, size = 0.5)
+## - Protein domains
+pdom_track <- AnnotationTrack(pdoms_gnm_grng, group = pdoms_gnm_grng$grp,
+                              id = pdoms_gnm_grng$id, groupAnnotation = "id",
+                              just.group = "right", shape = "box",
+                              name = "Protein domains", size = 0.5)
+
+## Generate the plot
+plotTracks(list(ideo_track, gaxis_track, gene_track, pdom_track))
+
+```
+
+All transcripts are relatively short with the full coding region being in a
+single exon. Also, both transcripts encode a protein with a single protein
+domain, the helix-loop-helix domain PF00010.
+
+Next we repeat the analysis for _SIM2_ by first fetching all of its transcript
+variants encoding the PF00010 Pfam protein domain from the
+database. Subsequently we retrieve all Pfam protein domains encoded in these
+transcripts.
+
+```{r sim2-fetch, message = FALSE}
+## Fetch all SIM2 transcripts encoding PF00010
+txs <- getGeneRegionTrackForGviz(edb, filter = ~ genename == "SIM2" &
+                                          protein_domain_id == "PF00010")
+## Fetch all Pfam protein domains within these transcripts
+pdoms <- proteins(edb, filter = ~ tx_id %in% txs$transcript &
+                           protein_domain_source == "pfam",
+                  columns = c("protein_domain_id", "prot_dom_start",
+                              "prot_dom_end"))
+
+```
+
+At last we have to map the protein domain coordinates to the genome and prepare
+the data for the plot. Since the code is essentially identical to the one for
+_OLIG1_ and _OLIG2_ it is not displayed.
+
+```{r sim2-plot, message = FALSE, warning = FALSE, fig.align = "center", fig.width = 8, fig.height = 2, fig.cap = "Transcripts of the gene SIM2 encoding a helix-loop-helix domain. Shown are all transcripts of SIM2 encoding a protein with a helix-loop-helix protein domain (PF00010). Genomic positions encoding protein domains defined in Pfam are shown in light blue.", echo = FALSE, fig.pos = "h!"}
+pdoms_rng <- IRanges(start = pdoms$prot_dom_start, end = pdoms$prot_dom_end,
+                     names = pdoms$protein_id)
+pdoms_gnm <- proteinToGenome(pdoms_rng, edb)
+
+## Convert the list to a GRanges with grouping information
+pdoms_gnm_grng <- unlist(GRangesList(pdoms_gnm))
+pdoms_gnm_grng$id <- rep(pdoms$protein_domain_id, lengths(pdoms_gnm))
+pdoms_gnm_grng$grp <- rep(1:nrow(pdoms), lengths(pdoms_gnm))
+
+gene_track <- GeneRegionTrack(txs, showId = TRUE, just.group = "right",
+                              name = "", geneSymbol = TRUE, size = 0.5)
+## - Protein domains
+pdom_track <- AnnotationTrack(pdoms_gnm_grng, group = pdoms_gnm_grng$grp,
+                              id = pdoms_gnm_grng$id, groupAnnotation = "id",
+                              just.group = "right", shape = "box",
+                              name = "Protein domains", size = 0.5)
+
+## Generate the plot
+plotTracks(list(ideo_track, gaxis_track, gene_track, pdom_track))
+
+```
+
+The _SIM2_ transcript encodes a protein with in total 4 protein domains. The
+helix-loop-helix domain PF00010 is encoded in its first exon.
+
+
+# Mapping of genomic coordinates to protein-relative positions
+
+One of the known mutations for human red hair color is located at position
+16:89920138 (dbSNP ID rs1805009) on the human genome (version GRCh38). Below we
+map this genomic coordinate to the respective coordinate within the protein
+sequence encoded at that location using the `genomeToProtein` function. Note
+that we use `"chr16"` as the name of the chromosome, since we changed the
+chromosome naming style to UCSC in the previous example.
+
+```{r ex2-map, message = FALSE, warning = FALSE}
+gnm_pos <- GRanges("chr16", IRanges(89920138, width = 1))
+prt_pos <- genomeToProtein(gnm_pos, edb)
+prt_pos
+```
+
+The genomic position could thus be mapped to the amino acid 294 in each of the 3
+proteins listed above. Using the `select` function we retrieve the official
+symbol of the gene for these 3 proteins.
+
+```{r ex2-select, message = FALSE}
+select(edb, keys = ~ protein_id == names(prt_pos[[1]]), columns = "SYMBOL")
+```
+
+Two proteins are from the _MC1R_ gene and one from _RP11-566K11.2_
+(ENSG00000198211) a gene which exons overlap exons from _MC1R_ as well as exons
+of the more downstream located gene _TUBB3_. To visualize this we first fetch
+transcripts overlapping the genomic position of interest and subsequently all
+additional transcripts within the region defined by the most downstream and
+upstream exons of the transcripts.
+
+```{r ex2-plot, message = FALSE, warning = FALSE, fig.cap = "Transcripts overlapping, or close to, the genomic position of interest. Shown are all transcripts The genomic position of the variant is highlighted in red.", fig.width = 8, fig.height = 4, fig.pos = "h!"}
+## Get transcripts overlapping the genomic position.
+txs <- getGeneRegionTrackForGviz(edb, filter = GRangesFilter(gnm_pos))
+
+## Get all transcripts within the region from the start of the most 5'
+## and end of the most 3' exon.
+all_txs <- getGeneRegionTrackForGviz(
+    edb, filter = GRangesFilter(range(txs), type = "within"))
+
+## Plot the data
+## - Ideogram
+ideo_track <- IdeogramTrack(genome = "hg38", chromosome = "chr16")
+## - Genome axis
+gaxis_track <- GenomeAxisTrack()
+## - Transcripts
+gene_track <- GeneRegionTrack(all_txs, showId = TRUE, just.group = "right",
+                              name = "", geneSymbol = TRUE, size = 0.5)
+## - highlight the region.
+hl_track <- HighlightTrack(list(gaxis_track, gene_track), range = gnm_pos)
+
+## Generate the plot
+plotTracks(list(ideo_track, hl_track))
+
+```
+
+In the plot above we see 4 transcripts for which one exon overlaps the genomic
+position of the variant: two of the gene _MC1R_, one of _RP11-566K11.2_ and one
+of _RP11-566K11.4_, a non-coding gene encoded on the reverse strand. Using the
+`proteins` method we next extract the sequences of the proteins encoded by the 3
+transcripts on the forward strand and determine the amino acid at position 294
+in these. To retrieve the results in a format most suitable for the
+representation of amino acid sequences we specify `return.type = "AAStringSet"`
+in the `proteins` call.
+
+```{r ex2-res, message = FALSE}
+## Get the amino acid sequences for the 3 transcripts
+prt_seq <- proteins(edb, return.type = "AAStringSet",
+                    filter = ~ protein_id == names(prt_pos[[1]]))
+## Extract the amino acid at position 294
+subseq(prt_seq, start = 294, end = 294)
+```
+
+The amino acid at position 294 is for all an aspartic acid ("D") which is in
+agreement with the reference amino acid of mutation Asp294His [@Valverde:1995if]
+described by the dbSNP ID of this example.
+
+
+# Session information
+
+```{r sessionInfo}
+sessionInfo()
+```
+
+# References
