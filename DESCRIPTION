@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.7.1
+Version: 2.7.2
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -67,7 +67,7 @@ Description: The package provides functions to create and use
     their encoding transcripts. Finally, ensembldb provides
     functions to map between genomic, transcript and protein
     coordinates.
-Collate: 
+Collate:
     'Classes.R'
     'Deprecated.R'
     'Generics.R'

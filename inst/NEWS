@@ -1,3 +1,8 @@
+Changes in version 2.7.2
+
+- Add vignette with coordinate mapping use cases
+
+
 Changes in version 2.7.1
 
 - transcriptToGenome returns an empty GRanges if the input range is outside
@@ -73,7 +78,7 @@ Changes in version 2.3.6
 Changes in version 2.3.5
 
 - Fix problem mapping genomic coordinates on named GRanges.
-    
+
 
 Changes in version 2.3.2
 
@@ -103,7 +108,7 @@ Changes in version 2.1.11
 
 - ensDbFromGtf failed to parse header for GTF files with more than one
   white space.
-      
+
 
 Changes in version 2.1.10
 
@@ -115,7 +120,7 @@ Changes in version 2.1.9
 
 - Support for global filters in an EnsDb object.
 - Add filter function.
-    
+
 
 Changes in version 2.1.8
 
@@ -136,7 +141,7 @@ Changes in version 1.99.11
 
 - ensDbFromGtf failed to fetch sequence length for some ensemblgenomes
   versions.
-    
+
 
 Changes in version 1.99.11
 
@@ -522,5 +527,3 @@ Changes in version 0.99.13
 Changes in version 0.99.12
 
 - argument "x" for method organism changed to "object".
-
-
