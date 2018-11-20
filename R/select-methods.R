@@ -371,7 +371,9 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                return(unlist(vals))
            },
            CharacterList={
-               stop("Not yet implemented!")
+               f <- factor(res[, 1], levels=unique(theNames))
+               vals <- splitAsList(res[, 2], f=f)
+               return(vals)
            })
 }
 
