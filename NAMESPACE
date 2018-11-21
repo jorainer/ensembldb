@@ -41,7 +41,8 @@ importFrom("IRanges",
            "IRanges",
            "IRangesList")
 importMethodsFrom("IRanges",
-                  "subsetByOverlaps")
+                  "subsetByOverlaps",
+		  "splitAsList")
 import("GenomicRanges")
 import("GenomicFeatures")
 
