@@ -262,6 +262,11 @@ test_that("mapIds works", {
     expect_equal(names(lis), randordergenes)
     Test <- lapply(lis, function(z){return(z[1])})
     expect_equal(first, unlist(Test))
+    ## o CharacterList
+    clis <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
+                   column = "TXID", multiVals = "CharacterList")
+    expect_true(length(clis) == length(randordergenes))
+    expect_equal(lis, as.list(clis))
     ## o filter
     filt <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                    column = "TXID", multiVals = "filter")

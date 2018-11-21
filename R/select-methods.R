@@ -297,10 +297,6 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                     multiVals = NULL) {
     if (is.null(keys))
         stop("Argument keys has to be provided!")
-    ## if (!(is(keys, "character") | is(keys, "list") |
-    ##       is(keys, "AnnotationFilter")))
-    ##     stop("Argument keys should be a character vector, an object extending",
-    ##          " AnnotationFilter or a list of objects extending AnnotationFilter.")
     if (is.null(column))
         column <- "GENEID"
     ## Have to specify the columns argument. Has to be keytype and column.
@@ -321,20 +317,6 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
         columns <- c(names(mapping)[mapping == cn], column)
         keytype <- NULL
     }
-    ## if(is(keys, "list") | is(keys, "AnnotationFilter")){
-    ##     if(is(keys, "list")){
-    ##         if(length(keys) > 1)
-    ##             warning("Got ", length(keys), " filter objects.",
-    ##                     " Will use the keys of the first for the mapping!")
-    ##         cn <- class(keys[[1]])[1]
-    ##     }else{
-    ##         cn <- class(keys)[1]
-    ##     }
-    ##     ## Use the first element to determine the keytype...
-    ##     mapping <- .keytype2FilterMapping()
-    ##     columns <- c(names(mapping)[mapping == cn], column)
-    ##     keytype <- NULL
-    ## }
     res <- select(x, keys = keys, columns = columns, keytype = keytype)
     if(nrow(res) == 0)
         return(character())
@@ -355,7 +337,6 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                return(vals)
            },
            list={
-               ## vals <- split(res[, 2], f=factor(res[, 1], levels=unique(res[, 1])))
                vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
                return(vals)
            },
@@ -376,6 +357,3 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                return(vals)
            })
 }
-
-
-

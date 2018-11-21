@@ -1,3 +1,8 @@
+Changes in version 2.7.3
+
+- Implement mapIds multiVals = "CharacterList" option (issue #87).
+
+
 Changes in version 2.7.2
 
 - Add vignette with coordinate mapping use cases
