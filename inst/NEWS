@@ -1,3 +1,9 @@
+Changes in version 2.7.4
+
+- Update perl script to add columns tx_id_version and gene_id_version to the
+  transcript and gene database tables.
+
+
 Changes in version 2.7.3
 
 - Implement mapIds multiVals = "CharacterList" option (issue #87).

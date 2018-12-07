@@ -39,7 +39,6 @@ setMethod("formatSeqnamesForQuery", "EnsDb", function(x, sn, ifNotFound){
     dbSst <- dbSeqlevelsStyle(x)
     if(sst == dbSst)
         return(sn)
-    ## Don't like that the genomeStyles is reading the stuff form file.
     map <- getProperty(x, "genomeStyle")
     if(!is(map, "data.frame"))
         map <- genomeStyles(organism(x))
@@ -255,4 +254,3 @@ ucscToEnsMapping <- function(){
     theMap <- c(MT="chrM")
     return(theMap)
 }
-
