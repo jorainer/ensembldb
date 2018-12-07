@@ -11,7 +11,7 @@
 #'
 #' @param with.tables \code{character} specifying the tables that should be
 #'     considered when prefixing the column name.
-#' 
+#'
 #' @noRd
 setMethod("ensDbColumn", "AnnotationFilter",
           function(object, db, with.tables = character()) {
@@ -36,7 +36,7 @@ setMethod("ensDbColumn", "AnnotationFilterList",
 #'
 #' @aliases convertFilter,AnnotationFilter,EnsDb-method
 #'     convertFilter,AnnotationFilterList,EnsDb-method
-#' 
+#'
 #' @description `convertFilter` converts an `AnnotationFilter::AnnotationFilter`
 #'     or `AnnotationFilter::AnnotationFilterList` to an SQL where condition
 #'     for an `EnsDb` database.
@@ -55,11 +55,11 @@ setMethod("ensDbColumn", "AnnotationFilterList",
 #'     database tables that are being queried.
 #'
 #' @return A `character(1)` with the SQL where condition.
-#' 
+#'
 #' @md
 #'
 #' @rdname convertFilter
-#' 
+#'
 #' @author Johannes Rainer
 #'
 #' @examples
@@ -125,7 +125,7 @@ setMethod("ensDbQuery", "AnnotationFilterList",
 
 #' Need an ensDbQuery for SeqNameFilter to support different chromosome naming
 #' styles
-#' 
+#'
 #' @noRd
 setMethod("ensDbQuery", "SeqNameFilter",
           function(object, db, with.tables = character()) {
@@ -179,19 +179,24 @@ setMethod("strand", signature(x="GRangesFilter"),
               as.character(strand(value(x)))
           })
 
-#' @description \code{seqnames}: accessor for the sequence names of the
-#' \code{GRanges} object within a \code{GRangesFilter}
-#' @param x For \code{seqnames}, \code{seqlevels}: a \code{GRangesFilter} object.
-#' 
+#' @description `seqnames`: accessor for the sequence names of the `GRanges`
+#'     object within a `GRangesFilter`.
+#'
+#' @param x For `seqnames`, `seqlevels`: a `GRangesFilter` object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 setMethod("seqnames", signature(x="GRangesFilter"),
           function(x){
               as.character(seqnames(value(x)))
           })
 
-#' @description \code{seqnames}: accessor for the \code{seqlevels} of the
-#' \code{GRanges} object within a \code{GRangesFilter}
-#' 
+#' @description `seqnames`: accessor for the `seqlevels` of the `GRanges`
+#'     object within a `GRangesFilter`.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 setMethod("seqlevels", signature(x="GRangesFilter"),
           function(x){

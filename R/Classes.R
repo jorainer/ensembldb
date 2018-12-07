@@ -12,239 +12,162 @@ setClass("EnsDb",
 
 #' @title Filters supported by ensembldb
 #'
-#' @description \code{ensembldb} supports most of the filters from the
-#'     \code{\link{AnnotationFilter}} package to retrieve specific content from
-#'     \code{\linkS4class{EnsDb}} databases. These filters can be passed to
-#'     the methods such as \code{\link{genes}} with the \code{filter} parameter
-#'     or can be added as a \emph{global} filter to an \code{EnsDb} object
-#'     (see \code{\link{addFilter}} for more details). Use the
-#'     \code{\link{supportedFilters}} to list all filters supported for
-#'     \code{EnsDb} object.
+#' @description
 #'
-#' @note For users of \code{ensembldb} version < 2.0: in the
-#'     \code{GRangesFilter} from the
-#'     \code{AnnotationFilter} package the \code{condition} parameter was
-#'     renamed to \code{type} (to be consistent with the \code{IRanges} package)
-#'     . In addition, the \code{condition = "overlapping"} is no longer
-#'     recognized. To retrieve all features overlapping the range
-#'     \code{type = "any"} has to be used.
-#'     
-#' @details \code{ensembldb} supports the following filters from the
-#' \code{AnnotationFilter} package:
-#' 
-#' \describe{
-#' 
-#' \item{GeneIdFilter}{
-#'     filter based on the Ensembl gene ID.
-#' }
+#' `ensembldb` supports most of the filters from the [AnnotationFilter]
+#' package to retrieve specific content from [EnsDb] databases. These filters
+#' can be passed to the methods such as [genes()] with the `filter` parameter
+#' or can be added as a *global* filter to an `EnsDb` object (see
+#' [addFilter()] for more details). Use [supportedFilters()] to get an
+#' overview of all filters supported by `EnsDb` object.
 #'
-#' \item{GeneNameFilter}{
-#'     filter based on the name of the gene as provided by Ensembl. In most cases
-#'     this will correspond to the official gene symbol.
-#' }
+#' @note
 #'
-#' \item{SymbolFilter}{
-#'     filter based on the gene names. \code{\linkS4class{EnsDb}} objects don't
-#'     have a dedicated \emph{symbol} column, the filtering is hence based on the
-#'     gene names.
-#' }
+#' For users of `ensembldb` version < 2.0: in the `GRangesFilter` from the
+#' `AnnotationFilter` package the `condition` parameter was renamed to `type`
+#' (to be consistent with the `IRanges` package). In addition,
+#' `condition = "overlapping"` is no longer recognized. To retrieve all
+#' features overlapping the range `type = "any"` has to be used.
 #'
-#' \item{GeneBiotype}{
-#'     filter based on the biotype of genes (e.g. \code{"protein_coding"}).
-#' }
+#' @details
 #'
-#' \item{GeneStartFilter}{
-#'     filter based on the genomic start coordinate of genes.
-#' }
-#' 
-#' \item{GeneEndFilter}{
-#'     filter based on the genomic end coordinate of genes.
-#' }
-#' 
-#' \item{EntrezidFilter}{
-#'     filter based on the genes' NCBI Entrezgene ID.
-#' }
-#' 
-#' \item{TxIdFilter}{
-#'     filter based on the Ensembld transcript ID.
-#' }
-#' 
-#' \item{TxNameFilter}{
-#'     filter based on the Ensembld transcript ID; no transcript names are
-#'     provided in \code{\linkS4class{EnsDb}} databases.
-#' }
-#' 
-#' \item{TxBiotypeFilter}{
-#'     filter based on the transcripts' biotype.
-#' }
-#' 
-#' \item{TxStartFilter}{
-#'     filter based on the genomic start coordinate of the transcripts.
-#' }
-#' 
-#' \item{TxEndFilter}{
-#'     filter based on the genonic end coordinates of the transcripts.
-#' }
-#' 
-#' \item{ExonIdFilter}{
-#'     filter based on Ensembl exon IDs.
-#' }
+#' `ensembldb` supports the following filters from the `AnnotationFilter`
+#' package:
 #'
-#' \item{ExonRankFilter}{
-#'     filter based on the index/rank of the exon within the transcrips.
-#' }
+#' - `GeneIdFilter`: filter based on the Ensembl gene ID.
+#' - `GeneNameFilter`: filter based on the name of the gene as provided
+#'   Ensembl. In most cases this will correspond to the official gene symbol.
+#' - `SymbolFilter` filter based on the gene names. `EnsDb` objects don't
+#'   have a dedicated *symbol* column, the filtering is hence based on the
+#'   gene names.
+#' - `GeneBiotype`: filter based on the biotype of genes (e.g.
+#'   `"protein_coding"`).
+#' - `GeneStartFilter`: filter based on the genomic start coordinate of genes.
+#' - `GeneEndFilter`: filter based on the genomic end coordinate of genes.
+#' - `EntrezidFilter`: filter based on the genes' NCBI Entrezgene ID.
+#' - `TxIdFilter`: filter based on the Ensembld transcript ID.
+#' - `TxNameFilter`: filter based on the Ensembld transcript ID; no transcript
+#'   names are provided in `EnsDb` databases.
+#' - `TxBiotypeFilter`: filter based on the transcripts' biotype.
+#' - `TxStartFilter`: filter based on the genomic start coordinate of the
+#'   transcripts.
+#' - `TxEndFilter`: filter based on the genonic end coordinates of the
+#'   transcripts.
+#' - `ExonIdFilter`: filter based on Ensembl exon IDs.
+#' - `ExonRankFilter`: filter based on the index/rank of the exon within the
+#'   transcrips.
+#' - `ExonStartFilter`: filter based on the genomic start coordinates of the
+#'   exons.
+#' - `ExonEndFilter`: filter based on the genomic end coordinates of the exons.
 #'
-#' \item{ExonStartFilter}{
-#'     filter based on the genomic start coordinates of the exons.
-#' }
-#' 
-#' \item{ExonEndFilter}{
-#'     filter based on the genomic end coordinates of the exons.
-#' }
+#' - `GRangesFilter`: Allows to fetch features within or overlapping specified
+#'   genomic region(s)/range(s). This filter takes a `GRanges` object
+#'   as input and, if `type = "any"` (the default) will restrict results to
+#'   features (genes, transcripts or exons) that are partially overlapping the
+#'   region. Alternatively, by specifying `condition = "within"` it will
+#'   return features located within the range. In addition, the `GRangesFilter`
+#'   `condition = "start"`, `condition = "end"` and `condition = "equal"`
+#'   filtering for features with the same start or end coordinate or that are
+#'   equal to the `GRanges`.
 #'
-#' \item{GRangesFilter}{
-#'     Allows to fetch features within or overlapping specified genomic region(s)/
-#'     range(s). This filter takes a \code{GRanges} object
-#'     as input and, if \code{type = "any"} (the default) will restrict
-#'     results to features (genes, transcripts or exons) that are partially
-#'     overlapping the region. Alternatively, by specifying
-#'     \code{condition = "within"} it will return features located within the
-#'     range. In addition, the \code{GRangesFilter}
-#'     supports \code{condition = "start"}, \code{condition = "end"} and
-#'     \code{condition = "equal"} filtering for features with the same start or
-#'     end coordinate or that are equal to the \code{GRanges}.
+#'   Note that the type of feature on which the filter is applied depends on
+#'   the method that is called, i.e. [genes()] will filter on the
+#'   genomic coordinates of genes, [transcripts()] on those of
+#'   transcripts and [exons()] on exon coordinates.
 #'
-#'     Note that the type of feature on which the filter is applied depends on
-#'     the method that is called, i.e. \code{\link{genes}} will filter on the
-#'     genomic coordinates of genes, \code{\link{transcripts}} on those of
-#'     transcripts and \code{\link{exons}} on exon coordinates.
+#'   Calls to the methods [exonsBy()], [cdsBy()] and
+#'   [transcriptsBy()] use the start and end coordinates of the
+#'   feature type specified with argument `by` (i.e. `"gene"`,
+#'   `"transcript"` or `"exon"`) for the filtering.
 #'
-#'     Calls to the methods \code{\link{exonsBy}}, \code{\link{cdsBy}} and
-#'     \code{\link{transcriptsBy}} use the start and end coordinates of the
-#'     feature type specified with argument \code{by} (i.e. \code{"gene"},
-#'     \code{"transcript"} or \code{"exon"}) for the filtering.
+#'   If the specified `GRanges` object defines multiple regions, all
+#'   features within (or overlapping) any of these regions are returned.
 #'
-#'     If the specified \code{GRanges} object defines multiple regions, all
-#'     features within (or overlapping) any of these regions are returned.
+#'   Chromosome names/seqnames can be provided in UCSC format (e.g.
+#'   `"chrX"`) or Ensembl format (e.g. `"X"`); see [seqlevelsStyle()] for
+#'   more information.
 #'
-#'     Chromosome names/seqnames can be provided in UCSC format (e.g.
-#'     \code{"chrX"}) or Ensembl format (e.g. \code{"X"}); see
-#'     \code{\link{seqlevelsStyle}} for more information. 
-#' }
+#' - `SeqNameFilter`: filter based on chromosome names.
+#' - `SeqStrandFilter`: filter based on the chromosome strand. The strand can
+#'   be specified with `value = "+"`, `value = "-"`, `value = -1` or
+#'   `value = 1`.
+#' - `ProteinIdFilter`: filter based on Ensembl protein IDs. This filter is
+#'   only supported if the `EnsDb` provides protein annotations; use the
+#'   [hasProteinData()] method to check.
+#' - `UniprotFilter`: filter based on Uniprot IDs. This filter is only
+#'   supported if the `EnsDb` provides protein annotations; use the
+#'   [hasProteinData()] method to check.
 #'
-#' \item{SeqNameFilter}{
-#'     filter based on chromosome names.
-#' }
+#' In addition, the following filters are defined by `ensembldb`:
 #'
-#' \item{SeqStrandFilter}{
-#'     filter based on the chromosome strand. The strand can be specified with
-#'     \code{value = "+"}, \code{value = "-"}, \code{value = -1} or
-#'     \code{value = 1}.
-#' }
-#' 
-#' \item{ProteinIdFilter}{
-#'     filter based on Ensembl protein IDs. This filter is only supported if the
-#'     \code{\linkS4class{EnsDb}} provides protein annotations; use the
-#'     \code{\link{hasProteinData}} method to evaluate.
-#' }
+#' - `TxSupportLevel`: allows to filter results using the provided transcript
+#'   support level. Support levels for transcripts are defined by Ensembl
+#'   based on the available evidences for a transcript with 1 being the
+#'   highest evidence grade and 5 the lowest level. This filter is only
+#'   supported on `EnsDb` databases with a db schema version higher 2.1.
+#' - `UniprotDbFilter`: allows to filter results based on the specified Uniprot
+#'   database name(s).
+#' - `UniprotMappingTypeFilter`: allows to filter results based on the mapping
+#'   method/type that was used to assign Uniprot IDs to Ensembl protein IDs.
+#' - `ProtDomIdFilter`, `ProteinDomainIdFilter`: allows to retrieve entries
+#'   from the database matching the provided filter criteria based on their
+#'   protein domain ID (*protein_domain_id*).
+#' - `ProteinDomainSourceFilter`: filter results based on the source
+#'   (database/method) defining the protein domain (e.g. `"pfam"`).
+#' - `OnlyCodingTxFilter`: allows to retrieve entries only for protein coding
+#'   transcripts, i.e. transcripts with a CDS. This filter does not take any
+#'   input arguments.
 #'
-#' \item{UniprotFilter}{
-#'     filter based on Uniprot IDs. This filter is only supported if the
-#'     \code{\linkS4class{EnsDb}} provides protein annotations; use the
-#'     \code{\link{hasProteinData}} method to evaluate.
-#' }
+#' @param condition `character(1)` specifying the *condition* of the
+#'     filter. For `character`-based filters (such as
+#'     `GeneIdFilter`) `"=="`, `"!="`, `"startsWith"` and `"endsWith"` are
+#'     supported. Allowed values for `integer`-based filters (such as
+#'     `GeneStartFilter`) are `"=="`, `"!="`, `"<"`. `"<="`, `">"` and `">="`.
 #'
-#' }
+#' @param value The value(s) for the filter. For `GRangesFilter` it has to be a
+#'     `GRanges` object.
 #'
-#' In addition, the following filters are defined by \code{ensembldb}:
-#' \describe{
-#'
-#' \item{TxSupportLevel}{
-#'     allows to filter results using the provided transcript support level.
-#'     Support levels for transcripts are defined by Ensembl based on the
-#'     available evidences for a transcript with 1 being the highest evidence
-#'     grade and 5 the lowest level. This filter is only supported on
-#'     \code{EnsDb} databases with a db schema version higher 2.1.
-#' }
-#' 
-#' \item{UniprotDbFilter}{
-#'     allows to filter results based on the specified Uniprot database name(s).
-#' }
-#' 
-#' \item{UniprotMappingTypeFilter}{
-#'     allows to filter results based on the mapping method/type that was used
-#'     to assign Uniprot IDs to Ensembl protein IDs.
-#' }
-#'
-#' \item{ProtDomIdFilter, ProteinDomainIdFilter}{
-#'     allows to retrieve entries from the database matching the provided filter
-#'     criteria based on their protein domain ID (\emph{protein_domain_id}).
-#' }
-#'
-#' \item{ProteinDomainSourceFilter}{
-#'     filter results based on the source (database/method) defining the protein
-#'     domain (e.g. \code{"pfam"}).
-#' }
-#'
-#' \item{OnlyCodingTxFilter}{
-#'     allows to retrieve entries only for protein coding transcripts, i.e.
-#'     transcripts with a CDS. This filter does not take any input arguments.
-#' }
-#' 
-#' }
-#'
-#' @param condition \code{character(1)} specifying the \emph{condition} of the
-#'     filter. For \code{character}-based filters (such as
-#'     \code{GeneIdFilter}) \code{"=="}, \code{"!="},
-#'     \code{"startsWith"} and \code{"endsWith"} are supported. Allowed values
-#'     for \code{integer}-based filters (such as
-#'     \code{GeneStartFilter}) are \code{"=="},
-#'     \code{"!="}, \code{"<"}. \code{"<="}, \code{">"} and \code{">="}.
-#' 
-#' @param value The value(s) for the filter. For
-#'     \code{GRangesFilter} it has to be a
-#'     \code{GRanges} object.
-#' 
 #' @note Protein annotation based filters can only be used if the
-#'     \code{\linkS4class{EnsDb}} database contains protein annotations, i.e.
-#'     if \code{\link{hasProteinData}} is \code{TRUE}. Also, only protein coding
-#'     transcripts will have protein annotations available, thus, non-coding
-#'     transcripts/genes will not be returned by the queries using protein
-#'     annotation filters.
-#' 
+#'     `EnsDb` database contains protein annotations, i.e. if `hasProteinData`
+#'     is `TRUE`. Also, only protein coding transcripts will have protein
+#'     annotations available, thus, non-coding transcripts/genes will not be
+#'     returned by the queries using protein annotation filters.
+#'
 #' @name Filter-classes
-#' 
+#'
+#' @md
+#'
 #' @seealso
-#' \code{\link{supportedFilters}} to list all filters supported for \code{EnsDb}
-#'     objects.
-#'     \code{\link{listUniprotDbs}} and \code{\link{listUniprotMappingTypes}} to
-#'     list all Uniprot database names respectively mapping method types from
-#'     the database.
 #'
-#'     \code{GeneIdFilter} in the \code{AnnotationFilter} package for more
-#'     details on the filter objects.
+#' [supportedFilters()] to list all filters supported for `EnsDb` objects.
 #'
-#'     \code{\link{genes}}, \code{\link{transcripts}}, \code{\link{exons}},
-#'     \code{\link{listGenebiotypes}}, \code{\link{listTxbiotypes}}.
+#' [listUniprotDbs()] and [listUniprotMappingTypes()] to list all Uniprot
+#' database names respectively mapping method types from the database.
 #'
-#'     \code{\link{addFilter}} for globally adding filters to an \code{EnsDb}
-#'     object.
-#' 
+#' [GeneIdFilter()] in the `AnnotationFilter` package for more details on the
+#' filter objects.
+#'
+#' [genes()], [transcripts()], [exons()], [listGenebiotypes()],
+#' [listTxbiotypes()].
+#'
+#' [addFilter()] and [filter()] for globally adding filters to an `EnsDb`.
+#'
 #' @author Johannes Rainer
+#'
 #' @examples
 #'
 #' ## Create a filter that could be used to retrieve all informations for
 #' ## the respective gene.
 #' gif <- GeneIdFilter("ENSG00000012817")
 #' gif
-#' 
+#'
 #' ## Create a filter for a chromosomal end position of a gene
 #' sef <- GeneEndFilter(10000, condition = ">")
 #' sef
-#' 
+#'
 #' ## For additional examples see the help page of "genes".
-#' 
-#' 
+#'
+#'
 #' ## Example for GRangesFilter:
 #' ## retrieve all genes overlapping the specified region
 #' grf <- GRangesFilter(GRanges("11", ranges = IRanges(114129278, 114129328),
@@ -252,10 +175,10 @@ setClass("EnsDb",
 #' library(EnsDb.Hsapiens.v86)
 #' edb <- EnsDb.Hsapiens.v86
 #' genes(edb, filter = grf)
-#' 
+#'
 #' ## Get also all transcripts overlapping that region.
 #' transcripts(edb, filter = grf)
-#' 
+#'
 #' ## Retrieve all transcripts for the above gene
 #' gn <- genes(edb, filter = grf)
 #' txs <- transcripts(edb, filter = GeneNameFilter(gn$gene_name))
@@ -272,27 +195,27 @@ setClass("EnsDb",
 #' }
 #' ## Thus, we can see that only 4 transcripts of that gene are indeed
 #' ## overlapping the region.
-#' 
-#' 
+#'
+#'
 #' ## No exon is overlapping that region, thus we're not getting anything
 #' exons(edb, filter = grf)
-#' 
-#' 
+#'
+#'
 #' ## Example for ExonRankFilter
 #' ## Extract all exons 1 and (if present) 2 for all genes encoded on the
 #' ## Y chromosome
 #' exons(edb, columns = c("tx_id", "exon_idx"),
 #'       filter=list(SeqNameFilter("Y"),
 #'                   ExonRankFilter(3, condition = "<")))
-#' 
-#' 
+#'
+#'
 #' ## Get all transcripts for the gene SKA2
 #' transcripts(edb, filter = GeneNameFilter("SKA2"))
-#' 
+#'
 #' ## Which is the same as using a SymbolFilter
 #' transcripts(edb, filter = SymbolFilter("SKA2"))
-#' 
-#' 
+#'
+#'
 #' ## Create a ProteinIdFilter:
 #' pf <- ProteinIdFilter("ENSP00000362111")
 #' pf
@@ -348,7 +271,10 @@ setClass("ProtDomIdFilter", contains = "CharacterFilter",
              value = "",
              field = "prot_dom_id"
          ))
-#' @return For \code{ProtDomIdFilter}: A \code{ProtDomIdFilter} object.
+#' @return For `ProtDomIdFilter`: A `ProtDomIdFilter` object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 ProtDomIdFilter <- function(value, condition = "==") {
     new("ProtDomIdFilter", condition = condition,
@@ -361,7 +287,10 @@ setClass("ProteinDomainIdFilter", contains = "CharacterFilter",
              value = "",
              field = "protein_domain_id"
          ))
-#' @return For \code{ProteinDomainIdFilter}: A \code{ProteinDomainIdFilter} object.
+#' @return For `ProteinDomainIdFilter`: A `ProteinDomainIdFilter` object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 ProteinDomainIdFilter <- function(value, condition = "==") {
     new("ProteinDomainIdFilter", condition = condition,
@@ -375,7 +304,11 @@ setClass("ProteinDomainSourceFilter", contains = "CharacterFilter",
              value = "",
              field = "protein_domain_source"
          ))
-#' @return For \code{ProteinDomainSourceFilter}: A \code{ProteinDomainSourceFilter} object.
+#' @return For `ProteinDomainSourceFilter`: A `ProteinDomainSourceFilter`
+#'     object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 ProteinDomainSourceFilter <- function(value, condition = "==") {
     new("ProteinDomainSourceFilter", condition = condition,
@@ -391,7 +324,10 @@ setClass("UniprotDbFilter", contains = "CharacterFilter",
              values = "",
              field = "uniprot_db"
          ))
-#' @return For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
+#' @return For `UniprotDbFilter`: A `UniprotDbFilter` object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 UniprotDbFilter <- function(value, condition = "==") {
     new("UniprotDbFilter", condition = condition,
@@ -407,8 +343,10 @@ setClass("UniprotMappingTypeFilter", contains = "CharacterFilter",
              values = "",
              field = "uniprot_mapping_type"
          ))
-#' @return For \code{UniprotMappingTypeFilter}: A
-#' \code{UniprotMappingTypeFilter} object.
+#' @return For `UniprotMappingTypeFilter`: A `UniprotMappingTypeFilter` object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 UniprotMappingTypeFilter <- function(value, condition = "==") {
     new("UniprotMappingTypeFilter", condition = condition,
@@ -422,8 +360,10 @@ setClass("TxSupportLevelFilter", contains = "IntegerFilter",
              values = 0L,
              field = "tx_support_level"
          ))
-#' @return For \code{TxSupportLevel}: A
-#' \code{TxSupportLevel} object.
+#' @return For `TxSupportLevel`: A `TxSupportLevel` object.
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 TxSupportLevelFilter <- function(value, condition = "==") {
     if (!is.numeric(value))

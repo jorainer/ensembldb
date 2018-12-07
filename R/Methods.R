@@ -436,21 +436,21 @@ setMethod("tablesByDegree", "EnsDb", function(x,
 ## Simply check if the database has required tables protein, uniprot
 ## and protein_domain.
 #' @title Determine whether protein data is available in the database
-#' 
+#'
 #' @aliases hasProteinData
-#' 
+#'
 #' @description Determines whether the \code{\linkS4class{EnsDb}}
 #'     provides protein annotation data.
-#' 
+#'
 #' @param x The \code{\linkS4class{EnsDb}} object.
-#' 
+#'
 #' @return A logical of length one, \code{TRUE} if protein annotations are
 #'     available and \code{FALSE} otherwise.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @seealso \code{\link{listTables}}
-#' 
+#'
 #' @examples
 #' library(EnsDb.Hsapiens.v86)
 #' ## Does this database/package have protein annotations?
@@ -1704,7 +1704,7 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 ##
 ## Switch from RSQlite backend to a MariaDB/MySQL backend.
 #' @title Use a MariaDB/MySQL backend
-#' 
+#'
 #' @aliases useMySQL
 #'
 #' @description Change the SQL backend from \emph{SQLite} to \emph{MySQL}.
@@ -1721,10 +1721,10 @@ setReplaceMethod("orderResultsInR", "EnsDb", function(x, value) {
 #'     between the SQLite and MariaDB/MySQL database differ.
 #'
 #' @param x The \code{\linkS4class{EnsDb}} object.
-#' 
+#'
 #' @param host Character vector specifying the host on which the MariaDB/MySQL
 #'     server runs.
-#' 
+#'
 #' @param port The port on which the MariaDB/MySQL server can be accessed.
 #'
 #' @param user The user name for the MariaDB/MySQL server.
@@ -1812,7 +1812,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 ## If return type is GRanges, make a seqlevel and seqinfo for each protein, i.e.
 ## put each protein on its own sequence.
 #' @title Protein related functionality
-#' 
+#'
 #' @aliases proteins
 #'
 #' @description This help page provides information about most of the
@@ -1828,7 +1828,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 #'     annotations for protein coding transcripts, the \code{\link{genes}} or
 #'     \code{\link{transcripts}} methods have to be used to retrieve annotations
 #'     for non-coding transcripts.
-#' 
+#'
 #' @param object The \code{\linkS4class{EnsDb}} object.
 #'
 #' @param columns For \code{proteins}: character vector defining the columns to
@@ -1860,7 +1860,7 @@ setMethod("useMySQL", "EnsDb", function(x, host = "localhost",
 #'     method on the returned object.
 #'
 #' @rdname ProteinFunctionality
-#' 
+#'
 #' @author Johannes Rainer
 #'
 #' @examples
@@ -1951,10 +1951,10 @@ setMethod("proteins", "EnsDb", function(object,
 ############################################################
 ## listUniprotDbs
 #' @aliases listUniprotDbs
-#' 
+#'
 #' @description The \code{listUniprotDbs} method lists all Uniprot database
 #'     names in the \code{EnsDb}.
-#' 
+#'
 #' @examples
 #'
 #' ## List the names of all Uniprot databases from which Uniprot IDs are
@@ -1973,7 +1973,7 @@ setMethod("listUniprotDbs", "EnsDb", function(object) {
 ############################################################
 ## listUniprotMappingTypes
 #' @aliases listUniprotMappingTypes
-#' 
+#'
 #' @description The \code{listUniprotMappingTypes} method lists all methods
 #'     that were used for the mapping of Uniprot IDs to Ensembl protein IDs.
 #'
@@ -1993,17 +1993,19 @@ setMethod("listUniprotMappingTypes", "EnsDb", function(object) {
     return(res$uniprot_mapping_type)
 })
 
-#' @description \code{supportedFilters} returns a \code{data.frame} with the
+#' @description `supportedFilters` returns a `data.frame` with the
 #'     names of all filters and the corresponding field supported by the
-#'     \code{EnsDb} object.
+#'     `EnsDb` object.
 #'
-#' @param object For \code{supportedFilters}: an \code{EnsDb} object.
+#' @param object For `supportedFilters`: an `EnsDb` object.
 #'
-#' @param ... For \code{supportedFilters}: currently not used.
+#' @param ... For `supportedFilters`: currently not used.
 #'
-#' @return For \code{supportedFilters}: a \code{data.frame} with the names and
+#' @return For `supportedFilters`: a `data.frame` with the names and
 #'     the corresponding field of the supported filter classes.
-#' 
+#'
+#' @md
+#'
 #' @rdname Filter-classes
 setMethod("supportedFilters", "EnsDb", function(object, ...) {
     .supportedFilters(object)
@@ -2033,20 +2035,20 @@ setMethod("supportedFilters", "EnsDb", function(object, ...) {
 #'
 #' @return \code{addFilter} and \code{filter} return an \code{EnsDb} object
 #'     with the specified filter added.
-#' 
+#'
 #'     \code{activeFilter} returns an
 #'     \code{\link[AnnotationFilter]{AnnotationFilterList}} object being the
 #'     active global filter or \code{NA} if no filter was added.
 #'
 #'     \code{dropFilter} returns an \code{EnsDb} object with all eventually
 #'     present global filters removed.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @rdname global-filters
 #'
 #' @seealso \code{\link{Filter-classes}} for a list of all supported filters.
-#' 
+#'
 #' @examples
 #' library(EnsDb.Hsapiens.v86)
 #' edb <- EnsDb.Hsapiens.v86
@@ -2090,9 +2092,8 @@ setMethod("dropFilter", "EnsDb", function(x) {
 #'
 #' @description \code{activeFilter} returns the globally set filter from an
 #'     \code{EnsDb} object.
-#' 
+#'
 #' @rdname global-filters
 setMethod("activeFilter", "EnsDb", function(x) {
     .activeFilter(x)
 })
-

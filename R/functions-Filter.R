@@ -37,21 +37,6 @@
     protein_domain_source = "protein_domain_source"
 )
 
-## .supportedFilters <- function(x) {
-##     flts <- c(
-##         "EntrezFilter", "GeneBiotypeFilter", "GeneIdFilter", "GeneNameFilter",
-##         "SymbolFilter", "SeqNameFilter", "SeqStrandFilter", "GeneStartFilter",
-##         "GeneEndFilter", "TxIdFilter", "TxBiotypeFilter", "TxNameFilter",
-##         "TxStartFilter", "TxEndFilter", "ExonIdFilter", "ExonRankFilter",
-##         "ExonStartFilter", "ExonEndFilter", "GRangesFilter"
-##     )
-##     if (hasProteinData(x))
-##         flts <- c(flts, "ProteinIdFilter", "UniprotFilter", "UniprotDbFilter",
-##                   "UniprotMappingTypeFilter", "ProtDomIdFilter")
-##     if (any(listColumns(x) == "tx_support_level"))
-##         flts <- c(flts, "TxSupportLevelFilter")
-##     return(sort(flts))
-## }
 .supportedFilters <- function(x) {
     flds <- .filterFields(x)
     flts <- c(.fieldToClass(flds), "GRangesFilter")
@@ -168,9 +153,9 @@
 #'
 #' @param x Can be an \code{AnnotationFilter}, an \code{AnnotationFilterList},
 #' a \code{list} or a filter \code{expression}. This should NOT be empty!
-#' 
+#'
 #' @return Returns an \code{AnnotationFilterList} with all filters.
-#' 
+#'
 #' @noRd
 .processFilterParam <- function(x, db) {
     if (missing(db))
