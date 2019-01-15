@@ -6,8 +6,12 @@
 ##
 ##***********************************************************************
 setClass("EnsDb",
-         representation(ensdb="DBIConnection", tables="list", .properties="list"),
-         prototype=list(ensdb=NULL, tables=list(), .properties=list())
+         slots = c(ensdb = "DBIConnection",
+                   tables = "list",
+                   .properties = "list"),
+         prototype = list(ensdb = NULL,
+                          tables = list(),
+                          .properties = list())
          )
 
 #' @title Filters supported by ensembldb
@@ -251,7 +255,8 @@ NULL
 ## That's a special case filter that just returns transcripts
 ## that have tx_cds_seq_start defined (i.e. not NULL).
 #' @rdname Filter-classes
-setClass("OnlyCodingTxFilter", contains = "CharacterFilter",
+setClass("OnlyCodingTxFilter",
+         contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              value = character(),
@@ -265,7 +270,8 @@ OnlyCodingTxFilter <- function() {
 ############################################################
 ## ProtDomIdFilter
 #' @rdname Filter-classes
-setClass("ProtDomIdFilter", contains = "CharacterFilter",
+setClass("ProtDomIdFilter",
+         contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              value = "",
@@ -281,7 +287,8 @@ ProtDomIdFilter <- function(value, condition = "==") {
         value = as.character(value))
 }
 #' @rdname Filter-classes
-setClass("ProteinDomainIdFilter", contains = "CharacterFilter",
+setClass("ProteinDomainIdFilter",
+         contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              value = "",
@@ -298,7 +305,8 @@ ProteinDomainIdFilter <- function(value, condition = "==") {
 }
 
 #' @rdname Filter-classes
-setClass("ProteinDomainSourceFilter", contains = "CharacterFilter",
+setClass("ProteinDomainSourceFilter",
+         contains = "CharacterFilter",
          prototype = list(
              condition = "==",
              value = "",
@@ -318,10 +326,11 @@ ProteinDomainSourceFilter <- function(value, condition = "==") {
 ############################################################
 ## UniprotDbFilter
 #' @rdname Filter-classes
-setClass("UniprotDbFilter", contains = "CharacterFilter",
+setClass("UniprotDbFilter",
+         contains = "CharacterFilter",
          prototype = list(
              condition = "==",
-             values = "",
+             value = "",
              field = "uniprot_db"
          ))
 #' @return For `UniprotDbFilter`: A `UniprotDbFilter` object.
@@ -337,10 +346,11 @@ UniprotDbFilter <- function(value, condition = "==") {
 ############################################################
 ## UniprotMappingTypeFilter
 #' @rdname Filter-classes
-setClass("UniprotMappingTypeFilter", contains = "CharacterFilter",
+setClass("UniprotMappingTypeFilter",
+         contains = "CharacterFilter",
          prototype = list(
              condition = "==",
-             values = "",
+             value = "",
              field = "uniprot_mapping_type"
          ))
 #' @return For `UniprotMappingTypeFilter`: A `UniprotMappingTypeFilter` object.
@@ -354,10 +364,11 @@ UniprotMappingTypeFilter <- function(value, condition = "==") {
 }
 
 #' @rdname Filter-classes
-setClass("TxSupportLevelFilter", contains = "IntegerFilter",
+setClass("TxSupportLevelFilter",
+         contains = "IntegerFilter",
          prototype = list(
              condition = "==",
-             values = 0L,
+             value = 0L,
              field = "tx_support_level"
          ))
 #' @return For `TxSupportLevel`: A `TxSupportLevel` object.
