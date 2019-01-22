@@ -376,8 +376,8 @@ genomeToProtein <- function(x, db) {
     exns <- exonsBy(db, by = "tx",
                     filter = AnnotationFilterList(
                         SeqNameFilter(as.character(unique(seqnames(genome)))),
-                        GeneStartFilter(min(start(genome))),
-                        GeneEndFilter(max(end(genome)))
+                        GeneStartFilter(max(end(genome)), condition = "<="),
+                        GeneEndFilter(min(start(genome)), condition = ">=")
                         ))
     .genome_to_tx_ranges(genome, exns)
 }
