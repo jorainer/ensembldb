@@ -22,12 +22,12 @@
 #'
 #' The function throws a warning and returns an empty `IRanges` object if the
 #' genomic coordinates can not be mapped to a transcript.
-#' 
+#'
 #' @param x `GRanges` object with the genomic coordinates that should be
 #'     mapped.
 #'
 #' @param db `EnsDb` object.
-#' 
+#'
 #' @return
 #'
 #' An `IRangesList` with length equal to `length(x)`. Each element providing
@@ -39,7 +39,7 @@
 #' The ID of the exon and its rank (index of the exon in the transcript) are
 #' provided in the result's `IRanges` metadata columns as well as the genomic
 #' position of `x`.
-#' 
+#'
 #' @md
 #'
 #' @family coordinate mapping functions
@@ -113,7 +113,7 @@ genomeToTranscript <- function(x, db) {
 #'
 #' @param x `GRanges` with the genomic coordinates that should be mapped to
 #'     within-protein coordinates.
-#' 
+#'
 #' @param db `EnsDb` object.
 #'
 #' @return
@@ -137,11 +137,11 @@ genomeToTranscript <- function(x, db) {
 #' @family coordinate mapping functions
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @examples
-#' 
+#'
 #' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
 #' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
@@ -212,9 +212,9 @@ genomeToProtein <- function(x, db) {
 #' @author Johannes Rainer
 #'
 #' @md
-#' 
+#'
 #' @noRd
-#' 
+#'
 #' @examples
 #'
 #' ## Second example: nt 2 of exon 4 of ENST00000554971 (nt 637 of tx)
@@ -241,14 +241,15 @@ genomeToProtein <- function(x, db) {
 #' genome <- GRanges("X", IRanges(start = 106956451, width = 3))
 #' .genome_to_tx(genome, edbx)
 #'
-#' 
+#'
 #' ## Example with two genes, on two strands!
 .genome_to_tx <- function(genome, db) {
     if (length(genome) > 1) {
         return(IRangesList(lapply(as(genome, "GRangesList"),
                                   FUN = .genome_to_tx, db = db)))
     }
-    metad <- DataFrame(exon_id = NA_character_, exon_rank = NA_integer_,
+    metad <- DataFrame(tx_id = NA_character_, exon_id = NA_character_,
+                       exon_rank = NA_integer_,
                        seq_start = start(genome), seq_end = end(genome),
                        seq_name = as.character(seqnames(genome)),
                        seq_strand = as.character(strand(genome)))
@@ -258,10 +259,9 @@ genomeToProtein <- function(x, db) {
     if (length(exns) == 0) {
         return(empty_rng)
     }
-    
     ## Now go through each and intersect.
-    res <- lapply(exns, function(x) {
-        ints <- intersect(x, genome, ignore.strand = TRUE)
+    res <- mapply(exns, names(exns), FUN = function(x, tx_id) {
+        ints <- intersect(x, genome, ignore.strand = TRUE) # was TRUE
         if (length(ints)) {
             ## Only consider if the complete range is within an exon!
             if (width(ints) == width(genome)) {
@@ -281,20 +281,20 @@ genomeToProtein <- function(x, db) {
                                     width = width(genome))
                 }
                 ## Add metadata columns
-                exon_idx <- findOverlaps(ints, x, select = "first")
                 dfrm <- DataFrame(
+                    tx_id = tx_id,
                     exon_id = x$exon_id[exon_idx],
                     exon_rank = x$exon_rank[exon_idx],
                     seq_start = start(genome),
                     seq_end = end(genome),
                     seq_name = as.character(seqnames(genome)),
-                    seq_strand = as.character(strand(genome))
+                    seq_strand = as.character(strand(genome)[1])
                 )
                 mcols(irng) <- dfrm
                 irng
             }
         }
-    })
+    }, SIMPLIFY = FALSE)
     res <- res[lengths(res) > 0]
     if (length(res))
         unlist(IRangesList(res))
@@ -302,3 +302,82 @@ genomeToProtein <- function(x, db) {
         empty_rng
 }
 
+#' This function takes a `GRanges` and a `GRangesList` as input and maps
+#' coordinates. We loop through each input range and map that to within
+#' transcript positions based on the `exns` argument.
+#'
+#' @param genome `GRanges` with the genomic positions to be mapped.
+#'
+#' @param exns `GRangesList` with genomic positions of transcripts' exons, i.e.
+#'     a `GRangesList` as the one returned by `exonsBy`.
+#'
+#' @author Johannes Rainer
+#'
+#' @md
+#'
+#' @noRd
+.genome_to_tx_ranges <- function(genome, exns) {
+    IRangesList(unlist(
+        lapply(as(genome, "GRangesList"), FUN = function(rgn, exns) {
+            if (length(exns)) {
+                ints <- pintersect(exns, rgn, drop.nohit.ranges = TRUE,
+                                   ignore.strand = FALSE)
+                ints <- ints[width(ints) == width(rgn)]
+                ints <- ints[lengths(ints) > 0]
+                ints_map <- mapply(
+                    ints, exns[names(ints)], names(ints), FUN = function(int, tx,
+                                                                         tx_id,
+                                                                         rgn) {
+                        exon_idx <- int$exon_rank
+                        if (exon_idx > 1)
+                            count_up <- sum(width(tx)[1:(exon_idx - 1)])
+                        else count_up <- 0
+                        if (as.character(strand(int)[1]) == "+")
+                            irng <- IRanges(start = count_up + start(rgn) -
+                                                start(tx[exon_idx]) + 1,
+                                            width = width(rgn))
+                        else
+                            irng <- IRanges(start = count_up + end(tx[exon_idx]) -
+                                                end(rgn) + 1,
+                                            width = width(rgn))
+                        names(irng) <- tx_id
+                        dfrm <- DataFrame(
+                            tx_id = tx_id,
+                            exon_id = int$exon_id,
+                            exon_rank = exon_idx,
+                            seq_start = start(rgn),
+                            seq_end = end(rgn),
+                            seq_name = as.character(seqnames(rgn)),
+                            seq_strand = as.character(strand(rgn))
+                        )
+                        mcols(irng) <- dfrm
+                        irng
+                    }, MoreArgs = list(rgn = rgn), USE.NAMES = FALSE)
+            } else ints_map <- NULL
+            if (length(ints_map))
+                unlist(IRangesList(ints_map))
+            else {
+                metad <- DataFrame(tx_id = NA_character_,
+                                   exon_id = NA_character_,
+                                   exon_rank = NA_integer_,
+                                   seq_start = start(rgn), seq_end = end(rgn),
+                                   seq_name = as.character(seqnames(rgn)),
+                                   seq_strand = as.character(strand(rgn)))
+                empty_rng <- IRanges(start = -1, width = 1)
+                mcols(empty_rng) <- metad
+                empty_rng
+            }
+        }, exns = exns)
+      , use.names = FALSE))
+}
+
+.genome_to_tx2 <- function(genome, db) {
+    ## Get exonsBy for all input ranges.
+    exns <- exonsBy(db, by = "tx",
+                    filter = AnnotationFilterList(
+                        SeqNameFilter(as.character(unique(seqnames(genome)))),
+                        GeneStartFilter(min(start(genome))),
+                        GeneEndFilter(max(end(genome)))
+                        ))
+    .genome_to_tx_ranges(genome, exns)
+}
