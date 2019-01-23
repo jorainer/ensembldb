@@ -1,3 +1,8 @@
+Changes in version 2.7.6
+
+- Increase performance of genomeToTranscript for input GRanges of length > 1.
+
+
 Changes in version 2.7.5
 
 - Fix class definitions for R >= 3.6.

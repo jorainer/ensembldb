@@ -12,7 +12,7 @@
 #' transcript (which includes the 5' UTR). Positions relative to the CDS of a
 #' transcript (e.g. /PKP2 c.1643delg/) have to be first converted to
 #' transcript-relative coordinates. This can be done with the
-#' [cdsToTranscript()] function. 
+#' [cdsToTranscript()] function.
 #'
 #' @details
 #'
@@ -30,7 +30,7 @@
 #'
 #' @param id `character(1)` specifying where the transcript identifier can be
 #'     found. Has to be either `"name"` or one of `colnames(mcols(prng))`.
-#' 
+#'
 #' @return
 #'
 #' `IRanges` with the same length (and order) than the input `IRanges`
@@ -49,13 +49,13 @@
 #'
 #' @seealso [cdsToTranscript()] and [transcriptToCds()] for conversion between
 #' CDS- and transcript-relative coordinates.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @examples
-#' 
+#'
 #' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
 #' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
@@ -166,10 +166,10 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' of the transcript's CDS is mapped to the first position in the protein
 #' sequence, same as if the transcri(no matter which transcript relative
 #' position corresponding to the first,
-#' second or third nucleotide of the CDS are provided, all (any) of  
+#' second or third nucleotide of the CDS are provided, all (any) of
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @noRd
@@ -299,7 +299,7 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' [cdsToTranscript()] function.
 #'
 #' @inheritParams transcriptToProtein
-#' 
+#'
 #' @return
 #'
 #' `GRangesList` with the same length (and order) than the input `IRanges`
@@ -308,18 +308,18 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' original transcript ID and the transcript-relative coordinates are provided
 #' as metadata columns as well as the ID of the individual exon(s). An empty
 #' `GRanges` is returned for transcripts that can not be found in the database.
-#' 
+#'
 #' @md
-#' 
+#'
 #' @author Johannes Rainer
 #'
 #' @family coordinate mapping functions
 #'
 #' @seealso [cdsToTranscript()] and [transcriptToCds()] for the mapping between
 #' CDS- and transcript-relative coordinates.
-#' 
+#'
 #' @examples
-#' 
+#'
 #' library(EnsDb.Hsapiens.v86)
 #' ## Restrict all further queries to chromosome x to speed up the examples
 #' edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
@@ -391,7 +391,7 @@ transcriptToGenome <- function(x, db, id = "name") {
             } else GRanges()
         } else GRanges()
     })
-    names(res) <- names(x)
+    names(res) <- ids
     as(res, "GRangesList")
 }
 
@@ -423,7 +423,7 @@ transcriptToGenome <- function(x, db, id = "name") {
 #' @family coordinate mapping functions
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @examples
@@ -520,7 +520,7 @@ transcriptToCds <- function(x, db, id = "name") {
 #' @family coordinate mapping functions
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @examples

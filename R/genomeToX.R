@@ -199,109 +199,6 @@ genomeToProtein <- function(x, db) {
     prts
 }
 
-#' @description
-#'
-#' Takes a `GRanges` object, identifies all exons overlapping that region,
-#' checks if the region is completely included in an exons and returns
-#' the position within the transcript for that exon.
-#'
-#' @param db `EnsDb`.
-#'
-#' @param genome `GRanges`
-#'
-#' @author Johannes Rainer
-#'
-#' @md
-#'
-#' @noRd
-#'
-#' @examples
-#'
-#' ## Second example: nt 2 of exon 4 of ENST00000554971 (nt 637 of tx)
-#' genome <- GRanges("X", IRanges(start = 601735, end = 601735))
-#' db <- edbx
-#'
-#' ## + strand: Last two nt of CDS for ENST00000381578
-#' genome <- GRanges("X", IRanges(start = 605370, end = 605374))
-#' ## Length of result is 2.
-#' ## Position within ENST00000381578: 259 + 709 + 209 + 58 + 89 + 245 = 1569
-#'
-#' ## - strand: TSC22D3:
-#' ## 1) ENST00000486554 nt 1-3:
-#' genome <- GRanges("X", IRanges(end = 106959631, start = 106959629))
-#' ## Overlaps 2 tx: ENST00000372390, ENST00000486554
-#'
-#' ## 1) ENST00000486554 nts 5-8 in exon 2
-#' ## exon 1: 503nt: region is 508-511
-#' genome <- GRanges("X", IRanges(end = 106957975, width = 4))
-#' .genome_to_tx(genome, edbx)
-#'
-#' ## 3) ENST00000372397, last 3nt
-#' ## exon 3: 446 + 52 + 1529 total length: 2025-2027
-#' genome <- GRanges("X", IRanges(start = 106956451, width = 3))
-#' .genome_to_tx(genome, edbx)
-#'
-#'
-#' ## Example with two genes, on two strands!
-.genome_to_tx <- function(genome, db) {
-    if (length(genome) > 1) {
-        return(IRangesList(lapply(as(genome, "GRangesList"),
-                                  FUN = .genome_to_tx, db = db)))
-    }
-    metad <- DataFrame(tx_id = NA_character_, exon_id = NA_character_,
-                       exon_rank = NA_integer_,
-                       seq_start = start(genome), seq_end = end(genome),
-                       seq_name = as.character(seqnames(genome)),
-                       seq_strand = as.character(strand(genome)))
-    empty_rng <- IRanges(start = -1, width = 1)
-    mcols(empty_rng) <- metad
-    exns <- exonsBy(db, by = "tx", filter = GRangesFilter(genome))
-    if (length(exns) == 0) {
-        return(empty_rng)
-    }
-    ## Now go through each and intersect.
-    res <- mapply(exns, names(exns), FUN = function(x, tx_id) {
-        ints <- intersect(x, genome, ignore.strand = TRUE) # was TRUE
-        if (length(ints)) {
-            ## Only consider if the complete range is within an exon!
-            if (width(ints) == width(genome)) {
-                ## Identify the exon in which the region was found.
-                exon_idx <- findOverlaps(ints, x, select = "first")
-                if (exon_idx > 1)
-                    count_up <- sum(width(x)[1:(exon_idx - 1)])
-                else count_up <- 0
-                if (as.character(strand(x)[1]) == "+") {
-                    ## Forward strand:
-                    irng <- IRanges(start = count_up + start(genome) -
-                                        start(x[exon_idx]) + 1,
-                                    width = width(genome))
-                } else {
-                    irng <- IRanges(start = count_up + end(x[exon_idx]) -
-                                        end(genome) + 1,
-                                    width = width(genome))
-                }
-                ## Add metadata columns
-                dfrm <- DataFrame(
-                    tx_id = tx_id,
-                    exon_id = x$exon_id[exon_idx],
-                    exon_rank = x$exon_rank[exon_idx],
-                    seq_start = start(genome),
-                    seq_end = end(genome),
-                    seq_name = as.character(seqnames(genome)),
-                    seq_strand = as.character(strand(genome)[1])
-                )
-                mcols(irng) <- dfrm
-                irng
-            }
-        }
-    }, SIMPLIFY = FALSE)
-    res <- res[lengths(res) > 0]
-    if (length(res))
-        unlist(IRangesList(res))
-    else
-        empty_rng
-}
-
 #' This function takes a `GRanges` and a `GRangesList` as input and maps
 #' coordinates. We loop through each input range and map that to within
 #' transcript positions based on the `exns` argument.
@@ -371,7 +268,51 @@ genomeToProtein <- function(x, db) {
       , use.names = FALSE))
 }
 
-.genome_to_tx2 <- function(genome, db) {
+#' @description
+#'
+#' Takes a `GRanges` object, identifies all exons overlapping that region,
+#' checks if the region is completely included in an exons and returns
+#' the position within the transcript for that exon.
+#'
+#' @param db `EnsDb`.
+#'
+#' @param genome `GRanges`
+#'
+#' @author Johannes Rainer
+#'
+#' @md
+#'
+#' @noRd
+#'
+#' @examples
+#'
+#' ## Second example: nt 2 of exon 4 of ENST00000554971 (nt 637 of tx)
+#' genome <- GRanges("X", IRanges(start = 601735, end = 601735))
+#' db <- edbx
+#'
+#' ## + strand: Last two nt of CDS for ENST00000381578
+#' genome <- GRanges("X", IRanges(start = 605370, end = 605374))
+#' ## Length of result is 2.
+#' ## Position within ENST00000381578: 259 + 709 + 209 + 58 + 89 + 245 = 1569
+#'
+#' ## - strand: TSC22D3:
+#' ## 1) ENST00000486554 nt 1-3:
+#' genome <- GRanges("X", IRanges(end = 106959631, start = 106959629))
+#' ## Overlaps 2 tx: ENST00000372390, ENST00000486554
+#'
+#' ## 1) ENST00000486554 nts 5-8 in exon 2
+#' ## exon 1: 503nt: region is 508-511
+#' genome <- GRanges("X", IRanges(end = 106957975, width = 4))
+#' .genome_to_tx(genome, edbx)
+#'
+#' ## 3) ENST00000372397, last 3nt
+#' ## exon 3: 446 + 52 + 1529 total length: 2025-2027
+#' genome <- GRanges("X", IRanges(start = 106956451, width = 3))
+#' .genome_to_tx(genome, edbx)
+#'
+#'
+#' ## Example with two genes, on two strands!
+.genome_to_tx <- function(genome, db) {
     ## Get exonsBy for all input ranges.
     exns <- exonsBy(db, by = "tx",
                     filter = AnnotationFilterList(
@@ -379,5 +320,10 @@ genomeToProtein <- function(x, db) {
                         GeneStartFilter(max(end(genome)), condition = "<="),
                         GeneEndFilter(min(start(genome)), condition = ">=")
                         ))
-    .genome_to_tx_ranges(genome, exns)
+    res <- .genome_to_tx_ranges(genome, exns)
+    if (!is.null(names(genome)))
+        names(res) <- names(genome)
+    if (length(genome) == 1)
+        res[[1]]
+    else res
 }

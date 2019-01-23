@@ -771,7 +771,7 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
                                " end")
         } else {
             ## Funny thing is the query takes longer if I use tx2exon.tx_id!
-            order.by <- "tx.tx_id, tx2exon.exon_idx"
+            order.by <- "tx.gene_id, tx.tx_id, tx2exon.exon_idx"
         }
     }
     Res <- getWhat(x, columns = columns, filter = filter,
@@ -813,8 +813,8 @@ setMethod("exonsBy", "EnsDb", function(x, by = c("tx", "gene"),
                                    end = Res$exon_seq_end),
                   seqinfo = SI,
                   Res[, columns.metadata, drop=FALSE]
-                )
-    return(split(GR, Res[, paste0(by, bySuff)]))
+                  )
+    split(GR, Res[, paste0(by, bySuff)])
 })
 
 ############################################################
