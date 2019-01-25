@@ -25,43 +25,54 @@ test_that(".cds_for_id and .cds_matching_protein work", {
     txs <- c("ENST00000589955", "ENST00000544220")
     rngs <- IRanges(start = c(4, 1, 9), end = c(4, 1, 11))
     names(rngs) <- prts
-    ## seq_names 11, 18
-    dbsub <- filter(edb, filter = ~ seq_name %in% c("11", "18"))
-    expect_warning(res <- .cds_for_id(dbsub, prts))
+    expect_warning(res <- ensembldb:::.cds_for_id(edb, prts))
     expect_equal(names(res), prts)
     expect_equal(names(res[[1]]), txs[1])
     expect_equal(names(res[[3]]), txs[2])
     expect_true(is.null(res[[2]]))
+    res_2 <- ensembldb:::.cds_for_id2(edb, prts)
+    fix_seqlevels <- function(z) {
+        if (length(z))
+            z <- keepSeqlevels(
+                z, unique(as.character(unlist(seqnames(z),
+                                              use.names = FALSE))))
+        z
+    }
+    expect_equal(res, lapply(res_2, fix_seqlevels))
 
     ## Use uniprot...
     ## want a uniprot that is mapped to two tx.
     ## unis <- c("E7EMD7_HUMAN", "ALAT2_HUMAN", "H0YIP2_HUMAN")
     unis <- c("Q9NPH5", "Q8TD30", "H0YIP2")
     unis_counts <- c(10, 2, 1)
-    dbsub2 <- filter(edb, filter = ~ seq_name %in% c("11", "12", "16"))
-    res2 <- .cds_for_id(dbsub2, unis, idType = "uniprot_id")
-    expect_equal(unname(lengths(res2)), unis_counts)
-    expect_equal(names(res2), unis)
+    ## dbsub2 <- filter(edb, filter = ~ seq_name %in% c("11", "12", "16"))
+    res <- ensembldb:::.cds_for_id(edb, unis, idType = "uniprot_id")
+    expect_equal(unname(lengths(res)), unis_counts)
+    expect_equal(names(res), unis)
+
+    res_2 <- ensembldb:::.cds_for_id2(edb, unis, idType = "uniprot_id")
+    expect_equal(lapply(res_2, fix_seqlevels), res)
 
     rngs <- IRanges(start = c(11, 6, 4), end = c(19, 6, 9))
     names(rngs) <- unis
     ## Can I use that right away?
-    z <- res2[[1]]
+    z <- res[[1]]
     irng <- IRanges(start = 5, end = 8)
-    tmp <- .to_genome(z, irng)
-    
+    tmp <- ensembldb:::.to_genome(z, irng)
+
     ## Run .cds_matching_protein on the results to avoid re-querying.
     ## H0YIP2_HUMAN has incomplete 5' and 3' CDS.
-    expect_warning(clnd <- .cds_matching_protein(dbsub2, res2))
+    expect_warning(clnd <- ensembldb:::.cds_matching_protein(edb, res))
     expect_equal(unname(lengths(clnd)), c(10, 2, 1))
     expect_true(is.list(clnd))
     expect_true(is(clnd[[1]], "GRangesList"))
     expect_true(all(clnd[[1]][[1]]$cds_ok))
     expect_true(all(clnd[[2]][[1]]$cds_ok))
     expect_true(all(clnd[[3]][[1]]$cds_ok == FALSE))
-    
+
     ## ENSP00000437716 encoding transcript has an incomplete 3' CDS
-    expect_warning(clnd <- .cds_matching_protein(dbsub, res))
+    expect_warning(res <- ensembldb:::.cds_for_id(edb, prts))
+    expect_warning(clnd <- ensembldb:::.cds_matching_protein(edb, res))
     expect_equal(unname(lengths(clnd)), c(1, 0, 1))
     expect_true(all(clnd[[1]][[1]]$cds_ok))
     expect_true(all(clnd[[3]][[1]]$cds_ok == FALSE))
@@ -81,12 +92,12 @@ test_that("proteinToGenome works", {
     expect_error(proteinToGenome(5, db = edbx))
     expect_error(proteinToGenome(prngs))
     expect_error(proteinToGenome(prngs, db = 5))
-    
+
     expect_warning(res <- proteinToGenome(prngs, edbx))
     ## Result has to be a triplet
     expect_true(all(sapply(res, function(z) sum(width(z))) %% 3 == 0))
     ## Manually check for the ranges here.
-    ## ENSP00000418169, SYP, encoded by ENST00000479808, - strand 
+    ## ENSP00000418169, SYP, encoded by ENST00000479808, - strand
     ## coords cds: 23 -> 67, 24 -> 72
     ## exon 1 width 49, 5' UTR: 13nt long. 36 nt
     ## exon 2 width 66. relative pos is 31nt in exon 2
@@ -114,13 +125,13 @@ test_that("proteinToGenome works", {
     expect_equal(end(res[[4]]), ends)
     expect_equal(res[[4]]$exon_rank, c(2, 3, 4, 5))
     expect_true(all(res[[4]]$cds_ok))
-        
+
     ## Uniprot identifier
     ## ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
     ids <- c("D6RDZ7", "O15266", "Q9HBJ8", "unexistant")
     prngs <- IRanges(start = c(1, 13, 43, 100), end = c(2, 21, 80, 100))
     names(prngs) <- ids
-    
+
     expect_warning(res <- proteinToGenome(prngs, edbx, idType = "uniprot_id"))
     ## Now, expect elements 1 and 2 to be a GRangesList and not a GRanges.
     expect_true(is(res[[1]], "GRanges"))
@@ -144,17 +155,16 @@ test_that("proteinToGenome works", {
 })
 
 test_that("proteinToTranscript works", {
-    edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
     prng <- IRanges(start = c(1, 2, 3, 11, 12), end = c(1, 4, 9, 12, 12),
                     names = c("ENSP00000014935", "ENSP00000173898",
                               "ENSP00000217901", "ENSP00000425155", "ffff"))
 
     expect_error(proteinToTranscript())
-    expect_error(proteinToTranscript(5, db = edbx))
+    expect_error(proteinToTranscript(5, db = edb))
     expect_error(proteinToTranscript(prng))
     expect_error(proteinToTranscript(prng, db = 5))
 
-    expect_warning(tx_rel <- proteinToTranscript(prng, edbx))
+    expect_warning(tx_rel <- proteinToTranscript(prng, edb))
     expect_true(is(tx_rel, "IRangesList"))
     expect_true(all(unlist(lapply(tx_rel, function(z) is(z, "IRanges")))))
     expect_equal(unname(lengths(tx_rel)), c(1, 1, 1, 1, 1))
@@ -176,7 +186,7 @@ test_that("proteinToTranscript works", {
     ids <- c("D6RDZ7", "O15266", "Q9HBJ8", "unexistant")
     prngs <- IRanges(start = c(1, 13, 43, 100), end = c(2, 21, 80, 100))
     names(prngs) <- ids
-    expect_warning(tx_rel <- proteinToTranscript(prngs, edbx,
+    expect_warning(tx_rel <- proteinToTranscript(prngs, edb,
                                                  idType = "uniprot_id"))
     expect_equal(length(tx_rel), length(prngs))
     expect_equal(unname(lengths(tx_rel)), c(1, 4, 1, 1))
@@ -190,7 +200,7 @@ test_that("proteinToTranscript works", {
     prngs <- IRanges(start = c(1, 13), end = c(2, 21))
     names(prngs) <- ids
 
-    expect_warning(res <- proteinToTranscript(prngs, edbx))
+    expect_warning(res <- proteinToTranscript(prngs, edb))
     expect_true(is(res, "IRangesList"))
     expect_equal(unlist(unname(start(res))), c(-1, -1))
 })
@@ -231,7 +241,7 @@ test_that(".to_genome works", {
     res <- .to_genome(g_coords, c_coords)
     expect_equal(start(res), c(9, 15, 19))
     expect_equal(end(res), c(12, 16, 20))
-    
+
     ## Reverse strand
     g_coords <- GRanges("1", IRanges(start = c(28, 21, 16, 10, 3),
                                      end = c(30, 25, 17, 12, 6)),
@@ -263,7 +273,7 @@ test_that(".to_genome works", {
     c_coords_2 <- IRanges(start = 1, end = 1200)
     res <- expect_warning(.to_genome(g_coords, c_coords_2))
     expect_equal(lengths(res), c(0, 0))
-    
+
     ## Check errors.
     expect_error(.to_genome(c_coords, c_coords))
     g_coords <- GRanges("2", IRanges(start = c(3, 8, 15, 19),
@@ -274,4 +284,3 @@ test_that(".to_genome works", {
     c_coords <- IRanges(start = 40, end = 50)
     expect_warning(.to_genome(g_coords, c_coords))
 })
-

@@ -13,9 +13,9 @@
 #' the encoding CDS and throws a warning if that is not the case. Incomplete
 #' 3' or 5' CDS of the encoding transcript are the most common reasons for a
 #' mismatch between protein and transcript sequences.
-#' 
+#'
 #' @details
-#' 
+#'
 #' Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
 #' be passed to the function as `names` of the `x` `IRanges` object, or
 #' alternatively in any one of the metadata columns (`mcols`) of `x`.
@@ -27,8 +27,14 @@
 #' `proteinToTranscript` calculates in such cases transcript-relative
 #' coordinates for each annotated Ensembl protein.
 #'
+#' Mapping using Uniprot identifiers needs also additional internal checks that
+#' can have a significant impact on the performance of the function. It is thus
+#' strongly suggested to first identify the Ensembl protein identifiers for the
+#' list of input Uniprot identifiers (e.g. using the [proteins()] function and
+#' use these as input for the mapping function.
+#'
 #' @inheritParams proteinToGenome
-#' 
+#'
 #' @return
 #'
 #' `IRangesList`, each element being the mapping results for one of the input
@@ -40,7 +46,7 @@
 #' can be the case if Uniprot IDs are provided). If the coordinates can not be
 #' mapped (because the protein identifier is unknown to the database) an
 #' `IRanges` with negative coordinates is returned.
-#' 
+#'
 #' The following metadata columns are available in each `IRanges` in the result:
 #' + `"protein_id"`: the ID of the Ensembl protein for which the within-protein
 #'   coordinates were mapped to the genome.
@@ -52,9 +58,9 @@
 #' + `"protein_end"`: the within-protein sequence end coordinate of the mapping.
 #'
 #' @family coordinate mapping functions
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @examples
@@ -71,7 +77,7 @@
 #' res
 #' ## Positions 4 to 17 within the protein span are encoded by the region
 #' ## from nt 23 to 64.
-#' 
+#'
 #' ## Perform the mapping for multiple proteins identified by their Uniprot
 #' ## IDs.
 #' ids <- c("O15266", "Q9HBJ8", "unexistant")
@@ -79,7 +85,7 @@
 #' names(prngs) <- ids
 #'
 #' res <- proteinToTranscript(prngs, edbx, idType = "uniprot_id")
-#' 
+#'
 #' ## The result is a list, same length as the input object
 #' length(res)
 #' names(res)
@@ -105,9 +111,11 @@ proteinToTranscript <- function(x, db, id = "name",
     message("Fetching CDS for ", length(x), " proteins ... ",
             appendLF = FALSE)
     cds_genome <- .cds_for_id_range(db, x, id = id, idType = idType)
-    ## Manage cases in which nothing could be mapped.LLLL
-    ## have a list of GRangesList
-    message(sum(lengths(cds_genome) > 0), " found")
+    miss <- lengths(cds_genome) == 0
+    if (any(miss))
+        warning("No CDS found for: ", paste0(names(cds_genome)[miss],
+                                             collapse = ", "))
+    message(sum(!miss), " found")
     ## 2) ensure that the CDS matches the AA sequence length
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
     cds_genome <- .cds_matching_protein(db, cds_genome)
@@ -139,7 +147,7 @@ proteinToTranscript <- function(x, db, id = "name",
                 if (idType == "uniprot_id")
                     mc$uniprot_id <- names(prt)
                 else mc$protein_id <- names(prt)
-                ir <- IRanges(start = -1, width = 1)                
+                ir <- IRanges(start = -1, width = 1)
                 mcols(ir) <- mc
                 ir
             } else {
@@ -173,12 +181,12 @@ proteinToTranscript <- function(x, db, id = "name",
 #' based on the genomic coordinates of the CDS of the encoding transcript. The
 #' encoding transcript is identified using protein-to-transcript annotations
 #' (and eventually Uniprot to Ensembl protein identifier mappings) from the
-#' submittes `EnsDb` object (and thus based on annotations from Ensembl).
+#' submitted `EnsDb` object (and thus based on annotations from Ensembl).
 #'
 #' Not all coding regions for protein coding transcripts are complete, and the
 #' function thus checks also if the length of the coding region matches the
 #' length of the protein sequence and throws a warning if that is not the case.
-#' 
+#'
 #' The genomic coordinates for the within-protein coordinates, the Ensembl
 #' protein ID, the ID of the encoding transcript and the within protein start
 #' and end coordinates are reported for each input range.
@@ -188,7 +196,7 @@ proteinToTranscript <- function(x, db, id = "name",
 #' Protein identifiers (supported are Ensembl protein IDs or Uniprot IDs) can
 #' be passed to the function as `names` of the `x` `IRanges` object, or
 #' alternatively in any one of the metadata columns (`mcols`) of `x`.
-#' 
+#'
 #' @note
 #'
 #' While the mapping for Ensembl protein IDs to encoding transcripts (and
@@ -197,7 +205,13 @@ proteinToTranscript <- function(x, db, id = "name",
 #' such cases `proteinToGenome` calculates genomic coordinates for
 #' within-protein coordinates for all of the annotated Ensembl proteins and
 #' returns all of them. See below for examples.
-#' 
+#'
+#' Mapping using Uniprot identifiers needs also additional internal checks that
+#' have a significant impact on the performance of the function. It is thus
+#' strongly suggested to first identify the Ensembl protein identifiers for the
+#' list of input Uniprot identifiers (e.g. using the [proteins()] function and
+#' use these as input for the mapping function.
+#'
 #' A warning is thrown for proteins which sequence does not match the coding
 #' sequence length of any encoding transcripts. For such proteins/transcripts
 #' a `FALSE` is reported in the respective `"cds_ok"` metadata column.
@@ -209,7 +223,7 @@ proteinToTranscript <- function(x, db, id = "name",
 #' @param x `IRanges` with the coordinates within the protein(s). The
 #'     object has also to provide some means to identify the protein (see
 #'     details).
-#' 
+#'
 #' @param db `EnsDb` object to be used to retrieve genomic coordinates of
 #'     encoding transcripts.
 #'
@@ -232,7 +246,7 @@ proteinToTranscript <- function(x, db, id = "name",
 #'   used). Each element in this `GRangesList` is a `GRanges` with the genomic
 #'   coordinates calculated for the protein-relative coordinates from the
 #'   respective Ensembl protein ID.
-#' 
+#'
 #' The following metadata columns are available in each `GRanges` in the result:
 #' + `"protein_id"`: the ID of the Ensembl protein for which the within-protein
 #'   coordinates were mapped to the genome.
@@ -247,12 +261,12 @@ proteinToTranscript <- function(x, db, id = "name",
 #'
 #' Genomic coordinates are returned ordered by the exon index within the
 #' transcript.
-#' 
+#'
 #' @family coordinate mapping functions
-#' 
+#'
 #' @author Johannes Rainer based on initial code from Laurent Gatto and
 #'     Sebastian Gibb
-#' 
+#'
 #' @md
 #'
 #' @examples
@@ -269,7 +283,7 @@ proteinToTranscript <- function(x, db, id = "name",
 #' res
 #' ## Positions 4 to 17 within the protein span two exons of the encoding
 #' ## transcript.
-#' 
+#'
 #' ## Perform the mapping for multiple proteins identified by their Uniprot
 #' ## IDs.
 #' ids <- c("O15266", "Q9HBJ8", "unexistant")
@@ -277,7 +291,7 @@ proteinToTranscript <- function(x, db, id = "name",
 #' names(prngs) <- ids
 #'
 #' res <- proteinToGenome(prngs, edbx, idType = "uniprot_id")
-#' 
+#'
 #' ## The result is a list, same length as the input object
 #' length(res)
 #' names(res)
@@ -380,7 +394,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #'     transcript was found `NULL` is returned.
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @noRd
@@ -404,6 +418,62 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
     cds
 }
 
+#' @description Fetch the CDS for all transcripts encoding the specified protein.
+#'
+#' @note Use one query to fetch CDS for all (unique) input ids.
+#'
+#' @param x `EnsDb` object.
+#'
+#' @param id `character` with the protein ID(s).
+#'
+#' @param idType `character(1)` defining what type of IDs are provided. Has to
+#'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
+#'
+#' @return a `list` with the CDS of the encoding transcript(s) for each provided
+#'     id (as a `GRangesList`). Names of the `list` are the ids, if no
+#'     transcript was found `NULL` is returned.
+#'
+#' @author Johannes Rainer
+#'
+#' @md
+#'
+#' @noRd
+.cds_for_id2 <- function(x, id, idType = "protein_id") {
+    ## First convert protein IDs to transcript ids. Speeds up the query for
+    ## CDS.
+    if (idType != "tx_id") {
+        map <- transcripts(x, filter = .filter_for_idType(unique(id), idType),
+                           columns = c("tx_id", idType), order.by = "tx_id",
+                           return.type = "data.frame")
+        tx_id <- split(map$tx_id, map[, idType])
+    } else {
+        tx_id <- id
+        split(tx_id, id)
+    }
+    if (length(tx_id)) {
+        suppressWarnings(
+            cds <- cdsBy(
+                x, columns = unique(c(idType, "tx_id", "protein_id")), by = "tx",
+                filter = TxIdFilter(unique(unlist(tx_id, use.names = FALSE))))
+        )
+        if (length(cds)) {
+            if (idType == "uniprot_id") {
+                ## Additional (in)sanity checks for Uniprot identifiers
+                ## This has a significant impact on performance, but otherwise
+                ## we end up with duplicated transcript entries!
+                tmp <- unlist(cds)
+                tmp <- as.list(split(unname(tmp), tmp$uniprot_id))
+                cds <- lapply(tmp, function(z) split(z, z$tx_id))
+            } else
+                cds <- lapply(tx_id, function(z) cds[z])
+        }
+        else cds <- list()
+    } else cds <- list()
+    cds <- cds[id]
+    names(cds) <- id # to add also names for elements not found
+    cds
+}
+
 #' @description
 #'
 #' Uses .cds_for_id to fetch CDS for protein identifiers and in addition
@@ -420,9 +490,9 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #'     be one of `"protein_id"` (default), `"uniprot_id"` or `"tx_id"`.
 #'
 #' @return `list` of `GRangesList`.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @noRd
@@ -432,7 +502,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
     if (id == "name")
         ids <- names(range)
     else ids <- mcols(range)[, id]
-    cds <- .cds_for_id(x, ids, idType = idType)
+    cds <- .cds_for_id2(x, ids, idType = idType)
     ## check returned CDS if their width matches the provided protein ranges
     mapply(cds, end(range) * 3,
                   FUN = function(x, x_end) {
@@ -463,9 +533,9 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #' @return `list` of `GRangesList`s with one list element per input protein,
 #'    and the `GRangesList` containing the CDS of all matching (or one not
 #'    matching) transcripts.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @noRd
@@ -522,7 +592,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #' While designed for cds-relative coordinates, the function should also
 #' work for `g_coords` that represent the exons of a transcript and
 #' `cds_coords` being transcript-relative.
-#' 
+#'
 #' @param g_coords `GRanges` with the exons encoding the CDS. These have to be
 #'     provided in the correct order (i.e. first element being the first exon
 #'     etc, also for genes on the reverse strand!). If `g_coords` is a
@@ -533,7 +603,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #'
 #' @return A `GRanges` with the result from the within-cds coordinate mapping
 #'     to the genome.
-#' 
+#'
 #' @md
 #'
 #' @noRd
@@ -548,7 +618,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #'
 #' cds_coords <- IRanges(start = 5, end = 12)
 #' ## Expect: 9:20
-#' 
+#'
 #' .to_genome(g_coords, cds_coords)
 #'
 #' ## Reverse strand example
@@ -638,9 +708,9 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #' *Splices* the provided `GRanges`/`IRanges` by removing all intronic ranges.
 #'
 #' @param x `IRanges`
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @md
 #'
 #' @noRd

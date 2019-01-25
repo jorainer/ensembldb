@@ -57,7 +57,7 @@ transcript.
 based on the genomic coordinates of the CDS of the encoding transcript. The
 encoding transcript is identified using protein-to-transcript annotations
 (and eventually Uniprot to Ensembl protein identifier mappings) from the
-submittes \code{EnsDb} object (and thus based on annotations from Ensembl).
+submitted \code{EnsDb} object (and thus based on annotations from Ensembl).
 
 Not all coding regions for protein coding transcripts are complete, and the
 function thus checks also if the length of the coding region matches the
@@ -79,6 +79,12 @@ transcripts (which is based on Ensembl annotations) can be one to many. In
 such cases \code{proteinToGenome} calculates genomic coordinates for
 within-protein coordinates for all of the annotated Ensembl proteins and
 returns all of them. See below for examples.
+
+Mapping using Uniprot identifiers needs also additional internal checks that
+have a significant impact on the performance of the function. It is thus
+strongly suggested to first identify the Ensembl protein identifiers for the
+list of input Uniprot identifiers (e.g. using the \code{\link[=proteins]{proteins()}} function and
+use these as input for the mapping function.
 
 A warning is thrown for proteins which sequence does not match the coding
 sequence length of any encoding transcripts. For such proteins/transcripts

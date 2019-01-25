@@ -64,6 +64,12 @@ While mapping of Ensembl protein IDs to Ensembl transcript IDs is 1:1, a
 single Uniprot identifier can be annotated to several Ensembl protein IDs.
 \code{proteinToTranscript} calculates in such cases transcript-relative
 coordinates for each annotated Ensembl protein.
+
+Mapping using Uniprot identifiers needs also additional internal checks that
+can have a significant impact on the performance of the function. It is thus
+strongly suggested to first identify the Ensembl protein identifiers for the
+list of input Uniprot identifiers (e.g. using the \code{\link[=proteins]{proteins()}} function and
+use these as input for the mapping function.
 }
 \examples{
 

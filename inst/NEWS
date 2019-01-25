@@ -1,3 +1,8 @@
+Changes in version 2.7.7
+
+- Performance improvement for proteinToTranscript.
+
+
 Changes in version 2.7.6
 
 - Increase performance of genomeToTranscript for input GRanges of length > 1.
