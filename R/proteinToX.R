@@ -315,8 +315,11 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
     message("Fetching CDS for ", length(x), " proteins ... ",
             appendLF = FALSE)
     cds_genome <- .cds_for_id_range(db, x, id = id, idType = idType)
-    ## have a list of GRangesList
-    message(sum(lengths(cds_genome) > 0), " found")
+    miss <- lengths(cds_genome) == 0
+    if (any(miss))
+        warning("No CDS found for: ", paste0(names(cds_genome)[miss],
+                                             collapse = ", "))
+    message(sum(!miss), " found")
     ## 2) ensure that the CDS matches the AA sequence length
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
     cds_genome <- .cds_matching_protein(db, cds_genome)
@@ -420,7 +423,12 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 
 #' @description Fetch the CDS for all transcripts encoding the specified protein.
 #'
-#' @note Use one query to fetch CDS for all (unique) input ids.
+#' @note
+#'
+#' Use one query to fetch CDS for all (unique) input IDs. If input IDs are
+#' Uniprot identifiers we have to perform additional checks and data
+#' re-organizations because one transript (and thus CDS) can be associated
+#' with multiple Uniprot identifiers.
 #'
 #' @param x `EnsDb` object.
 #'
@@ -439,8 +447,6 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
 #'
 #' @noRd
 .cds_for_id2 <- function(x, id, idType = "protein_id") {
-    ## First convert protein IDs to transcript ids. Speeds up the query for
-    ## CDS.
     if (idType != "tx_id") {
         map <- transcripts(x, filter = .filter_for_idType(unique(id), idType),
                            columns = c("tx_id", idType), order.by = "tx_id",
