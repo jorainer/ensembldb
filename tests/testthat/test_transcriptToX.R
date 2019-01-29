@@ -115,7 +115,7 @@ test_that(".tx_to_genome works", {
                    names = c("ENST00000486554", "ENST00000486554",
                              "ENST00000381578", "ENST00000381578", "some",
                              "ENST00000155093"))
-    res <- ensembldb:::.tx_to_genome(rng, edbx)
+    res <- .tx_to_genome(rng, edbx)
     expect_equal(length(res), length(rng))
     expect_equal(unname(lengths(res)), c(2, 1, 1, 2, 0, 1))
     ## 1
@@ -143,7 +143,7 @@ test_that(".tx_to_genome works", {
     ## wrong ID and range outside tx
     rng <- IRanges(start = c(501, 200, 1), end = c(505, 1200, 5),
                    names = c("ENST00000486554", "ENST00000486554", "B"))
-    expect_warning(res_2 <- ensembldb:::.tx_to_genome(rng, edbx))
+    expect_warning(res_2 <- .tx_to_genome(rng, edbx))
     a <- res[1]
     b <- res_2[1]
     seqlevels(a) <- seqlevels(b)

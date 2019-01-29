@@ -2,18 +2,26 @@ test_that(".genome_to_tx and genomeToTranscript works", {
     library(EnsDb.Hsapiens.v86)
     edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 
+    res_lst <- list()
+    ## TODO: 1) compare .genome_to_tx2 to .genome_to_tx.
+    ##       2) add all results to a result list.
+    ##       3) run the analysis on a GRanges length > 1, adding also bogus
+    ##          /failing ranges.
+    ##       4) Check that the final version also works.
+
     ## 1) ENST00000381578, + strand last four nt of CDS.
     ##    Position in ENST00000381578: 259 + 709 + 209 + 58 + 89 + 245 = 1569
     ## gnm <- GRanges("X", IRanges(start = 605370, end = 605374))
     gnm <- GRanges("X", IRanges(start = 644635, end = 644639))
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
+    res_lst <- c(res_lst, list(res))
     expect_true(length(res) == 2)
     expect_true(is(res, "IRanges"))
     expect_equal(start(res["ENST00000381578"]), 1569)
     expect_equal(width(res["ENST00000381578"]), 5)
     ##    Restrict to negative strand - nothing there.
     strand(gnm) <- "-"
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
     expect_equal(length(res), 1)
     expect_equal(start(res), -1)
     expect_true(is(res, "IRanges"))
@@ -21,49 +29,55 @@ test_that(".genome_to_tx and genomeToTranscript works", {
     ## 2) ENST00000486554, - strand, nt 1-3 of tx
     ## gnm <- GRanges("X:106959629-106959631")
     gnm <- GRanges("X:107716399-107716401")
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
+    res_lst <- c(res_lst, list(res))
     expect_equal(names(res), c("ENST00000372390", "ENST00000486554"))
     expect_equal(start(res["ENST00000486554"]), 1)
     expect_equal(width(res["ENST00000486554"]), 3)
 
-    ## 2) ENST00000486554, - strand, nt 1-3 of CDS, nt 501-503 of tx
+    ## 3) ENST00000486554, - strand, nt 1-3 of CDS, nt 501-503 of tx
     ## gnm <- GRanges("X:106959129-106959131")
     gnm <- GRanges("X:107715899-107715901")
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
+    res_lst <- c(res_lst, list(res))
     expect_equal(length(res), 11)
     expect_equal(start(res["ENST00000486554"]), 501)
     expect_equal(width(res["ENST00000486554"]), 3)
-    
-    ## 3) As above, just not all within the exon.
+
+    ## 4) As above, just not all within the exon.
     ## gnm <- GRanges("X:106959629-106959635")
     gnm <- GRanges("X:107716399-107716405")
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
+    res_lst <- c(res_lst, list(res))
     expect_true(length(res) == 1)
     expect_equal(names(res), "ENST00000372390")
 
-    ## 4) ENST00000486554, - strand, nts 5-8 in exon 2
+    ## 5) ENST00000486554, - strand, nts 5-8 in exon 2
     ##    exon 1: 503nt: region is expected at 508-511.
     ## gnm <- GRanges("X", IRanges(end = 106957975, width = 4))
     gnm <- GRanges("X", IRanges(end = 107714745, width = 4))
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
+    res_lst <- c(res_lst, list(res))
     expect_true(length(res) == 9)       # overlapping many tx...
     expect_equal(start(res["ENST00000486554"]), 508)
     expect_equal(end(res["ENST00000486554"]), 511)
 
-    ## 5) ENST00000372397, - strand, last 3nt
+    ## 6) ENST00000372397, - strand, last 3nt
     ##    exon 3: 446 + 52 + 1529 total length: 2025
     ## gnm <- GRanges("X", IRanges(start = 106956451, width = 3))
     gnm <- GRanges("X", IRanges(start = 107713221, width = 3))
-    res <- .genome_to_tx(gnm, db = edbx)
+    res <- ensembldb:::.genome_to_tx(gnm, db = edbx)
+    res_lst <- c(res_lst, list(res))
     expect_true(length(res) == 3)
     expect_equal(start(res["ENST00000372397"]), 2025)
     expect_equal(end(res["ENST00000372397"]), 2027)
 
-    ## 6) A region with a tx/exon on both strands.
+    ## 7) A region with a tx/exon on both strands.
     ## gnm <- GRanges("7", IRanges(start = 127231550, width = 5))
     gnm <- GRanges("7", IRanges(start = 127591496, width = 5))
     edb7 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "7")
-    res <- .genome_to_tx(gnm, edb7)
+    res <- ensembldb:::.genome_to_tx(gnm, edb7)
+    res_lst <- c(res_lst, list(res))
     tx <- transcripts(edb7, filter = TxIdFilter(names(res)))
     expect_equal(as.character(strand(tx)), c("+", "+", "+", "-"))
     expect_true(all(names(tx) %in% c("ENST00000473728", "ENST00000463733",
@@ -83,6 +97,24 @@ test_that(".genome_to_tx and genomeToTranscript works", {
     expect_equal(names(res[[2]]), c("ENST00000372390", "ENST00000486554"))
     expect_equal(start(res[[2]]["ENST00000486554"]), 1)
     expect_equal(width(res[[2]]["ENST00000486554"]), 3)
+
+    ## Larger example
+    gnm <- GRanges(
+        IRanges(start = c(644635, 107716399, 107715899, 107716399, 107714742,
+                          107713221, 127591496, 127591496, 127591496),
+                end = c(644639, 107716401, 107715901, 107716405, 107714745,
+                        107713223, 127591500, 127591996, 127591497)),
+        seqnames = c("X", "X", "X", "X", "X", "X", "7", "7", "Z"))
+    res <- ensembldb:::.genome_to_tx(gnm, edb)
+    expect_equal(res[[1]], res_lst[[1]])
+    expect_equal(res[[2]], res_lst[[2]])
+    expect_equal(res[[3]], res_lst[[3]])
+    expect_equal(res[[4]], res_lst[[4]])
+    expect_equal(res[[5]], res_lst[[5]])
+    expect_equal(res[[6]], res_lst[[6]])
+    expect_equal(res[[7]], res_lst[[7]])
+    expect_equal(start(res[[8]]), -1)
+    expect_equal(start(res[[9]]), -1)
 
     ## Check errors etc.
     expect_error(genomeToTranscript())
@@ -199,4 +231,3 @@ test_that("genomeToProtein works", {
     expect_warning(res <- genomeToProtein(grg, edb_2))
     expect_equal(length(res), length(grg))
 })
-
