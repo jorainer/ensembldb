@@ -206,7 +206,8 @@ exportMethods("cdsBy",
               "supportedFilters",
               "addFilter",
               "activeFilter",
-              "dropFilter"
+              "dropFilter",
+              "intronsByTranscript"
               )
 ## Protein data related stuff
 exportMethods("hasProteinData",

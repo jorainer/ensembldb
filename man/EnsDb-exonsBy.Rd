@@ -10,6 +10,7 @@
 \alias{exons,EnsDb-method}
 \alias{exonsBy}
 \alias{exonsBy,EnsDb-method}
+\alias{intronsByTranscript,EnsDb-method}
 \alias{exonsByOverlaps,EnsDb-method}
 \alias{genes}
 \alias{genes,EnsDb-method}
@@ -41,6 +42,8 @@
 \S4method{exonsBy}{EnsDb}(x, by = c("tx", "gene"),
         columns = listColumns(x, "exon"), filter =
         AnnotationFilterList(), use.names = FALSE)
+
+\S4method{intronsByTranscript}{EnsDb}(x, ..., use.names = FALSE)
 
 \S4method{exonsByOverlaps}{EnsDb}(x, ranges, maxgap = -1L, minoverlap = 0L,
         type = c("any", "start", "end"), columns = listColumns(x, "exon"),
@@ -85,7 +88,8 @@
 
   \item{...}{
     For \code{promoters}: additional arguments to be passed to the
-    \code{transcripts} method.
+    \code{transcripts} method. For \code{intronsByTranscript}:
+    additional arguments such as \code{filter}.    
   }
 
   \item{aggregateGenes}{
@@ -236,6 +240,12 @@
       + or - strand (for \code{by="gene"}).
       The \code{GRanges} in the \code{GRangesList} will be ordered by
       the name of the gene or transcript.
+    }
+
+    \item{intronsByTranscript}{
+      Retrieve introns by transcripts. Filters can also be passed to the
+      function. For more information see the \code{intronsByTranscript}
+      method in the \code{GenomicFeatures} package.
     }
 
     \item{exonsByOverlaps}{

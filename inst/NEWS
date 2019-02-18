@@ -1,3 +1,8 @@
+Changes in version 2.6.6
+
+- Add intronsByTranscript method (issue #94).
+
+
 Changes in version 2.6.4
 
 - Partial rewrite of the mapping functions to speed up queries.

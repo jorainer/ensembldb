@@ -935,3 +935,10 @@ test_that("methods work with global filter", {
     exs <- exonsBy(edb_2, "gene")
 })
 
+test_that("intronsByTranscript works", {
+    edb_sub <- filter(edb, filter = ~ seq_name == "Y")
+    exns <- exonsBy(edb_sub)
+    res <- intronsByTranscript(edb_sub)
+    expect_equal(names(exns), names(res))
+    expect_equal(lengths(res), lengths(exns) - 1)
+})

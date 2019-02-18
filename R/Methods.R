@@ -2096,3 +2096,9 @@ setMethod("activeFilter", "EnsDb", function(x) {
     .activeFilter(x)
 })
 
+setMethod("intronsByTranscript", "EnsDb", function(x, ..., use.names = FALSE) {
+    txs <- transcripts(x, ...)
+    exns <- exonsBy(x, by = "tx", ...)
+    txs <- txs[match(names(exns), names(txs))]
+    psetdiff(txs, exns)
+})

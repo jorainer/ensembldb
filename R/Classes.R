@@ -388,7 +388,7 @@ ProteinDomainSourceFilter <- function(value, condition = "==") {
 setClass("UniprotDbFilter", contains = "CharacterFilter",
          prototype = list(
              condition = "==",
-             values = "",
+             value = "",
              field = "uniprot_db"
          ))
 #' @return For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
@@ -404,7 +404,7 @@ UniprotDbFilter <- function(value, condition = "==") {
 setClass("UniprotMappingTypeFilter", contains = "CharacterFilter",
          prototype = list(
              condition = "==",
-             values = "",
+             value = "",
              field = "uniprot_mapping_type"
          ))
 #' @return For \code{UniprotMappingTypeFilter}: A
@@ -419,7 +419,7 @@ UniprotMappingTypeFilter <- function(value, condition = "==") {
 setClass("TxSupportLevelFilter", contains = "IntegerFilter",
          prototype = list(
              condition = "==",
-             values = 0L,
+             value = 0L,
              field = "tx_support_level"
          ))
 #' @return For \code{TxSupportLevel}: A
