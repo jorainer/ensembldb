@@ -1,11 +1,9 @@
 \name{getGenomeFaFile}
 \Rdversion{1.1}
-%\alias{extractTranscriptSeqs}
-%\alias{extractTranscriptSeqs,ANY-method}
-%\alias{extractTranscriptSeqs,ANY,ANY}
-%\alias{extractTranscriptSeqs,ANY,EnsDb-method}
 \alias{getGenomeFaFile}
 \alias{getGenomeFaFile,EnsDb-method}
+\alias{getGenomeTwoBitFile}
+\alias{getGenomeTwoBitFile,EnsDb-method}
 
 \title{Functionality related to DNA/RNA sequences}
 \description{
@@ -16,47 +14,25 @@
 
 \S4method{getGenomeFaFile}{EnsDb}(x, pattern="dna.toplevel.fa")
 
-%\S4method{extractTranscriptSeqs}{ANY,EnsDb}(x, transcripts, filter)
+\S4method{getGenomeTwoBitFile}{EnsDb}(x)
 
 }
 \arguments{
 
   (In alphabetic order)
 
-  %% \item{filter}{
-  %%   A filter object extending \code{\linkS4class{BasicFilter}} or a list
-  %%   of such object(s) to select specific entries from the database (see
-  %%   examples below).
-  %% }
-
   \item{pattern}{
     For method \code{getGenomeFaFile}: the pattern to be used to
     identify the fasta file representing genomic DNA sequence.
   }
 
-  %% \item{transcripts}{
-  %%   For \code{extractTranscriptSeqs}: the \code{EnsDb} object from which
-  %%   the transcript definitions should be extracted.
-  %% }
-
   \item{x}{
-    %% For \code{extractTranscriptSeqs}: An object representing a single
-    %% chromosome or a collection of chromosomes. Refer to the help of the
-    %% \code{\link[GenomicFeatures]{extractTranscriptSeqs}} method in
-    %% \code{GenomicFeatures} package for more information.
-    For all other methods an \code{EnsDb} instance.
+    An \code{EnsDb} instance.
   }
 
 }
 \section{Methods and Functions}{
   \describe{
-    %% \item{extractTranscriptSeqs}{
-    %%   Extract transcript sequences. This method adapts the
-    %%   \code{\link[GenomicFeatures]{extractTranscriptSeqs}} from the
-    %%   \code{GenomicFeatures} package to allow the usage of filters to
-    %%   specify the transcripts from which the sequence should be
-    %%   extracted.
-    %% }
 
     \item{getGenomeFaFile}{
       Returns a \code{\link[Rsamtools]{FaFile-class}} (defined in
@@ -67,12 +43,25 @@
       required to locate and download the file; subsequent calls will
       load the cached file instead.
       If no fasta file for the actual Ensembl version is available the
-      function tries to identify a file matchint the species and genome
+      function tries to identify a file matching the species and genome
       build version of the closest Ensembl release and returns that
       instead.
       See the vignette for an example to work with such files.
     }
 
+    \item{getGenomeTwoBitFile}{
+      Returns a \code{\link{TwoBitFile-class}} (defined in the
+      \code{rtracklayer} package) with the genomeic sequence of the
+      genome build matching the Ensembl version of the \code{EnsDb}
+      object. The file is retrieved from \code{AnnotationHub} and hence
+      requires (at least for the first query) an active internet
+      connection to download the respective resource. If no DNA sequence
+      matching the Ensembl version of \code{x} is available, the
+      function tries to find the genomic sequence of the best matching
+      genome build (closest Ensembl release) and returns that.
+
+      See the \code{ensembldb} vignette for details.
+    }
   }
 }
 
@@ -80,9 +69,8 @@
   For \code{getGenomeFaFile}: a \code{\link[Rsamtools]{FaFile-class}}
   object with the genomic DNA sequence.
 
-  %% For \code{extractTranscriptSeqs}: A \code{DNAStringSet} object
-  %% parallel to \code{transcripts} (i.e. the i-th element in it is the
-  %% sequence of the i-th transcript in \code{transcripts}).
+  For \code{getGenomeTwoBitFile}: a \code{\link{TwoBitFile-class}}
+  object with the genome sequence.
 }
 \author{
   Johannes Rainer
@@ -98,10 +86,10 @@ library(EnsDb.Hsapiens.v86)
 edb <- EnsDb.Hsapiens.v86
 
 \dontrun{
-    ## Retrieve a FaFile with the gneomic DNA sequence matching the organism,
+    ## Retrieve a TwoBitFile with the gneomic DNA sequence matching the organism,
     ## genome release version and, if possible, the Ensembl version of the
     ## EnsDb object.
-    Dna <- getGenomeFaFile(edb)
+    Dna <- getGenomeTwoBitFile(edb)
     ## Extract the transcript sequence for all transcripts encoded on chromosome
     ## Y.
     ##extractTranscriptSeqs(Dna, edb, filter=SeqNameFilter("Y"))
@@ -110,8 +98,3 @@ edb <- EnsDb.Hsapiens.v86
 
 }
 \keyword{classes}
-
-
-
-
-
