@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.6.7
+Version: 2.6.8
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre")),
@@ -18,8 +18,8 @@ Author: Johannes Rainer <johannes.rainer@eurac.edu> with contributions
 	from Tim Triche, Sebastian Gibb, Laurent Gatto and
 	Christian Weichenberger.
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
-URL: https://github.com/jotsetung/ensembldb
-BugReports: https://github.com/jotsetung/ensembldb/issues
+URL: https://github.com/jorainer/ensembldb
+BugReports: https://github.com/jorainer/ensembldb/issues
 Imports:
     methods,
     RSQLite (>= 1.1),
