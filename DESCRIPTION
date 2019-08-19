@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.9.1
+Version: 2.9.2
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre"),
@@ -35,7 +35,7 @@ Imports:
     GenomeInfoDb,
     AnnotationDbi (>= 1.31.19),
     rtracklayer,
-    S4Vectors,
+    S4Vectors (>= 0.23.10),
     Rsamtools,
     IRanges (>= 2.13.24),
     ProtGenerics,
