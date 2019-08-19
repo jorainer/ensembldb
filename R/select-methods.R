@@ -289,8 +289,8 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
         keytype <- NULL
     if(missing(multiVals))
         multiVals <- NULL
-    return(.mapIds(x = x, keys = keys, column = column, keytype = keytype,
-                   multiVals = multiVals, ...))
+    .mapIds(x = x, keys = keys, column = column, keytype = keytype,
+            multiVals = multiVals, ...)
 })
 ## Other methods: saveDb, species, dbfile, dbconn, taxonomyId
 .mapIds <- function(x, keys = NULL, column = NULL, keytype = NULL, ...,
@@ -321,39 +321,39 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
     if(nrow(res) == 0)
         return(character())
     ## Handling multiVals.
-    if(is.null(multiVals))
+    if (is.null(multiVals))
         multiVals <- "first"
-    if(is(multiVals, "function"))
+    if (is(multiVals, "function"))
         stop("Not yet implemented!")
-    if(is.character(keys)){
+    if (is.character(keys)) {
         theNames <- keys
-    }else{
+    } else {
         theNames <- unique(res[, 1])
     }
     switch(multiVals,
-           first={
+           first = {
                vals <- res[match(theNames, res[, 1]), 2]
                names(vals) <- theNames
-               return(vals)
+               vals
            },
-           list={
-               vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
-               return(vals)
+           list = {
+               split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
            },
-           filter={
-               vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
+           filter = {
+               vals <- split(res[, 2], f = factor(res[, 1],
+                                                  levels = unique(theNames)))
                vals <- vals[unlist(lapply(vals, length)) == 1]
-               return(unlist(vals))
+               unlist(vals)
            },
-           asNA={
+           asNA = {
                ## Split the vector, set all those with multi mappings NA.
                vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
-               vals[unlist(lapply(vals, length)) > 1] <- NA
-               return(unlist(vals))
+               vals[unlist(lapply(vals, length)) > 1] <- NA_character_
+               unlist(vals)
            },
-           CharacterList={
+           CharacterList = {
                f <- factor(res[, 1], levels=unique(theNames))
                vals <- splitAsList(res[, 2], f=f)
-               return(vals)
+               vals
            })
 }

@@ -274,6 +274,9 @@ test_that("mapIds works", {
     ## o asNA
     asNA <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                    column = "TXID", multiVals = "asNA")
+    expect_true(is.character(asNA))
+    asNA <- mapIds(edb, "BCL2", "TXID", "GENENAME", multiVals = "asNA")
+    expect_true(is.character(asNA))
     ## Check what happens if we provide 2 identical keys.
     Test <- mapIds(edb, keys = c("BCL2", "BCL2L11", "BCL2"),
                    keytype = "GENENAME", column = "TXID")
