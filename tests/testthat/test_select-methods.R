@@ -247,19 +247,23 @@ test_that("mapIds works", {
     randordergenes <- allgenes[sample(1:length(allgenes), 100)]
     mi <- mapIds(edb, keys = allgenes, keytype = "GENEID", column = "GENENAME")
     expect_equal(allgenes, names(mi))
+    expect_true(is.character(mi))
     ## Ordering should always match the ordering of the input:
     mi <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                  column = "GENENAME")
     expect_equal(randordergenes, names(mi))
+    expect_true(is.character(mi))
     ## Handle multi mappings.
     ## o first
     first <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                     column = "TXID")
     expect_equal(names(first), randordergenes)
+    expect_true(is.character(first))
     ## o list
     lis <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                   column = "TXID", multiVals = "list")
     expect_equal(names(lis), randordergenes)
+    expect_true(is.list(lis))
     Test <- lapply(lis, function(z){return(z[1])})
     expect_equal(first, unlist(Test))
     ## o CharacterList
@@ -271,6 +275,7 @@ test_that("mapIds works", {
     filt <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                    column = "TXID", multiVals = "filter")
     expect_equal(filt, unlist(lis[unlist(lapply(lis, length)) == 1]))
+    expect_true(is.character(filt))
     ## o asNA
     asNA <- mapIds(edb, keys = randordergenes, keytype = "GENEID",
                    column = "TXID", multiVals = "asNA")
@@ -282,9 +287,11 @@ test_that("mapIds works", {
                    keytype = "GENENAME", column = "TXID")
     expect_equal(names(Test), c("BCL2", "BCL2L11", "BCL2"))
     expect_true(length(unique(Test)) == 2)
+    expect_true(is.character(Test))
     ## Submit Filter:
     Test <- mapIds(edb, keys = SeqNameFilter("Y"), column = "GENEID",
                    multiVals = "list")
+    expect_true(is.list(Test))
     TestS <- select(edb, keys = Test[[1]], columns = "SEQNAME",
                     keytype = "GENEID")
     expect_equal(unique(TestS$SEQNAME), "Y")
@@ -332,6 +339,16 @@ test_that("mapIds works", {
                        column = "GENENAME")
         expect_true(all(mapd == "ZBTB16"))
     }
+
+    res <- mapIds(EnsDb.Hsapiens.v86, keys = "BCL2", column = "TXID",
+                  keytype = "GENENAME", multiVals = "asNA")
+    expect_true(is.character(res))
+    res <- mapIds(EnsDb.Hsapiens.v86, keys = "BCL2", column = "TXID",
+                  keytype = "GENENAME", multiVals = "filter")
+    expect_true(is.character(res))
+    res <- mapIds(EnsDb.Hsapiens.v86, keys = c("BCL2", "ENPP4"), "TXID",
+                  "GENENAME", multiVals = "filter")
+    expect_true(is.character(res))
 })
 
 ## Test if the results are properly sorted if we submit a single filter or just keys.

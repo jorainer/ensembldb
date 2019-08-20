@@ -342,8 +342,8 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
            filter = {
                vals <- split(res[, 2], f = factor(res[, 1],
                                                   levels = unique(theNames)))
-               vals <- vals[unlist(lapply(vals, length)) == 1]
-               unlist(vals)
+               vals <- unlist(vals[lengths(vals) == 1])
+               if (length(vals)) vals else character()
            },
            asNA = {
                ## Split the vector, set all those with multi mappings NA.
@@ -352,7 +352,7 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                unlist(vals)
            },
            CharacterList = {
-               f <- factor(res[, 1], levels=unique(theNames))
+               f <- factor(res[, 1], levels = unique(theNames))
                vals <- splitAsList(res[, 2], f=f)
                vals
            })
