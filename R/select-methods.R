@@ -343,7 +343,7 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
                vals <- split(res[, 2], f = factor(res[, 1],
                                                   levels = unique(theNames)))
                vals <- unlist(vals[lengths(vals) == 1])
-               if (length(vals)) vals else character()
+               if (length(vals)) vals else setNames(nm = character())
            },
            asNA = {
                ## Split the vector, set all those with multi mappings NA.
