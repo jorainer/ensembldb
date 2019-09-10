@@ -1,5 +1,5 @@
 .editorconfig
-readme.org
+readme.md
 .git
 ^\.travis\.yml$
 local_data

@@ -161,8 +161,8 @@ test_that("getEnsemblMysqlUrl works", {
 
     ## Only run this if we have access to Ensembl.
     tmp <- try(
-        RCurl::getURL(ensembldb:::.ENSEMBL_URL, dirlistonly = TRUE,
-                      .opts = list(timeout = 5, maxredirs = 2))
+        readLines(curl::curl(paste0(ensembldb:::.ENSEMBL_URL,
+                                    "current_README")))
     )
     if (!is(tmp, "try-error")) {
         res <- ensembldb:::.getEnsemblMysqlUrl(type = "ensembl",
@@ -187,8 +187,8 @@ test_that("getEnsemblMysqlUrl works", {
     }
     ## ensemblgenomes
     tmp <- try(
-        RCurl::getURL(ensembldb:::.ENSEMBLGENOMES_URL, dirlistonly = TRUE,
-                      .opts = list(timeout = 5, maxredirs = 2))
+        readLines(curl::curl(paste0(ensembldb:::.ENSEMBLGENOMES_URL,
+                                    "current_README")))
     )
     if (!is(tmp, "try-error")) {
         ## check fungi
@@ -233,4 +233,3 @@ test_that("getSeqlengthsFromMysqlFolder works", {
         expect_equal(sl, sl_2[names(sl)])
     }
 })
-

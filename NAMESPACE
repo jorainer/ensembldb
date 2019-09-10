@@ -1,6 +1,7 @@
 ## ensembldb NAMESPACE
 import(methods)
 
+importFrom("stats", "setNames")
 importFrom("utils",
            "read.table",
            "str",
