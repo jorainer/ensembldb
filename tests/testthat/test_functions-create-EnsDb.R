@@ -187,10 +187,11 @@ test_that("getEnsemblMysqlUrl works", {
     }
     ## ensemblgenomes
     tmp <- try(
+        ## fungi.ensembl.org
         RCurl::getURL(ensembldb:::.ENSEMBLGENOMES_URL, dirlistonly = TRUE,
                       .opts = list(timeout = 5, maxredirs = 2))
     )
-    if (!is(tmp, "try-error")) {
+    if (!is(tmp, "try-error") && tmp != "") {
         ## check fungi
         res <- ensembldb:::.getEnsemblMysqlUrl(type = "ensemblgenomes",
                                                organism = "fusarium_oxysporum",
@@ -233,4 +234,3 @@ test_that("getSeqlengthsFromMysqlFolder works", {
         expect_equal(sl, sl_2[names(sl)])
     }
 })
-

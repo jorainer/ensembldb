@@ -11,7 +11,7 @@ test_that(".tx_to_protein works",  {
     x <- IRanges(start = 2, width = 4)
     expect_error(.tx_to_protein(x, edbx))
     expect_error(.txs_to_proteins(x, edbx))
-    
+
     ## Non existant transcript.
     x <- IRanges(start = 2, width = 5, names = "some")
     expect_warning(res_a <- .tx_to_protein(x, edbx))
@@ -21,7 +21,7 @@ test_that(".tx_to_protein works",  {
     expect_true(start(res_a) < 0)
     expect_warning(res_b <- .txs_to_proteins(x, edbx))
     expect_equal(res_a, res_b)
-    
+
     ## ENST00000431238: non-coding transcript
     x <- IRanges(start = 2, width = 5, names = "ENST00000431238")
     expect_warning(res_a <- .tx_to_protein(x, edbx))
@@ -72,7 +72,7 @@ test_that(".tx_to_protein works",  {
     res_a <- .tx_to_protein(x, edbx, id = "id")
     res_b <- .txs_to_proteins(x, edbx, id = "id")
     expect_equal(res_a, res_b)
-    
+
     ## Multiple input.
     ## just outside the CDS (last nt of the 5' UTR).
     x <- IRanges(start = c(691, 692, 32, 5000, 1, 1565),
@@ -82,18 +82,18 @@ test_that(".tx_to_protein works",  {
                            "ENST00000381578"))
     expect_warning(res_a <- .tx_to_protein(x, edbx))
     expect_warning(res_b <- .txs_to_proteins(x, edbx))
-    expect_equal(res_a, res_b)    
+    expect_equal(res_a, res_b)
 })
 
 test_that("transcriptToProtein works", {
     edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
-    
+
     ## Errors.
     expect_error(transcriptToProtein())
     expect_error(transcriptToProtein(db = edbx))
     expect_error(transcriptToProtein(txpos))
-    
-    ## 
+
+    ##
     x <- IRanges(start = 692, width = 2)
     mcols(x)$id <- "ENST00000381578"
     expect_error(transcriptToProtein(x))
@@ -146,22 +146,20 @@ test_that(".tx_to_genome works", {
     expect_warning(res_2 <- .tx_to_genome(rng, edbx))
     a <- res[1]
     b <- res_2[1]
-    seqlevels(a) <- seqlevels(b)
-    expect_equal(a, b)
     expect_equal(lengths(res_2), c(ENST00000486554 = 2, ENST00000486554 = 0,
                                    B = 0))
 })
 
 test_that("transcriptToGenome works", {
     edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
-    
+
     x <- IRanges(start = c(259, 1, 259), end = c(260, 4, 261),
                  names = c("ENST00000381578", "some", "ENST00000381578"))
     ## Errors.
     expect_error(transcriptToGenome())
     expect_error(transcriptToGenome(db = edbx))
     expect_error(transcriptToGenome(x))
-    
+
     expect_warning(res <- transcriptToGenome(x, edbx))
     expect_true(is(res, "GRangesList"))
     expect_true(length(res) == length(x))
@@ -170,7 +168,7 @@ test_that("transcriptToGenome works", {
     expect_equal(start(res[[1]]), start(res[[3]]))
     expect_equal(end(res[[1]])[1], end(res[[3]])[1])
     expect_equal(end(res[[1]])[2] + 1, end(res[[3]])[2])
-    
+
     expect_warning(res <- transcriptToGenome(x[2], edbx))
     expect_true(is(res, "GRangesList"))
     expect_true(length(res) == 1)
