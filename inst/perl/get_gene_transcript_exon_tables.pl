@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.5: * Add column gc_content to transcript table.
 ## version 0.3.4: * Add columns gene_id_version and tx_id_version to the gene
 ##                  and transcript tables.
 ## version 0.3.3: * Write the species' scientific name to the Organism metadata
@@ -32,7 +33,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.4";
+my $script_version = "0.3.5";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
@@ -135,7 +136,7 @@ open(GENE , ">ens_gene.txt");
 print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\tdescription\tgene_id_version\n";
 
 open(TRANSCRIPT , ">ens_tx.txt");
-print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\n";
+print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\tgc_content\n";
 
 open(EXON , ">ens_exon.txt");
 print EXON "exon_id\texon_seq_start\texon_seq_end\n";
@@ -274,11 +275,14 @@ foreach my $gene_id (@gene_ids){
 	}
       }
       my $tx_description = $transcript->description;
+      my $seqs = $transcript->seq()->seq();
+      my $seql = $transcript->length();
+      my $gc_count = ($seqs =~ tr/[G|C]//) / $seql * 100;
       # if (!defined($tx_description)) {
       # 	$tx_description = "NULL";
       # }
       ## write info.
-      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\n";
+      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\t$gc_count\n";
 ##      print G2T "$gene_id\t$tx_id\n";
 
       ## Process proteins/translations (if possible)

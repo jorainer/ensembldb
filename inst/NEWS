@@ -1,3 +1,8 @@
+Changes in version 2.11.1
+
+- Add gc_count to the transcripts table.
+
+
 Changes in version 2.7.10
 
 - Export getGenomeTwoBitFile (issue #95).
