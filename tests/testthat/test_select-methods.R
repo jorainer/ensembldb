@@ -349,6 +349,78 @@ test_that("mapIds works", {
     res <- mapIds(EnsDb.Hsapiens.v86, keys = c("BCL2", "ENPP4"), "TXID",
                   "GENENAME", multiVals = "filter")
     expect_true(is.character(res))
+
+    ## issue #104: unable to map.
+    res <- mapIds(edb, "ENSG00000107562", "SYMBOL", "GENEID")
+    expect_equal(length(res), 1)
+    expect_equal(names(res), "ENSG00000107562")
+    expect_warning(res <- mapIds(edb, "ENSMUSG00000000001", "SYMBOL", "GENEID"))
+    expect_equal(length(res), 1)
+    expect_equal(names(res), "ENSMUSG00000000001")
+    expect_warning(res <- mapIds(edb, c("ENSG00000107562", "ENSMUSG00000000001"),
+                                 "SYMBOL", "GENEID"))
+    expect_equal(length(res), 2)
+    expect_equal(names(res), c("ENSG00000107562", "ENSMUSG00000000001"))
+    expect_warning(res <- mapIds(edb, c("ENSMUSG00000000001", "ENSG00000107562"),
+                                 "SYMBOL", "GENEID"))
+    expect_equal(length(res), 2)
+    expect_equal(names(res), c("ENSMUSG00000000001", "ENSG00000107562"))
+    expect_warning(res <- mapIds(edb, c("a", "b", "c"), "SYMBOL", "GENEID"))
+    expect_equal(length(res), 3)
+    expect_equal(names(res), c("a", "b", "c"))
+
+    ## list
+    res <- mapIds(edb, "ENSG00000107562", "SYMBOL", "GENEID", multiVals = "list")
+    expect_equal(length(res), 1)
+    expect_equal(names(res), "ENSG00000107562")
+    expect_true(is.list(res))
+    expect_warning(res <- mapIds(edb, "ENSMUSG00000000001", "SYMBOL", "GENEID",
+                                 multiVals = "list"))
+    expect_equal(length(res), 1)
+    expect_equal(names(res), "ENSMUSG00000000001")
+    expect_true(is.list(res))
+    expect_warning(res <- mapIds(edb, c("ENSG00000107562", "ENSMUSG00000000001"),
+                                 "SYMBOL", "GENEID", multiVals = "list"))
+    expect_equal(length(res), 2)
+    expect_equal(names(res), c("ENSG00000107562", "ENSMUSG00000000001"))
+    expect_true(is.list(res))
+    expect_warning(res <- mapIds(edb, c("ENSMUSG00000000001", "ENSG00000107562"),
+                                 "SYMBOL", "GENEID", multiVals = "list"))
+    expect_equal(length(res), 2)
+    expect_equal(names(res), c("ENSMUSG00000000001", "ENSG00000107562"))
+    expect_true(is.list(res))
+    expect_warning(res <- mapIds(edb, c("a", "b", "c"), "SYMBOL", "GENEID",
+                                 multiVals = "list"))
+    expect_equal(length(res), 3)
+    expect_equal(names(res), c("a", "b", "c"))
+    expect_true(is.list(res))
+
+    ## CharacterList
+    res <- mapIds(edb, "ENSG00000107562", "SYMBOL", "GENEID",
+                  multiVals = "CharacterList")
+    expect_equal(length(res), 1)
+    expect_equal(names(res), "ENSG00000107562")
+    expect_true(is(res, "CharacterList"))
+    expect_warning(res <- mapIds(edb, "ENSMUSG00000000001", "SYMBOL", "GENEID",
+                                 multiVals = "CharacterList"))
+    expect_equal(length(res), 1)
+    expect_equal(names(res), "ENSMUSG00000000001")
+    expect_true(is(res, "CharacterList"))
+    expect_warning(res <- mapIds(edb, c("ENSG00000107562", "ENSMUSG00000000001"),
+                                 "SYMBOL", "GENEID", multiVals = "CharacterList"))
+    expect_equal(length(res), 2)
+    expect_equal(names(res), c("ENSG00000107562", "ENSMUSG00000000001"))
+    expect_true(is(res, "CharacterList"))
+    expect_warning(res <- mapIds(edb, c("ENSMUSG00000000001", "ENSG00000107562"),
+                                 "SYMBOL", "GENEID", multiVals = "CharacterList"))
+    expect_equal(length(res), 2)
+    expect_equal(names(res), c("ENSMUSG00000000001", "ENSG00000107562"))
+    expect_true(is(res, "CharacterList"))
+    expect_warning(res <- mapIds(edb, c("a", "b", "c"), "SYMBOL", "GENEID",
+                                 multiVals = "CharacterList"))
+    expect_equal(length(res), 3)
+    expect_equal(names(res), c("a", "b", "c"))
+    expect_true(is(res, "CharacterList"))
 })
 
 ## Test if the results are properly sorted if we submit a single filter or just keys.
