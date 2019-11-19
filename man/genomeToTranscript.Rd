@@ -72,13 +72,14 @@ gnm <- GRanges("X", IRanges(start = c(644635, 107716399, 107716399),
 genomeToTranscript(gnm, edbx)
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{cdsToTranscript}},
-  \code{\link{genomeToProtein}},
-  \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}},
-  \code{\link{transcriptToCds}},
-  \code{\link{transcriptToGenome}},
-  \code{\link{transcriptToProtein}}
+Other coordinate mapping functions: 
+\code{\link{cdsToTranscript}()},
+\code{\link{genomeToProtein}()},
+\code{\link{proteinToGenome}()},
+\code{\link{proteinToTranscript}()},
+\code{\link{transcriptToCds}()},
+\code{\link{transcriptToGenome}()},
+\code{\link{transcriptToProtein}()}
 }
 \author{
 Johannes Rainer

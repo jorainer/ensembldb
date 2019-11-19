@@ -55,13 +55,14 @@ transcriptToGenome(cdsToTranscript(pkp2, EnsDb.Hsapiens.v86),
     EnsDb.Hsapiens.v86)
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{genomeToProtein}},
-  \code{\link{genomeToTranscript}},
-  \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}},
-  \code{\link{transcriptToCds}},
-  \code{\link{transcriptToGenome}},
-  \code{\link{transcriptToProtein}}
+Other coordinate mapping functions: 
+\code{\link{genomeToProtein}()},
+\code{\link{genomeToTranscript}()},
+\code{\link{proteinToGenome}()},
+\code{\link{proteinToTranscript}()},
+\code{\link{transcriptToCds}()},
+\code{\link{transcriptToGenome}()},
+\code{\link{transcriptToProtein}()}
 }
 \author{
 Johannes Rainer

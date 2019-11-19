@@ -76,13 +76,14 @@ res
 \code{\link[=cdsToTranscript]{cdsToTranscript()}} and \code{\link[=transcriptToCds]{transcriptToCds()}} for the mapping between
 CDS- and transcript-relative coordinates.
 
-Other coordinate mapping functions: \code{\link{cdsToTranscript}},
-  \code{\link{genomeToProtein}},
-  \code{\link{genomeToTranscript}},
-  \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}},
-  \code{\link{transcriptToCds}},
-  \code{\link{transcriptToProtein}}
+Other coordinate mapping functions: 
+\code{\link{cdsToTranscript}()},
+\code{\link{genomeToProtein}()},
+\code{\link{genomeToTranscript}()},
+\code{\link{proteinToGenome}()},
+\code{\link{proteinToTranscript}()},
+\code{\link{transcriptToCds}()},
+\code{\link{transcriptToProtein}()}
 }
 \author{
 Johannes Rainer

@@ -1,6 +1,8 @@
 Changes in version 2.11.1
 
 - Add gc_count to the transcripts table.
+- Ensure `mapIds` returns a result equal to the number of input keys - even if
+  none of them could be mapped (issue #104).
 
 
 Changes in version 2.7.10

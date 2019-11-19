@@ -318,42 +318,44 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
         keytype <- NULL
     }
     res <- select(x, keys = keys, columns = columns, keytype = keytype)
-    if(nrow(res) == 0)
-        return(character())
-    ## Handling multiVals.
     if (is.null(multiVals))
         multiVals <- "first"
     if (is(multiVals, "function"))
         stop("Not yet implemented!")
-    if (is.character(keys)) {
+    if (is.character(keys))
         theNames <- keys
-    } else {
+    else
         theNames <- unique(res[, 1])
-    }
     switch(multiVals,
            first = {
                vals <- res[match(theNames, res[, 1]), 2]
                names(vals) <- theNames
-               vals
+               not_mapped <- sum(is.na(vals))
            },
            list = {
-               split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
+               vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
+               not_mapped <- lengths(vals) == 0
            },
            filter = {
                vals <- split(res[, 2], f = factor(res[, 1],
                                                   levels = unique(theNames)))
                vals <- unlist(vals[lengths(vals) == 1])
-               if (length(vals)) vals else setNames(nm = character())
+               if (length(vals)) return(vals) else return(setNames(nm = character()))
            },
            asNA = {
                ## Split the vector, set all those with multi mappings NA.
                vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
+               not_mapped <- lengths(vals) == 0
                vals[unlist(lapply(vals, length)) > 1] <- NA_character_
-               unlist(vals)
+               vals <- unlist(vals)
            },
            CharacterList = {
                f <- factor(res[, 1], levels = unique(theNames))
                vals <- splitAsList(res[, 2], f=f)
-               vals
+               not_mapped <- lengths(vals) == 0
            })
+    if (not_mapped)
+        warning("Unable to map ", not_mapped, " of ", length(theNames),
+                " requested IDs.", call. = FALSE)
+    vals
 }

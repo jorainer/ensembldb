@@ -13,7 +13,7 @@ vignette: >
   %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,AnnotationHub,ggbio,Gviz,magrittr}
 ---
 
-```{r  biocstyle, echo = FALSE, results = "asis", message = FALSE }
+```{r biocstyle, echo = FALSE, results = "asis", message = FALSE}
 library(BiocStyle)
 BiocStyle::markdown()
 ```
@@ -23,16 +23,17 @@ BiocStyle::markdown()
 
 The `ensembldb` package provides functions to create and use transcript centric
 annotation databases/packages. The annotation for the databases are directly
-fetched from Ensembl <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> using their Perl API. The functionality and data is
-similar to that of the `TxDb` packages from the `GenomicFeatures` package, but, in
-addition to retrieve all gene/transcript models and annotations from the
-database, the `ensembldb` package provides also a filter framework allowing to
-retrieve annotations for specific entries like genes encoded on a chromosome
-region or transcript models of lincRNA genes. From version 1.7 on, `EnsDb`
-databases created by the `ensembldb` package contain also protein annotation data
-(see Section [11](#org4707794) for the database layout and an overview of
-available attributes/columns). For more information on the use of the protein
-annotations refer to the *proteins* vignette.
+fetched from Ensembl <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>
+using their Perl API. The functionality and data is similar to that of the
+`TxDb` packages from the `GenomicFeatures` package, but, in addition to retrieve
+all gene/transcript models and annotations from the database, the `ensembldb`
+package provides also a filter framework allowing to retrieve annotations for
+specific entries like genes encoded on a chromosome region or transcript models
+of lincRNA genes. From version 1.7 on, `EnsDb` databases created by the
+`ensembldb` package contain also protein annotation data (see Section
+[11](#org4707794) for the database layout and an overview of available
+attributes/columns). For more information on the use of the protein annotations
+refer to the *proteins* vignette.
 
 Another main goal of this package is to generate *versioned* annotation
 packages, i.e. annotation packages that are build for a specific Ensembl
@@ -44,10 +45,10 @@ also allows to load multiple annotation packages at the same time in order to
 e.g. compare gene models between Ensembl releases.
 
 In the example below we load an Ensembl based annotation package for Homo
-sapiens, Ensembl version 86. The `EnsDb` object providing access to the underlying
-SQLite database is bound to the variable name `EnsDb.Hsapiens.v86`.
+sapiens, Ensembl version 86. The `EnsDb` object providing access to the
+underlying SQLite database is bound to the variable name `EnsDb.Hsapiens.v86`.
 
-```{r  load-libs, warning=FALSE, message=FALSE }
+```{r load-libs, warning=FALSE, message=FALSE}
 library(EnsDb.Hsapiens.v86)
 
 ## Making a "short cut"
@@ -57,120 +58,120 @@ edb
 
 ## For what organism was the database generated?
 organism(edb)
-
 ```
 
-```{r  no-network, echo = FALSE, results = "hide" }
+```{r no-network, echo = FALSE, results = "hide"}
 ## Disable code chunks that require network connection - conditionally
 ## disable this on Windows only. This is to avoid TIMEOUT errors on the
 ## Bioconductor Windows build maching (issue #47).
 use_network <- TRUE
-
 ```
 
 
 # Using `ensembldb` annotation packages to retrieve specific annotations
 
-One of the strengths of the `ensembldb` package and the related `EnsDb` databases is
-its implementation of a filter framework that enables to efficiently extract
-data sub-sets from the databases. The `ensembldb` package supports most of the
-filters defined in the `AnnotationFilter` Bioconductor package and defines some
-additional filters specific to the data stored in `EnsDb` databases. Filters can
-be passed directly to all methods extracting data from an `EnsDb` (such as `genes`,
-`transcripts` or `exons`). Alternatively it is possible with the `addFilter` or `filter`
-functions to add a filter directly to an `EnsDb` which will then be used in all
-queries on that object.
+One of the strengths of the `ensembldb` package and the related `EnsDb`
+databases is its implementation of a filter framework that enables to
+efficiently extract data sub-sets from the databases. The `ensembldb` package
+supports most of the filters defined in the `AnnotationFilter` Bioconductor
+package and defines some additional filters specific to the data stored in
+`EnsDb` databases. Filters can be passed directly to all methods extracting data
+from an `EnsDb` (such as `genes`, `transcripts` or `exons`). Alternatively it is
+possible with the `addFilter` or `filter` functions to add a filter directly to
+an `EnsDb` which will then be used in all queries on that object.
 
 The `supportedFilters` method can be used to get an overview over all supported
 filter classes, each of them (except the `GRangesFilter`) working on a single
 column/field in the database.
 
-```{r  filters }
+```{r filters}
 supportedFilters(edb)
-
 ```
 
 These filters can be divided into 3 main filter types:
 
--   `IntegerFilter`: filter classes extending this basic object can take a single
-    numeric value as input and support the conditions *==*, *!=*, *>*, *<*, *>=* and *<=*. All
-    filters that work on chromosomal coordinates, such as the `GeneEndFilter` extend
-    `IntegerFilter`.
--   `CharacterFilter`: filter classes extending this object can take a single or
-    multiple character values as input and allow conditions: *==*, *!=*, *"startsWith"*
-    , *"endsWith"* and *"contains"*. All filters working on IDs extend this class.
--   `GRangesFilter`: takes a `GRanges` object as input and supports all conditions
-    that `findOverlaps` from the `IRanges` package supports ("any", "start", "end",
-    "within", "equal"). Note that these have to be passed using the parameter `type`
-    to the constructor function.
+- `IntegerFilter`: filter classes extending this basic object can take a single
+  numeric value as input and support the conditions `==`, `!=`, `>`, `<`, `>=`
+  and `<=`. All filters that work on chromosomal coordinates, such as the
+  `GeneEndFilter` extend `IntegerFilter`.
+- `CharacterFilter`: filter classes extending this object can take a single or
+  multiple character values as input and allow conditions: `==`, `!=`,
+  `"startsWith"` , `"endsWith"` and `"contains"`. All filters working on IDs
+  extend this class.
+- `GRangesFilter`: takes a `GRanges` object as input and supports all conditions
+  that `findOverlaps` from the `IRanges` package supports (`"any"`, `"start"`,
+  `"end"`, `"within"`, `"equal"`). Note that these have to be passed using the
+  parameter `type` to the constructor function.
 
 The supported filters are:
 
--   `EntrezFilter`: allows to filter results based on NCBI Entrezgene
-    identifiers of the genes.
--   `ExonEndFilter`: filter using the chromosomal end coordinate of exons.
--   `ExonIdFilter`: filter based on the (Ensembl) exon identifiers.
--   `ExonRankFilter`: filter based on the rank (index) of an exon within the
-    transcript model. Exons are always numbered from 5' to 3' end of the
-    transcript, thus, also on the reverse strand, the exon 1 is the most 5' exon
-    of the transcript.
--   `ExonStartFilter`: filter using the chromosomal start coordinate of exons.
--   `GeneBiotypeFilter`: filter using the gene biotypes defined in the Ensembl
-    database; use the `listGenebiotypes` method to list all available biotypes.
--   `GeneEndFilter`: filter using the chromosomal end coordinate of gene.
--   `GeneIdFilter`: filter based on the Ensembl gene IDs.
--   `GeneNameFilter`: filter based on the names (symbols) of the genes.
--   `GeneStartFilter`: filter using the chromosomal start coordinate of gene.
--   `GRangesFilter`: allows to retrieve all features (genes, transcripts or exons)
-    that are either within (setting parameter `type` to "within") or partially
-    overlapping (setting `type` to "any") the defined genomic region/range. Note
-    that, depending on the called method (`genes`, `transcripts` or `exons`) the start
-    and end coordinates of either the genes, transcripts or exons are used for the
-    filter. For methods `exonsBy`, `cdsBy` and `txBy` the coordinates of `by` are used.
--   `SeqNameFilter`: filter by the name of the chromosomes the genes are encoded
-    on.
--   `SeqStrandFilter`: filter for the chromosome strand on which the genes are
-    encoded.
--   `SymbolFilter`: filter on gene symbols; note that no database columns *symbol* is
-    available in an `EnsDb` database and hence the gene name is used for filtering.
--   `TxBiotypeFilter`: filter on the transcript biotype defined in Ensembl; use
-    the `listTxbiotypes` method to list all available biotypes.
--   `TxEndFilter`: filter using the chromosomal end coordinate of transcripts.
--   `TxIdFilter`: filter on the Ensembl transcript identifiers.
--   `TxNameFilter`: filter on the Ensembl transcript names (currently identical to
-    the transcript IDs).
--   `TxStartFilter`: filter using the chromosomal start coordinate of transcripts.
+- `EntrezFilter`: allows to filter results based on NCBI Entrezgene identifiers
+  of the genes.
+- `ExonEndFilter`: filter using the chromosomal end coordinate of exons.
+- `ExonIdFilter`: filter based on the (Ensembl) exon identifiers.
+- `ExonRankFilter`: filter based on the rank (index) of an exon within the
+  transcript model. Exons are always numbered from 5' to 3' end of the
+  transcript, thus, also on the reverse strand, the exon 1 is the most 5' exon
+  of the transcript.
+- `ExonStartFilter`: filter using the chromosomal start coordinate of exons.
+- `GeneBiotypeFilter`: filter using the gene biotypes defined in the Ensembl
+  database; use the `listGenebiotypes` method to list all available biotypes.
+- `GeneEndFilter`: filter using the chromosomal end coordinate of gene.
+- `GeneIdFilter`: filter based on the Ensembl gene IDs.
+- `GeneNameFilter`: filter based on the names (symbols) of the genes.
+- `GeneStartFilter`: filter using the chromosomal start coordinate of gene.
+- `GRangesFilter`: allows to retrieve all features (genes, transcripts or exons)
+  that are either within (setting parameter `type` to "within") or partially
+  overlapping (setting `type` to "any") the defined genomic region/range. Note
+  that, depending on the called method (`genes`, `transcripts` or `exons`) the
+  start and end coordinates of either the genes, transcripts or exons are used
+  for the filter. For methods `exonsBy`, `cdsBy` and `txBy` the coordinates of
+  `by` are used.
+- `SeqNameFilter`: filter by the name of the chromosomes the genes are encoded
+  on.
+- `SeqStrandFilter`: filter for the chromosome strand on which the genes are
+  encoded.
+- `SymbolFilter`: filter on gene symbols; note that no database columns *symbol*
+  is available in an `EnsDb` database and hence the gene name is used for
+  filtering.
+- `TxBiotypeFilter`: filter on the transcript biotype defined in Ensembl; use
+  the `listTxbiotypes` method to list all available biotypes.
+- `TxEndFilter`: filter using the chromosomal end coordinate of transcripts.
+- `TxIdFilter`: filter on the Ensembl transcript identifiers.
+- `TxNameFilter`: filter on the Ensembl transcript names (currently identical to
+  the transcript IDs).
+- `TxStartFilter`: filter using the chromosomal start coordinate of transcripts.
 
 In addition to the above listed *DNA-RNA-based* filters, *protein-specific*
 filters are also available:
 
--   `ProtDomIdFilter`, `ProteinDomainIdFilter`: filter by the protein domain ID.
--   `ProteinDomainSourceFilter`: filter by the source of the protein domain
-    (database or method, e.g. *pfam*).
--   `ProteinIdFilter`: filter by Ensembl protein ID filters.
--   `UniprotDbFilter`: filter by the name of the Uniprot database.
--   `UniprotFilter`: filter by the Uniprot ID.
--   `UniprotMappingTypeFilter`: filter by the mapping type of Ensembl protein IDs to
-    Uniprot IDs.
+- `ProtDomIdFilter`, `ProteinDomainIdFilter`: filter by the protein domain ID.
+- `ProteinDomainSourceFilter`: filter by the source of the protein domain
+  (database or method, e.g. *pfam*).
+- `ProteinIdFilter`: filter by Ensembl protein ID filters.
+- `UniprotDbFilter`: filter by the name of the Uniprot database.
+- `UniprotFilter`: filter by the Uniprot ID.
+- `UniprotMappingTypeFilter`: filter by the mapping type of Ensembl protein IDs
+  to Uniprot IDs.
 
 These can however only be used on `EnsDb` databases that provide protein
 annotations, i.e. for which a call to `hasProteinData` returns `TRUE`.
 
 `EnsDb` databases for more recent Ensembl versions (starting from Ensembl 87)
-provide also evidence levels for individual transcripts in the `tx_support_level`
-database column. Such databases support also a `TxSupportLevelFilter` filter to
-use this columns for filtering.
+provide also evidence levels for individual transcripts in the
+`tx_support_level` database column. Such databases support also a
+`TxSupportLevelFilter` filter to use this columns for filtering.
 
 A simple use case for the filter framework would be to get all transcripts for
 the gene *BCL2L11*. To this end we specify a `GeneNameFilter` with the value
-*BCL2L11*. As a result we get a `GRanges` object with `start`, `end`, `strand` and `seqname`
-being the start coordinate, end coordinate, chromosome name and strand for the
-respective transcripts. All additional annotations are available as metadata
-columns. Alternatively, by setting `return.type` to "DataFrame", or "data.frame"
-the method would return a `DataFrame` or `data.frame` object instead of the default
-`GRanges`.
+*BCL2L11*. As a result we get a `GRanges` object with `start`, `end`, `strand`
+and `seqname` being the start coordinate, end coordinate, chromosome name and
+strand for the respective transcripts. All additional annotations are available
+as metadata columns. Alternatively, by setting `return.type` to "DataFrame", or
+"data.frame" the method would return a `DataFrame` or `data.frame` object
+instead of the default `GRanges`.
 
-```{r  transcripts }
+```{r transcripts}
 Tx <- transcripts(edb, filter = GeneNameFilter("BCL2L11"))
 
 Tx
@@ -180,7 +181,6 @@ head(start(Tx))
 
 ## or extract the biotype with
 head(Tx$tx_biotype)
-
 ```
 
 The parameter `columns` of the extractor methods (such as `exons`, `genes` or
@@ -190,45 +190,43 @@ retrieved. The `exons` method returns by default all exon-related columns, the
 from the gene table. Note however that in the example above we got also a column
 `gene_name` although this column is not present in the transcript database
 table. By default the methods return also all columns that are used by any of
-the filters submitted with the `filter` argument (thus, because a `GeneNameFilter`
-was used, the column `gene_name` is also returned). Setting
+the filters submitted with the `filter` argument (thus, because a
+`GeneNameFilter` was used, the column `gene_name` is also returned). Setting
 `returnFilterColumns(edb) <- FALSE` disables this option and only the columns
 specified by the `columns` parameter are retrieved.
 
-Instead of passing a filter *object* to the method it is also possible to provide
-a filter *expression* written as a `formula`. The `formula` has to be written in the
-form `~ <field> <condition> <value>` with `<field>` being the field (database
-column) in the database, `<condition>` the condition for the filter object and
-`<value>` its value. Use the `supportedFilter` method to get the field names
-corresponding to each filter class.
+Instead of passing a filter *object* to the method it is also possible to
+provide a filter *expression* written as a `formula`. The `formula` has to be
+written in the form `~ <field> <condition> <value>` with `<field>` being the
+field (database column) in the database, `<condition>` the condition for the
+filter object and `<value>` its value. Use the `supportedFilter` method to get
+the field names corresponding to each filter class.
 
-```{r  transcripts-filter-expression }
+```{r transcripts-filter-expression}
 ## Use a filter expression to perform the filtering.
 transcripts(edb, filter = ~ gene_name == "ZBTB16")
-
 ```
 
 Filter expression have to be written as a formula (i.e. starting with a `~`) in
 the form *column name* followed by the logical condition.
 
 Alternatively, `EnsDb` objects can be filtered directly using the `filter`
-function. In the example below we use the `filter` function to filter the `EnsDb`
-object and pass that filtered database to the `transcripts` method using the `%>%`
-from the `magrittr` package.
+function. In the example below we use the `filter` function to filter the
+`EnsDb` object and pass that filtered database to the `transcripts` method using
+the `%>%` from the `magrittr` package.
 
-```{r  transcripts-filter, message = FALSE }
+```{r transcripts-filter, message = FALSE}
 library(magrittr)
 
 edb %>% filter(~ symbol == "BCL2" & tx_biotype != "protein_coding") %>%
     transcripts
-
 ```
 
 Adding a filter to an `EnsDb` enables this filter (globally) on all subsequent
 queries on that object. We could thus filter an `EnsDb` to (virtually) contain
 only features encoded on chromosome Y.
 
-```{r  filter-Y }
+```{r filter-Y}
 edb_y <- addFilter(edb, SeqNameFilter("Y"))
 
 ## All subsequent filters on that EnsDb will only work on features encoded on
@@ -237,56 +235,52 @@ genes(edb_y)
 
 ## Get all lincRNAs on chromosome Y
 genes(edb_y, filter = ~ gene_biotype == "lincRNA")
-
 ```
 
 To get an overview of database tables and available columns the function
-`listTables` can be used. The method `listColumns` on the other hand lists columns
-for the specified database table.
+`listTables` can be used. The method `listColumns` on the other hand lists
+columns for the specified database table.
 
-```{r  list-columns }
+```{r list-columns}
 ## list all database tables along with their columns
 listTables(edb)
 
 ## list columns from a specific table
 listColumns(edb, "tx")
-
 ```
 
-Thus, we could retrieve all transcripts of the biotype *nonsense\_mediated\_decay*
-(which, according to the definitions by Ensembl are transcribed, but most likely
-not translated in a protein, but rather degraded after transcription) along with
-the name of the gene for each transcript. Note that we are changing here the
-`return.type` to `DataFrame`, so the method will return a `DataFrame` with the
-results instead of the default `GRanges`.
+Thus, we could retrieve all transcripts of the biotype
+*nonsense\_mediated\_decay* (which, according to the definitions by Ensembl are
+transcribed, but most likely not translated in a protein, but rather degraded
+after transcription) along with the name of the gene for each transcript. Note
+that we are changing here the `return.type` to `DataFrame`, so the method will
+return a `DataFrame` with the results instead of the default `GRanges`.
 
-```{r  transcripts-example2 }
+```{r transcripts-example2}
 Tx <- transcripts(edb,
 		  columns = c(listColumns(edb , "tx"), "gene_name"),
 		  filter = TxBiotypeFilter("nonsense_mediated_decay"),
 		  return.type = "DataFrame")
 nrow(Tx)
 Tx
-
 ```
 
 For protein coding transcripts, we can also specifically extract their coding
 region. In the example below we extract the CDS for all transcripts encoded on
 chromosome Y.
 
-```{r  cdsBy }
+```{r cdsBy}
 yCds <- cdsBy(edb, filter = SeqNameFilter("Y"))
 yCds
-
 ```
 
 Using a `GRangesFilter` we can retrieve all features from the database that are
-either within or overlapping the specified genomic region. In the example
-below we query all genes that are partially overlapping with a small region on
+either within or overlapping the specified genomic region. In the example below
+we query all genes that are partially overlapping with a small region on
 chromosome 11. The filter restricts to all genes for which either an exon or an
 intron is partially overlapping with the region.
 
-```{r  genes-GRangesFilter }
+```{r genes-GRangesFilter}
 ## Define the filter
 grf <- GRangesFilter(GRanges("11", ranges = IRanges(114129278, 114129328),
 			     strand = "+"), type = "any")
@@ -297,10 +291,9 @@ gn
 
 ## Next we retrieve all transcripts for that gene so that we can plot them.
 txs <- transcripts(edb, filter = GeneNameFilter(gn$gene_name))
-
 ```
 
-```{r  granges-zbtb16, message = FALSE, echo = FALSE }
+```{r granges-zbtb16, message = FALSE, echo = FALSE}
 plot(3, 3, pch = NA, xlim = c(start(gn), end(gn)), ylim = c(0, length(txs)),
      yaxt = "n", ylab = "")
 ## Highlight the GRangesFilter region
@@ -312,7 +305,6 @@ for(i in 1:length(txs)) {
          ytop = i-0.125, border = "grey")
     text(start(current), y = i-0.5, pos = 4, cex = 0.75, labels = current$tx_id)
 }
-
 ```
 
 As we can see, 4 transcripts of the gene ZBTB16 are also overlapping the
@@ -320,9 +312,8 @@ region. Below we fetch these 4 transcripts. Note, that a call to `exons` will
 not return any features from the database, as no exon is overlapping with the
 region.
 
-```{r  transcripts-GRangesFilter }
+```{r transcripts-GRangesFilter}
 transcripts(edb, filter = grf)
-
 ```
 
 The `GRangesFilter` supports also `GRanges` defining multiple regions and a
@@ -333,24 +324,23 @@ overlapping genomic regions using the `exonsByOverlaps` or
 implementation of these methods for `EnsDb` objects supports also to use filters
 to further fine-tune the query.
 
-The functions `listGenebiotypes` and `listTxbiotypes` can be used to get an overview
-of allowed/available gene and transcript biotype
+The functions `listGenebiotypes` and `listTxbiotypes` can be used to get an
+overview of allowed/available gene and transcript biotype
 
-```{r  biotypes }
+```{r biotypes}
 ## Get all gene biotypes from the database. The GeneBiotypeFilter
 ## allows to filter on these values.
 listGenebiotypes(edb)
 
 ## Get all transcript biotypes from the database.
 listTxbiotypes(edb)
-
 ```
 
 Data can be fetched in an analogous way using the `exons` and `genes`
 methods. In the example below we retrieve `gene_name`, `entrezid` and the
 `gene_biotype` of all genes in the database which names start with "BCL2".
 
-```{r  genes-BCL2 }
+```{r genes-BCL2}
 ## We're going to fetch all genes which names start with BCL.
 BCLs <- genes(edb,
 	      columns = c("gene_name", "entrezid", "gene_biotype"),
@@ -358,7 +348,6 @@ BCLs <- genes(edb,
 	      return.type = "DataFrame")
 nrow(BCLs)
 BCLs
-
 ```
 
 Sometimes it might be useful to know the length of genes or transcripts
@@ -366,10 +355,10 @@ Sometimes it might be useful to know the length of genes or transcripts
 the mean length of transcripts from protein coding genes on chromosomes X and Y
 as well as the average length of snoRNA, snRNA and rRNA transcripts encoded on
 these chromosomes. For the first query we combine two `AnnotationFilter` objects
-using an `AnnotationFilterList` object, in the second we define the query using a
-filter expression.
+using an `AnnotationFilterList` object, in the second we define the query using
+a filter expression.
 
-```{r  example-AnnotationFilterList }
+```{r example-AnnotationFilterList}
 ## determine the average length of snRNA, snoRNA and rRNA genes encoded on
 ## chromosomes X and Y.
 mean(lengthOf(edb, of = "tx",
@@ -382,7 +371,6 @@ mean(lengthOf(edb, of = "tx",
 mean(lengthOf(edb, of = "tx",
 	      filter = ~ gene_biotype == "protein_coding" &
 		  seq_name %in% c("X", "Y")))
-
 ```
 
 Not unexpectedly, transcripts of protein coding genes are longer than those of
@@ -391,13 +379,12 @@ snRNA, snoRNA or rRNA genes.
 At last we extract the first two exons of each transcript model from the
 database.
 
-```{r  example-first-two-exons }
+```{r example-first-two-exons}
 ## Extract all exons 1 and (if present) 2 for all genes encoded on the
 ## Y chromosome
 exons(edb, columns = c("tx_id", "exon_idx"),
       filter = list(SeqNameFilter("Y"),
                     ExonRankFilter(3, condition = "<")))
-
 ```
 
 
@@ -406,21 +393,20 @@ exons(edb, columns = c("tx_id", "exon_idx"),
 For the feature counting step of an RNAseq experiment, the gene or transcript
 models (defined by the chromosomal start and end positions of their exons) have
 to be known. To extract these from an Ensembl based annotation package, the
-`exonsBy`, `genesBy` and `transcriptsBy` methods can be used in an analogous way as in
-`TxDb` packages generated by the `GenomicFeatures` package.  However, the
-`transcriptsBy` method does not, in contrast to the method in the `GenomicFeatures`
-package, allow to return transcripts by "cds". While the annotation packages
-built by the `ensembldb` contain the chromosomal start and end coordinates of
-the coding region (for protein coding genes) they do not assign an ID to each
-CDS.
+`exonsBy`, `genesBy` and `transcriptsBy` methods can be used in an analogous way
+as in `TxDb` packages generated by the `GenomicFeatures` package. However, the
+`transcriptsBy` method does not, in contrast to the method in the
+`GenomicFeatures` package, allow to return transcripts by "cds". While the
+annotation packages built by the `ensembldb` contain the chromosomal start and
+end coordinates of the coding region (for protein coding genes) they do not
+assign an ID to each CDS.
 
 A simple use case is to retrieve all genes encoded on chromosomes X and Y from
 the database.
 
-```{r  transcriptsBy-X-Y }
+```{r transcriptsBy-X-Y}
 TxByGns <- transcriptsBy(edb, by = "gene", filter = SeqNameFilter(c("X", "Y")))
 TxByGns
-
 ```
 
 Since Ensembl contains also definitions of genes that are on chromosome variants
@@ -430,29 +416,28 @@ gene models should be returned.
 In a real use case, we might thus want to retrieve all genes encoded on the
 *standard* chromosomes. In addition it is advisable to use a `GeneIdFilter` to
 restrict to Ensembl genes only, as also *LRG* (Locus Reference Genomic)
-genes<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> are defined in the database, which are partially redundant with
-Ensembl genes.
+genes<sup><a id="fnr.2" class="footref" href="#fn.2">2</a></sup> are defined in
+the database, which are partially redundant with Ensembl genes.
 
-```{r  exonsBy-RNAseq, message = FALSE, eval = FALSE }
+```{r exonsBy-RNAseq, message = FALSE, eval = FALSE}
 ## will just get exons for all genes on chromosomes 1 to 22, X and Y.
 ## Note: want to get rid of the "LRG" genes!!!
 EnsGenes <- exonsBy(edb, by = "gene", filter = AnnotationFilterList(
 					  SeqNameFilter(c(1:22, "X", "Y")),
 					  GeneIdFilter("ENSG", "startsWith")))
-
 ```
 
 The code above returns a `GRangesList` that can be used directly as an input for
-the `summarizeOverlaps` function from the `GenomicAlignments` package <sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>.
+the `summarizeOverlaps` function from the `GenomicAlignments` package <sup><a
+id="fnr.3" class="footref" href="#fn.3">3</a></sup>.
 
 Alternatively, the above `GRangesList` can be transformed to a `data.frame` in
 *SAF* format that can be used as an input to the `featureCounts` function of the
 `Rsubread` package <sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup>.
 
-```{r  toSAF-RNAseq, message = FALSE, eval = FALSE }
+```{r toSAF-RNAseq, message = FALSE, eval = FALSE}
 ## Transforming the GRangesList into a data.frame in SAF format
 EnsGenes.SAF <- toSAF(EnsGenes)
-
 ```
 
 Note that the ID by which the `GRangesList` is split is used in the SAF
@@ -464,12 +449,11 @@ In addition, the `disjointExons` function (similar to the one defined in
 `GenomicFeatures`) can be used to generate a `GRanges` of non-overlapping exon
 parts which can be used in the `DEXSeq` package.
 
-```{r  disjointExons, message = FALSE, eval = FALSE }
+```{r disjointExons, message = FALSE, eval = FALSE}
 ## Create a GRanges of non-overlapping exon parts.
 DJE <- disjointExons(edb, filter = AnnotationFilterList(
 			      SeqNameFilter(c(1:22, "X", "Y")),
 			      GeneIdFilter("ENSG%", "startsWith")))
-
 ```
 
 
@@ -1081,7 +1065,11 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
     -   `tx_seq_end`: the end coordinate of the transcript.
     -   `tx_cds_seq_start`: the start coordinate of the coding region of the
         transcript (NULL for non-coding transcripts).
-    -   `tx_cds_seq_end`: the end coordinate of the coding region of the transcript.
+    -   `tx_cds_seq_end`: the end coordinate of the coding region of the
+        transcript.
+	-   `gc_count`: from Ensembl release 98 on, the **tx** table contains also a
+	    column `gc_count` providing the transcript's G-C content expressed as a
+	    percentage.
     -   `gene_id`: the gene to which the transcript belongs.
 
     `EnsDb` databases for more recent Ensembl releases have also a column

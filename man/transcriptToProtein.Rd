@@ -83,13 +83,14 @@ transcriptToProtein(IRanges(1, 1, names = "ENST00000381578"), edbx)
 \code{\link[=cdsToTranscript]{cdsToTranscript()}} and \code{\link[=transcriptToCds]{transcriptToCds()}} for conversion between
 CDS- and transcript-relative coordinates.
 
-Other coordinate mapping functions: \code{\link{cdsToTranscript}},
-  \code{\link{genomeToProtein}},
-  \code{\link{genomeToTranscript}},
-  \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}},
-  \code{\link{transcriptToCds}},
-  \code{\link{transcriptToGenome}}
+Other coordinate mapping functions: 
+\code{\link{cdsToTranscript}()},
+\code{\link{genomeToProtein}()},
+\code{\link{genomeToTranscript}()},
+\code{\link{proteinToGenome}()},
+\code{\link{proteinToTranscript}()},
+\code{\link{transcriptToCds}()},
+\code{\link{transcriptToGenome}()}
 }
 \author{
 Johannes Rainer

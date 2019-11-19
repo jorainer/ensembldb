@@ -89,7 +89,7 @@
   \item{...}{
     For \code{promoters}: additional arguments to be passed to the
     \code{transcripts} method. For \code{intronsByTranscript}:
-    additional arguments such as \code{filter}.    
+    additional arguments such as \code{filter}.
   }
 
   \item{aggregateGenes}{
@@ -368,6 +368,8 @@
     \item{tx_cds_seq_start}{the start coordinate of the coding region of
       the transcript (NULL for non-coding transcripts).}
     \item{tx_cds_seq_end}{the end coordinate of the coding region.}
+    \item{gc_content}{the G and C nucleotide content of the transcript's
+    sequence expressed as a percentage (i.e. between 0 and 100).}
     \item{exon_id}{the ID of the exon. In Ensembl, each exon specified
       by a unique chromosomal start and end position has its own
       ID. Thus, the same exon might be part of several transcripts.}
@@ -596,8 +598,3 @@ tUTRs <- threeUTRsByTranscript(edb, filter = SeqNameFilter("Y"),
 
 }
 \keyword{classes}
-
-
-
-
-
