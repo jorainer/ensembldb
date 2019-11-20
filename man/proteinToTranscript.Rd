@@ -110,13 +110,14 @@ res[[1]]
 res[[2]]
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{cdsToTranscript}},
-  \code{\link{genomeToProtein}},
-  \code{\link{genomeToTranscript}},
-  \code{\link{proteinToGenome}},
-  \code{\link{transcriptToCds}},
-  \code{\link{transcriptToGenome}},
-  \code{\link{transcriptToProtein}}
+Other coordinate mapping functions: 
+\code{\link{cdsToTranscript}()},
+\code{\link{genomeToProtein}()},
+\code{\link{genomeToTranscript}()},
+\code{\link{proteinToGenome}()},
+\code{\link{transcriptToCds}()},
+\code{\link{transcriptToGenome}()},
+\code{\link{transcriptToProtein}()}
 }
 \author{
 Johannes Rainer

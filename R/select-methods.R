@@ -337,7 +337,7 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
            },
            list = {
                vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
-               not_mapped <- lengths(vals) == 0
+               not_mapped <- sum(lengths(vals) == 0)
            },
            filter = {
                vals <- split(res[, 2], f = factor(res[, 1],
@@ -348,14 +348,14 @@ setMethod("mapIds", "EnsDb", function(x, keys, column, keytype, ..., multiVals) 
            asNA = {
                ## Split the vector, set all those with multi mappings NA.
                vals <- split(res[, 2], f=factor(res[, 1], levels=unique(theNames)))
-               not_mapped <- lengths(vals) == 0
+               not_mapped <- sum(lengths(vals) == 0)
                vals[unlist(lapply(vals, length)) > 1] <- NA_character_
                vals <- unlist(vals)
            },
            CharacterList = {
                f <- factor(res[, 1], levels = unique(theNames))
                vals <- splitAsList(res[, 2], f=f)
-               not_mapped <- lengths(vals) == 0
+               not_mapped <- sum(lengths(vals) == 0)
            })
     if (not_mapped)
         warning("Unable to map ", not_mapped, " of ", length(theNames),

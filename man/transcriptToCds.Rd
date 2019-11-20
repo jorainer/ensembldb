@@ -48,13 +48,14 @@ transcriptToCds(txcoords, EnsDb.Hsapiens.v86)
 ## -1 is reported.
 }
 \seealso{
-Other coordinate mapping functions: \code{\link{cdsToTranscript}},
-  \code{\link{genomeToProtein}},
-  \code{\link{genomeToTranscript}},
-  \code{\link{proteinToGenome}},
-  \code{\link{proteinToTranscript}},
-  \code{\link{transcriptToGenome}},
-  \code{\link{transcriptToProtein}}
+Other coordinate mapping functions: 
+\code{\link{cdsToTranscript}()},
+\code{\link{genomeToProtein}()},
+\code{\link{genomeToTranscript}()},
+\code{\link{proteinToGenome}()},
+\code{\link{proteinToTranscript}()},
+\code{\link{transcriptToGenome}()},
+\code{\link{transcriptToProtein}()}
 }
 \author{
 Johannes Rainer
