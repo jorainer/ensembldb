@@ -4,7 +4,7 @@
 #'     objects.
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @noRd
 #'
 #' @examples
@@ -21,4 +21,18 @@ checkEnsDbs <- function(x) {
         message(" version: ", ensembldb:::dbSchemaVersion(edb))
         message(" OK")
     }
+}
+
+#' @param x `character(1)` with the directory containing EnsDb SQLite files.
+#'
+#' @return the species/organism name of the databases that have to be re-created
+check_gc_content <- function(x) {
+    edbs <- dir(x, pattern = ".sqlite$", full.names = TRUE)
+    failed <- lapply(edbs, function(edb) {
+        edb <- EnsDb(edb)
+        if (!any(colnames(mcols(transcripts(edb))) == "gc_content"))
+            paste0(tolower(organism(edb)), collapse = "_")
+        else NULL
+    })
+    failed[lengths(failed)]
 }
