@@ -6,6 +6,8 @@ package: ensembldb
 output:
   BiocStyle::html_document:
     toc_float: true
+    includes:
+      in_header: coordinate-mapping.bioschemas.html
 vignette: >
   %\VignetteIndexEntry{Mapping between genome, transcript and protein coordinates}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,7 +17,7 @@ vignette: >
 
 ```{r  biocstyle, echo = FALSE, results = "asis", message = FALSE }
 library(BiocStyle)
-BiocStyle::markdown() 
+BiocStyle::markdown()
 ```
 
 
@@ -105,7 +107,7 @@ to a single chromosome speeds all database queries considerably up.
 library(ensembldb)
 library(EnsDb.Hsapiens.v86)
 
-edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X") 
+edbx <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "X")
 ```
 
 
@@ -140,7 +142,7 @@ gtx <- GeneRegionTrack(gnm_gns, name = "tx", geneSymbol = TRUE,
 ht <- HighlightTrack(trackList = list(gat, gtx), range = gnm)
 ## plot the region
 plotTracks(list(ht))
- 
+
 ```
 
 The genomic position overlaps two transcripts of the gene TSC22D3, encoded on
@@ -150,7 +152,7 @@ function.
 
 ```{r genomeToTranscript-ex1-map, message = FALSE}
 ## Map genomic coordinates to within-transcript coordinates
-gnm_tx <- genomeToTranscript(gnm, edbx) 
+gnm_tx <- genomeToTranscript(gnm, edbx)
 ```
 
 As a result we get an `IRangesList` object of length 1 (since we defined a
@@ -159,7 +161,7 @@ result object provides the mapped coordinates within each transcript that is
 encoded in the specified genomic region.
 
 ```{r genomeToTranscript-ex1-object}
-gnm_tx 
+gnm_tx
 ```
 
 The genomic region overlapped two transcripts and the transcript-relative
@@ -210,7 +212,7 @@ region is located within an intron of the same transcript.
 gnm <- GRanges("X", IRanges(start = c(630898, 644636, 644633, 634829),
                             width = c(5, 1, 1, 3)))
 gnm_prt <- genomeToProtein(gnm, edbx)
- 
+
 ```
 
 The resulting object has the length 4, one `IRanges` for each region in the
@@ -251,7 +253,7 @@ The third region can be mapped to the last nucleotide before the stop codon and
 was thus mapped to the last amino acid of the encoded protein.
 
 ```{r  genomeToProtein-ex1-res3 }
-gnm_prt[[3]] 
+gnm_prt[[3]]
 ```
 
 This region maps however to coordinates within two transcripts, each with their
@@ -262,7 +264,7 @@ by ENST00000381578.
 ```{r genomeToProtein-ex1-res3-2, message = FALSE}
 prt <- proteins(edbx, filter = ProteinIdFilter(names(gnm_prt[[3]])))
 
-nchar(prt$protein_sequence) 
+nchar(prt$protein_sequence)
 ```
 
 As expected, the position mapped to the last amino acid of the amino acid
@@ -274,7 +276,7 @@ coordinates and hence also not to any protein. As a result, an `IRanges` with
 negative coordinates is returned.
 
 ```{r genomeToProtein-ex1-res4}
-gnm_prt[[4]] 
+gnm_prt[[4]]
 ```
 
 
@@ -309,7 +311,7 @@ object's `cds_ok` metadata column. In such cases (i.e. when the CDS of the
 transcript is incomplete), the returned coordinates could be wrong.
 
 ```{r proteinToTranscript-ex1-map, message = FALSE}
-GAGE10_tx <- proteinToTranscript(GAGE10_prt, edbx) 
+GAGE10_tx <- proteinToTranscript(GAGE10_prt, edbx)
 ```
 
 The result is a `list` with the same length as the input `IRanges`, each element
@@ -333,7 +335,7 @@ ids <- c("O15266", "Q9HBJ8", "donotexistant")
 prt <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
 names(prt) <- ids
 
-prt_tx <- proteinToTranscript(prt, edbx, idType = "uniprot_id") 
+prt_tx <- proteinToTranscript(prt, edbx, idType = "uniprot_id")
 ```
 
 The region within the first protein with a Uniprot ID can be mapped to 4
@@ -341,21 +343,21 @@ different Ensembl protein IDs and the coordinates are thus mapped to regions
 within 4 transcripts.
 
 ```{r proteinToTranscript-ex2-res1}
-prt_tx[[1]] 
+prt_tx[[1]]
 ```
 
 The Uniprot identifier for the second region can be mapped to a single Ensembl
 protein ID and we get thus coordinates within a single transcript.
 
 ```{r proteinToTranscript-ex2-res2}
-prt_tx[[2]] 
+prt_tx[[2]]
 ```
 
 The last identifier can not be mapped to any Ensembl protein, and a region with
 negative coordinates is thus returned.
 
 ```{r proteinToTranscript-ex2-res3}
-prt_tx[[3]] 
+prt_tx[[3]]
 ```
 
 
@@ -374,7 +376,7 @@ of the protein *ENSP00000385415* from gene GAGE10 to the genome.
 ```{r proteinToGenome-gage10-define, message = FALSE}
 ## Define the IRanges object.
 GAGE10_prt <- IRanges(start = 5, end = 9, names = "ENSP00000385415")
- 
+
 ```
 
 We can now map the protein-relative coordinates to genomic coordinates. By
@@ -382,7 +384,7 @@ default, `proteinToGenome` assumes the names of the provided
 `IRanges` object to be Ensembl protein identifiers.
 
 ```{r proteinToGenome-gage10-map, message = FALSE}
-GAGE10_gnm <- proteinToGenome(GAGE10_prt, edbx) 
+GAGE10_gnm <- proteinToGenome(GAGE10_prt, edbx)
 ```
 
 `proteinToGenome` returns a `list`, one element for each range in the input
@@ -391,7 +393,7 @@ length 1. The `GRanges` object in the first element of `GAGE10_gnm` represents
 the coordinates of the DNA sequence encoding positions 5 to 9 in the protein.
 
 ```{r proteinToGenome-gage10-res}
-GAGE10_gnm 
+GAGE10_gnm
 ```
 
 This `GRanges` contains also useful additional information as metadata columns,
@@ -415,7 +417,7 @@ uni_rng <- IRanges(start = c(2, 12, 8), end = c(2, 15, 17),
                    names = c("D6RDZ7", "O15266", "H7C2F2"))
 
 ## We have to specify that the IDs are Uniprot IDs
-uni_gnm <- proteinToGenome(uni_rng, edbx, idType = "uniprot_id") 
+uni_gnm <- proteinToGenome(uni_rng, edbx, idType = "uniprot_id")
 ```
 
 The length of the protein coding region of the encoding transcript for two of
@@ -437,14 +439,14 @@ of the first two proteins was annotated to 4 Ensembl proteins.
 
 ```{r proteinToGenome-uniprot-counts}
 ## To how many Ensembl proteins was each Uniprot ID mapped?
-lengths(uni_gnm) 
+lengths(uni_gnm)
 ```
 
 Below we show the genomic coordinates for the within-protein positions
 calculated for all 4 Ensembl protein IDs for *O15266*.
 
 ```{r proteinToGenome-uniprot-multi}
-uni_gnm[["O15266"]] 
+uni_gnm[["O15266"]]
 ```
 
 As a last example we fetch all protein domains for the gene SYP and map all of
@@ -474,7 +476,7 @@ unique(mcols(SYP)$protein_id)
 SYP <- SYP[names(SYP) == "ENSP00000263233"]
 
 ## List the available protein domains and additional annotations
-mcols(SYP) 
+mcols(SYP)
 ```
 
 Next we create the `IRanges` object, one range for each protein domain, and
@@ -489,7 +491,7 @@ mcols(SYP_rng) <- mcols(SYP)
 
 ## Map the domains to the genome. We set "id" to the name
 ## of the metadata columns containing the protein IDs
-SYP_gnm <- proteinToGenome(SYP_rng, edbx, id = "protein_id") 
+SYP_gnm <- proteinToGenome(SYP_rng, edbx, id = "protein_id")
 ```
 
 The function mapped each domain to the genome and returned a `list` with the
@@ -497,7 +499,7 @@ mapping result for each as a `GRanges` object. As an example we show the mapping
 result for the second protein domain (*PF01284*).
 
 ```{r proteinToGenome-SYP-second}
-SYP_gnm[[2]] 
+SYP_gnm[[2]]
 ```
 
 The protein domain is encoded by a sequence spanning exons 2 to 5 of the
@@ -541,7 +543,7 @@ plotTracks(list(gat,
                                 shape = "box",
                                 name = "Protein domains")),
            transcriptAnnotation = "transcript")
- 
+
 ```
 
 
@@ -555,7 +557,7 @@ within 2 transcript to the genome.
 rng_tx <- IRanges(start = c(501, 1), width = c(5, 5),
                   names = c("ENST00000486554", "ENST00000381578"))
 
-rng_gnm <- transcriptToGenome(rng_tx, edbx) 
+rng_gnm <- transcriptToGenome(rng_tx, edbx)
 ```
 
 The function returns a `GRangesList` with the `GRanges` in each element
@@ -591,7 +593,7 @@ pkp2_cds <- IRanges(start = c(1643, 1881), width = c(1, 1),
 ## Convert cds-relative to transcript-relative coordinates
 pkp2 <- cdsToTranscript(pkp2_cds, EnsDb.Hsapiens.v86)
 
-pkp2 
+pkp2
 ```
 
 With the coordinates being now relative to the first nucleotide of the
@@ -601,7 +603,7 @@ the position to the genome.
 ```{r pkp2-transcriptToGenome}
 pkp2_gnm <- transcriptToGenome(pkp2, EnsDb.Hsapiens.v86)
 
-pkp2_gnm 
+pkp2_gnm
 ```
 
 To verify that the nucleotides at the positions are indeed *G* and *C* as stated
@@ -613,7 +615,7 @@ based.
 ```{r pkp2-variant-pos-validate}
 library(BSgenome.Hsapiens.NCBI.GRCh38)
 
-getSeq(BSgenome.Hsapiens.NCBI.GRCh38, pkp2_gnm) 
+getSeq(BSgenome.Hsapiens.NCBI.GRCh38, pkp2_gnm)
 ```
 
 
@@ -632,7 +634,7 @@ corresponding amino acid residues in the protein.
 rng_tx <- IRanges(start = c(501, 1, 200), width = c(5, 5, 4),
                   names = c("ENST00000486554", "ENST00000381578",
                             "ENST00000431238"))
-rng_prt <- transcriptToProtein(rng_tx, edbx) 
+rng_prt <- transcriptToProtein(rng_tx, edbx)
 ```
 
 The mapping did throw several warnings. The region within transcript
@@ -644,7 +646,7 @@ transcript *ENST00000486554* is not complete and, while the coordinates were
 mapped to protein residues, they might not be correct.
 
 ```{r transcriptToProtein-res}
-rng_prt 
+rng_prt
 ```
 
 For transcript coordinates that could not be mapped, negative coordinates are
@@ -658,6 +660,5 @@ transcript and the returned coordinates are thus correct.
 # Session information
 
 ```{r  sessionInfo }
-sessionInfo() 
+sessionInfo()
 ```
-
