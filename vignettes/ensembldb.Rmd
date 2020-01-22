@@ -6,6 +6,8 @@ package: ensembldb
 output:
   BiocStyle::html_document:
     toc_float: true
+    includes:
+      in_header: ensembldb.bioschemas.html
 vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
