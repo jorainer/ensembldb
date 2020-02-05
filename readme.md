@@ -6,7 +6,6 @@
 [![Bioconductor devel build status](http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg)](http://www.bioconductor.org/checkResults/devel/bioc-LATEST/ensembldb.html)
 [![Travis build result](https://travis-ci.org/jorainer/ensembldb.svg?branch=master)](https://travis-ci.org/jorainer/ensembldb)
 [![codecov result](https://codecov.io/github/jorainer/ensembldb/coverage.svg?branch=master)](https://codecov.io/github/jorainer/ensembldb?branch=master)
-<span class="__dimensions_badge_embed__" data-id="pub.1111722971" data-style="large_rectangle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
 
 # `ensembldb`: build and use Ensembl-based annotation packages
 
