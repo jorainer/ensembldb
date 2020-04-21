@@ -29,6 +29,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("RCurl")
+          install.packages("BiocManager")
+          BiocManager::install(c("EnsDb.Hsapiens.v86", "GenomeInfoDb", "GenomeInfoDbData"))
           install.packages("remotes")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_dev("pkgdown")
