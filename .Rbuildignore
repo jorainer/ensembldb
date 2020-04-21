@@ -1,6 +1,0 @@
-.editorconfig
-readme.md
-.git
-^\.travis\.yml$
-local_data
-.org
