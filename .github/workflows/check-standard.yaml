@@ -61,9 +61,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+	  install.packages("RCurl")
+	  install.packages("BiocManager")
+	  BiocManager::install(c("GenomeInfoDb", "GenomeInfoDbData"))
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
-	  install.packages("RCurl")
         shell: Rscript {0}
 
       - name: Check
