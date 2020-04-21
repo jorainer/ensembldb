@@ -63,7 +63,7 @@ jobs:
         run: |
 	  install.packages("RCurl")
 	  install.packages("BiocManager")
-	  BiocManager::install(c("GenomeInfoDb", "GenomeInfoDbData"))
+	  BiocManager::install(c("EnsDb.Hsapiens.v86", "GenomeInfoDb", "GenomeInfoDbData"))
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
