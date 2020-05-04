@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.11.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
       </span>
     </div>
 
@@ -340,7 +340,7 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
                     <span class="kw">filter</span> <span class="kw">=</span> ~ <span class="no">protein_id</span> <span class="kw">==</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">prt_pos</span><span class="kw">[[</span><span class="fl">1</span>]]))
 <span class="co">## Extract the amino acid at position 294</span>
 <span class="fu">subseq</span>(<span class="no">prt_seq</span>, <span class="kw">start</span> <span class="kw">=</span> <span class="fl">294</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="fl">294</span>)</pre></body></html></div>
-<pre><code>##   A AAStringSet instance of length 3
+<pre><code>## AAStringSet object of length 3:
 ##     width seq                                               names               
 ## [1]     1 D                                                 ENSP00000451560
 ## [2]     1 D                                                 ENSP00000451760
@@ -351,13 +351,13 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h1>
 <div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</pre></body></html></div>
-<pre><code>## R version 3.6.3 (2020-02-29)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+<pre><code>## R version 4.0.0 (2020-04-24)
+## Platform: x86_64-apple-darwin17.0 (64-bit)
 ## Running under: macOS Catalina 10.15.4
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -367,64 +367,64 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 ##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.30.3               EnsDb.Hsapiens.v86_2.99.0
-##  [3] ensembldb_2.11.4          AnnotationFilter_1.10.0  
-##  [5] GenomicFeatures_1.38.2    AnnotationDbi_1.48.0     
-##  [7] Biobase_2.46.0            GenomicRanges_1.38.0     
-##  [9] GenomeInfoDb_1.22.1       IRanges_2.20.2           
-## [11] S4Vectors_0.24.4          BiocGenerics_0.32.0      
-## [13] BiocStyle_2.14.4         
+##  [1] Gviz_1.32.0               EnsDb.Hsapiens.v86_2.99.0
+##  [3] ensembldb_2.13.0          AnnotationFilter_1.12.0  
+##  [5] GenomicFeatures_1.40.0    AnnotationDbi_1.50.0     
+##  [7] Biobase_2.48.0            GenomicRanges_1.40.0     
+##  [9] GenomeInfoDb_1.24.0       IRanges_2.22.1           
+## [11] S4Vectors_0.26.0          BiocGenerics_0.34.0      
+## [13] BiocStyle_2.16.0         
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] ProtGenerics_1.18.0         bitops_1.0-6               
+##   [1] ProtGenerics_1.20.0         bitops_1.0-6               
 ##   [3] matrixStats_0.56.0          fs_1.4.1                   
 ##   [5] bit64_0.9-7                 RColorBrewer_1.1-2         
 ##   [7] progress_1.2.2              httr_1.4.1                 
-##   [9] rprojroot_1.3-2             tools_3.6.3                
+##   [9] rprojroot_1.3-2             tools_4.0.0                
 ##  [11] backports_1.1.6             R6_2.4.1                   
 ##  [13] rpart_4.1-15                Hmisc_4.4-0                
 ##  [15] DBI_1.1.0                   lazyeval_0.2.2             
-##  [17] colorspace_1.4-1            nnet_7.3-12                
+##  [17] colorspace_1.4-1            nnet_7.3-13                
 ##  [19] gridExtra_2.3               tidyselect_1.0.0           
 ##  [21] prettyunits_1.1.1           bit_1.1-15.2               
-##  [23] curl_4.3                    compiler_3.6.3             
+##  [23] curl_4.3                    compiler_4.0.0             
 ##  [25] htmlTable_1.13.3            desc_1.2.0                 
-##  [27] DelayedArray_0.12.3         rtracklayer_1.46.0         
+##  [27] DelayedArray_0.14.0         rtracklayer_1.48.0         
 ##  [29] bookdown_0.18               checkmate_2.0.0            
 ##  [31] scales_1.1.0                askpass_1.1                
 ##  [33] rappdirs_0.3.1              pkgdown_1.5.1.9000         
 ##  [35] stringr_1.4.0               digest_0.6.25              
-##  [37] Rsamtools_2.2.3             foreign_0.8-75             
-##  [39] rmarkdown_2.1               XVector_0.26.0             
+##  [37] Rsamtools_2.4.0             foreign_0.8-78             
+##  [39] rmarkdown_2.1               XVector_0.28.0             
 ##  [41] dichromat_2.0-0             base64enc_0.1-3            
 ##  [43] jpeg_0.1-8.1                pkgconfig_2.0.3            
 ##  [45] htmltools_0.4.0             highr_0.8                  
-##  [47] BSgenome_1.54.0             dbplyr_1.4.3               
-##  [49] htmlwidgets_1.5.1           rlang_0.4.5                
+##  [47] dbplyr_1.4.3                BSgenome_1.56.0            
+##  [49] htmlwidgets_1.5.1           rlang_0.4.6                
 ##  [51] rstudioapi_0.11             RSQLite_2.2.0              
-##  [53] BiocParallel_1.20.1         acepack_1.4.1              
-##  [55] dplyr_0.8.5                 VariantAnnotation_1.32.0   
+##  [53] BiocParallel_1.22.0         acepack_1.4.1              
+##  [55] dplyr_0.8.5                 VariantAnnotation_1.34.0   
 ##  [57] RCurl_1.98-1.2              magrittr_1.5               
-##  [59] GenomeInfoDbData_1.2.2      Formula_1.2-3              
+##  [59] GenomeInfoDbData_1.2.3      Formula_1.2-3              
 ##  [61] Matrix_1.2-18               Rcpp_1.0.4.6               
 ##  [63] munsell_0.5.0               lifecycle_0.2.0            
 ##  [65] stringi_1.4.6               yaml_2.2.1                 
-##  [67] MASS_7.3-51.5               SummarizedExperiment_1.16.1
-##  [69] zlibbioc_1.32.0             BiocFileCache_1.10.2       
+##  [67] MASS_7.3-51.5               SummarizedExperiment_1.18.1
+##  [69] zlibbioc_1.34.0             BiocFileCache_1.12.0       
 ##  [71] blob_1.2.1                  crayon_1.3.4               
-##  [73] lattice_0.20-38             Biostrings_2.54.0          
-##  [75] splines_3.6.3               hms_0.5.3                  
+##  [73] lattice_0.20-41             Biostrings_2.56.0          
+##  [75] splines_4.0.0               hms_0.5.3                  
 ##  [77] knitr_1.28                  pillar_1.4.3               
-##  [79] biomaRt_2.42.1              XML_3.99-0.3               
+##  [79] biomaRt_2.44.0              XML_3.99-0.3               
 ##  [81] glue_1.4.0                  evaluate_0.14              
-##  [83] biovizBase_1.34.1           latticeExtra_0.6-29        
+##  [83] biovizBase_1.36.0           latticeExtra_0.6-29        
 ##  [85] data.table_1.12.8           BiocManager_1.30.10        
 ##  [87] vctrs_0.2.4                 png_0.1-7                  
 ##  [89] gtable_0.3.0                openssl_1.4.1              
 ##  [91] purrr_0.3.4                 assertthat_0.2.1           
 ##  [93] ggplot2_3.3.0               xfun_0.13                  
-##  [95] survival_3.1-8              tibble_3.0.1               
-##  [97] GenomicAlignments_1.22.1    memoise_1.1.0              
+##  [95] survival_3.1-12             tibble_3.0.1               
+##  [97] GenomicAlignments_1.24.0    memoise_1.1.0              
 ##  [99] cluster_2.1.0               ellipsis_0.3.0</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">

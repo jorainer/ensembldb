@@ -84,7 +84,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.11.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
       </span>
     </div>
 
@@ -298,7 +298,7 @@
 
     <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
-    <p></p><dl'>
+    <p></p><dl>
     <dt>ensDbFromAH</dt><dd><p>Create an <code>EnsDb</code> (SQLite) database from a GTF file provided
       by <code>AnnotationHub</code>. The function returns the file name of the
       generated database file. For usage see the examples below.</p></dd>
@@ -439,30 +439,30 @@
 <span class='no'>Y</span></div><div class='output co'>#&gt; GRanges object with 7155 ranges and 16 metadata columns:
 #&gt;          seqnames            ranges strand |               source       type
 #&gt;             &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |             &lt;factor&gt;   &lt;factor&gt;
-#&gt;      [1]        Y   2652790-2652894      + |                snRNA       gene
-#&gt;      [2]        Y   2652790-2652894      + |                snRNA transcript
-#&gt;      [3]        Y   2652790-2652894      + |                snRNA       exon
-#&gt;      [4]        Y   2654896-2655740      - |       protein_coding       gene
+#&gt;      [1]        Y   2652790-2652894      + |       snRNA          gene      
+#&gt;      [2]        Y   2652790-2652894      + |       snRNA          transcript
+#&gt;      [3]        Y   2652790-2652894      + |       snRNA          exon      
+#&gt;      [4]        Y   2654896-2655740      - |       protein_coding gene      
 #&gt;      [5]        Y   2654896-2655740      - |       protein_coding transcript
 #&gt;      ...      ...               ...    ... .                  ...        ...
 #&gt;   [7151]        Y 28772667-28773306      - | processed_pseudogene transcript
-#&gt;   [7152]        Y 28772667-28773306      - | processed_pseudogene       exon
-#&gt;   [7153]        Y 59001391-59001635      + |           pseudogene       gene
+#&gt;   [7152]        Y 28772667-28773306      - | processed_pseudogene exon      
+#&gt;   [7153]        Y 59001391-59001635      + | pseudogene           gene      
 #&gt;   [7154]        Y 59001391-59001635      + | processed_pseudogene transcript
-#&gt;   [7155]        Y 59001391-59001635      + | processed_pseudogene       exon
+#&gt;   [7155]        Y 59001391-59001635      + | processed_pseudogene exon      
 #&gt;              score     phase         gene_id   gene_name    gene_source
 #&gt;          &lt;numeric&gt; &lt;integer&gt;     &lt;character&gt; &lt;character&gt;    &lt;character&gt;
-#&gt;      [1]      &lt;NA&gt;      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
-#&gt;      [2]      &lt;NA&gt;      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
-#&gt;      [3]      &lt;NA&gt;      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
-#&gt;      [4]      &lt;NA&gt;      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana
-#&gt;      [5]      &lt;NA&gt;      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana
+#&gt;      [1]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
+#&gt;      [2]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
+#&gt;      [3]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
+#&gt;      [4]        NA      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana
+#&gt;      [5]        NA      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana
 #&gt;      ...       ...       ...             ...         ...            ...
-#&gt;   [7151]      &lt;NA&gt;      &lt;NA&gt; ENSG00000231514     FAM58CP         havana
-#&gt;   [7152]      &lt;NA&gt;      &lt;NA&gt; ENSG00000231514     FAM58CP         havana
-#&gt;   [7153]      &lt;NA&gt;      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
-#&gt;   [7154]      &lt;NA&gt;      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
-#&gt;   [7155]      &lt;NA&gt;      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
+#&gt;   [7151]        NA      &lt;NA&gt; ENSG00000231514     FAM58CP         havana
+#&gt;   [7152]        NA      &lt;NA&gt; ENSG00000231514     FAM58CP         havana
+#&gt;   [7153]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
+#&gt;   [7154]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
+#&gt;   [7155]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
 #&gt;            gene_biotype   transcript_id transcript_name transcript_source
 #&gt;             &lt;character&gt;     &lt;character&gt;     &lt;character&gt;       &lt;character&gt;
 #&gt;      [1]          snRNA            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;
@@ -478,16 +478,16 @@
 #&gt;   [7155]     pseudogene ENST00000431853     CTBP2P1-001            havana
 #&gt;          exon_number         exon_id         tag     ccds_id  protein_id
 #&gt;            &lt;numeric&gt;     &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;
-#&gt;      [1]        &lt;NA&gt;            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [2]        &lt;NA&gt;            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;      [1]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;      [2]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
 #&gt;      [3]           1 ENSE00002088309        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [4]        &lt;NA&gt;            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [5]        &lt;NA&gt;            &lt;NA&gt;        CCDS   CCDS14772        &lt;NA&gt;
+#&gt;      [4]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;      [5]          NA            &lt;NA&gt;        CCDS   CCDS14772        &lt;NA&gt;
 #&gt;      ...         ...             ...         ...         ...         ...
-#&gt;   [7151]        &lt;NA&gt;            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;   [7151]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
 #&gt;   [7152]           1 ENSE00001616687        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   [7153]        &lt;NA&gt;            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   [7154]        &lt;NA&gt;            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;   [7153]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
+#&gt;   [7154]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
 #&gt;   [7155]           1 ENSE00001794473        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh37 genome</div><div class='input'>

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.11.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
       </span>
     </div>
 
@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="no">prts</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span>(<span class="no">edb</span>, <span class="kw">filter</span> <span class="kw">=</span> <span class="fu">GeneNameFilter</span>(<span class="st">"ZBTB16"</span>),
          <span class="kw">return.type</span> <span class="kw">=</span> <span class="st">"AAStringSet"</span>)
 <span class="no">prts</span></pre></body></html></div>
-<pre><code>##   A AAStringSet instance of length 5
+<pre><code>## AAStringSet object of length 5:
 ##     width seq                                               names               
 ## [1]   673 MDLTKMGMIQLQNPSHPTGLLCK...GHKPEEIPPDWRIEKTYLYLCYV ENSP00000338157
 ## [2]   115 MDLTKMGMIQLQNPSHPTGLLCK...QAKAEDLDDLLYAAEILEIEYLE ENSP00000437716
@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", function() {
            <span class="kw">columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"tx_id"</span>, <span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span>(<span class="no">edb</span>, <span class="st">"protein_domain"</span>)),
            <span class="kw">return.type</span> <span class="kw">=</span> <span class="st">"AAStringSet"</span>)
 <span class="no">pd</span></pre></body></html></div>
-<pre><code>##   A AAStringSet instance of length 81
+<pre><code>## AAStringSet object of length 81:
 ##      width seq                                              names               
 ##  [1]   673 MDLTKMGMIQLQNPSHPTGLLCK...HKPEEIPPDWRIEKTYLYLCYV ENSP00000338157
 ##  [2]   673 MDLTKMGMIQLQNPSHPTGLLCK...HKPEEIPPDWRIEKTYLYLCYV ENSP00000338157
@@ -463,13 +463,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h1>
 <div class="sourceCode" id="cb37"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</pre></body></html></div>
-<pre><code>## R version 3.6.3 (2020-02-29)
-## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+<pre><code>## R version 4.0.0 (2020-04-24)
+## Platform: x86_64-apple-darwin17.0 (64-bit)
 ## Running under: macOS Catalina 10.15.4
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
 ## 
 ## locale:
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -479,46 +479,46 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.11.4         
-##  [3] AnnotationFilter_1.10.0   GenomicFeatures_1.38.2   
-##  [5] AnnotationDbi_1.48.0      Biobase_2.46.0           
-##  [7] GenomicRanges_1.38.0      GenomeInfoDb_1.22.1      
-##  [9] IRanges_2.20.2            S4Vectors_0.24.4         
-## [11] BiocGenerics_0.32.0       BiocStyle_2.14.4         
+##  [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.13.0         
+##  [3] AnnotationFilter_1.12.0   GenomicFeatures_1.40.0   
+##  [5] AnnotationDbi_1.50.0      Biobase_2.48.0           
+##  [7] GenomicRanges_1.40.0      GenomeInfoDb_1.24.0      
+##  [9] IRanges_2.22.1            S4Vectors_0.26.0         
+## [11] BiocGenerics_0.34.0       BiocStyle_2.16.0         
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] httr_1.4.1                  bit64_0.9-7                
 ##  [3] assertthat_0.2.1            askpass_1.1                
-##  [5] BiocManager_1.30.10         BiocFileCache_1.10.2       
-##  [7] blob_1.2.1                  GenomeInfoDbData_1.2.2     
-##  [9] Rsamtools_2.2.3             yaml_2.2.1                 
+##  [5] BiocManager_1.30.10         BiocFileCache_1.12.0       
+##  [7] blob_1.2.1                  GenomeInfoDbData_1.2.3     
+##  [9] Rsamtools_2.4.0             yaml_2.2.1                 
 ## [11] progress_1.2.2              pillar_1.4.3               
 ## [13] RSQLite_2.2.0               backports_1.1.6            
-## [15] lattice_0.20-38             glue_1.4.0                 
-## [17] digest_0.6.25               XVector_0.26.0             
+## [15] lattice_0.20-41             glue_1.4.0                 
+## [17] digest_0.6.25               XVector_0.28.0             
 ## [19] htmltools_0.4.0             Matrix_1.2-18              
 ## [21] XML_3.99-0.3                pkgconfig_2.0.3            
-## [23] biomaRt_2.42.1              bookdown_0.18              
-## [25] zlibbioc_1.32.0             purrr_0.3.4                
-## [27] BiocParallel_1.20.1         tibble_3.0.1               
+## [23] biomaRt_2.44.0              bookdown_0.18              
+## [25] zlibbioc_1.34.0             purrr_0.3.4                
+## [27] BiocParallel_1.22.0         tibble_3.0.1               
 ## [29] openssl_1.4.1               ellipsis_0.3.0             
-## [31] SummarizedExperiment_1.16.1 lazyeval_0.2.2             
+## [31] SummarizedExperiment_1.18.1 lazyeval_0.2.2             
 ## [33] magrittr_1.5                crayon_1.3.4               
 ## [35] memoise_1.1.0               evaluate_0.14              
 ## [37] fs_1.4.1                    MASS_7.3-51.5              
-## [39] tools_3.6.3                 prettyunits_1.1.1          
+## [39] tools_4.0.0                 prettyunits_1.1.1          
 ## [41] hms_0.5.3                   lifecycle_0.2.0            
 ## [43] matrixStats_0.56.0          stringr_1.4.0              
-## [45] DelayedArray_0.12.3         Biostrings_2.54.0          
-## [47] compiler_3.6.3              pkgdown_1.5.1.9000         
-## [49] rlang_0.4.5                 grid_3.6.3                 
+## [45] DelayedArray_0.14.0         Biostrings_2.56.0          
+## [47] compiler_4.0.0              pkgdown_1.5.1.9000         
+## [49] rlang_0.4.6                 grid_4.0.0                 
 ## [51] RCurl_1.98-1.2              rappdirs_0.3.1             
 ## [53] bitops_1.0-6                rmarkdown_2.1              
 ## [55] DBI_1.1.0                   curl_4.3                   
-## [57] R6_2.4.1                    GenomicAlignments_1.22.1   
+## [57] R6_2.4.1                    GenomicAlignments_1.24.0   
 ## [59] knitr_1.28                  dplyr_0.8.5                
-## [61] rtracklayer_1.46.0          bit_1.1-15.2               
-## [63] rprojroot_1.3-2             ProtGenerics_1.18.0        
+## [61] rtracklayer_1.48.0          bit_1.1-15.2               
+## [63] rprojroot_1.3-2             ProtGenerics_1.20.0        
 ## [65] desc_1.2.0                  stringi_1.4.6              
 ## [67] Rcpp_1.0.4.6                vctrs_0.2.4                
 ## [69] dbplyr_1.4.3                tidyselect_1.0.0           
