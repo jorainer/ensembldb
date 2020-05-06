@@ -171,7 +171,7 @@ setMethod("select", "EnsDb",
               if (missing(columns))
                   columns <- NULL
               if (missing(keytype))
-                  keytype <- NULL
+                  keytype <- "GENEID" # assuming by default (Ensembl) gene IDs
               return(.select(x = x, keys = keys, columns = columns,
                              keytype = keytype, ...))
           })
