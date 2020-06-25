@@ -74,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -146,46 +146,46 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>dbconn</span>(<span class='no'>x</span>)
+<span class='fu'>dbconn</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>ensemblVersion</span>(<span class='no'>x</span>)
+<span class='fu'>ensemblVersion</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>listColumns</span>(<span class='no'>x</span>, <span class='no'>table</span>, <span class='kw'>skip.keys</span><span class='kw'>=</span><span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='kw'>table</span>, skip.keys=<span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>listGenebiotypes</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>listGenebiotypes</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>listTxbiotypes</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>listTxbiotypes</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>listTables</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>listTables</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>metadata</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'>metadata</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>organism</span>(<span class='no'>object</span>)
+<span class='fu'>organism</span>(<span class='kw'>object</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>returnFilterColumns</span>(<span class='no'>x</span>)
+<span class='fu'>returnFilterColumns</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>returnFilterColumns</span>(<span class='no'>x</span>)
+<span class='fu'>returnFilterColumns</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>returnFilterColumns</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>returnFilterColumns</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>seqinfo</span>(<span class='no'>x</span>)
+<span class='fu'>seqinfo</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>seqlevels</span>(<span class='no'>x</span>)
+<span class='fu'>seqlevels</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>updateEnsDb</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>updateEnsDb</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -226,10 +226,10 @@
 
     <p>A connection to the respective annotation database is created upon
   loading of an annotation package created with the
-  <code><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></code> function. In addition, the
-  <code><a href='EnsDb.html'>EnsDb</a></code> constructor specifying the SQLite database file can be
+  <code>makeEnsembldbPackage</code> function. In addition, the
+  <code>EnsDb</code> constructor specifying the SQLite database file can be
   called to generate an instance of the object (see
-  <code><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></code> for an example).</p>
+  <code>makeEnsemblSQLiteFromTables</code> for an example).</p>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     <p></p><dl>
@@ -323,22 +323,25 @@
   actually the transcript IDs. This <em>virtual</em> column was only
   introduced to be compliant with <code>TxDb</code> objects (which provide
   transcript names).</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Johannes Rainer</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='EnsDb.html'>EnsDb</a></code>,
-  <code><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></code>,
-  <code><a href='EnsDb-exonsBy.html'>exonsBy</a></code>, <code><a href='EnsDb-exonsBy.html'>genes</a></code>,
-  <code><a href='EnsDb-exonsBy.html'>transcripts</a></code>,
-  <code><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></code></p>  
-<p><code><a href='global-filters.html'>addFilter</a></code> for globally adding filters to an <code>EnsDb</code>
+    <div class='dont-index'><p><code>EnsDb</code>,
+  <code>makeEnsembldbPackage</code>,
+  <code>exonsBy</code>, <code>genes</code>,
+  <code>transcripts</code>,
+  <code>makeEnsemblSQLiteFromTables</code></p>  
+<p><code>addFilter</code> for globally adding filters to an <code>EnsDb</code>
   object.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
 
 <span class='co'>## Display some information:</span>
-<span class='no'>EnsDb.Hsapiens.v86</span></div><div class='output co'>#&gt; EnsDb for Ensembl:
+<span class='kw'>EnsDb.Hsapiens.v86</span></div><div class='output co'>#&gt; EnsDb for Ensembl:
 #&gt; |Backend: SQLite
 #&gt; |Db type: EnsDb
 #&gt; |Type of Gene ID: Ensembl Gene ID
@@ -356,7 +359,7 @@
 #&gt; | No. of transcripts: 216741.
 #&gt; |Protein data available.</div><div class='input'>
 <span class='co'>## Show the tables along with its columns</span>
-<span class='fu'>listTables</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; $gene
+<span class='fu'>listTables</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; $gene
 #&gt; [1] "gene_id"          "gene_name"        "gene_biotype"     "gene_seq_start"  
 #&gt; [5] "gene_seq_end"     "seq_name"         "seq_strand"       "seq_coord_system"
 #&gt; [9] "symbol"          
@@ -392,11 +395,11 @@
 #&gt; [1] "name"  "value"
 #&gt; </div><div class='input'>
 <span class='co'>## For what species is this database?</span>
-<span class='fu'>organism</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; [1] "Homo sapiens"</div><div class='input'>
+<span class='fu'>organism</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; [1] "Homo sapiens"</div><div class='input'>
 <span class='co'>## What Ensembl version if the database based on?</span>
-<span class='fu'>ensemblVersion</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; [1] "86"</div><div class='input'>
+<span class='fu'>ensemblVersion</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; [1] "86"</div><div class='input'>
 <span class='co'>## Get some more information from the database</span>
-<span class='fu'>metadata</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;                  name                               value
+<span class='fu'>metadata</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;                  name                               value
 #&gt; 1             Db type                               EnsDb
 #&gt; 2     Type of Gene ID                     Ensembl Gene ID
 #&gt; 3  Supporting package                           ensembldb
@@ -410,7 +413,7 @@
 #&gt; 11       genome_build                              GRCh38
 #&gt; 12    DBSCHEMAVERSION                                 2.0</div><div class='input'>
 <span class='co'>## Get all the sequence names.</span>
-<span class='fu'>seqlevels</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;   [1] "1"                                     
+<span class='fu'>seqlevels</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;   [1] "1"                                     
 #&gt;   [2] "10"                                    
 #&gt;   [3] "11"                                    
 #&gt;   [4] "12"                                    
@@ -768,7 +771,7 @@
 #&gt; [356] "X"                                     
 #&gt; [357] "Y"                                     </div><div class='input'>
 <span class='co'>## List all available gene biotypes from the database:</span>
-<span class='fu'>listGenebiotypes</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;  [1] "protein_coding"                     "unitary_pseudogene"                
+<span class='fu'>listGenebiotypes</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;  [1] "protein_coding"                     "unitary_pseudogene"                
 #&gt;  [3] "unprocessed_pseudogene"             "processed_pseudogene"              
 #&gt;  [5] "processed_transcript"               "transcribed_unprocessed_pseudogene"
 #&gt;  [7] "antisense"                          "transcribed_unitary_pseudogene"    
@@ -792,7 +795,7 @@
 #&gt; [43] "macro_lncRNA"                       "non_coding"                        
 #&gt; [45] "IG_pseudogene"                      "LRG_gene"                          </div><div class='input'>
 <span class='co'>## List all available transcript biotypes:</span>
-<span class='fu'>listTxbiotypes</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;  [1] "protein_coding"                     "processed_transcript"              
+<span class='fu'>listTxbiotypes</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt;  [1] "protein_coding"                     "processed_transcript"              
 #&gt;  [3] "nonsense_mediated_decay"            "retained_intron"                   
 #&gt;  [5] "unitary_pseudogene"                 "TEC"                               
 #&gt;  [7] "miRNA"                              "misc_RNA"                          
@@ -818,7 +821,7 @@
 #&gt; [47] "non_coding"                         "IG_pseudogene"                     
 #&gt; [49] "LRG_gene"                          </div><div class='input'>
 <span class='co'>## Update the EnsDb; this is in most instances not necessary at all.</span>
-<span class='fu'>updateEnsDb</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; EnsDb for Ensembl:
+<span class='fu'>updateEnsDb</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; EnsDb for Ensembl:
 #&gt; |Backend: SQLite
 #&gt; |Db type: EnsDb
 #&gt; |Type of Gene ID: Ensembl Gene ID
@@ -836,12 +839,12 @@
 #&gt; | No. of transcripts: 216741.
 #&gt; |Protein data available.</div><div class='input'>
 <span class='co'>######    returnFilterColumns</span>
-<span class='fu'>returnFilterColumns</span>(<span class='no'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'>returnFilterColumns</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'>## Get protein coding genes on chromosome X, specifying to return</span>
 <span class='co'>## only columns gene_name as additional column.</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>, <span class='kw'>filter</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'>SeqNameFilter</span>(<span class='st'>"X"</span>),
+<span class='fu'>genes</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter=<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'>SeqNameFilter</span>(<span class='st'>"X"</span>),
                                       <span class='fu'>GeneBiotypeFilter</span>(<span class='st'>"protein_coding"</span>)),
-      <span class='kw'>columns</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_name"</span>))</div><div class='output co'>#&gt; GRanges object with 841 ranges and 3 metadata columns:
+      columns=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_name"</span>))</div><div class='output co'>#&gt; GRanges object with 841 ranges and 3 metadata columns:
 #&gt;                   seqnames              ranges strand |   gene_name
 #&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
 #&gt;   ENSG00000182378        X       276322-303356      + |      PLCXD1
@@ -873,10 +876,10 @@
 <span class='co'>## on this column.</span>
 
 <span class='co'>## This can be changed using the returnFilterColumns option</span>
-<span class='fu'>returnFilterColumns</span>(<span class='no'>EnsDb.Hsapiens.v86</span>) <span class='kw'>&lt;-</span> <span class='fl'>FALSE</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>, <span class='kw'>filter</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'>SeqNameFilter</span>(<span class='st'>"X"</span>),
+<span class='fu'>returnFilterColumns</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>) <span class='op'>&lt;-</span> <span class='fl'>FALSE</span>
+<span class='fu'>genes</span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter=<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'>SeqNameFilter</span>(<span class='st'>"X"</span>),
                                       <span class='fu'>GeneBiotypeFilter</span>(<span class='st'>"protein_coding"</span>)),
-      <span class='kw'>columns</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_name"</span>))</div><div class='output co'>#&gt; GRanges object with 841 ranges and 2 metadata columns:
+      columns=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_name"</span>))</div><div class='output co'>#&gt; GRanges object with 841 ranges and 2 metadata columns:
 #&gt;                   seqnames              ranges strand |   gene_name
 #&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
 #&gt;   ENSG00000182378        X       276322-303356      + |      PLCXD1
@@ -905,7 +908,6 @@
 #&gt;   ENSG00000124334 ENSG00000124334
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

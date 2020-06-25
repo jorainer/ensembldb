@@ -82,7 +82,7 @@ The listProteinColumns function allows to conveniently
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -151,52 +151,52 @@ The listProteinColumns function allows to conveniently
     <p>This help page provides information about most of the
     functionality related to protein annotations in <code>ensembldb</code>.</p>
 <p>The <code>proteins</code> method retrieves protein related annotations from
-    an <code><a href='EnsDb-class.html'>EnsDb</a></code> database.</p>
+    an <code>EnsDb</code> database.</p>
 <p>The <code>listUniprotDbs</code> method lists all Uniprot database
     names in the <code>EnsDb</code>.</p>
 <p>The <code>listUniprotMappingTypes</code> method lists all methods
     that were used for the mapping of Uniprot IDs to Ensembl protein IDs.</p>
 <p>The <code>listProteinColumns</code> function allows to conveniently
     extract all database columns containing protein annotations from
-    an <code><a href='EnsDb-class.html'>EnsDb</a></code> database.</p>
+    an <code>EnsDb</code> database.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
 <span class='fu'>proteins</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>object</span>, <span class='st'>"protein"</span>),
-  <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(),
-  <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>order.type</span> <span class='kw'>=</span> <span class='st'>"asc"</span>,
-  <span class='kw'>return.type</span> <span class='kw'>=</span> <span class='st'>"DataFrame"</span>
+  <span class='kw'>object</span>,
+  columns = <span class='fu'>listColumns</span>(<span class='kw'>object</span>, <span class='st'>"protein"</span>),
+  filter = <span class='fu'>AnnotationFilterList</span>(),
+  order.by = <span class='st'>""</span>,
+  order.type = <span class='st'>"asc"</span>,
+  return.type = <span class='st'>"DataFrame"</span>
 )
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>listUniprotDbs</span>(<span class='no'>object</span>)
+<span class='fu'>listUniprotDbs</span>(<span class='kw'>object</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>listUniprotMappingTypes</span>(<span class='no'>object</span>)
+<span class='fu'>listUniprotMappingTypes</span>(<span class='kw'>object</span>)
 
-<span class='fu'>listProteinColumns</span>(<span class='no'>object</span>)</pre>
+<span class='fu'>listProteinColumns</span>(<span class='kw'>object</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>The <code><a href='EnsDb-class.html'>EnsDb</a></code> object.</p></td>
+      <td><p>The <code>EnsDb</code> object.</p></td>
     </tr>
     <tr>
       <th>columns</th>
       <td><p>For <code>proteins</code>: character vector defining the columns to
 be extracted from the database. Can be any column(s) listed by the
-<code><a href='EnsDb-class.html'>listColumns</a></code> method.</p></td>
+<code>listColumns</code> method.</p></td>
     </tr>
     <tr>
       <th>filter</th>
       <td><p>For <code>proteins</code>: A filter object extending
 <code>AnnotationFilter</code> or a list of such objects to select
-specific entries from the database. See <code><a href='Filter-classes.html'>Filter-classes</a></code> for
+specific entries from the database. See <code>Filter-classes</code> for
 a documentation of available filters and use
 <code>supportedFilters</code> to get the full list of supported filters.</p></td>
     </tr>
@@ -222,7 +222,7 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The <code>proteins</code> method returns protein related annotations from
-    an <code><a href='EnsDb-class.html'>EnsDb</a></code> object with its <code>return.type</code> argument
+    an <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object with its <code>return.type</code> argument
     allowing to define the type of the returned object. Note that if
     <code>return.type = "AAStringSet"</code> additional annotation columns are
     stored in a <code>DataFrame</code> that can be accessed with the <code>mcols</code>
@@ -236,54 +236,43 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
     <code>protein</code> tables and can hence return all annotations from the
     database that are related to proteins and transcripts encoding these
     proteins from the database. Since <code>proteins</code> does thus only query
-    annotations for protein coding transcripts, the <code><a href='EnsDb-exonsBy.html'>genes</a></code> or
-    <code><a href='EnsDb-exonsBy.html'>transcripts</a></code> methods have to be used to retrieve annotations
+    annotations for protein coding transcripts, the <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-exonsBy.html'>genes</a></code> or
+    <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-exonsBy.html'>transcripts</a></code> methods have to be used to retrieve annotations
     for non-coding transcripts.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>ensembldb</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='no'>EnsDb.Hsapiens.v86</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'><a href='https://github.com/jorainer/ensembldb'>ensembldb</a></span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
 <span class='co'>## Get all proteins from tha database for the gene ZBTB16, if protein</span>
 <span class='co'>## annotations are available</span>
-<span class='kw'>if</span> (<span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='no'>edb</span>))
-    <span class='fu'>proteins</span>(<span class='no'>edb</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>GeneNameFilter</span>(<span class='st'>"ZBTB16"</span>))</div><div class='output co'>#&gt; DataFrame with 5 rows and 4 columns
-#&gt;             tx_id      protein_id
-#&gt;       &lt;character&gt;     &lt;character&gt;
-#&gt; 1 ENST00000335953 ENSP00000338157
-#&gt; 2 ENST00000544220 ENSP00000437716
-#&gt; 3 ENST00000535700 ENSP00000443013
-#&gt; 4 ENST00000392996 ENSP00000376721
-#&gt; 5 ENST00000539918 ENSP00000445047
-#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    protein_sequence
-#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         &lt;character&gt;
-#&gt; 1 MDLTKMGMIQLQNPSHPTGLLCKANQMRLAGTLCDVVIMVDSQEFHAHRTVLACTSKMFEILFHRNSQHYTLDFLSPKTFQQILEYAYTATLQAKAEDLDDLLYAAEILEIEYLEEQCLKMLETIQASDDNDTEATMADGGAEEEEDRKARYLKNIFISKHSSEESGYASVAGQSLPGPMVDQSPSVSTSFGLSAMSPTKAAVDSLMTIGQSLLQGTLQPPAGPEEPTLAGGGRHPGVAEVKTEMMQVDEVPSQDSPGAAESSISGGMGDKVEERGKEGPGTPTRSSVITSARELHYGREESAEQVPPPAEAGQAPTGRPEHPAPPPEKHLGIYSVLPNHKADAVLSMPSSVTSGLHVQPALAVSMDFSTYGGLLPQGFIQRELFSKLGELAVGMKSESRTIGEQCSVCGVELPDNEAVEQHRKLHSGMKTYGCELCGKRFLDSLRLRMHLLAHSAGAKAFVCDQCGAQFSKEDALETHRQTHTGTDMAVFCLLCGKRFQAQSALQQHMEVHAGVRSYICSECNRTFPSHTALKRHLRSHTGDHPYECEFCGSCFRDESTLKSHKRIHTGEKPYECNGCGKKFSLKHQLETHYRVHTGEKPFECKLCHQRSRDYSAMIKHLRTHNGASPYQCTICTEYCPSLSSMQKHMKGHKPEEIPPDWRIEKTYLYLCYV
-#&gt; 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               MDLTKMGMIQLQNPSHPTGLLCKANQMRLAGTLCDVVIMVDSQEFHAHRTVLACTSKMFEILFHRNSQHYTLDFLSPKTFQQILEYAYTATLQAKAEDLDDLLYAAEILEIEYLE
-#&gt; 3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              MDLTKMGMIQLQNPSHPTGLLCKANQMRLAGTLCDVVIMVDSQEFHAHRTVLACTSKMFEILFHRNSQHYTLDFLSPKTFQQILEYAYTATLQAKAEDLDDLLYAAEILEIEYLEEQCLKMLETIQASDDNDTEATMADGGAEEEEDR
-#&gt; 4 MDLTKMGMIQLQNPSHPTGLLCKANQMRLAGTLCDVVIMVDSQEFHAHRTVLACTSKMFEILFHRNSQHYTLDFLSPKTFQQILEYAYTATLQAKAEDLDDLLYAAEILEIEYLEEQCLKMLETIQASDDNDTEATMADGGAEEEEDRKARYLKNIFISKHSSEESGYASVAGQSLPGPMVDQSPSVSTSFGLSAMSPTKAAVDSLMTIGQSLLQGTLQPPAGPEEPTLAGGGRHPGVAEVKTEMMQVDEVPSQDSPGAAESSISGGMGDKVEERGKEGPGTPTRSSVITSARELHYGREESAEQVPPPAEAGQAPTGRPEHPAPPPEKHLGIYSVLPNHKADAVLSMPSSVTSGLHVQPALAVSMDFSTYGGLLPQGFIQRELFSKLGELAVGMKSESRTIGEQCSVCGVELPDNEAVEQHRKLHSGMKTYGCELCGKRFLDSLRLRMHLLAHSAGAKAFVCDQCGAQFSKEDALETHRQTHTGTDMAVFCLLCGKRFQAQSALQQHMEVHAGVRSYICSECNRTFPSHTALKRHLRSHTGDHPYECEFCGSCFRDESTLKSHKRIHTGEKPYECNGCGKKFSLKHQLETHYRVHTGEKPFECKLCHQRSRDYSAMIKHLRTHNGASPYQCTICTEYCPSLSSMQKHMKGHKPEEIPPDWRIEKTYLYLCYV
-#&gt; 5                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           XGGLLPQGFIQRELFSKLGELAVGMKSESRTIGEQCSVCGVELPDNEAVEQHRVF
-#&gt;     gene_name
-#&gt;   &lt;character&gt;
-#&gt; 1      ZBTB16
-#&gt; 2      ZBTB16
-#&gt; 3      ZBTB16
-#&gt; 4      ZBTB16
-#&gt; 5      ZBTB16</div><div class='input'>
+<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>proteins</a></span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneNameFilter</span>(<span class='st'>"ZBTB16"</span>))</div><div class='output co'>#&gt; DataFrame with 5 rows and 4 columns
+#&gt;             tx_id      protein_id       protein_sequence   gene_name
+#&gt;       &lt;character&gt;     &lt;character&gt;            &lt;character&gt; &lt;character&gt;
+#&gt; 1 ENST00000335953 ENSP00000338157 MDLTKMGMIQLQNPSHPTGL..      ZBTB16
+#&gt; 2 ENST00000544220 ENSP00000437716 MDLTKMGMIQLQNPSHPTGL..      ZBTB16
+#&gt; 3 ENST00000535700 ENSP00000443013 MDLTKMGMIQLQNPSHPTGL..      ZBTB16
+#&gt; 4 ENST00000392996 ENSP00000376721 MDLTKMGMIQLQNPSHPTGL..      ZBTB16
+#&gt; 5 ENST00000539918 ENSP00000445047 XGGLLPQGFIQRELFSKLGE..      ZBTB16</div><div class='input'>
 <span class='co'>## List the names of all Uniprot databases from which Uniprot IDs are</span>
 <span class='co'>## available in the EnsDb</span>
-<span class='kw'>if</span> (<span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='no'>edb</span>))
-    <span class='fu'>listUniprotDbs</span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt; [1] "SWISSPROT" "SPTREMBL" </div><div class='input'>
+<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>listUniprotDbs</a></span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; [1] "SWISSPROT" "SPTREMBL" </div><div class='input'>
 
 <span class='co'>## List the type of all methods that were used to map Uniprot IDs to Ensembl</span>
 <span class='co'>## protein IDs</span>
-<span class='kw'>if</span> (<span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='no'>edb</span>))
-    <span class='fu'>listUniprotMappingTypes</span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt; [1] "DIRECT"         "SEQUENCE_MATCH"</div><div class='input'>
+<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>listUniprotMappingTypes</a></span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; [1] "DIRECT"         "SEQUENCE_MATCH"</div><div class='input'>
 
 <span class='co'>## List all columns containing protein annotations</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='no'>EnsDb.Hsapiens.v86</span>
-<span class='kw'>if</span> (<span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='no'>edb</span>))
-    <span class='fu'>listProteinColumns</span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt;  [1] "tx_id"                 "protein_id"            "protein_sequence"     
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
+<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>listProteinColumns</a></span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt;  [1] "tx_id"                 "protein_id"            "protein_sequence"     
 #&gt;  [4] "protein_domain_id"     "protein_domain_source" "interpro_accession"   
 #&gt;  [7] "prot_dom_start"        "prot_dom_end"          "uniprot_id"           
 #&gt; [10] "uniprot_db"            "uniprot_mapping_type" </div></pre>

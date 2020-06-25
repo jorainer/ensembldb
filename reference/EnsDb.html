@@ -74,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -142,10 +142,10 @@
     <div class="ref-description">
     <p>The <code>EnsDb</code> constructor function connects to the database
     specified with argument <code>x</code> and returns a corresponding
-    <code><a href='EnsDb-class.html'>EnsDb</a></code> object.</p>
+    <code>EnsDb</code> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>EnsDb</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>EnsDb</span>(<span class='kw'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -159,7 +159,7 @@ a <code>DBIConnection</code> to e.g. a MariaDB/MySQL database.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='EnsDb-class.html'>EnsDb</a></code> object.</p>
+    <p>A <code>EnsDb</code> object.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>By providing the connection to a MariaDB/MySQL database, it is possible
@@ -167,14 +167,17 @@ to use MariaDB/MySQL as the database backend and queries will be performed on
 that database. Note however that this requires the package <code>RMariaDB</code>
 to be installed. In addition, the user needs to have access to a MySQL
 server providing already an EnsDb database, or must have write
-privileges on a MySQL server, in which case the <code><a href='useMySQL-EnsDb-method.html'>useMySQL</a></code>
+privileges on a MySQL server, in which case the <code>useMySQL</code>
 method can be used to insert the annotations from an EnsDB package into
 a MySQL database.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>## "Standard" way to create an EnsDb object:</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
-<span class='no'>EnsDb.Hsapiens.v86</span></div><div class='output co'>#&gt; EnsDb for Ensembl:
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
+<span class='kw'>EnsDb.Hsapiens.v86</span></div><div class='output co'>#&gt; EnsDb for Ensembl:
 #&gt; |Backend: SQLite
 #&gt; |Db type: EnsDb
 #&gt; |Type of Gene ID: Ensembl Gene ID
@@ -192,9 +195,9 @@ a MySQL database.</p>
 #&gt; | No. of transcripts: 216741.
 #&gt; |Protein data available.</div><div class='input'>
 <span class='co'>## Alternatively, provide the full file name of a SQLite database file</span>
-<span class='no'>dbfile</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/EnsDb.Hsapiens.v86.sqlite"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"EnsDb.Hsapiens.v86"</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='fu'>EnsDb</span>(<span class='no'>dbfile</span>)
-<span class='no'>edb</span></div><div class='output co'>#&gt; EnsDb for Ensembl:
+<span class='kw'>dbfile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/EnsDb.Hsapiens.v86.sqlite"</span>, package = <span class='st'>"EnsDb.Hsapiens.v86"</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='fu'>EnsDb</span>(<span class='kw'>dbfile</span>)
+<span class='kw'>edb</span></div><div class='output co'>#&gt; EnsDb for Ensembl:
 #&gt; |Backend: SQLite
 #&gt; |Db type: EnsDb
 #&gt; |Type of Gene ID: Ensembl Gene ID
@@ -212,11 +215,11 @@ a MySQL database.</p>
 #&gt; | No. of transcripts: 216741.
 #&gt; |Protein data available.</div><div class='input'>
 <span class='co'>## Third way: connect to a MySQL database</span>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RMariaDB</span>)
-<span class='no'>dbcon</span> <span class='kw'>&lt;-</span> <span class='fu'>dbConnect</span>(<span class='fu'>MySQL</span>(), <span class='kw'>user</span> <span class='kw'>=</span> <span class='no'>my_user</span>, <span class='kw'>pass</span> <span class='kw'>=</span> <span class='no'>my_pass</span>,
-    <span class='kw'>host</span> <span class='kw'>=</span> <span class='no'>my_host</span>, <span class='kw'>dbname</span> <span class='kw'>=</span> <span class='st'>"ensdb_hsapiens_v86"</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='fu'>EnsDb</span>(<span class='no'>dbcon</span>)
+<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>RMariaDB</span>)
+<span class='kw'>dbcon</span> <span class='op'>&lt;-</span> <span class='fu'>dbConnect</span>(<span class='fu'>MySQL</span>(), user = <span class='kw'>my_user</span>, pass = <span class='kw'>my_pass</span>,
+    host = <span class='kw'>my_host</span>, dbname = <span class='st'>"ensdb_hsapiens_v86"</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='fu'>EnsDb</span>(<span class='kw'>dbcon</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -103,16 +103,20 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-
-<p align="center">
-<img src="https://github.com/jotsetung/BioC-stickers/blob/master/ensembldb/ensembldb.png" height="100"></p>
-<p><a href="http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html"><img src="http://www.bioconductor.org/shields/years-in-bioc/ensembldb.svg" alt="Years in Bioconductor"></a> <a href="http://www.bioconductor.org/packages/release/bioc/html/ensembldb.html"><img src="http://www.bioconductor.org/shields/build/release/bioc/ensembldb.svg" alt="Bioconductor release build status"></a> <a href="http://www.bioconductor.org/checkResults/devel/bioc-LATEST/ensembldb.html"><img src="http://www.bioconductor.org/shields/build/devel/bioc/ensembldb.svg" alt="Bioconductor devel build status"></a> <a href="https://github.com/jorainer/ensembldb/actions?query=workflow%3AR-CMD-check"><img src="https://github.com/jorainer/ensembldb/workflows/R-CMD-check/badge.svg" alt="build status"></a> <a href="https://codecov.io/github/jorainer/ensembldb?branch=master"><img src="https://codecov.io/github/jorainer/ensembldb/coverage.svg?branch=master" alt="codecov result"></a></p>
-<div id="ensembldb-build-and-use-ensembl-based-annotation-packages" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#ensembldb-build-and-use-ensembl-based-annotation-packages" class="anchor"></a><code>ensembldb</code>: build and use Ensembl-based annotation packages</h1></div>
-<p>For more information please refer to the <a href="vignettes/ensembldb.org">vignettes/ensembldb.org</a> file.</p>
-</div>
-
+The package provides functions to create and use
+    transcript centric annotation databases/packages. The
+    annotation for the databases are directly fetched from Ensembl
+    using their Perl API. The functionality and data is similar to
+    that of the TxDb packages from the GenomicFeatures package,
+    but, in addition to retrieve all gene/transcript models and
+    annotations from the database, ensembldb provides a filter
+    framework allowing to retrieve annotations for specific entries
+    like genes encoded on a chromosome region or transcript models
+    of lincRNA genes. EnsDb databases built with ensembldb contain
+    also protein annotations and mappings between proteins and
+    their encoding transcripts. Finally, ensembldb provides
+    functions to map between genomic, transcript and protein
+    coordinates.
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

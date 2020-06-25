@@ -77,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -144,72 +144,72 @@
 
     <div class="ref-description">
     <p>Retrieve gene/transcript/exons annotations stored in an Ensembl based
-  database package generated with the <code><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></code>
+  database package generated with the <code>makeEnsembldbPackage</code>
   function. Parameter <code>filter</code> enables to define filters to
   retrieve only specific data. Alternatively, a global filter might be
-  added to the <code>EnsDb</code> object using the <code><a href='global-filters.html'>addFilter</a></code>
+  added to the <code>EnsDb</code> object using the <code>addFilter</code>
   method.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>exons</span>(<span class='no'>x</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>,<span class='st'>"exon"</span>),
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(), <span class='no'>order.by</span>,
-        <span class='kw'>order.type</span> <span class='kw'>=</span> <span class='st'>"asc"</span>, <span class='kw'>return.type</span> <span class='kw'>=</span> <span class='st'>"GRanges"</span>)
+<span class='fu'>exons</span>(<span class='kw'>x</span>, columns = <span class='fu'>listColumns</span>(<span class='kw'>x</span>,<span class='st'>"exon"</span>),
+        filter = <span class='fu'>AnnotationFilterList</span>(), <span class='kw'>order.by</span>,
+        order.type = <span class='st'>"asc"</span>, return.type = <span class='st'>"GRanges"</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>exonsBy</span>(<span class='no'>x</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx"</span>, <span class='st'>"gene"</span>),
-        <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>, <span class='st'>"exon"</span>), <span class='kw'>filter</span> <span class='kw'>=</span>
-        <span class='fu'>AnnotationFilterList</span>(), <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>exonsBy</span>(<span class='kw'>x</span>, by = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx"</span>, <span class='st'>"gene"</span>),
+        columns = <span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='st'>"exon"</span>), filter =
+        <span class='fu'>AnnotationFilterList</span>(), use.names = <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>intronsByTranscript</span>(<span class='no'>x</span>, <span class='no'>...</span>, <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>intronsByTranscript</span>(<span class='kw'>x</span>, <span class='kw'>...</span>, use.names = <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>exonsByOverlaps</span>(<span class='no'>x</span>, <span class='no'>ranges</span>, <span class='kw'>maxgap</span> <span class='kw'>=</span> -<span class='fl'>1L</span>, <span class='kw'>minoverlap</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
-        <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"any"</span>, <span class='st'>"start"</span>, <span class='st'>"end"</span>), <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>, <span class='st'>"exon"</span>),
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>())
+<span class='fu'>exonsByOverlaps</span>(<span class='kw'>x</span>, <span class='kw'>ranges</span>, maxgap = <span class='op'>-</span><span class='fl'>1L</span>, minoverlap = <span class='fl'>0L</span>,
+        type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"any"</span>, <span class='st'>"start"</span>, <span class='st'>"end"</span>), columns = <span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='st'>"exon"</span>),
+        filter = <span class='fu'>AnnotationFilterList</span>())
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>transcripts</span>(<span class='no'>x</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>, <span class='st'>"tx"</span>),
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(), <span class='no'>order.by</span>, <span class='kw'>order.type</span> <span class='kw'>=</span> <span class='st'>"asc"</span>,
-        <span class='kw'>return.type</span> <span class='kw'>=</span> <span class='st'>"GRanges"</span>)
+<span class='fu'>transcripts</span>(<span class='kw'>x</span>, columns = <span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='st'>"tx"</span>),
+        filter = <span class='fu'>AnnotationFilterList</span>(), <span class='kw'>order.by</span>, order.type = <span class='st'>"asc"</span>,
+        return.type = <span class='st'>"GRanges"</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>transcriptsBy</span>(<span class='no'>x</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene"</span>, <span class='st'>"exon"</span>),
-        <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>, <span class='st'>"tx"</span>), <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>())
+<span class='fu'>transcriptsBy</span>(<span class='kw'>x</span>, by = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene"</span>, <span class='st'>"exon"</span>),
+        columns = <span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='st'>"tx"</span>), filter = <span class='fu'>AnnotationFilterList</span>())
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>transcriptsByOverlaps</span>(<span class='no'>x</span>, <span class='no'>ranges</span>, <span class='kw'>maxgap</span> <span class='kw'>=</span> -<span class='fl'>1L</span>,
-        <span class='kw'>minoverlap</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"any"</span>, <span class='st'>"start"</span>, <span class='st'>"end"</span>),
-        <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>, <span class='st'>"tx"</span>), <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>())
+<span class='fu'>transcriptsByOverlaps</span>(<span class='kw'>x</span>, <span class='kw'>ranges</span>, maxgap = <span class='op'>-</span><span class='fl'>1L</span>,
+        minoverlap = <span class='fl'>0L</span>, type = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"any"</span>, <span class='st'>"start"</span>, <span class='st'>"end"</span>),
+        columns = <span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='st'>"tx"</span>), filter = <span class='fu'>AnnotationFilterList</span>())
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>promoters</span>(<span class='no'>x</span>, <span class='kw'>upstream</span> <span class='kw'>=</span> <span class='fl'>2000</span>, <span class='kw'>downstream</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-        <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>promoters</span>(<span class='kw'>x</span>, upstream = <span class='fl'>2000</span>, downstream = <span class='fl'>200</span>,
+        use.names = <span class='fl'>TRUE</span>, <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>genes</span>(<span class='no'>x</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='no'>x</span>, <span class='st'>"gene"</span>), <span class='st'>"entrezid"</span>),
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(), <span class='no'>order.by</span>, <span class='kw'>order.type</span> <span class='kw'>=</span> <span class='st'>"asc"</span>,
-        <span class='kw'>return.type</span> <span class='kw'>=</span> <span class='st'>"GRanges"</span>)
+<span class='fu'>genes</span>(<span class='kw'>x</span>, columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'>listColumns</span>(<span class='kw'>x</span>, <span class='st'>"gene"</span>), <span class='st'>"entrezid"</span>),
+        filter = <span class='fu'>AnnotationFilterList</span>(), <span class='kw'>order.by</span>, order.type = <span class='st'>"asc"</span>,
+        return.type = <span class='st'>"GRanges"</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>disjointExons</span>(<span class='no'>x</span>, <span class='kw'>aggregateGenes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-        <span class='kw'>includeTranscripts</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(), <span class='no'>...</span>)
+<span class='fu'>disjointExons</span>(<span class='kw'>x</span>, aggregateGenes = <span class='fl'>FALSE</span>,
+        includeTranscripts = <span class='fl'>TRUE</span>, filter = <span class='fu'>AnnotationFilterList</span>(), <span class='kw'>...</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>cdsBy</span>(<span class='no'>x</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx"</span>, <span class='st'>"gene"</span>), <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(), <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>cdsBy</span>(<span class='kw'>x</span>, by = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx"</span>, <span class='st'>"gene"</span>), columns = <span class='kw'>NULL</span>,
+        filter = <span class='fu'>AnnotationFilterList</span>(), use.names = <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>fiveUTRsByTranscript</span>(<span class='no'>x</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>())
+<span class='fu'>fiveUTRsByTranscript</span>(<span class='kw'>x</span>, columns = <span class='kw'>NULL</span>,
+        filter = <span class='fu'>AnnotationFilterList</span>())
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>threeUTRsByTranscript</span>(<span class='no'>x</span>, <span class='kw'>columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>())
+<span class='fu'>threeUTRsByTranscript</span>(<span class='kw'>x</span>, columns = <span class='kw'>NULL</span>,
+        filter = <span class='fu'>AnnotationFilterList</span>())
 
 <span class='co'># S4 method for GRangesList</span>
-<span class='fu'>toSAF</span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>toSAF</span>(<span class='kw'>x</span>, <span class='kw'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -249,8 +249,8 @@
     <code>transcriptBy</code> the columns of the <code>tx</code> data base table
     (see details below for more information).</p>
 <p>Note that any of the column names of the database tables can be
-    submitted to any of the methods (use <code><a href='EnsDb-class.html'>listTables</a></code> or
-    <code><a href='EnsDb-class.html'>listColumns</a></code> methods for a complete list of allowed
+    submitted to any of the methods (use <code>listTables</code> or
+    <code>listColumns</code> methods for a complete list of allowed
     column names).</p>
 <p>For <code>cdsBy</code>: this argument is only supported for for
     <code>by="tx"</code>.</p></td>
@@ -482,7 +482,7 @@
 </dl>
 
 <p>Many <code>EnsDb</code> databases provide also protein related
-  annotations. See <code><a href='ProteinFunctionality.html'>listProteinColumns</a></code> for more information.</p>
+  annotations. See <code>listProteinColumns</code> for more information.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p>Ensembl defines genes not only on standard chromosomes, but also on
@@ -542,24 +542,27 @@
     <p>While it is possible to request values from a column <code>"tx_name"</code>
   (with the <code>columns</code> argument), no such column is present in the
   database. The returned values correspond to the ID of the transcripts.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Johannes Rainer, Tim Triche</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>supportedFilters</code> to get an overview of supported filters.
-  <code><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></code>,
-  <code><a href='EnsDb-class.html'>listColumns</a></code>, <code><a href='EnsDb-lengths.html'>lengthOf</a></code></p>
-<p><code><a href='global-filters.html'>addFilter</a></code> for globally adding filters to an <code>EnsDb</code>
+  <code>makeEnsembldbPackage</code>,
+  <code>listColumns</code>, <code>lengthOf</code></p>
+<p><code>addFilter</code> for globally adding filters to an <code>EnsDb</code>
   object.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='no'>EnsDb.Hsapiens.v86</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
 
 <span class='co'>######   genes</span>
 <span class='co'>##</span>
 <span class='co'>## Get all genes encoded on chromosome Y</span>
-<span class='no'>AllY</span> <span class='kw'>&lt;-</span> <span class='fu'>genes</span>(<span class='no'>edb</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>))
-<span class='no'>AllY</span></div><div class='output co'>#&gt; GRanges object with 523 ranges and 6 metadata columns:
+<span class='kw'>AllY</span> <span class='op'>&lt;-</span> <span class='fu'>genes</span>(<span class='kw'>edb</span>, filter = <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>))
+<span class='kw'>AllY</span></div><div class='output co'>#&gt; GRanges object with 523 ranges and 6 metadata columns:
 #&gt;                   seqnames            ranges strand |         gene_id
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
 #&gt;   ENSG00000251841        Y   2784749-2784853      + | ENSG00000251841
@@ -603,10 +606,10 @@
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Return the result as a DataFrame; also, we use a filter expression here</span>
 <span class='co'>## to define which features to extract from the database.</span>
-<span class='no'>AllY.granges</span> <span class='kw'>&lt;-</span> <span class='fu'>genes</span>(<span class='no'>edb</span>,
-                      <span class='kw'>filter</span> <span class='kw'>=</span> ~ <span class='no'>seq_name</span> <span class='kw'>==</span> <span class='st'>"Y"</span>,
-                      <span class='kw'>return.type</span><span class='kw'>=</span><span class='st'>"DataFrame"</span>)
-<span class='no'>AllY.granges</span></div><div class='output co'>#&gt; DataFrame with 523 rows and 10 columns
+<span class='kw'>AllY.granges</span> <span class='op'>&lt;-</span> <span class='fu'>genes</span>(<span class='kw'>edb</span>,
+                      filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"Y"</span>,
+                      return.type=<span class='st'>"DataFrame"</span>)
+<span class='kw'>AllY.granges</span></div><div class='output co'>#&gt; DataFrame with 523 rows and 10 columns
 #&gt;             gene_id   gene_name           gene_biotype gene_seq_start
 #&gt;         &lt;character&gt; &lt;character&gt;            &lt;character&gt;      &lt;integer&gt;
 #&gt; 1   ENSG00000251841  RNU6-1334P                  snRNA        2784749
@@ -636,13 +639,13 @@
 <span class='co'>## Include all transcripts of the gene and their chromosomal</span>
 <span class='co'>## coordinates, sort by chrom start of transcripts and return as</span>
 <span class='co'>## GRanges.</span>
-<span class='no'>AllY.granges.tx</span> <span class='kw'>&lt;-</span> <span class='fu'>genes</span>(<span class='no'>edb</span>,
-                         <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
-                         <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_id"</span>, <span class='st'>"seq_name"</span>,
+<span class='kw'>AllY.granges.tx</span> <span class='op'>&lt;-</span> <span class='fu'>genes</span>(<span class='kw'>edb</span>,
+                         filter = <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
+                         columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_id"</span>, <span class='st'>"seq_name"</span>,
                                      <span class='st'>"seq_strand"</span>, <span class='st'>"tx_id"</span>, <span class='st'>"tx_biotype"</span>,
                                      <span class='st'>"tx_seq_start"</span>, <span class='st'>"tx_seq_end"</span>),
-                         <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='st'>"tx_seq_start"</span>)
-<span class='no'>AllY.granges.tx</span></div><div class='output co'>#&gt; GRanges object with 740 ranges and 5 metadata columns:
+                         order.by = <span class='st'>"tx_seq_start"</span>)
+<span class='kw'>AllY.granges.tx</span></div><div class='output co'>#&gt; GRanges object with 740 ranges and 5 metadata columns:
 #&gt;                   seqnames            ranges strand |         gene_id
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
 #&gt;   ENSG00000251841        Y   2784749-2784853      + | ENSG00000251841
@@ -689,10 +692,10 @@
 <span class='co'>######   transcripts</span>
 <span class='co'>##</span>
 <span class='co'>## Get all transcripts of a gene</span>
-<span class='no'>Tx</span> <span class='kw'>&lt;-</span> <span class='fu'>transcripts</span>(<span class='no'>edb</span>,
-                  <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>GeneIdFilter</span>(<span class='st'>"ENSG00000184895"</span>),
-                  <span class='kw'>order.by</span> <span class='kw'>=</span> <span class='st'>"tx_seq_start"</span>)
-<span class='no'>Tx</span></div><div class='output co'>#&gt; GRanges object with 1 range and 6 metadata columns:
+<span class='kw'>Tx</span> <span class='op'>&lt;-</span> <span class='fu'>transcripts</span>(<span class='kw'>edb</span>,
+                  filter = <span class='fu'>GeneIdFilter</span>(<span class='st'>"ENSG00000184895"</span>),
+                  order.by = <span class='st'>"tx_seq_start"</span>)
+<span class='kw'>Tx</span></div><div class='output co'>#&gt; GRanges object with 1 range and 6 metadata columns:
 #&gt;                   seqnames          ranges strand |           tx_id
 #&gt;                      &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
 #&gt;   ENST00000383070        Y 2786855-2787699      - | ENST00000383070
@@ -706,12 +709,12 @@
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Get all transcripts of two genes along with some information on the</span>
 <span class='co'>## gene and transcript</span>
-<span class='no'>Tx</span> <span class='kw'>&lt;-</span> <span class='fu'>transcripts</span>(<span class='no'>edb</span>,
-                  <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>GeneIdFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ENSG00000184895"</span>,
+<span class='kw'>Tx</span> <span class='op'>&lt;-</span> <span class='fu'>transcripts</span>(<span class='kw'>edb</span>,
+                  filter = <span class='fu'>GeneIdFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ENSG00000184895"</span>,
                                           <span class='st'>"ENSG00000092377"</span>)),
-                  <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_id"</span>, <span class='st'>"gene_seq_start"</span>, <span class='st'>"gene_seq_end"</span>,
+                  columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_id"</span>, <span class='st'>"gene_seq_start"</span>, <span class='st'>"gene_seq_end"</span>,
                               <span class='st'>"gene_biotype"</span>, <span class='st'>"tx_biotype"</span>))
-<span class='no'>Tx</span></div><div class='output co'>#&gt; GRanges object with 4 ranges and 6 metadata columns:
+<span class='kw'>Tx</span></div><div class='output co'>#&gt; GRanges object with 4 ranges and 6 metadata columns:
 #&gt;                   seqnames          ranges strand |         gene_id
 #&gt;                      &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
 #&gt;   ENST00000383070        Y 2786855-2787699      - | ENSG00000184895
@@ -735,7 +738,7 @@
 <span class='co'>######   promoters</span>
 <span class='co'>##</span>
 <span class='co'>## Get the bona-fide promoters (2k up- to 200nt downstream of TSS)</span>
-<span class='fu'>promoters</span>(<span class='no'>edb</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>GeneIdFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ENSG00000184895"</span>,
+<span class='fu'>promoters</span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneIdFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ENSG00000184895"</span>,
                                        <span class='st'>"ENSG00000092377"</span>)))</div><div class='output co'>#&gt; GRanges object with 4 ranges and 6 metadata columns:
 #&gt;                   seqnames          ranges strand |           tx_id
 #&gt;                      &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -760,12 +763,12 @@
 <span class='co'>######   exons</span>
 <span class='co'>##</span>
 <span class='co'>## Get all exons of protein coding transcript for the gene ENSG00000184895</span>
-<span class='no'>Exon</span> <span class='kw'>&lt;-</span> <span class='fu'>exons</span>(<span class='no'>edb</span>,
-              <span class='kw'>filter</span> <span class='kw'>=</span> ~ <span class='no'>gene_id</span> <span class='kw'>==</span> <span class='st'>"ENSG00000184895"</span> <span class='kw'>&amp;</span>
-                  <span class='no'>tx_biotype</span> <span class='kw'>==</span> <span class='st'>"protein_coding"</span>,
-              <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_id"</span>, <span class='st'>"gene_seq_start"</span>, <span class='st'>"gene_seq_end"</span>,
+<span class='kw'>Exon</span> <span class='op'>&lt;-</span> <span class='fu'>exons</span>(<span class='kw'>edb</span>,
+              filter = <span class='op'>~</span> <span class='kw'>gene_id</span> <span class='op'>==</span> <span class='st'>"ENSG00000184895"</span> <span class='op'>&amp;</span>
+                  <span class='kw'>tx_biotype</span> <span class='op'>==</span> <span class='st'>"protein_coding"</span>,
+              columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_id"</span>, <span class='st'>"gene_seq_start"</span>, <span class='st'>"gene_seq_end"</span>,
                           <span class='st'>"tx_biotype"</span>, <span class='st'>"gene_biotype"</span>))
-<span class='no'>Exon</span></div><div class='output co'>#&gt; GRanges object with 1 range and 6 metadata columns:
+<span class='kw'>Exon</span></div><div class='output co'>#&gt; GRanges object with 1 range and 6 metadata columns:
 #&gt;                   seqnames          ranges strand |         gene_id
 #&gt;                      &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
 #&gt;   ENSE00001494622        Y 2786855-2787699      - | ENSG00000184895
@@ -782,9 +785,9 @@
 <span class='co'>#####    exonsBy</span>
 <span class='co'>##</span>
 <span class='co'>## Get all exons for transcripts encoded on chromosomes X and Y.</span>
-<span class='no'>ETx</span> <span class='kw'>&lt;-</span> <span class='fu'>exonsBy</span>(<span class='no'>edb</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"tx"</span>,
-               <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)))
-<span class='no'>ETx</span></div><div class='output co'>#&gt; GRangesList object of length 6829:
+<span class='kw'>ETx</span> <span class='op'>&lt;-</span> <span class='fu'>exonsBy</span>(<span class='kw'>edb</span>, by = <span class='st'>"tx"</span>,
+               filter = <span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)))
+<span class='kw'>ETx</span></div><div class='output co'>#&gt; GRangesList object of length 6829:
 #&gt; $ENST00000014935
 #&gt; GRanges object with 9 ranges and 2 metadata columns:
 #&gt;       seqnames              ranges strand |         exon_id exon_rank
@@ -804,10 +807,10 @@
 #&gt; ...
 #&gt; &lt;6828 more elements&gt;</div><div class='input'><span class='co'>## Get all exons for genes encoded on chromosome 1 to 22, X and Y and</span>
 <span class='co'>## include additional annotation columns in the result</span>
-<span class='no'>EGenes</span> <span class='kw'>&lt;-</span> <span class='fu'>exonsBy</span>(<span class='no'>edb</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"gene"</span>,
-                  <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)),
-                  <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_biotype"</span>, <span class='st'>"gene_name"</span>))
-<span class='no'>EGenes</span></div><div class='output co'>#&gt; GRangesList object of length 2922:
+<span class='kw'>EGenes</span> <span class='op'>&lt;-</span> <span class='fu'>exonsBy</span>(<span class='kw'>edb</span>, by = <span class='st'>"gene"</span>,
+                  filter = <span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)),
+                  columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_biotype"</span>, <span class='st'>"gene_name"</span>))
+<span class='kw'>EGenes</span></div><div class='output co'>#&gt; GRangesList object of length 2922:
 #&gt; $ENSG00000000003
 #&gt; GRanges object with 20 ranges and 3 metadata columns:
 #&gt;        seqnames              ranges strand |   gene_biotype   gene_name
@@ -842,14 +845,14 @@
 #&gt; ...
 #&gt; &lt;2921 more elements&gt;</div><div class='input'>
 <span class='co'>## Note that this might also contain "LRG" genes.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grep</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='no'>EGenes</span>), <span class='kw'>pattern</span><span class='kw'>=</span><span class='st'>"LRG"</span>))</div><div class='output co'>#&gt; [1] 40</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grep</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='kw'>EGenes</span>), pattern=<span class='st'>"LRG"</span>))</div><div class='output co'>#&gt; [1] 40</div><div class='input'>
 <span class='co'>## to fetch just Ensemblgenes, use an GeneIdFilter with value</span>
 <span class='co'>## "ENS%" and condition "like"</span>
-<span class='no'>eg</span> <span class='kw'>&lt;-</span> <span class='fu'>exonsBy</span>(<span class='no'>edb</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"gene"</span>,
-              <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>AnnotationFilterList</span>(<span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)),
+<span class='kw'>eg</span> <span class='op'>&lt;-</span> <span class='fu'>exonsBy</span>(<span class='kw'>edb</span>, by = <span class='st'>"gene"</span>,
+              filter = <span class='fu'>AnnotationFilterList</span>(<span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)),
                                             <span class='fu'>GeneIdFilter</span>(<span class='st'>"ENS"</span>, <span class='st'>"startsWith"</span>)),
-              <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_biotype"</span>, <span class='st'>"gene_name"</span>))
-<span class='no'>eg</span></div><div class='output co'>#&gt; GRangesList object of length 2882:
+              columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"gene_biotype"</span>, <span class='st'>"gene_name"</span>))
+<span class='kw'>eg</span></div><div class='output co'>#&gt; GRangesList object of length 2882:
 #&gt; $ENSG00000000003
 #&gt; GRanges object with 20 ranges and 4 metadata columns:
 #&gt;        seqnames              ranges strand |   gene_biotype   gene_name
@@ -882,12 +885,12 @@
 #&gt;   seqinfo: 2 sequences from GRCh38 genome
 #&gt; 
 #&gt; ...
-#&gt; &lt;2881 more elements&gt;</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grep</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='no'>eg</span>), <span class='kw'>pattern</span><span class='kw'>=</span><span class='st'>"LRG"</span>))</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
+#&gt; &lt;2881 more elements&gt;</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grep</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>(<span class='kw'>eg</span>), pattern=<span class='st'>"LRG"</span>))</div><div class='output co'>#&gt; [1] 0</div><div class='input'>
 <span class='co'>#####    transcriptsBy</span>
 <span class='co'>##</span>
-<span class='no'>TGenes</span> <span class='kw'>&lt;-</span> <span class='fu'>transcriptsBy</span>(<span class='no'>edb</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"gene"</span>,
-                        <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)))
-<span class='no'>TGenes</span></div><div class='output co'>#&gt; GRangesList object of length 2922:
+<span class='kw'>TGenes</span> <span class='op'>&lt;-</span> <span class='fu'>transcriptsBy</span>(<span class='kw'>edb</span>, by = <span class='st'>"gene"</span>,
+                        filter = <span class='fu'>SeqNameFilter</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"X"</span>, <span class='st'>"Y"</span>)))
+<span class='kw'>TGenes</span></div><div class='output co'>#&gt; GRangesList object of length 2922:
 #&gt; $ENSG00000000003
 #&gt; GRanges object with 5 ranges and 6 metadata columns:
 #&gt;       seqnames              ranges strand |           tx_id
@@ -940,13 +943,13 @@
 #&gt;   [3]        X 65512583-65534756      - | ENST00000374804
 #&gt;   [4]        X 65512582-65534754      - | ENST00000374807
 #&gt;   [5]        X 65520429-65523617      - | ENST00000469091
-#&gt;                    tx_biotype tx_cds_seq_start tx_cds_seq_end         gene_id
-#&gt;                   &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;     &lt;character&gt;
-#&gt;   [1] nonsense_mediated_decay         65525021       65534715 ENSG00000001497
-#&gt;   [2]          protein_coding         65512775       65534715 ENSG00000001497
-#&gt;   [3]          protein_coding         65512775       65534715 ENSG00000001497
-#&gt;   [4]          protein_coding         65512775       65534715 ENSG00000001497
-#&gt;   [5]          protein_coding         65520655       65523617 ENSG00000001497
+#&gt;                   tx_biotype tx_cds_seq_start tx_cds_seq_end         gene_id
+#&gt;                  &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;     &lt;character&gt;
+#&gt;   [1] nonsense_mediated_de..         65525021       65534715 ENSG00000001497
+#&gt;   [2]         protein_coding         65512775       65534715 ENSG00000001497
+#&gt;   [3]         protein_coding         65512775       65534715 ENSG00000001497
+#&gt;   [4]         protein_coding         65512775       65534715 ENSG00000001497
+#&gt;   [5]         protein_coding         65520655       65523617 ENSG00000001497
 #&gt;               tx_name
 #&gt;           &lt;character&gt;
 #&gt;   [1] ENST00000484069
@@ -961,7 +964,7 @@
 #&gt; &lt;2919 more elements&gt;</div><div class='input'>
 <span class='co'>## convert this to a SAF formatted data.frame that can be used by the</span>
 <span class='co'>## featureCounts function from the Rsubreader package.</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'>toSAF</span>(<span class='no'>TGenes</span>))</div><div class='output co'>#&gt;            GeneID Chr     Start       End Strand
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='fu'>toSAF</span>(<span class='kw'>TGenes</span>))</div><div class='output co'>#&gt;            GeneID Chr     Start       End Strand
 #&gt; 1 ENSG00000000003   X 100633442 100639991      -
 #&gt; 2 ENSG00000000003   X 100627109 100637104      -
 #&gt; 3 ENSG00000000003   X 100632063 100637104      -
@@ -971,13 +974,13 @@
 
 <span class='co'>#####   transcriptsByOverlaps</span>
 <span class='co'>##</span>
-<span class='no'>ir</span> <span class='kw'>&lt;-</span> <span class='fu'>IRanges</span>(<span class='kw'>start</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2654890</span>, <span class='fl'>2709520</span>, <span class='fl'>28111770</span>),
-              <span class='kw'>end</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2654900</span>, <span class='fl'>2709550</span>, <span class='fl'>28111790</span>))
-<span class='no'>gr</span> <span class='kw'>&lt;-</span> <span class='fu'>GRanges</span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='st'>"Y"</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>ir</span>)), <span class='no'>ir</span>)
+<span class='kw'>ir</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span>(start = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2654890</span>, <span class='fl'>2709520</span>, <span class='fl'>28111770</span>),
+              end = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2654900</span>, <span class='fl'>2709550</span>, <span class='fl'>28111790</span>))
+<span class='kw'>gr</span> <span class='op'>&lt;-</span> <span class='fu'>GRanges</span>(<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='st'>"Y"</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>ir</span>)), <span class='kw'>ir</span>)
 
 <span class='co'>## Retrieve all transcripts overlapping any of the regions.</span>
-<span class='no'>txs</span> <span class='kw'>&lt;-</span> <span class='fu'>transcriptsByOverlaps</span>(<span class='no'>edb</span>, <span class='no'>gr</span>)
-<span class='no'>txs</span></div><div class='output co'>#&gt; GRanges object with 0 ranges and 6 metadata columns:
+<span class='kw'>txs</span> <span class='op'>&lt;-</span> <span class='fu'>transcriptsByOverlaps</span>(<span class='kw'>edb</span>, <span class='kw'>gr</span>)
+<span class='kw'>txs</span></div><div class='output co'>#&gt; GRanges object with 0 ranges and 6 metadata columns:
 #&gt;    seqnames    ranges strand |       tx_id  tx_biotype tx_cds_seq_start
 #&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt;        &lt;integer&gt;
 #&gt;    tx_cds_seq_end     gene_id     tx_name
@@ -985,9 +988,9 @@
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Alternatively, use a GRangesFilter</span>
-<span class='no'>grf</span> <span class='kw'>&lt;-</span> <span class='fu'>GRangesFilter</span>(<span class='no'>gr</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"any"</span>)
-<span class='no'>txs</span> <span class='kw'>&lt;-</span> <span class='fu'>transcripts</span>(<span class='no'>edb</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='no'>grf</span>)
-<span class='no'>txs</span></div><div class='output co'>#&gt; GRanges object with 0 ranges and 6 metadata columns:
+<span class='kw'>grf</span> <span class='op'>&lt;-</span> <span class='fu'>GRangesFilter</span>(<span class='kw'>gr</span>, type = <span class='st'>"any"</span>)
+<span class='kw'>txs</span> <span class='op'>&lt;-</span> <span class='fu'>transcripts</span>(<span class='kw'>edb</span>, filter = <span class='kw'>grf</span>)
+<span class='kw'>txs</span></div><div class='output co'>#&gt; GRanges object with 0 ranges and 6 metadata columns:
 #&gt;    seqnames    ranges strand |       tx_id  tx_biotype tx_cds_seq_start
 #&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt; &lt;character&gt;        &lt;integer&gt;
 #&gt;    tx_cds_seq_end     gene_id     tx_name
@@ -999,15 +1002,17 @@
 <span class='co'>## Get the coding region for all transcripts on chromosome Y.</span>
 <span class='co'>## Specifying also additional annotation columns (in addition to the default</span>
 <span class='co'>## exon_id and exon_rank).</span>
-<span class='no'>cds</span> <span class='kw'>&lt;-</span> <span class='fu'>cdsBy</span>(<span class='no'>edb</span>, <span class='kw'>by</span> <span class='kw'>=</span> <span class='st'>"tx"</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
-             <span class='kw'>columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx_biotype"</span>, <span class='st'>"gene_name"</span>))
+<span class='kw'>cds</span> <span class='op'>&lt;-</span> <span class='fu'>cdsBy</span>(<span class='kw'>edb</span>, by = <span class='st'>"tx"</span>, filter = <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
+             columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx_biotype"</span>, <span class='st'>"gene_name"</span>))
 
 <span class='co'>####    the 5' untranslated regions:</span>
-<span class='no'>fUTRs</span> <span class='kw'>&lt;-</span> <span class='fu'>fiveUTRsByTranscript</span>(<span class='no'>edb</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>))
+<span class='kw'>fUTRs</span> <span class='op'>&lt;-</span> <span class='fu'>fiveUTRsByTranscript</span>(<span class='kw'>edb</span>, filter = <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>))
 
 <span class='co'>####    the 3' untranslated regions with additional column gene_name.</span>
-<span class='no'>tUTRs</span> <span class='kw'>&lt;-</span> <span class='fu'>threeUTRsByTranscript</span>(<span class='no'>edb</span>, <span class='kw'>filter</span> <span class='kw'>=</span> <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
-                               <span class='kw'>columns</span> <span class='kw'>=</span> <span class='st'>"gene_name"</span>)</div></pre>
+<span class='kw'>tUTRs</span> <span class='op'>&lt;-</span> <span class='fu'>threeUTRsByTranscript</span>(<span class='kw'>edb</span>, filter = <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
+                               columns = <span class='st'>"gene_name"</span>)
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

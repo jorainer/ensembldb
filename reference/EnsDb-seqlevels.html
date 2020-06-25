@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -148,13 +148,13 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>seqlevelsStyle</span>(<span class='no'>x</span>)
+<span class='fu'>seqlevelsStyle</span>(<span class='kw'>x</span>)
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>seqlevelsStyle</span>(<span class='no'>x</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>seqlevelsStyle</span>(<span class='kw'>x</span>) <span class='op'>&lt;-</span> <span class='kw'>value</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>supportedSeqlevelsStyles</span>(<span class='no'>x</span>)</pre>
+<span class='fu'>supportedSeqlevelsStyles</span>(<span class='kw'>x</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -211,20 +211,23 @@
 
     <p>For <code>seqlevelsStyle</code>: see method description above.</p>
 <p>For <code>supportedSeqlevelsStyles</code>: see method description above.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Johannes Rainer</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='EnsDb-class.html'>EnsDb</a></code>
-  <code><a href='EnsDb-exonsBy.html'>transcripts</a></code></p></div>
+    <div class='dont-index'><p><code>EnsDb</code>
+  <code>transcripts</code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='no'>EnsDb.Hsapiens.v86</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
 
 <span class='co'>## Get the internal, default seqlevel style.</span>
-<span class='fu'>seqlevelsStyle</span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt; [1] "Ensembl"</div><div class='input'>
+<span class='fu'>seqlevelsStyle</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; [1] "Ensembl"</div><div class='input'>
 <span class='co'>## Get the seqlevels from the database.</span>
-<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt;   [1] "1"                                     
+<span class='fu'>seqlevels</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt;   [1] "1"                                     
 #&gt;   [2] "10"                                    
 #&gt;   [3] "11"                                    
 #&gt;   [4] "12"                                    
@@ -582,10 +585,10 @@
 #&gt; [356] "X"                                     
 #&gt; [357] "Y"                                     </div><div class='input'>
 <span class='co'>## Get all supported mappings for the organism of the EnsDb.</span>
-<span class='fu'>supportedSeqlevelsStyles</span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
+<span class='fu'>supportedSeqlevelsStyles</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'>## Change the seqlevels to UCSC style.</span>
-<span class='fu'>seqlevelsStyle</span>(<span class='no'>edb</span>) <span class='kw'>&lt;-</span> <span class='st'>"UCSC"</span>
-<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning the orginal seqnames for these.</span></div><div class='output co'>#&gt;   [1] "chr1"                                  
+<span class='fu'>seqlevelsStyle</span>(<span class='kw'>edb</span>) <span class='op'>&lt;-</span> <span class='st'>"UCSC"</span>
+<span class='fu'>seqlevels</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning the orginal seqnames for these.</span></div><div class='output co'>#&gt;   [1] "chr1"                                  
 #&gt;   [2] "chr10"                                 
 #&gt;   [3] "chr11"                                 
 #&gt;   [4] "chr12"                                 
@@ -944,9 +947,9 @@
 #&gt; [357] "chrY"                                  </div><div class='input'>
 <span class='co'>## Change the option ensembldb.seqnameNotFound to return NA in case</span>
 <span class='co'>## the seqname can not be mapped form Ensembl to UCSC.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>ensembldb.seqnameNotFound</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(ensembldb.seqnameNotFound = <span class='fl'>NA</span>)
 
-<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='no'>edb</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning NA for these.</span></div><div class='output co'>#&gt;   [1] "chr1"  "chr10" "chr11" "chr12" "chr13" "chr14" "chr15" "chr16" "chr17"
+<span class='fu'>seqlevels</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning NA for these.</span></div><div class='output co'>#&gt;   [1] "chr1"  "chr10" "chr11" "chr12" "chr13" "chr14" "chr15" "chr16" "chr17"
 #&gt;  [10] "chr18" "chr19" "chr2"  "chr20" "chr21" "chr22" "chr3"  "chr4"  "chr5" 
 #&gt;  [19] "chr6"  "chr7"  "chr8"  "chr9"  NA      NA      NA      NA      NA     
 #&gt;  [28] NA      NA      NA      NA      NA      NA      NA      NA      NA     
@@ -987,7 +990,8 @@
 #&gt; [343] NA      NA      NA      NA      NA      NA      NA      NA      NA     
 #&gt; [352] NA      NA      NA      "chrM"  "chrX"  "chrY" </div><div class='input'>
 <span class='co'>## Restoring the original setting.</span>
-<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(<span class='kw'>ensembldb.seqnameNotFound</span> <span class='kw'>=</span> <span class='st'>"ORIGINAL"</span>)</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(ensembldb.seqnameNotFound = <span class='st'>"ORIGINAL"</span>)
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

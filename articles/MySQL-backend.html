@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -88,7 +88,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="MySQL-backend_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Using a MySQL server backend</h1>
@@ -112,65 +112,74 @@
 <h1 class="hasAnchor">
 <a href="#using-ensembldb-with-a-mysql-server" class="anchor"></a>Using <code>ensembldb</code> with a MySQL server</h1>
 <p>Installation of <code>EnsDb</code> databases in a MySQL server is straight forward - given that the user has write access to the server:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ensembldb</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/jorainer/ensembldb">ensembldb</a></span>)
 <span class="co">## Load the EnsDb package that should be installed on the MySQL server</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">EnsDb.Hsapiens.v86</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">EnsDb.Hsapiens.v86</span>)
 
 <span class="co">## Call the useMySQL method providing the required credentials to create</span>
 <span class="co">## databases and inserting data on the MySQL server</span>
-<span class="no">edb_mysql</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/useMySQL-EnsDb-method.html">useMySQL</a></span>(<span class="no">EnsDb.Hsapiens.v86</span>, <span class="kw">host</span> <span class="kw">=</span> <span class="st">"localhost"</span>,
-                      <span class="kw">user</span> <span class="kw">=</span> <span class="st">"userwrite"</span>, <span class="kw">pass</span> <span class="kw">=</span> <span class="st">"userpass"</span>)
+<span class="kw">edb_mysql</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/useMySQL,EnsDb-method.html">useMySQL</a></span>(<span class="kw">EnsDb.Hsapiens.v86</span>, host = <span class="st">"localhost"</span>,
+                      user = <span class="st">"userwrite"</span>, pass = <span class="st">"userpass"</span>)
 
 <span class="co">## Use this EnsDb object</span>
-<span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span>(<span class="no">edb_mysql</span>)</pre></body></html></div>
+<span class="fu"><a href="../reference/exonsBy.html">genes</a></span>(<span class="kw">edb_mysql</span>)
+</pre></div>
 <p>To use an <code>EnsDb</code> in a MySQL server without the need to install the corresponding R-package, the connection to the database can be passed to the <code>EnsDb</code> constructor function. With the resulting <code>EnsDb</code> object annotations can be retrieved from the MySQL database.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ensembldb</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">RMariaDB</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/jorainer/ensembldb">ensembldb</a></span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">RMariaDB</span>)
 
 <span class="co">## Connect to the MySQL database to list the databases.</span>
-<span class="no">dbcon</span> <span class="kw">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">MariaDB</span>(), <span class="kw">host</span> <span class="kw">=</span> <span class="st">"localhost"</span>, <span class="kw">user</span> <span class="kw">=</span> <span class="st">"readonly"</span>,
-                   <span class="kw">pass</span> <span class="kw">=</span> <span class="st">"readonly"</span>)
+<span class="kw">dbcon</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">MariaDB</span>(), host = <span class="st">"localhost"</span>, user = <span class="st">"readonly"</span>,
+                   pass = <span class="st">"readonly"</span>)
 
 <span class="co">## List the available databases</span>
-<span class="fu"><a href="../reference/listEnsDbs.html">listEnsDbs</a></span>(<span class="no">dbcon</span>)
+<span class="fu"><a href="../reference/listEnsDbs.html">listEnsDbs</a></span>(<span class="kw">dbcon</span>)
 
 <span class="co">## Connect to one of the databases and use that one.</span>
-<span class="no">dbcon</span> <span class="kw">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">MariaDB</span>(), <span class="kw">host</span> <span class="kw">=</span> <span class="st">"localhost"</span>, <span class="kw">user</span> <span class="kw">=</span> <span class="st">"readonly"</span>,
-                   <span class="kw">pass</span> <span class="kw">=</span> <span class="st">"readonly"</span>, <span class="kw">dbname</span> <span class="kw">=</span> <span class="st">"ensdb_hsapiens_v75"</span>)
-<span class="no">edb</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/EnsDb.html">EnsDb</a></span>(<span class="no">dbcon</span>)
-<span class="no">edb</span></pre></body></html></div>
+<span class="kw">dbcon</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span>(<span class="fu">MariaDB</span>(), host = <span class="st">"localhost"</span>, user = <span class="st">"readonly"</span>,
+                   pass = <span class="st">"readonly"</span>, dbname = <span class="st">"ensdb_hsapiens_v75"</span>)
+<span class="kw">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb.html">EnsDb</a></span>(<span class="kw">dbcon</span>)
+<span class="kw">edb</span>
+</pre></div>
 </div>
 <div id="session-information" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h1>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>() 
+</pre></div>
 <pre><code>## R version 4.0.0 (2020-04-24)
-## Platform: x86_64-apple-darwin17.0 (64-bit)
-## Running under: macOS Catalina 10.15.4
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 18.04.4 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/libopenblasp-r0.2.20.so
 ## 
 ## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=C             
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] BiocStyle_2.16.0
+## [1] BiocStyle_2.17.0
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] bookdown_0.18       Rcpp_1.0.4.6        rprojroot_1.3-2    
-##  [4] crayon_1.3.4        digest_0.6.25       assertthat_0.2.1   
-##  [7] MASS_7.3-51.5       R6_2.4.1            backports_1.1.6    
-## [10] magrittr_1.5        evaluate_0.14       stringi_1.4.6      
-## [13] rlang_0.4.6         fs_1.4.1            rmarkdown_2.1      
-## [16] pkgdown_1.5.1.9000  desc_1.2.0          tools_4.0.0        
-## [19] stringr_1.4.0       yaml_2.2.1          xfun_0.13          
-## [22] compiler_4.0.0      BiocManager_1.30.10 memoise_1.1.0      
-## [25] htmltools_0.4.0     knitr_1.28</code></pre>
+##  [1] bookdown_0.19       digest_0.6.25       crayon_1.3.4       
+##  [4] rprojroot_1.3-2     assertthat_0.2.1    R6_2.4.1           
+##  [7] backports_1.1.8     magrittr_1.5        evaluate_0.14      
+## [10] stringi_1.4.6       rlang_0.4.6         fs_1.4.1           
+## [13] rmarkdown_2.3.1     pkgdown_1.5.1.9000  desc_1.2.0         
+## [16] tools_4.0.0         stringr_1.4.0       yaml_2.2.1         
+## [19] xfun_0.15           compiler_4.0.0      BiocManager_1.30.10
+## [22] memoise_1.1.0       htmltools_0.5.0     knitr_1.28</code></pre>
 </div>
   </div>
 

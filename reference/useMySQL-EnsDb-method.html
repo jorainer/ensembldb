@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
       </span>
     </div>
 
@@ -142,20 +142,20 @@
 
     <div class="ref-description">
     <p>Change the SQL backend from <em>SQLite</em> to <em>MySQL</em>.
-    When first called on an <code><a href='EnsDb-class.html'>EnsDb</a></code> object, the function
+    When first called on an <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object, the function
     tries to create and save all of the data into a MySQL database. All
     subsequent calls will connect to the already existing MySQL database.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>useMySQL</span>(<span class='no'>x</span>, <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"localhost"</span>, <span class='kw'>port</span> <span class='kw'>=</span> <span class='fl'>3306</span>, <span class='no'>user</span>, <span class='no'>pass</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/useMySQL-EnsDb-method.html'>useMySQL</a></span>(<span class='kw'>x</span>, host = <span class='st'>"localhost"</span>, port = <span class='fl'>3306</span>, <span class='kw'>user</span>, <span class='kw'>pass</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>The <code><a href='EnsDb-class.html'>EnsDb</a></code> object.</p></td>
+      <td><p>The <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object.</p></td>
     </tr>
     <tr>
       <th>host</th>
@@ -178,7 +178,7 @@ server runs.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='EnsDb-class.html'>EnsDb</a></code> object providing access to the
+    <p>A <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object providing access to the
      data stored in the MySQL backend.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -190,15 +190,18 @@ server runs.</p></td>
 
     <p>At present the function does not evaluate whether the versions
     between the SQLite and MariaDB/MySQL database differ.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>## Load the EnsDb database (SQLite backend).</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>EnsDb.Hsapiens.v86</span>)
-<span class='no'>edb</span> <span class='kw'>&lt;-</span> <span class='no'>EnsDb.Hsapiens.v86</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
+<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
 <span class='co'>## Now change the backend to MySQL; my_user and my_pass should</span>
 <span class='co'>## be the user name and password to access the MySQL server.</span>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>edb_mysql</span> <span class='kw'>&lt;-</span> <span class='fu'>useMySQL</span>(<span class='no'>edb</span>, <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"localhost"</span>, <span class='kw'>user</span> <span class='kw'>=</span> <span class='no'>my_user</span>, <span class='kw'>pass</span> <span class='kw'>=</span> <span class='no'>my_pass</span>)
+<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='kw'>edb_mysql</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/useMySQL-EnsDb-method.html'>useMySQL</a></span>(<span class='kw'>edb</span>, host = <span class='st'>"localhost"</span>, user = <span class='kw'>my_user</span>, pass = <span class='kw'>my_pass</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
