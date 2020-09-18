@@ -151,7 +151,7 @@ genomic region crosses the exon boundary an empty <code>IRanges</code> is return
 See examples for details.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a></span>(<span class='kw'>x</span>, <span class='kw'>db</span>)</pre>
+    <pre class="usage"><span class='fu'>genomeToTranscript</span>(<span class='kw'>x</span>, <span class='kw'>db</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -190,13 +190,13 @@ genomic coordinates can not be mapped to a transcript.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other coordinate mapping functions: 
-<code><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToProtein.html'>genomeToProtein</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToGenome.html'>proteinToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToTranscript.html'>proteinToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
+<code><a href='cdsToTranscript.html'>cdsToTranscript</a>()</code>,
+<code><a href='genomeToProtein.html'>genomeToProtein</a>()</code>,
+<code><a href='proteinToGenome.html'>proteinToGenome</a>()</code>,
+<code><a href='proteinToTranscript.html'>proteinToTranscript</a>()</code>,
+<code><a href='transcriptToCds.html'>transcriptToCds</a>()</code>,
+<code><a href='transcriptToGenome.html'>transcriptToGenome</a>()</code>,
+<code><a href='transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Johannes Rainer</p>
@@ -207,15 +207,16 @@ genomic coordinates can not be mapped to a transcript.</p>
 
 <span class='co'>## Subsetting the EnsDb object to chromosome X only to speed up execution</span>
 <span class='co'>## time of examples</span>
-<span class='kw'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/global-filters.html'>filter</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>)
+<span class='kw'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addFilter,EnsDb-method.html'>filter</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>)
 
 <span class='co'>## Define a genomic region and calculate within-transcript coordinates</span>
 <span class='kw'>gnm</span> <span class='op'>&lt;-</span> <span class='fu'>GRanges</span>(<span class='st'>"X:107716399-107716401"</span>)
 
-<span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a></span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)
+<span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'>genomeToTranscript</span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)
 <span class='co'>## Result is an IRanges object with the start and end coordinates within</span>
 <span class='co'>## each transcript that has an exon at the genomic range.</span>
-<span class='kw'>res</span></div><div class='output co'>#&gt; IRangesList object of length 1:
+<span class='kw'>res</span>
+</div><div class='output co'>#&gt; IRangesList object of length 1:
 #&gt; [[1]]
 #&gt; IRanges object with 2 ranges and 7 metadata columns:
 #&gt;                       start       end     width |           tx_id
@@ -235,7 +236,8 @@ genomic coordinates can not be mapped to a transcript.</p>
 <span class='co'>## position no exon is present. Below we use the same coordinates but</span>
 <span class='co'>## specify that the coordinates are on the forward (+) strand</span>
 <span class='kw'>gnm</span> <span class='op'>&lt;-</span> <span class='fu'>GRanges</span>(<span class='st'>"X:107716399-107716401:+"</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a></span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?seqlevelsStyle if you used UCSC chromosome names</span></div><div class='output co'>#&gt; IRangesList object of length 1:
+<span class='fu'>genomeToTranscript</span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?seqlevelsStyle if you used UCSC chromosome names</span></div><div class='output co'>#&gt; IRangesList object of length 1:
 #&gt; [[1]]
 #&gt; IRanges object with 1 range and 7 metadata columns:
 #&gt;           start       end     width |       tx_id     exon_id exon_rank
@@ -251,7 +253,8 @@ genomic coordinates can not be mapped to a transcript.</p>
 
 <span class='co'>## The result of the mapping is an IRangesList each element providing the</span>
 <span class='co'>## within-transcript coordinates for each input region</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a></span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?seqlevelsStyle if you used UCSC chromosome names</span></div><div class='output co'>#&gt; IRangesList object of length 3:
+<span class='fu'>genomeToTranscript</span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?seqlevelsStyle if you used UCSC chromosome names</span></div><div class='output co'>#&gt; IRangesList object of length 3:
 #&gt; [[1]]
 #&gt; IRanges object with 2 ranges and 7 metadata columns:
 #&gt;                       start       end     width |           tx_id
@@ -306,7 +309,7 @@ genomic coordinates can not be mapped to a transcript.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

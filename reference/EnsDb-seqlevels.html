@@ -216,8 +216,8 @@
     <p>Johannes Rainer</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>EnsDb</code>
-  <code>transcripts</code></p></div>
+    <div class='dont-index'><p><code><a href='EnsDb-class.html'>EnsDb</a></code>
+  <code><a href='exonsBy.html'>transcripts</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -225,9 +225,11 @@
 <span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
 
 <span class='co'>## Get the internal, default seqlevel style.</span>
-<span class='fu'>seqlevelsStyle</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; [1] "Ensembl"</div><div class='input'>
+<span class='fu'>seqlevelsStyle</span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt; [1] "Ensembl"</div><div class='input'>
 <span class='co'>## Get the seqlevels from the database.</span>
-<span class='fu'>seqlevels</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt;   [1] "1"                                     
+<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt;   [1] "1"                                     
 #&gt;   [2] "10"                                    
 #&gt;   [3] "11"                                    
 #&gt;   [4] "12"                                    
@@ -585,10 +587,12 @@
 #&gt; [356] "X"                                     
 #&gt; [357] "Y"                                     </div><div class='input'>
 <span class='co'>## Get all supported mappings for the organism of the EnsDb.</span>
-<span class='fu'>supportedSeqlevelsStyles</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
+<span class='fu'>supportedSeqlevelsStyles</span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'>## Change the seqlevels to UCSC style.</span>
 <span class='fu'>seqlevelsStyle</span>(<span class='kw'>edb</span>) <span class='op'>&lt;-</span> <span class='st'>"UCSC"</span>
-<span class='fu'>seqlevels</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning the orginal seqnames for these.</span></div><div class='output co'>#&gt;   [1] "chr1"                                  
+<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning the orginal seqnames for these.</span></div><div class='output co'>#&gt;   [1] "chr1"                                  
 #&gt;   [2] "chr10"                                 
 #&gt;   [3] "chr11"                                 
 #&gt;   [4] "chr12"                                 
@@ -949,7 +953,8 @@
 <span class='co'>## the seqname can not be mapped form Ensembl to UCSC.</span>
 <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(ensembldb.seqnameNotFound = <span class='fl'>NA</span>)
 
-<span class='fu'>seqlevels</span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning NA for these.</span></div><div class='output co'>#&gt;   [1] "chr1"  "chr10" "chr11" "chr12" "chr13" "chr14" "chr15" "chr16" "chr17"
+<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning NA for these.</span></div><div class='output co'>#&gt;   [1] "chr1"  "chr10" "chr11" "chr12" "chr13" "chr14" "chr15" "chr16" "chr17"
 #&gt;  [10] "chr18" "chr19" "chr2"  "chr20" "chr21" "chr22" "chr3"  "chr4"  "chr5" 
 #&gt;  [19] "chr6"  "chr7"  "chr8"  "chr9"  NA      NA      NA      NA      NA     
 #&gt;  [28] NA      NA      NA      NA      NA      NA      NA      NA      NA     
@@ -991,6 +996,7 @@
 #&gt; [352] NA      NA      NA      "chrM"  "chrX"  "chrY" </div><div class='input'>
 <span class='co'>## Restoring the original setting.</span>
 <span class='fu'><a href='https://rdrr.io/r/base/options.html'>options</a></span>(ensembldb.seqnameNotFound = <span class='st'>"ORIGINAL"</span>)
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -1007,7 +1013,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

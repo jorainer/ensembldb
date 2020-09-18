@@ -149,15 +149,15 @@ negative coordinates (i.e. a start position of -1) is returned." />
     <p>Map positions along the genome to positions within the protein sequence if
 a protein is encoded at the location. The provided coordinates have to be
 completely within the genomic position of an exon of a protein coding
-transcript (see <code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript()</a></code> for details). Also, the provided
+transcript (see <code><a href='genomeToTranscript.html'>genomeToTranscript()</a></code> for details). Also, the provided
 positions have to be within the genomic region encoding the CDS of a
-transcript (excluding its stop codon; soo <code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein()</a></code> for
+transcript (excluding its stop codon; soo <code><a href='transcriptToProtein.html'>transcriptToProtein()</a></code> for
 details).</p>
 <p>For genomic positions for which the mapping failed an <code>IRanges</code> with
 negative coordinates (i.e. a start position of -1) is returned.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/genomeToProtein.html'>genomeToProtein</a></span>(<span class='kw'>x</span>, <span class='kw'>db</span>)</pre>
+    <pre class="usage"><span class='fu'>genomeToProtein</span>(<span class='kw'>x</span>, <span class='kw'>db</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -191,18 +191,18 @@ provided genomic coordinates.</p>
 an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>genomeToProtein</code> combines calls to <code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript()</a></code> and
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein()</a></code>.</p>
+    <p><code>genomeToProtein</code> combines calls to <code><a href='genomeToTranscript.html'>genomeToTranscript()</a></code> and
+<code><a href='transcriptToProtein.html'>transcriptToProtein()</a></code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other coordinate mapping functions: 
-<code><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToGenome.html'>proteinToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToTranscript.html'>proteinToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
+<code><a href='cdsToTranscript.html'>cdsToTranscript</a>()</code>,
+<code><a href='genomeToTranscript.html'>genomeToTranscript</a>()</code>,
+<code><a href='proteinToGenome.html'>proteinToGenome</a>()</code>,
+<code><a href='proteinToTranscript.html'>proteinToTranscript</a>()</code>,
+<code><a href='transcriptToCds.html'>transcriptToCds</a>()</code>,
+<code><a href='transcriptToGenome.html'>transcriptToGenome</a>()</code>,
+<code><a href='transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Johannes Rainer</p>
@@ -211,7 +211,7 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
 <span class='co'>## Restrict all further queries to chromosome x to speed up the examples</span>
-<span class='kw'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/global-filters.html'>filter</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>)
+<span class='kw'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addFilter,EnsDb-method.html'>filter</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>)
 
 <span class='co'>## In the example below we define 4 genomic regions:</span>
 <span class='co'>## 630898: corresponds to the first nt of the CDS of ENST00000381578</span>
@@ -220,14 +220,18 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 <span class='co'>## 634829: position within an intron.</span>
 <span class='kw'>gnm</span> <span class='op'>&lt;-</span> <span class='fu'>GRanges</span>(<span class='st'>"X"</span>, <span class='fu'>IRanges</span>(start = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>630898</span>, <span class='fl'>644636</span>, <span class='fl'>644633</span>, <span class='fl'>634829</span>),
     width = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>3</span>)))
-<span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/genomeToProtein.html'>genomeToProtein</a></span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?seqlevelsStyle if you used UCSC chromosome names</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Transcript(s) '' could not be found</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Provided coordinates for 'ENST00000381578', 'ENST00000554971' are not within the coding region</span></div><div class='input'>
+<span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'>genomeToProtein</span>(<span class='kw'>gnm</span>, <span class='kw'>edbx</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?seqlevelsStyle if you used UCSC chromosome names</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Transcript(s) '' could not be found</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Provided coordinates for 'ENST00000381578', 'ENST00000554971' are not within the coding region</span></div><div class='input'>
 <span class='co'>## The result is an IRangesList with the same length as gnm</span>
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>res</span>)</div><div class='output co'>#&gt; [1] 4</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>gnm</span>)</div><div class='output co'>#&gt; [1] 4</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>res</span>)
+</div><div class='output co'>#&gt; [1] 4</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>gnm</span>)
+</div><div class='output co'>#&gt; [1] 4</div><div class='input'>
 <span class='co'>## The first element represents the mapping for the first GRanges:</span>
 <span class='co'>## the coordinate is mapped to the first amino acid of the protein(s).</span>
 <span class='co'>## The genomic coordinates can be mapped to several transcripts (and hence</span>
 <span class='co'>## proteins).</span>
-<span class='kw'>res</span>[[<span class='fl'>1</span>]]</div><div class='output co'>#&gt; IRanges object with 4 ranges and 9 metadata columns:
+<span class='kw'>res</span>[[<span class='fl'>1</span>]]
+</div><div class='output co'>#&gt; IRanges object with 4 ranges and 9 metadata columns:
 #&gt;                       start       end     width |           tx_id    cds_ok
 #&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;
 #&gt;   ENSP00000335505         1         2         2 | ENST00000334060      TRUE
@@ -248,7 +252,8 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 #&gt;   ENSP00000452016           X           *</div><div class='input'>
 <span class='co'>## The stop codon is not translated, thus the mapping for the second</span>
 <span class='co'>## GRanges fails</span>
-<span class='kw'>res</span>[[<span class='fl'>2</span>]]</div><div class='output co'>#&gt; IRanges object with 2 ranges and 9 metadata columns:
+<span class='kw'>res</span>[[<span class='fl'>2</span>]]
+</div><div class='output co'>#&gt; IRanges object with 2 ranges and 9 metadata columns:
 #&gt;        start       end     width |           tx_id    cds_ok           tx_id
 #&gt;    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;     &lt;character&gt;
 #&gt;           -1        -1         1 | ENST00000381578      &lt;NA&gt; ENST00000381578
@@ -258,7 +263,8 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 #&gt;    ENSE00001489174         6    644636    644636           X           *
 #&gt;    ENSE00002438186         5    644636    644636           X           *</div><div class='input'>
 <span class='co'>## The 3rd GRanges is mapped to the last amino acid.</span>
-<span class='kw'>res</span>[[<span class='fl'>3</span>]]</div><div class='output co'>#&gt; IRanges object with 2 ranges and 9 metadata columns:
+<span class='kw'>res</span>[[<span class='fl'>3</span>]]
+</div><div class='output co'>#&gt; IRanges object with 2 ranges and 9 metadata columns:
 #&gt;                       start       end     width |           tx_id    cds_ok
 #&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;
 #&gt;   ENSP00000370990       292       292         1 | ENST00000381578      TRUE
@@ -272,7 +278,8 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 #&gt;   ENSP00000370990           X           *
 #&gt;   ENSP00000452016           X           *</div><div class='input'>
 <span class='co'>## Mapping of intronic positions fail</span>
-<span class='kw'>res</span>[[<span class='fl'>4</span>]]</div><div class='output co'>#&gt; IRanges object with 1 range and 9 metadata columns:
+<span class='kw'>res</span>[[<span class='fl'>4</span>]]
+</div><div class='output co'>#&gt; IRanges object with 1 range and 9 metadata columns:
 #&gt;        start       end     width |       tx_id    cds_ok       tx_id
 #&gt;    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;logical&gt; &lt;character&gt;
 #&gt;           -1        -1         1 |                  &lt;NA&gt;        &lt;NA&gt;
@@ -294,7 +301,7 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

@@ -142,20 +142,20 @@
 
     <div class="ref-description">
     <p>Change the SQL backend from <em>SQLite</em> to <em>MySQL</em>.
-    When first called on an <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object, the function
+    When first called on an <code><a href='EnsDb-class.html'>EnsDb</a></code> object, the function
     tries to create and save all of the data into a MySQL database. All
     subsequent calls will connect to the already existing MySQL database.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/useMySQL-EnsDb-method.html'>useMySQL</a></span>(<span class='kw'>x</span>, host = <span class='st'>"localhost"</span>, port = <span class='fl'>3306</span>, <span class='kw'>user</span>, <span class='kw'>pass</span>)</pre>
+<span class='fu'>useMySQL</span>(<span class='kw'>x</span>, host = <span class='st'>"localhost"</span>, port = <span class='fl'>3306</span>, <span class='kw'>user</span>, <span class='kw'>pass</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>The <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object.</p></td>
+      <td><p>The <code><a href='EnsDb-class.html'>EnsDb</a></code> object.</p></td>
     </tr>
     <tr>
       <th>host</th>
@@ -178,7 +178,7 @@ server runs.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object providing access to the
+    <p>A <code><a href='EnsDb-class.html'>EnsDb</a></code> object providing access to the
      data stored in the MySQL backend.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -201,8 +201,9 @@ server runs.</p></td>
 <span class='co'>## Now change the backend to MySQL; my_user and my_pass should</span>
 <span class='co'>## be the user name and password to access the MySQL server.</span>
 <span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>edb_mysql</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/useMySQL-EnsDb-method.html'>useMySQL</a></span>(<span class='kw'>edb</span>, host = <span class='st'>"localhost"</span>, user = <span class='kw'>my_user</span>, pass = <span class='kw'>my_pass</span>)
-}</div></pre>
+<span class='kw'>edb_mysql</span> <span class='op'>&lt;-</span> <span class='fu'>useMySQL</span>(<span class='kw'>edb</span>, host = <span class='st'>"localhost"</span>, user = <span class='kw'>my_user</span>, pass = <span class='kw'>my_pass</span>)
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -218,7 +219,7 @@ server runs.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

@@ -146,7 +146,7 @@ the transcript</h1>
 relative to the start of the transcript and hence including its 5' UTR.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a></span>(<span class='kw'>x</span>, <span class='kw'>db</span>, id = <span class='st'>"name"</span>)</pre>
+    <pre class="usage"><span class='fu'>cdsToTranscript</span>(<span class='kw'>x</span>, <span class='kw'>db</span>, id = <span class='st'>"name"</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,13 +182,13 @@ provided start and/or end coordinates are not within the coding region.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other coordinate mapping functions: 
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToProtein.html'>genomeToProtein</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToGenome.html'>proteinToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToTranscript.html'>proteinToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
+<code><a href='genomeToProtein.html'>genomeToProtein</a>()</code>,
+<code><a href='genomeToTranscript.html'>genomeToTranscript</a>()</code>,
+<code><a href='proteinToGenome.html'>proteinToGenome</a>()</code>,
+<code><a href='proteinToTranscript.html'>proteinToTranscript</a>()</code>,
+<code><a href='transcriptToCds.html'>transcriptToCds</a>()</code>,
+<code><a href='transcriptToGenome.html'>transcriptToGenome</a>()</code>,
+<code><a href='transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Johannes Rainer</p>
@@ -202,7 +202,8 @@ provided start and/or end coordinates are not within the coding region.</p>
     names = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ENST00000398117"</span>, <span class='st'>"ENST00000333681"</span>,
     <span class='st'>"ENST00000590515"</span>, <span class='st'>"ENST00000589955"</span>))
 
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a></span>(<span class='kw'>txcoords</span>, <span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 of 4 transcript(s) are non-coding: ENST00000590515</span></div><div class='output co'>#&gt; IRanges object with 4 ranges and 2 metadata columns:
+<span class='fu'>cdsToTranscript</span>(<span class='kw'>txcoords</span>, <span class='kw'>EnsDb.Hsapiens.v86</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 of 4 transcript(s) are non-coding: ENST00000590515</span></div><div class='output co'>#&gt; IRanges object with 4 ranges and 2 metadata columns:
 #&gt;                       start       end     width | cds_start   cds_end
 #&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;integer&gt; &lt;integer&gt;
 #&gt;   ENST00000398117      1466      1466         1 |         4         4
@@ -217,8 +218,9 @@ provided start and/or end coordinates are not within the coding region.</p>
 
 <span class='co'>## Map the coordinates by first converting the CDS- to transcript-relative</span>
 <span class='co'>## coordinates</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a></span>(<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a></span>(<span class='kw'>pkp2</span>, <span class='kw'>EnsDb.Hsapiens.v86</span>),
-    <span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; GRangesList object of length 1:
+<span class='fu'><a href='transcriptToGenome.html'>transcriptToGenome</a></span>(<span class='fu'>cdsToTranscript</span>(<span class='kw'>pkp2</span>, <span class='kw'>EnsDb.Hsapiens.v86</span>),
+    <span class='kw'>EnsDb.Hsapiens.v86</span>)
+</div><div class='output co'>#&gt; GRangesList object of length 1:
 #&gt; $ENST00000070846
 #&gt; GRanges object with 1 range and 5 metadata columns:
 #&gt;       seqnames    ranges strand |         exon_id           tx_id exon_rank
@@ -245,7 +247,7 @@ provided start and/or end coordinates are not within the coding region.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

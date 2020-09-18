@@ -143,7 +143,7 @@ transcript encodes a protein)." />
 transcript encodes a protein).</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds</a></span>(<span class='kw'>x</span>, <span class='kw'>db</span>, id = <span class='st'>"name"</span>)</pre>
+    <pre class="usage"><span class='fu'>transcriptToCds</span>(<span class='kw'>x</span>, <span class='kw'>db</span>, id = <span class='st'>"name"</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -179,13 +179,13 @@ provided start and/or end coordinates are not within the coding region.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>Other coordinate mapping functions: 
-<code><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToProtein.html'>genomeToProtein</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToGenome.html'>proteinToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToTranscript.html'>proteinToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
+<code><a href='cdsToTranscript.html'>cdsToTranscript</a>()</code>,
+<code><a href='genomeToProtein.html'>genomeToProtein</a>()</code>,
+<code><a href='genomeToTranscript.html'>genomeToTranscript</a>()</code>,
+<code><a href='proteinToGenome.html'>proteinToGenome</a>()</code>,
+<code><a href='proteinToTranscript.html'>proteinToTranscript</a>()</code>,
+<code><a href='transcriptToGenome.html'>transcriptToGenome</a>()</code>,
+<code><a href='transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Johannes Rainer</p>
@@ -200,7 +200,8 @@ provided start and/or end coordinates are not within the coding region.</p>
     <span class='st'>"ENST00000590515"</span>, <span class='st'>"ENST00000589955"</span>))
 
 <span class='co'>## Map the coordinates.</span>
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds</a></span>(<span class='kw'>txcoords</span>, <span class='kw'>EnsDb.Hsapiens.v86</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 of 4 transcript(s) are non-coding: ENST00000590515</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Coordinates for 1 of 4 transcript(s) are not in the coding region: ENST00000333681</span></div><div class='output co'>#&gt; IRanges object with 4 ranges and 2 metadata columns:
+<span class='fu'>transcriptToCds</span>(<span class='kw'>txcoords</span>, <span class='kw'>EnsDb.Hsapiens.v86</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 of 4 transcript(s) are non-coding: ENST00000590515</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Coordinates for 1 of 4 transcript(s) are not in the coding region: ENST00000333681</span></div><div class='output co'>#&gt; IRanges object with 4 ranges and 2 metadata columns:
 #&gt;                       start       end     width |  tx_start    tx_end
 #&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;integer&gt; &lt;integer&gt;
 #&gt;   ENST00000398117         1         1         1 |      1463      1463
@@ -209,7 +210,8 @@ provided start and/or end coordinates are not within the coding region.</p>
 #&gt;   ENST00000589955         1         1         1 |       147       147</div><div class='input'>
 <span class='co'>## ENST00000590515 does not encode a protein and thus -1 is returned</span>
 <span class='co'>## The coordinates within ENST00000333681 are outside the CDS and thus also</span>
-<span class='co'>## -1 is reported.</span></div></pre>
+<span class='co'>## -1 is reported.</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -225,7 +227,7 @@ provided start and/or end coordinates are not within the coding region.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

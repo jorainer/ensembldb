@@ -806,12 +806,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb83"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()
 </pre></div>
-<pre><code>## R version 4.0.0 (2020-04-24)
+<pre><code>## R version 4.0.2 Patched (2020-09-10 r79182)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 18.04.4 LTS
+## Running under: Ubuntu 20.04.1 LTS
 ## 
 ## Matrix products: default
-## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/libopenblasp-r0.2.20.so
+## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-openmp/libopenblasp-r0.3.8.so
 ## 
 ## locale:
 ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -827,19 +827,19 @@ document.addEventListener("DOMContentLoaded", function() {
 ## 
 ## other attached packages:
 ##  [1] BSgenome.Hsapiens.NCBI.GRCh38_1.3.1000
-##  [2] BSgenome_1.57.0                       
-##  [3] rtracklayer_1.49.3                    
+##  [2] BSgenome_1.57.6                       
+##  [3] rtracklayer_1.49.5                    
 ##  [4] Biostrings_2.57.2                     
-##  [5] XVector_0.29.2                        
-##  [6] Gviz_1.33.1                           
+##  [5] XVector_0.29.3                        
+##  [6] Gviz_1.33.2                           
 ##  [7] EnsDb.Hsapiens.v86_2.99.0             
 ##  [8] ensembldb_2.13.1                      
 ##  [9] AnnotationFilter_1.13.0               
-## [10] GenomicFeatures_1.41.0                
-## [11] AnnotationDbi_1.51.0                  
-## [12] Biobase_2.49.0                        
-## [13] GenomicRanges_1.41.5                  
-## [14] GenomeInfoDb_1.25.3                   
+## [10] GenomicFeatures_1.41.3                
+## [11] AnnotationDbi_1.51.3                  
+## [12] Biobase_2.49.1                        
+## [13] GenomicRanges_1.41.6                  
+## [14] GenomeInfoDb_1.25.11                  
 ## [15] IRanges_2.23.10                       
 ## [16] S4Vectors_0.27.12                     
 ## [17] BiocGenerics_0.35.4                   
@@ -847,53 +847,54 @@ document.addEventListener("DOMContentLoaded", function() {
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] ProtGenerics_1.21.0         bitops_1.0-6               
-##  [3] matrixStats_0.56.0          fs_1.4.1                   
-##  [5] bit64_0.9-7                 RColorBrewer_1.1-2         
-##  [7] progress_1.2.2              httr_1.4.1                 
-##  [9] rprojroot_1.3-2             tools_4.0.0                
-## [11] backports_1.1.8             R6_2.4.1                   
-## [13] rpart_4.1-15                Hmisc_4.4-0                
+##  [3] matrixStats_0.56.0          fs_1.5.0                   
+##  [5] bit64_4.0.5                 RColorBrewer_1.1-2         
+##  [7] progress_1.2.2              httr_1.4.2                 
+##  [9] rprojroot_1.3-2             tools_4.0.2                
+## [11] backports_1.1.10            R6_2.4.1                   
+## [13] rpart_4.1-15                Hmisc_4.4-1                
 ## [15] DBI_1.1.0                   lazyeval_0.2.2             
-## [17] colorspace_1.4-1            nnet_7.3-13                
+## [17] colorspace_1.4-1            nnet_7.3-14                
 ## [19] gridExtra_2.3               tidyselect_1.1.0           
-## [21] prettyunits_1.1.1           bit_1.1-15.2               
-## [23] curl_4.3                    compiler_4.0.0             
-## [25] htmlTable_2.0.0             desc_1.2.0                 
-## [27] DelayedArray_0.15.5         bookdown_0.19              
+## [21] prettyunits_1.1.1           bit_4.0.4                  
+## [23] curl_4.3                    compiler_4.0.2             
+## [25] htmlTable_2.1.0             desc_1.2.0                 
+## [27] DelayedArray_0.15.7         bookdown_0.20              
 ## [29] checkmate_2.0.0             scales_1.1.1               
 ## [31] askpass_1.1                 rappdirs_0.3.1             
-## [33] pkgdown_1.5.1.9000          stringr_1.4.0              
-## [35] digest_0.6.25               Rsamtools_2.5.2            
-## [37] foreign_0.8-78              rmarkdown_2.3.1            
-## [39] dichromat_2.0-0             base64enc_0.1-3            
-## [41] jpeg_0.1-8.1                pkgconfig_2.0.3            
-## [43] htmltools_0.5.0             dbplyr_1.4.4               
-## [45] htmlwidgets_1.5.1           rlang_0.4.6                
-## [47] rstudioapi_0.11             RSQLite_2.2.0              
-## [49] generics_0.0.2              BiocParallel_1.23.0        
-## [51] acepack_1.4.1               dplyr_1.0.0                
-## [53] VariantAnnotation_1.35.2    RCurl_1.98-1.2             
-## [55] magrittr_1.5                GenomeInfoDbData_1.2.3     
-## [57] Formula_1.2-3               Matrix_1.2-18              
-## [59] Rcpp_1.0.4.6                munsell_0.5.0              
-## [61] lifecycle_0.2.0             stringi_1.4.6              
-## [63] yaml_2.2.1                  SummarizedExperiment_1.19.5
-## [65] zlibbioc_1.35.0             BiocFileCache_1.13.0       
+## [33] pkgdown_1.6.1.9000          systemfonts_0.3.1          
+## [35] stringr_1.4.0               digest_0.6.25              
+## [37] Rsamtools_2.5.3             foreign_0.8-80             
+## [39] rmarkdown_2.3               dichromat_2.0-0            
+## [41] base64enc_0.1-3             jpeg_0.1-8.1               
+## [43] pkgconfig_2.0.3             htmltools_0.5.0            
+## [45] dbplyr_1.4.4                htmlwidgets_1.5.1          
+## [47] rlang_0.4.7                 rstudioapi_0.11            
+## [49] RSQLite_2.2.0               generics_0.0.2             
+## [51] BiocParallel_1.23.2         dplyr_1.0.2                
+## [53] VariantAnnotation_1.35.3    RCurl_1.98-1.2             
+## [55] magrittr_1.5                Formula_1.2-3              
+## [57] GenomeInfoDbData_1.2.3      Matrix_1.2-18              
+## [59] Rcpp_1.0.5                  munsell_0.5.0              
+## [61] lifecycle_0.2.0             stringi_1.5.3              
+## [63] yaml_2.2.1                  SummarizedExperiment_1.19.6
+## [65] zlibbioc_1.35.0             BiocFileCache_1.13.1       
 ## [67] blob_1.2.1                  crayon_1.3.4               
-## [69] lattice_0.20-41             splines_4.0.0              
-## [71] hms_0.5.3                   knitr_1.28                 
-## [73] pillar_1.4.4                biomaRt_2.45.1             
-## [75] XML_3.99-0.3                glue_1.4.1                 
+## [69] lattice_0.20-41             splines_4.0.2              
+## [71] hms_0.5.3                   knitr_1.29                 
+## [73] pillar_1.4.6                biomaRt_2.45.2             
+## [75] XML_3.99-0.5                glue_1.4.2                 
 ## [77] evaluate_0.14               biovizBase_1.37.0          
-## [79] latticeExtra_0.6-29         data.table_1.12.8          
-## [81] BiocManager_1.30.10         vctrs_0.3.1                
+## [79] latticeExtra_0.6-29         data.table_1.13.0          
+## [81] BiocManager_1.30.10         vctrs_0.3.4                
 ## [83] png_0.1-7                   gtable_0.3.0               
-## [85] openssl_1.4.1               purrr_0.3.4                
+## [85] openssl_1.4.2               purrr_0.3.4                
 ## [87] assertthat_0.2.1            ggplot2_3.3.2              
-## [89] xfun_0.15                   survival_3.1-12            
-## [91] tibble_3.0.1                GenomicAlignments_1.25.3   
-## [93] memoise_1.1.0               cluster_2.1.0              
-## [95] ellipsis_0.3.1</code></pre>
+## [89] cpp11_0.2.1                 xfun_0.17                  
+## [91] ragg_0.3.1                  survival_3.2-3             
+## [93] tibble_3.0.3                GenomicAlignments_1.25.3   
+## [95] memoise_1.1.0               cluster_2.1.0              
+## [97] ellipsis_0.3.1</code></pre>
 </div>
   </div>
 
@@ -912,7 +913,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

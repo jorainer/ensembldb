@@ -151,20 +151,20 @@ The listProteinColumns function allows to conveniently
     <p>This help page provides information about most of the
     functionality related to protein annotations in <code>ensembldb</code>.</p>
 <p>The <code>proteins</code> method retrieves protein related annotations from
-    an <code>EnsDb</code> database.</p>
+    an <code><a href='EnsDb-class.html'>EnsDb</a></code> database.</p>
 <p>The <code>listUniprotDbs</code> method lists all Uniprot database
     names in the <code>EnsDb</code>.</p>
 <p>The <code>listUniprotMappingTypes</code> method lists all methods
     that were used for the mapping of Uniprot IDs to Ensembl protein IDs.</p>
 <p>The <code>listProteinColumns</code> function allows to conveniently
     extract all database columns containing protein annotations from
-    an <code>EnsDb</code> database.</p>
+    an <code><a href='EnsDb-class.html'>EnsDb</a></code> database.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
 <span class='fu'>proteins</span>(
   <span class='kw'>object</span>,
-  columns = <span class='fu'>listColumns</span>(<span class='kw'>object</span>, <span class='st'>"protein"</span>),
+  columns = <span class='fu'><a href='EnsDb-class.html'>listColumns</a></span>(<span class='kw'>object</span>, <span class='st'>"protein"</span>),
   filter = <span class='fu'>AnnotationFilterList</span>(),
   order.by = <span class='st'>""</span>,
   order.type = <span class='st'>"asc"</span>,
@@ -184,19 +184,19 @@ The listProteinColumns function allows to conveniently
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>object</th>
-      <td><p>The <code>EnsDb</code> object.</p></td>
+      <td><p>The <code><a href='EnsDb-class.html'>EnsDb</a></code> object.</p></td>
     </tr>
     <tr>
       <th>columns</th>
       <td><p>For <code>proteins</code>: character vector defining the columns to
 be extracted from the database. Can be any column(s) listed by the
-<code>listColumns</code> method.</p></td>
+<code><a href='EnsDb-class.html'>listColumns</a></code> method.</p></td>
     </tr>
     <tr>
       <th>filter</th>
       <td><p>For <code>proteins</code>: A filter object extending
 <code>AnnotationFilter</code> or a list of such objects to select
-specific entries from the database. See <code>Filter-classes</code> for
+specific entries from the database. See <code><a href='Filter-classes.html'>Filter-classes</a></code> for
 a documentation of available filters and use
 <code>supportedFilters</code> to get the full list of supported filters.</p></td>
     </tr>
@@ -222,7 +222,7 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The <code>proteins</code> method returns protein related annotations from
-    an <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-class.html'>EnsDb</a></code> object with its <code>return.type</code> argument
+    an <code><a href='EnsDb-class.html'>EnsDb</a></code> object with its <code>return.type</code> argument
     allowing to define the type of the returned object. Note that if
     <code>return.type = "AAStringSet"</code> additional annotation columns are
     stored in a <code>DataFrame</code> that can be accessed with the <code>mcols</code>
@@ -236,8 +236,8 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
     <code>protein</code> tables and can hence return all annotations from the
     database that are related to proteins and transcripts encoding these
     proteins from the database. Since <code>proteins</code> does thus only query
-    annotations for protein coding transcripts, the <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-exonsBy.html'>genes</a></code> or
-    <code><a href='https://rdrr.io/pkg/ensembldb/man/EnsDb-exonsBy.html'>transcripts</a></code> methods have to be used to retrieve annotations
+    annotations for protein coding transcripts, the <code><a href='exonsBy.html'>genes</a></code> or
+    <code><a href='exonsBy.html'>transcripts</a></code> methods have to be used to retrieve annotations
     for non-coding transcripts.</p>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
@@ -249,8 +249,9 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
 <span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
 <span class='co'>## Get all proteins from tha database for the gene ZBTB16, if protein</span>
 <span class='co'>## annotations are available</span>
-<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
-    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>proteins</a></span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneNameFilter</span>(<span class='st'>"ZBTB16"</span>))</div><div class='output co'>#&gt; DataFrame with 5 rows and 4 columns
+<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'>proteins</span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneNameFilter</span>(<span class='st'>"ZBTB16"</span>))
+</div><div class='output co'>#&gt; DataFrame with 5 rows and 4 columns
 #&gt;             tx_id      protein_id       protein_sequence   gene_name
 #&gt;       &lt;character&gt;     &lt;character&gt;            &lt;character&gt; &lt;character&gt;
 #&gt; 1 ENST00000335953 ENSP00000338157 MDLTKMGMIQLQNPSHPTGL..      ZBTB16
@@ -260,19 +261,22 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
 #&gt; 5 ENST00000539918 ENSP00000445047 XGGLLPQGFIQRELFSKLGE..      ZBTB16</div><div class='input'>
 <span class='co'>## List the names of all Uniprot databases from which Uniprot IDs are</span>
 <span class='co'>## available in the EnsDb</span>
-<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
-    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>listUniprotDbs</a></span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; [1] "SWISSPROT" "SPTREMBL" </div><div class='input'>
+<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'>listUniprotDbs</span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt; [1] "SWISSPROT" "SPTREMBL" </div><div class='input'>
 
 <span class='co'>## List the type of all methods that were used to map Uniprot IDs to Ensembl</span>
 <span class='co'>## protein IDs</span>
-<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
-    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>listUniprotMappingTypes</a></span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt; [1] "DIRECT"         "SEQUENCE_MATCH"</div><div class='input'>
+<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'>listUniprotMappingTypes</span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt; [1] "DIRECT"         "SEQUENCE_MATCH"</div><div class='input'>
 
 <span class='co'>## List all columns containing protein annotations</span>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
 <span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
-<span class='co'>if</span> (<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/hasProteinData-EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
-    <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/ProteinFunctionality.html'>listProteinColumns</a></span>(<span class='kw'>edb</span>)</div><div class='output co'>#&gt;  [1] "tx_id"                 "protein_id"            "protein_sequence"     
+<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>))
+    <span class='fu'>listProteinColumns</span>(<span class='kw'>edb</span>)
+</div><div class='output co'>#&gt;  [1] "tx_id"                 "protein_id"            "protein_sequence"     
 #&gt;  [4] "protein_domain_id"     "protein_domain_source" "interpro_accession"   
 #&gt;  [7] "prot_dom_start"        "prot_dom_end"          "uniprot_id"           
 #&gt; [10] "uniprot_db"            "uniprot_mapping_type" </div></pre>
@@ -291,7 +295,7 @@ the type of the returned object. Can be either <code>"DataFrame"</code>,
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

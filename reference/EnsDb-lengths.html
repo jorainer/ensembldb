@@ -195,8 +195,8 @@
     <p>Johannes Rainer</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>exonsBy</code>
-  <code>transcripts</code>
+    <div class='dont-index'><p><code><a href='exonsBy.html'>exonsBy</a></code>
+  <code><a href='exonsBy.html'>transcripts</a></code>
   <code><a href='https://rdrr.io/pkg/GenomicFeatures/man/transcriptLengths.html'>transcriptLengths</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -207,26 +207,31 @@
 <span class='co'>#####    lengthOf</span>
 <span class='co'>##</span>
 <span class='co'>## length of a specific gene.</span>
-<span class='fu'>lengthOf</span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneIdFilter</span>(<span class='st'>"ENSG00000000003"</span>))</div><div class='output co'>#&gt; ENSG00000000003 
+<span class='fu'>lengthOf</span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneIdFilter</span>(<span class='st'>"ENSG00000000003"</span>))
+</div><div class='output co'>#&gt; ENSG00000000003 
 #&gt;            4535 </div><div class='input'>
 <span class='co'>## length of a transcript</span>
-<span class='fu'>lengthOf</span>(<span class='kw'>edb</span>, of = <span class='st'>"tx"</span>, filter = <span class='fu'>TxIdFilter</span>(<span class='st'>"ENST00000494424"</span>))</div><div class='output co'>#&gt; ENST00000494424 
+<span class='fu'>lengthOf</span>(<span class='kw'>edb</span>, of = <span class='st'>"tx"</span>, filter = <span class='fu'>TxIdFilter</span>(<span class='st'>"ENST00000494424"</span>))
+</div><div class='output co'>#&gt; ENST00000494424 
 #&gt;             820 </div><div class='input'>
 <span class='co'>## Average length of all protein coding genes encoded on chromosomes X</span>
 <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='fu'>lengthOf</span>(<span class='kw'>edb</span>, of = <span class='st'>"gene"</span>,
               filter = <span class='op'>~</span> <span class='kw'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"protein_coding"</span> <span class='op'>&amp;</span>
-                  <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>))</div><div class='output co'>#&gt; [1] 3934.111</div><div class='input'>
+                  <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>))
+</div><div class='output co'>#&gt; [1] 3934.111</div><div class='input'>
 <span class='co'>## Average length of all snoRNAs</span>
 <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='fu'>lengthOf</span>(<span class='kw'>edb</span>, of = <span class='st'>"gene"</span>,
               filter = <span class='op'>~</span> <span class='kw'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"snoRNA"</span> <span class='op'>&amp;</span>
-                  <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>))</div><div class='output co'>#&gt; [1] 125.8478</div><div class='input'>
+                  <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>))
+</div><div class='output co'>#&gt; [1] 125.8478</div><div class='input'>
 <span class='co'>##### transcriptLengths</span>
 <span class='co'>##</span>
 <span class='co'>## Calculate the length of transcripts encoded on chromosome Y, including</span>
 <span class='co'>## length of the CDS, 5' and 3' UTR.</span>
 <span class='kw'>len</span> <span class='op'>&lt;-</span> <span class='fu'>transcriptLengths</span>(<span class='kw'>edb</span>, with.cds_len = <span class='fl'>TRUE</span>, with.utr5_len = <span class='fl'>TRUE</span>,
                          with.utr3_len = <span class='fl'>TRUE</span>, filter = <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>))
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>len</span>)</div><div class='output co'>#&gt;                           tx_id         tx_name         gene_id nexon tx_len
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='kw'>len</span>)
+</div><div class='output co'>#&gt;                           tx_id         tx_name         gene_id nexon tx_len
 #&gt; ENST00000516032 ENST00000516032 ENST00000516032 ENSG00000251841     1    105
 #&gt; ENST00000383070 ENST00000383070 ENST00000383070 ENSG00000184895     1    845
 #&gt; ENST00000454281 ENST00000454281 ENST00000454281 ENSG00000237659     1    502
@@ -239,7 +244,8 @@
 #&gt; ENST00000454281       0        0        0
 #&gt; ENST00000430735       0        0        0
 #&gt; ENST00000250784     792      139      374
-#&gt; ENST00000430575     787       24        0</div><div class='input'></div></pre>
+#&gt; ENST00000430575     787       24        0</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -255,7 +261,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

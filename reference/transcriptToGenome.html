@@ -146,10 +146,10 @@ cdsToTranscript() function." />
 coordinates. Provided coordinates are expected to be relative to the first
 nucleotide of the <strong>transcript</strong>, not the <strong>CDS</strong>. CDS-relative coordinates
 have to be converted to transcript-relative positions first with the
-<code><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript()</a></code> function.</p>
+<code><a href='cdsToTranscript.html'>cdsToTranscript()</a></code> function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a></span>(<span class='kw'>x</span>, <span class='kw'>db</span>, id = <span class='st'>"name"</span>)</pre>
+    <pre class="usage"><span class='fu'>transcriptToGenome</span>(<span class='kw'>x</span>, <span class='kw'>db</span>, id = <span class='st'>"name"</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,16 +182,16 @@ as metadata columns as well as the ID of the individual exon(s). An empty
 <code>GRanges</code> is returned for transcripts that can not be found in the database.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript()</a></code> and <code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds()</a></code> for the mapping between
+    <div class='dont-index'><p><code><a href='cdsToTranscript.html'>cdsToTranscript()</a></code> and <code><a href='transcriptToCds.html'>transcriptToCds()</a></code> for the mapping between
 CDS- and transcript-relative coordinates.</p>
 <p>Other coordinate mapping functions: 
-<code><a href='https://rdrr.io/pkg/ensembldb/man/cdsToTranscript.html'>cdsToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToProtein.html'>genomeToProtein</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/genomeToTranscript.html'>genomeToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToGenome.html'>proteinToGenome</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/proteinToTranscript.html'>proteinToTranscript</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToCds.html'>transcriptToCds</a>()</code>,
-<code><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
+<code><a href='cdsToTranscript.html'>cdsToTranscript</a>()</code>,
+<code><a href='genomeToProtein.html'>genomeToProtein</a>()</code>,
+<code><a href='genomeToTranscript.html'>genomeToTranscript</a>()</code>,
+<code><a href='proteinToGenome.html'>proteinToGenome</a>()</code>,
+<code><a href='proteinToTranscript.html'>proteinToTranscript</a>()</code>,
+<code><a href='transcriptToCds.html'>transcriptToCds</a>()</code>,
+<code><a href='transcriptToProtein.html'>transcriptToProtein</a>()</code></p></div>
     <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
     <p>Johannes Rainer</p>
@@ -200,14 +200,15 @@ CDS- and transcript-relative coordinates.</p>
     <pre class="examples"><div class='input'>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
 <span class='co'>## Restrict all further queries to chromosome x to speed up the examples</span>
-<span class='kw'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/global-filters.html'>filter</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>)
+<span class='kw'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='addFilter,EnsDb-method.html'>filter</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>, filter = <span class='op'>~</span> <span class='kw'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span>)
 
 <span class='co'>## Below we map positions 1 to 5 within the transcript ENST00000381578 to</span>
 <span class='co'>## the genome. The ID of the transcript has to be provided either as names</span>
 <span class='co'>## or in one of the IRanges' metadata columns</span>
 <span class='kw'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span>(start = <span class='fl'>1</span>, end = <span class='fl'>5</span>, names = <span class='st'>"ENST00000381578"</span>)
 
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a></span>(<span class='kw'>txpos</span>, <span class='kw'>edbx</span>)</div><div class='output co'>#&gt; GRangesList object of length 1:
+<span class='fu'>transcriptToGenome</span>(<span class='kw'>txpos</span>, <span class='kw'>edbx</span>)
+</div><div class='output co'>#&gt; GRangesList object of length 1:
 #&gt; $ENST00000381578
 #&gt; GRanges object with 1 range and 5 metadata columns:
 #&gt;       seqnames        ranges strand |         exon_id           tx_id exon_rank
@@ -225,7 +226,8 @@ CDS- and transcript-relative coordinates.</p>
 <span class='co'>## Next we map nucleotides 501 to 505 of ENST00000486554 to the genome</span>
 <span class='kw'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span>(start = <span class='fl'>501</span>, end = <span class='fl'>505</span>, names = <span class='st'>"ENST00000486554"</span>)
 
-<span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a></span>(<span class='kw'>txpos</span>, <span class='kw'>edbx</span>)</div><div class='output co'>#&gt; GRangesList object of length 1:
+<span class='fu'>transcriptToGenome</span>(<span class='kw'>txpos</span>, <span class='kw'>edbx</span>)
+</div><div class='output co'>#&gt; GRangesList object of length 1:
 #&gt; $ENST00000486554
 #&gt; GRanges object with 2 ranges and 5 metadata columns:
 #&gt;       seqnames              ranges strand |         exon_id           tx_id
@@ -246,18 +248,22 @@ CDS- and transcript-relative coordinates.</p>
 <span class='kw'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span>(start = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>501</span>, <span class='fl'>1</span>, <span class='fl'>5</span>), end = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>505</span>, <span class='fl'>10</span>, <span class='fl'>6</span>),
     names = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"ENST00000486554"</span>, <span class='st'>"ENST00000486554"</span>, <span class='st'>"some"</span>))
 
-<span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/ensembldb/man/transcriptToGenome.html'>transcriptToGenome</a></span>(<span class='kw'>txpos</span>, <span class='kw'>edbx</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 transcript(s) could either not be found in the database or the specified range is outside the transcript's sequence</span></div><div class='input'>
+<span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'>transcriptToGenome</span>(<span class='kw'>txpos</span>, <span class='kw'>edbx</span>)
+</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 transcript(s) could either not be found in the database or the specified range is outside the transcript's sequence</span></div><div class='input'>
 <span class='co'>## The length of the result GRangesList has the same length than the</span>
 <span class='co'>## input IRanges</span>
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>res</span>)</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>res</span>)
+</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
 <span class='co'>## The result for the last region is an empty GRanges, because the</span>
 <span class='co'>## transcript could not be found in the database</span>
-<span class='kw'>res</span>[[<span class='fl'>3</span>]]</div><div class='output co'>#&gt; GRanges object with 0 ranges and 0 metadata columns:
+<span class='kw'>res</span>[[<span class='fl'>3</span>]]
+</div><div class='output co'>#&gt; GRanges object with 0 ranges and 0 metadata columns:
 #&gt;    seqnames    ranges strand
 #&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
 #&gt;   -------
 #&gt;   seqinfo: no sequences</div><div class='input'>
-<span class='kw'>res</span></div><div class='output co'>#&gt; GRangesList object of length 3:
+<span class='kw'>res</span>
+</div><div class='output co'>#&gt; GRangesList object of length 3:
 #&gt; $ENST00000486554
 #&gt; GRanges object with 2 ranges and 5 metadata columns:
 #&gt;       seqnames              ranges strand |         exon_id           tx_id
@@ -304,7 +310,7 @@ CDS- and transcript-relative coordinates.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
