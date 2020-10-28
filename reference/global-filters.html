@@ -80,19 +80,13 @@ filter filters an EnsDb object. filter is
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/ensembldb.html">Get started</a>
 </li>
 <li>
@@ -158,15 +152,15 @@ filter filters an EnsDb object. filter is
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>addFilter</span>(<span class='kw'>x</span>, filter = <span class='fu'>AnnotationFilterList</span>())
+<span class='fu'>addFilter</span><span class='op'>(</span><span class='va'>x</span>, filter <span class='op'>=</span> <span class='fu'>AnnotationFilterList</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>dropFilter</span>(<span class='kw'>x</span>)
+<span class='fu'>dropFilter</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>activeFilter</span>(<span class='kw'>x</span>)
+<span class='fu'>activeFilter</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'>filter</span>(<span class='kw'>x</span>, filter = <span class='fu'>AnnotationFilterList</span>())</pre>
+<span class='fu'>filter</span><span class='op'>(</span><span class='va'>x</span>, filter <span class='op'>=</span> <span class='fu'>AnnotationFilterList</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -208,22 +202,22 @@ expression. See</p></td>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
-<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
+<span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span>
 
 <span class='co'>## Add a global SeqNameFilter to the database such that all subsequent</span>
 <span class='co'>## queries will be applied on the filtered database.</span>
-<span class='kw'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'>addFilter</span>(<span class='kw'>edb</span>, <span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>))
+<span class='va'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'>addFilter</span><span class='op'>(</span><span class='va'>edb</span>, <span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"Y"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'>## Note: using the filter function is equivalent to a call to addFilter.</span>
 
 <span class='co'>## Each call returns now only features encoded on chromosome Y</span>
-<span class='kw'>gns</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>genes</a></span>(<span class='kw'>edb_y</span>)
+<span class='va'>gns</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
 
-<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='kw'>gns</span>)
+<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>gns</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "Y"</div><div class='input'>
 <span class='co'>## Get all lincRNA gene transcripts on chromosome Y</span>
-<span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb_y</span>, filter = <span class='op'>~</span> <span class='kw'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"lincRNA"</span>)
+<span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb_y</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"lincRNA"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 73 ranges and 7 metadata columns:
 #&gt;                   seqnames            ranges strand |           tx_id
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -267,13 +261,13 @@ expression. See</p></td>
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Get the currently active global filter:</span>
-<span class='fu'>activeFilter</span>(<span class='kw'>edb_y</span>)
+<span class='fu'>activeFilter</span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; AnnotationFilterList of length 1 
 #&gt; seq_name == 'Y'</div><div class='input'>
 <span class='co'>## Delete this filter again.</span>
-<span class='kw'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'>dropFilter</span>(<span class='kw'>edb_y</span>)
+<span class='va'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'>dropFilter</span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
 
-<span class='fu'>activeFilter</span>(<span class='kw'>edb_y</span>)
+<span class='fu'>activeFilter</span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] NA</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

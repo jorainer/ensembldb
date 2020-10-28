@@ -73,19 +73,13 @@ MariaDB/MySQL server." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/ensembldb.html">Get started</a>
 </li>
 <li>
@@ -143,7 +137,7 @@ MariaDB/MySQL server." />
 MariaDB/MySQL server.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>listEnsDbs</span>(<span class='kw'>dbcon</span>, <span class='kw'>host</span>, <span class='kw'>port</span>, <span class='kw'>user</span>, <span class='kw'>pass</span>)</pre>
+    <pre class="usage"><span class='fu'>listEnsDbs</span><span class='op'>(</span><span class='va'>dbcon</span>, <span class='va'>host</span>, <span class='va'>port</span>, <span class='va'>user</span>, <span class='va'>pass</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -194,11 +188,11 @@ lower case and that each <code>"."</code> is replaced by <code>"_"</code>.</p>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>RMariaDB</span>)
-<span class='kw'>dbcon</span> <span class='op'>&lt;-</span> <span class='fu'>dbConnect</span>(<span class='fu'>MariaDB</span>(), host = <span class='st'>"localhost"</span>, user = <span class='kw'>my_user</span>, pass = <span class='kw'>my_pass</span>)
-<span class='fu'>listEnsDbs</span>(<span class='kw'>dbcon</span>)
-}
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>RMariaDB</span><span class='op'>)</span>
+<span class='va'>dbcon</span> <span class='op'>&lt;-</span> <span class='fu'>dbConnect</span><span class='op'>(</span><span class='fu'>MariaDB</span><span class='op'>(</span><span class='op'>)</span>, host <span class='op'>=</span> <span class='st'>"localhost"</span>, user <span class='op'>=</span> <span class='va'>my_user</span>, pass <span class='op'>=</span> <span class='va'>my_pass</span><span class='op'>)</span>
+<span class='fu'>listEnsDbs</span><span class='op'>(</span><span class='va'>dbcon</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

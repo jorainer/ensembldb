@@ -31,18 +31,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/ensembldb.html">Get started</a>
 </li>
@@ -133,48 +127,43 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The <code>cdsToTranscript</code> and <code>transcriptToCds</code> functions are helpful to enable the mapping of variants in genes that are usually provided as positions within the gene’s (actually transcript’s) coding sequence. An example for such a mapping is provided in section <em>Mapping transcript coordinates to genomic coordinates</em> further below.</p>
 <p>Below we load all required libraries and filter the <code>EnsDb</code> database containing the annotations from Ensembl release 86 to chromosome X. All genes of the examples in this vignette are encoded on chromosome X and subsetting the <code>EnsDb</code> to a single chromosome speeds all database queries considerably up.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/jorainer/ensembldb">ensembldb</a></span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">EnsDb.Hsapiens.v86</span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb">ensembldb</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 
-<span class="kw">edbx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addFilter,EnsDb-method.html">filter</a></span>(<span class="kw">EnsDb.Hsapiens.v86</span>, filter = <span class="op">~</span> <span class="kw">seq_name</span> <span class="op">==</span> <span class="st">"X"</span>)
-</pre></div>
+<span class="va">edbx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addFilter,EnsDb-method.html">filter</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">seq_name</span> <span class="op">==</span> <span class="st">"X"</span><span class="op">)</span></pre></div>
 </div>
 <div id="mapping-genomic-coordinates-to-transcript-relative-coordinates" class="section level1">
 <h1 class="hasAnchor">
 <a href="#mapping-genomic-coordinates-to-transcript-relative-coordinates" class="anchor"></a>Mapping genomic coordinates to transcript-relative coordinates</h1>
 <p>Below we define a genomic region on chromosome X for which we want to identify the transcripts that are eventually encoded by that position and determine the coordinates of the genomic region within these (relative to their first nucleotide).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw">gnm</span> <span class="op">&lt;-</span> <span class="fu">GRanges</span>(<span class="st">"X:107716399-107716401"</span>)
-</pre></div>
+<span class="va">gnm</span> <span class="op">&lt;-</span> <span class="fu">GRanges</span><span class="op">(</span><span class="st">"X:107716399-107716401"</span><span class="op">)</span></pre></div>
 <p>Before we map the coordinates we visualize the genomic region and all genes and transcripts overlapping it.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/ivanek/Gviz">Gviz</a></span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ivanek/Gviz">Gviz</a></span><span class="op">)</span>
 <span class="co">## Since we're using Ensembl chromosome names we have to set:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(ucscChromosomeNames = <span class="fl">FALSE</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ucscChromosomeNames <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="co">## Define a genome axis track</span>
-<span class="kw">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html">GenomeAxisTrack</a></span>(range = <span class="kw">gnm</span>)
+<span class="va">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html">GenomeAxisTrack</a></span><span class="op">(</span>range <span class="op">=</span> <span class="va">gnm</span><span class="op">)</span>
 
 <span class="co">## Get all genes in that region</span>
-<span class="kw">gnm_gns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span>(<span class="kw">edbx</span>, filter = <span class="fu">GRangesFilter</span>(<span class="kw">gnm</span>))
-<span class="kw">gtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span>(<span class="kw">gnm_gns</span>, name = <span class="st">"tx"</span>, geneSymbol = <span class="fl">TRUE</span>,
-                       showId = <span class="fl">TRUE</span>)
+<span class="va">gnm_gns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edbx</span>, filter <span class="op">=</span> <span class="fu">GRangesFilter</span><span class="op">(</span><span class="va">gnm</span><span class="op">)</span><span class="op">)</span>
+<span class="va">gtx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span><span class="op">(</span><span class="va">gnm_gns</span>, name <span class="op">=</span> <span class="st">"tx"</span>, geneSymbol <span class="op">=</span> <span class="cn">TRUE</span>,
+                       showId <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
 <span class="co">## Generate a higlight track</span>
-<span class="kw">ht</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/HighlightTrack-class.html">HighlightTrack</a></span>(trackList = <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">gat</span>, <span class="kw">gtx</span>), range = <span class="kw">gnm</span>)
+<span class="va">ht</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/HighlightTrack-class.html">HighlightTrack</a></span><span class="op">(</span>trackList <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="va">gtx</span><span class="op">)</span>, range <span class="op">=</span> <span class="va">gnm</span><span class="op">)</span>
 <span class="co">## plot the region</span>
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">ht</span>))
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">ht</span><span class="op">)</span><span class="op">)</span></pre></div>
 <p><img src="coordinate-mapping_files/figure-html/genomeToTranscript-ex1-plot-1.png" width="700"></p>
 <p>The genomic position overlaps two transcripts of the gene TSC22D3, encoded on the reverse strand on chromosome X. Below we map this position to the nucleotides within the encoded transcripts with the <code>genomeToTranscript</code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit">
 <span class="co">## Map genomic coordinates to within-transcript coordinates</span>
-<span class="kw">gnm_tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomeToTranscript.html">genomeToTranscript</a></span>(<span class="kw">gnm</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="va">gnm_tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomeToTranscript.html">genomeToTranscript</a></span><span class="op">(</span><span class="va">gnm</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <p>As a result we get an <code>IRangesList</code> object of length 1 (since we defined a single genomic region as input). The <code>IRanges</code> in the first element of our result object provides the mapped coordinates within each transcript that is encoded in the specified genomic region.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="kw">gnm_tx</span>
-</pre></div>
+<span class="va">gnm_tx</span></pre></div>
 <pre><code>## IRangesList object of length 1:
 ## [[1]]
 ## IRanges object with 2 ranges and 7 metadata columns:
@@ -193,14 +182,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The genomic region overlapped two transcripts and the transcript-relative coordinates for both are reported. The ID of the transcripts are provided as the <code>names</code> of the <code>IRanges</code>. The original genomic coordinates are listed in additional metadata columns (which can be accessed with the <code>mcols</code> method). Also the ID of the exon encoded at the genomic region and its index/rank within the transcript is available in the <code>"exon_id"</code> metadata column.</p>
 <p>To illustrate mapping of multiple genomic regions, we define below 2 genomic regions: twice the example region from above but once restricting to the reverse and once to the forward strand.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="kw">gnm_1</span> <span class="op">&lt;-</span> <span class="kw">gnm</span>
-<span class="fu">strand</span>(<span class="kw">gnm_1</span>) <span class="op">&lt;-</span> <span class="st">"-"</span>
-<span class="kw">gnm_2</span> <span class="op">&lt;-</span> <span class="kw">gnm</span>
-<span class="fu">strand</span>(<span class="kw">gnm_2</span>) <span class="op">&lt;-</span> <span class="st">"+"</span>
-<span class="kw">gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">gnm_1</span>, <span class="kw">gnm_2</span>)
+<span class="va">gnm_1</span> <span class="op">&lt;-</span> <span class="va">gnm</span>
+<span class="fu">strand</span><span class="op">(</span><span class="va">gnm_1</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"-"</span>
+<span class="va">gnm_2</span> <span class="op">&lt;-</span> <span class="va">gnm</span>
+<span class="fu">strand</span><span class="op">(</span><span class="va">gnm_2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"+"</span>
+<span class="va">gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">gnm_1</span>, <span class="va">gnm_2</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/genomeToTranscript.html">genomeToTranscript</a></span>(<span class="kw">gnm</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="fu"><a href="../reference/genomeToTranscript.html">genomeToTranscript</a></span><span class="op">(</span><span class="va">gnm</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?
 ## seqlevelsStyle if you used UCSC chromosome names</code></pre>
 <pre><code>## IRangesList object of length 2:
@@ -235,10 +223,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>We can use the <code>genomeToProtein</code> function to map genomic coordinates to within-protein sequence coordinates. In addition to the <code>genomeToTranscript</code> function, this function determines whether the transcript at the genomic position encodes a protein, and if so, maps the genomic coordinates to coordinates within the respective protein sequence. To this end, the transcript-relative coordinates for the genomic region have to be located within CDS of the transcript (excluding the stop codon, i.e. last 3 nucleotides of the CDS, since they are not translated into an amino acid).</p>
 <p>Below we define 4 genomic regions and map them to protein-relative coordinates: the first corresponds to the first 4 nucleotides of the CDS of ENST00000381578, the second to the last nucleotide of the CDS of the same transcript. The third region maps to the last nt before the stop codon of ENST00000381578 and the last region is located within an intron of the same transcript.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="kw">gnm</span> <span class="op">&lt;-</span> <span class="fu">GRanges</span>(<span class="st">"X"</span>, <span class="fu">IRanges</span>(start = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">630898</span>, <span class="fl">644636</span>, <span class="fl">644633</span>, <span class="fl">634829</span>),
-                            width = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">3</span>)))
-<span class="kw">gnm_prt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomeToProtein.html">genomeToProtein</a></span>(<span class="kw">gnm</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="va">gnm</span> <span class="op">&lt;-</span> <span class="fu">GRanges</span><span class="op">(</span><span class="st">"X"</span>, <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">630898</span>, <span class="fl">644636</span>, <span class="fl">644633</span>, <span class="fl">634829</span><span class="op">)</span>,
+                            width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">gnm_prt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomeToProtein.html">genomeToProtein</a></span><span class="op">(</span><span class="va">gnm</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: 1 genomic region(s) could not be mapped to a transcript; hint: see ?
 ## seqlevelsStyle if you used UCSC chromosome names</code></pre>
 <pre><code>## Warning: Transcript(s) '' could not be found</code></pre>
@@ -246,8 +233,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## within the coding region</code></pre>
 <p>The resulting object has the length 4, one <code>IRanges</code> for each region in the input <code>GRanges</code>. The warning messages indicate that not all of the regions could be mapped to within-protein coordinates. We explore now the results for each input region separately.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit">
-<span class="kw">gnm_prt</span>[[<span class="fl">1</span>]]
-</pre></div>
+<span class="va">gnm_prt</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 4 ranges and 9 metadata columns:
 ##                       start       end     width |           tx_id    cds_ok
 ##                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;
@@ -270,8 +256,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The genomic region could be mapped to positions within the coding regions of 4 different transcripts, each of them being annotated to its own Ensembl protein ID. The input region was mapped to the first 4 nucleotides of each transcripts’ CDS and was thus mapped to the amino acid residues 1 and 2 of the encoded protein: the first 3 nucleotides to the first amino acid, the 4th to the second amino acid. The encoding transcript ID, the exon ID, exon rank and the input genomic region are provided as metadata columns in the result <code>IRanges</code>. A metadata column <code>cds_ok</code> provides the additional information whether the length of each transcripts’ CDS matches the length of the encoded protein sequence. This is an important information, as not all protein coding transcripts in Ensembl have complete CDS, either because their 3’ or their 5’ (or both) ends are incomplete (or could not be mapped/aligned to the genome). Mappings to or from protein coordinates with a <code>cds_ok</code> being <code>FALSE</code> might not be correct and should be manually evaluated e.g. using the Ensembl genome browser.</p>
 <p>The second genomic region maps to last nucleotide of the CDS of ENST00000381578, which is however part of the stop codon that is not translated. The coordinates can therefore not be mapped to the protein sequence and an <code>IRanges</code> with negative start position is thus returned.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit">
-<span class="kw">gnm_prt</span>[[<span class="fl">2</span>]]
-</pre></div>
+<span class="va">gnm_prt</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 2 ranges and 9 metadata columns:
 ##        start       end     width |           tx_id    cds_ok           tx_id
 ##    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;     &lt;character&gt;
@@ -283,8 +268,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##    ENSE00002438186         5    644636    644636           X           *</code></pre>
 <p>The third region can be mapped to the last nucleotide before the stop codon and was thus mapped to the last amino acid of the encoded protein.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit">
-<span class="kw">gnm_prt</span>[[<span class="fl">3</span>]]
-</pre></div>
+<span class="va">gnm_prt</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 2 ranges and 9 metadata columns:
 ##                       start       end     width |           tx_id    cds_ok
 ##                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;
@@ -300,16 +284,14 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   ENSP00000452016           X           *</code></pre>
 <p>This region maps however to coordinates within two transcripts, each with their own translation. Below we retrieve the protein sequences for both protein IDs to evaluate if it corresponds indeed to the last amino acid for the protein encoded by ENST00000381578.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit">
-<span class="kw">prt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteins,EnsDb-method.html">proteins</a></span>(<span class="kw">edbx</span>, filter = <span class="fu">ProteinIdFilter</span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">gnm_prt</span>[[<span class="fl">3</span>]])))
+<span class="va">prt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteins,EnsDb-method.html">proteins</a></span><span class="op">(</span><span class="va">edbx</span>, filter <span class="op">=</span> <span class="fu">ProteinIdFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">gnm_prt</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span>(<span class="kw">prt</span><span class="op">$</span><span class="kw">protein_sequence</span>)
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nchar</a></span><span class="op">(</span><span class="va">prt</span><span class="op">$</span><span class="va">protein_sequence</span><span class="op">)</span></pre></div>
 <pre><code>## [1] 292 292</code></pre>
 <p>As expected, the position mapped to the last amino acid of the amino acid sequence associated with both protein IDs. In fact, these amino acid sequences are identical.</p>
 <p>The result for the last region can not be mapped to any transcript-relative coordinates and hence also not to any protein. As a result, an <code>IRanges</code> with negative coordinates is returned.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit">
-<span class="kw">gnm_prt</span>[[<span class="fl">4</span>]]
-</pre></div>
+<span class="va">gnm_prt</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 1 range and 9 metadata columns:
 ##        start       end     width |       tx_id    cds_ok       tx_id
 ##    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;logical&gt; &lt;character&gt;
@@ -324,25 +306,21 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The <code>proteinToTranscript</code> method allows to map protein-sequence relative coordinates to the encoding region in the transcript. A protein identifier and the coordinates within the protein sequence have to be provided with an <code>IRanges</code> object, the protein identifiers (ideally Ensembl protein IDs or also Uniprot IDs) either provided as <code>names</code> of the object, or in one of its metadata columns. The function will first try to find the protein identifiers in the database and, if found, map the provided coordinates to transcript-relative positions.</p>
 <p>In our first example we retrieve the transcript-relative coordinates of positions 5 to 9 within the amino acid sequence of the gene <em>GAGE10</em>. Below we first get the protein ID for this gene from the database and define then the <code>IRanges</code> with the protein sequence-internal coordinates.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit">
-<span class="kw">GAGE10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteins,EnsDb-method.html">proteins</a></span>(<span class="kw">edbx</span>, filter = <span class="op">~</span> <span class="kw">genename</span> <span class="op">==</span> <span class="st">"GAGE10"</span>)
-<span class="kw">GAGE10</span>
-</pre></div>
+<span class="va">GAGE10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteins,EnsDb-method.html">proteins</a></span><span class="op">(</span><span class="va">edbx</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">genename</span> <span class="op">==</span> <span class="st">"GAGE10"</span><span class="op">)</span>
+<span class="va">GAGE10</span></pre></div>
 <pre><code>## DataFrame with 1 row and 4 columns
 ##             tx_id      protein_id       protein_sequence   gene_name
 ##       &lt;character&gt;     &lt;character&gt;            &lt;character&gt; &lt;character&gt;
 ## 1 ENST00000407599 ENSP00000385415 MSWRGRSTYRPRPRRYVEPP..      GAGE10</code></pre>
 <div class="sourceCode" id="cb26"><pre class="downlit">
 <span class="co">## Define the IRanges object.</span>
-<span class="kw">GAGE10_prt</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fl">5</span>, end = <span class="fl">9</span>, names = <span class="kw">GAGE10</span><span class="op">$</span><span class="kw">protein_id</span>)
-</pre></div>
+<span class="va">GAGE10_prt</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fl">5</span>, end <span class="op">=</span> <span class="fl">9</span>, names <span class="op">=</span> <span class="va">GAGE10</span><span class="op">$</span><span class="va">protein_id</span><span class="op">)</span></pre></div>
 <p>Now we use the <code>proteinToTranscript</code> function to map the coordinates. The function also compares the length of the CDS with the length of the encoded protein sequence and, if they are not matching, returns a <code>FALSE</code> in the result object’s <code>cds_ok</code> metadata column. In such cases (i.e. when the CDS of the transcript is incomplete), the returned coordinates could be wrong.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit">
-<span class="kw">GAGE10_tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToTranscript.html">proteinToTranscript</a></span>(<span class="kw">GAGE10_prt</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="va">GAGE10_tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToTranscript.html">proteinToTranscript</a></span><span class="op">(</span><span class="va">GAGE10_prt</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <p>The result is a <code>list</code> with the same length as the input <code>IRanges</code>, each element representing the mapping of the protein-relative coordinates to positions within all encoding transcripts. Note that the transcript coordinates are relative to the first nucleotide of the 5’ UTR, not of the CDS.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit">
-<span class="kw">GAGE10_tx</span>
-</pre></div>
+<span class="va">GAGE10_tx</span></pre></div>
 <pre><code>## IRangesList object of length 1:
 ## $ENSP00000385415
 ## IRanges object with 1 range and 5 metadata columns:
@@ -354,18 +332,16 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   ENST00000407599 ENST00000407599      TRUE             5           9</code></pre>
 <p>If Ensembl protein identifiers are used, the mapping between protein- and transcript coordinates will always be 1:1. Many Uniprot identifiers are however annotated to more than one Ensembl protein ID and the resulting <code>IRanges</code> for one input region might thus be of length larger than one. Below we define regions in protein sequences identified by Uniprot IDs. In addition, to illustrate a failing mapping, we add a region with an invalid ID.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit">
-<span class="kw">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"O15266"</span>, <span class="st">"Q9HBJ8"</span>, <span class="st">"donotexistant"</span>)
-<span class="kw">prt</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">13</span>, <span class="fl">43</span>, <span class="fl">100</span>), end = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">21</span>, <span class="fl">80</span>, <span class="fl">100</span>))
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">prt</span>) <span class="op">&lt;-</span> <span class="kw">ids</span>
+<span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"O15266"</span>, <span class="st">"Q9HBJ8"</span>, <span class="st">"donotexistant"</span><span class="op">)</span>
+<span class="va">prt</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">13</span>, <span class="fl">43</span>, <span class="fl">100</span><span class="op">)</span>, end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">21</span>, <span class="fl">80</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">prt</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">ids</span>
 
-<span class="kw">prt_tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToTranscript.html">proteinToTranscript</a></span>(<span class="kw">prt</span>, <span class="kw">edbx</span>, idType = <span class="st">"uniprot_id"</span>)
-</pre></div>
+<span class="va">prt_tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToTranscript.html">proteinToTranscript</a></span><span class="op">(</span><span class="va">prt</span>, <span class="va">edbx</span>, idType <span class="op">=</span> <span class="st">"uniprot_id"</span><span class="op">)</span></pre></div>
 <pre><code>## Warning in proteinToTranscript(prt, edbx, idType = "uniprot_id"): No CDS found
 ## for: donotexistant</code></pre>
 <p>The region within the first protein with a Uniprot ID can be mapped to 4 different Ensembl protein IDs and the coordinates are thus mapped to regions within 4 transcripts.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit">
-<span class="kw">prt_tx</span>[[<span class="fl">1</span>]]
-</pre></div>
+<span class="va">prt_tx</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 4 ranges and 6 metadata columns:
 ##                       start       end     width |      protein_id
 ##                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt;
@@ -387,8 +363,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   ENST00000554971      O15266</code></pre>
 <p>The Uniprot identifier for the second region can be mapped to a single Ensembl protein ID and we get thus coordinates within a single transcript.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit">
-<span class="kw">prt_tx</span>[[<span class="fl">2</span>]]
-</pre></div>
+<span class="va">prt_tx</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 1 range and 6 metadata columns:
 ##                       start       end     width |      protein_id
 ##                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt;
@@ -401,8 +376,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   ENST00000380342      Q9HBJ8</code></pre>
 <p>The last identifier can not be mapped to any Ensembl protein, and a region with negative coordinates is thus returned.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit">
-<span class="kw">prt_tx</span>[[<span class="fl">3</span>]]
-</pre></div>
+<span class="va">prt_tx</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## IRanges object with 1 range and 6 metadata columns:
 ##           start       end     width |  protein_id       tx_id    cds_ok
 ##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;character&gt; &lt;logical&gt;
@@ -418,16 +392,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>In our first example we map the positions 5 to 9 within the amino acid sequence of the protein <em>ENSP00000385415</em> from gene GAGE10 to the genome.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit">
 <span class="co">## Define the IRanges object.</span>
-<span class="kw">GAGE10_prt</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fl">5</span>, end = <span class="fl">9</span>, names = <span class="st">"ENSP00000385415"</span>)
-</pre></div>
+<span class="va">GAGE10_prt</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fl">5</span>, end <span class="op">=</span> <span class="fl">9</span>, names <span class="op">=</span> <span class="st">"ENSP00000385415"</span><span class="op">)</span></pre></div>
 <p>We can now map the protein-relative coordinates to genomic coordinates. By default, <code>proteinToGenome</code> assumes the names of the provided <code>IRanges</code> object to be Ensembl protein identifiers.</p>
 <div class="sourceCode" id="cb39"><pre class="downlit">
-<span class="kw">GAGE10_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToGenome.html">proteinToGenome</a></span>(<span class="kw">GAGE10_prt</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="va">GAGE10_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToGenome.html">proteinToGenome</a></span><span class="op">(</span><span class="va">GAGE10_prt</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <p><code>proteinToGenome</code> returns a <code>list</code>, one element for each range in the input <code>IRanges</code>. We did only map a single range and hence the result is a <code>list</code> of length 1. The <code>GRanges</code> object in the first element of <code>GAGE10_gnm</code> represents the coordinates of the DNA sequence encoding positions 5 to 9 in the protein.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit">
-<span class="kw">GAGE10_gnm</span>
-</pre></div>
+<span class="va">GAGE10_gnm</span></pre></div>
 <pre><code>## $ENSP00000385415
 ## GRanges object with 1 range and 7 metadata columns:
 ##       seqnames            ranges strand |      protein_id           tx_id
@@ -442,20 +413,18 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The reason to use a <code>list</code> as a result object and not, e.g. a <code>GRangesList</code>, was the one-to-many mappings between Uniprot identifiers and Ensembl protein IDs. To illustrate this, we map positions within 3 proteins identified by their Uniprot identifiers to genomic regions.</p>
 <div class="sourceCode" id="cb42"><pre class="downlit">
 <span class="co">## Define the IRanges providing Uniprot IDs.</span>
-<span class="kw">uni_rng</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>, <span class="fl">12</span>, <span class="fl">8</span>), end = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>, <span class="fl">15</span>, <span class="fl">17</span>),
-                   names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"D6RDZ7"</span>, <span class="st">"O15266"</span>, <span class="st">"H7C2F2"</span>))
+<span class="va">uni_rng</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">12</span>, <span class="fl">8</span><span class="op">)</span>, end <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">15</span>, <span class="fl">17</span><span class="op">)</span>,
+                   names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"D6RDZ7"</span>, <span class="st">"O15266"</span>, <span class="st">"H7C2F2"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## We have to specify that the IDs are Uniprot IDs</span>
-<span class="kw">uni_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToGenome.html">proteinToGenome</a></span>(<span class="kw">uni_rng</span>, <span class="kw">edbx</span>, idType = <span class="st">"uniprot_id"</span>)
-</pre></div>
+<span class="va">uni_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToGenome.html">proteinToGenome</a></span><span class="op">(</span><span class="va">uni_rng</span>, <span class="va">edbx</span>, idType <span class="op">=</span> <span class="st">"uniprot_id"</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: Could not find a CDS whith the expected length for protein: 'D6RDZ7'.
 ## The returned genomic coordinates might thus not be correct for this protein.</code></pre>
 <pre><code>## Warning: Could not find a CDS whith the expected length for protein: 'H7C2F2'.
 ## The returned genomic coordinates might thus not be correct for this protein.</code></pre>
 <p>The length of the protein coding region of the encoding transcript for two of the 3 proteins (<em>D6RDZ7</em> and <em>H7C2F2</em>) do not match the length of the protein sequence. For some transcripts the CDS is not complete (either at the 3’, 5’ or both ends). Mapped coordinates might not be correct in such cases and it is strongly suggested to manually check the mapped coordinates. The result from the comparison of the protein sequence and the CDS length is provided in the <code>"cds_ok"</code> metadata column of the <code>GRanges</code> with the genomic coordinates.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit">
-<span class="kw">uni_gnm</span>[[<span class="fl">3</span>]]
-</pre></div>
+<span class="va">uni_gnm</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## GRanges object with 1 range and 8 metadata columns:
 ##       seqnames          ranges strand |  uniprot_id           tx_id
 ##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;     &lt;character&gt;
@@ -471,14 +440,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Mappings between Uniprot and Ensembl protein IDs can be one-to-many. In such cases <code>proteinToGenome</code> returns a <code>GRangesList</code> with each element being the coordinates calculated for each annotated Ensembl protein. In our example, each of the first two proteins was annotated to 4 Ensembl proteins.</p>
 <div class="sourceCode" id="cb47"><pre class="downlit">
 <span class="co">## To how many Ensembl proteins was each Uniprot ID mapped?</span>
-<span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span>(<span class="kw">uni_gnm</span>)
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span><span class="op">(</span><span class="va">uni_gnm</span><span class="op">)</span></pre></div>
 <pre><code>## D6RDZ7 O15266 H7C2F2 
 ##      1      4      1</code></pre>
 <p>Below we show the genomic coordinates for the within-protein positions calculated for all 4 Ensembl protein IDs for <em>O15266</em>.</p>
 <div class="sourceCode" id="cb49"><pre class="downlit">
-<span class="kw">uni_gnm</span>[[<span class="st">"O15266"</span>]]
-</pre></div>
+<span class="va">uni_gnm</span><span class="op">[[</span><span class="st">"O15266"</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## GRangesList object of length 4:
 ## $ENSP00000335505
 ## GRanges object with 1 range and 8 metadata columns:
@@ -537,13 +504,12 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
 <p>As a last example we fetch all protein domains for the gene SYP and map all of them to the genome. To fetch protein domain information we select all columns from the <em>protein_domain</em> table. In addition, we retrieve the result as a <code>AAStringSet</code>. Additional annotations will be available in the <code>mcols</code> of this result object.</p>
 <div class="sourceCode" id="cb51"><pre class="downlit">
-<span class="kw">SYP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteins,EnsDb-method.html">proteins</a></span>(<span class="kw">edbx</span>, filter = <span class="op">~</span> <span class="kw">genename</span> <span class="op">==</span> <span class="st">"SYP"</span>,
-                columns = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"protein_id"</span>, <span class="st">"tx_id"</span>,
-                            <span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span>(<span class="kw">edbx</span>, <span class="st">"protein_domain"</span>)),
-                return.type = <span class="st">"AAStringSet"</span>)
+<span class="va">SYP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteins,EnsDb-method.html">proteins</a></span><span class="op">(</span><span class="va">edbx</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">genename</span> <span class="op">==</span> <span class="st">"SYP"</span>,
+                columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"protein_id"</span>, <span class="st">"tx_id"</span>,
+                            <span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span><span class="op">(</span><span class="va">edbx</span>, <span class="st">"protein_domain"</span><span class="op">)</span><span class="op">)</span>,
+                return.type <span class="op">=</span> <span class="st">"AAStringSet"</span><span class="op">)</span>
 
-<span class="kw">SYP</span>
-</pre></div>
+<span class="va">SYP</span></pre></div>
 <pre><code>## AAStringSet object of length 27:
 ##      width seq                                              names               
 ##  [1]   313 MLLLADMDVVNQLVAGGQFRVVK...QGDYGQQGYGPQGAPTSFSNQM ENSP00000263233
@@ -560,17 +526,15 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Each protein sequence of the gene SYP has multiple protein domains annotated to it, thus protein IDs and sequences are redundant in the <code>AAStringSet</code>. We restrict the result below to a single protein.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit">
 <span class="co">## How many proteins are annotated to SYP?</span>
-<span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="fu">mcols</span>(<span class="kw">SYP</span>)<span class="op">$</span><span class="kw">protein_id</span>)
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="fu">mcols</span><span class="op">(</span><span class="va">SYP</span><span class="op">)</span><span class="op">$</span><span class="va">protein_id</span><span class="op">)</span></pre></div>
 <pre><code>## [1] "ENSP00000263233" "ENSP00000418387" "ENSP00000365480" "ENSP00000418169"
 ## [5] "ENSP00000418987" "ENSP00000420774"</code></pre>
 <div class="sourceCode" id="cb55"><pre class="downlit">
 <span class="co">## Reduce the result to a single protein</span>
-<span class="kw">SYP</span> <span class="op">&lt;-</span> <span class="kw">SYP</span>[<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="kw">SYP</span>) <span class="op">==</span> <span class="st">"ENSP00000263233"</span>]
+<span class="va">SYP</span> <span class="op">&lt;-</span> <span class="va">SYP</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">SYP</span><span class="op">)</span> <span class="op">==</span> <span class="st">"ENSP00000263233"</span><span class="op">]</span>
 
 <span class="co">## List the available protein domains and additional annotations</span>
-<span class="fu">mcols</span>(<span class="kw">SYP</span>)
-</pre></div>
+<span class="fu">mcols</span><span class="op">(</span><span class="va">SYP</span><span class="op">)</span></pre></div>
 <pre><code>## DataFrame with 8 rows and 8 columns
 ##                      protein_id           tx_id protein_domain_id
 ##                     &lt;character&gt;     &lt;character&gt;       &lt;character&gt;
@@ -604,18 +568,16 @@ document.addEventListener("DOMContentLoaded", function() {
 ## ENSP00000263233          223         SYP</code></pre>
 <p>Next we create the <code>IRanges</code> object, one range for each protein domain, and perform the mapping of the protein domains to the genome. This time we provide the protein identifiers with one of the metadata columns and pass the name of this column with the <code>id</code> parameter.</p>
 <div class="sourceCode" id="cb57"><pre class="downlit">
-<span class="kw">SYP_rng</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fu">mcols</span>(<span class="kw">SYP</span>)<span class="op">$</span><span class="kw">prot_dom_start</span>,
-                   end = <span class="fu">mcols</span>(<span class="kw">SYP</span>)<span class="op">$</span><span class="kw">prot_dom_end</span>)
-<span class="fu">mcols</span>(<span class="kw">SYP_rng</span>) <span class="op">&lt;-</span> <span class="fu">mcols</span>(<span class="kw">SYP</span>)
+<span class="va">SYP_rng</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu">mcols</span><span class="op">(</span><span class="va">SYP</span><span class="op">)</span><span class="op">$</span><span class="va">prot_dom_start</span>,
+                   end <span class="op">=</span> <span class="fu">mcols</span><span class="op">(</span><span class="va">SYP</span><span class="op">)</span><span class="op">$</span><span class="va">prot_dom_end</span><span class="op">)</span>
+<span class="fu">mcols</span><span class="op">(</span><span class="va">SYP_rng</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">mcols</span><span class="op">(</span><span class="va">SYP</span><span class="op">)</span>
 
 <span class="co">## Map the domains to the genome. We set "id" to the name</span>
 <span class="co">## of the metadata columns containing the protein IDs</span>
-<span class="kw">SYP_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToGenome.html">proteinToGenome</a></span>(<span class="kw">SYP_rng</span>, <span class="kw">edbx</span>, id = <span class="st">"protein_id"</span>)
-</pre></div>
+<span class="va">SYP_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/proteinToGenome.html">proteinToGenome</a></span><span class="op">(</span><span class="va">SYP_rng</span>, <span class="va">edbx</span>, id <span class="op">=</span> <span class="st">"protein_id"</span><span class="op">)</span></pre></div>
 <p>The function mapped each domain to the genome and returned a <code>list</code> with the mapping result for each as a <code>GRanges</code> object. As an example we show the mapping result for the second protein domain (<em>PF01284</em>).</p>
 <div class="sourceCode" id="cb58"><pre class="downlit">
-<span class="kw">SYP_gnm</span>[[<span class="fl">2</span>]]
-</pre></div>
+<span class="va">SYP_gnm</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></pre></div>
 <pre><code>## GRanges object with 1 range and 7 metadata columns:
 ##       seqnames            ranges strand |      protein_id           tx_id
 ##          &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;
@@ -628,39 +590,38 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The protein domain is encoded by a sequence spanning exons 2 to 5 of the transcript ENST00000263233. Note that the gene is encoded on the reverse strand. The individual ranges are ordered by the index of the respective exon within the transcript.</p>
 <p>At last we plot the encoding transcript and all of the mapped protein domains for the protein <em>ENSP00000263233</em> of SYP.</p>
 <div class="sourceCode" id="cb60"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="https://github.com/ivanek/Gviz">Gviz</a></span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ivanek/Gviz">Gviz</a></span><span class="op">)</span>
 
 <span class="co">## Define a genome axis track</span>
-<span class="kw">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html">GenomeAxisTrack</a></span>()
+<span class="va">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co">## Get the transcript ID:</span>
-<span class="kw">txid</span> <span class="op">&lt;-</span> <span class="kw">SYP_gnm</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">tx_id</span>[<span class="fl">1</span>]
+<span class="va">txid</span> <span class="op">&lt;-</span> <span class="va">SYP_gnm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">tx_id</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 
 <span class="co">## Get a GRanges for the transcript</span>
-<span class="kw">trt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span>(<span class="kw">edbx</span>, filter = <span class="fu">TxIdFilter</span>(<span class="kw">txid</span>))
+<span class="va">trt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edbx</span>, filter <span class="op">=</span> <span class="fu">TxIdFilter</span><span class="op">(</span><span class="va">txid</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Define a GRanges for the mapped protein domains and add</span>
 <span class="co">## metadata columns with the grouping of the ranges and the</span>
 <span class="co">## IDs of the corresponding protein domains, so they can be</span>
 <span class="co">## identified in the plot</span>
-<span class="kw">dmns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="fu">GRangesList</span>(<span class="kw">SYP_gnm</span>))
-<span class="kw">dmns</span><span class="op">$</span><span class="kw">grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">SYP_rng</span>), <span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span>(<span class="kw">SYP_gnm</span>))
-<span class="kw">dmns</span><span class="op">$</span><span class="kw">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fu">mcols</span>(<span class="kw">SYP_rng</span>)<span class="op">$</span><span class="kw">protein_domain_id</span>, <span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span>(<span class="kw">SYP_gnm</span>))
+<span class="va">dmns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu">GRangesList</span><span class="op">(</span><span class="va">SYP_gnm</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dmns</span><span class="op">$</span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">SYP_rng</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span><span class="op">(</span><span class="va">SYP_gnm</span><span class="op">)</span><span class="op">)</span>
+<span class="va">dmns</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fu">mcols</span><span class="op">(</span><span class="va">SYP_rng</span><span class="op">)</span><span class="op">$</span><span class="va">protein_domain_id</span>, <span class="fu"><a href="https://rdrr.io/r/base/lengths.html">lengths</a></span><span class="op">(</span><span class="va">SYP_gnm</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Since we're using Ensembl chromosome names we have to set</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(ucscChromosomeNames = <span class="fl">FALSE</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ucscChromosomeNames <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
 <span class="co">## Plotting the transcript and the mapped protein domains.</span>
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">gat</span>,
-                <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span>(<span class="kw">trt</span>, name = <span class="st">"tx"</span>),
-                <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/AnnotationTrack-class.html">AnnotationTrack</a></span>(<span class="kw">dmns</span>, group = <span class="kw">dmns</span><span class="op">$</span><span class="kw">grp</span>,
-                                id = <span class="kw">dmns</span><span class="op">$</span><span class="kw">id</span>,
-                                groupAnnotation = <span class="st">"id"</span>,
-                                just.group = <span class="st">"above"</span>,
-                                shape = <span class="st">"box"</span>,
-                                name = <span class="st">"Protein domains"</span>)),
-           transcriptAnnotation = <span class="st">"transcript"</span>)
-</pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">gat</span>,
+                <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span><span class="op">(</span><span class="va">trt</span>, name <span class="op">=</span> <span class="st">"tx"</span><span class="op">)</span>,
+                <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/AnnotationTrack-class.html">AnnotationTrack</a></span><span class="op">(</span><span class="va">dmns</span>, group <span class="op">=</span> <span class="va">dmns</span><span class="op">$</span><span class="va">grp</span>,
+                                id <span class="op">=</span> <span class="va">dmns</span><span class="op">$</span><span class="va">id</span>,
+                                groupAnnotation <span class="op">=</span> <span class="st">"id"</span>,
+                                just.group <span class="op">=</span> <span class="st">"above"</span>,
+                                shape <span class="op">=</span> <span class="st">"box"</span>,
+                                name <span class="op">=</span> <span class="st">"Protein domains"</span><span class="op">)</span><span class="op">)</span>,
+           transcriptAnnotation <span class="op">=</span> <span class="st">"transcript"</span><span class="op">)</span></pre></div>
 <p><img src="coordinate-mapping_files/figure-html/proteinToGenome-SYP-plot-1.png" width="700"></p>
 </div>
 <div id="mapping-transcript-coordinates-to-genomic-coordinates" class="section level1">
@@ -668,15 +629,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <a href="#mapping-transcript-coordinates-to-genomic-coordinates" class="anchor"></a>Mapping transcript coordinates to genomic coordinates</h1>
 <p>Coordinates within transcript sequences can be mapped to genomic coordinates with the <code>transcriptToGenome</code> function. In the example below we map coordinates within 2 transcript to the genome.</p>
 <div class="sourceCode" id="cb61"><pre class="downlit">
-<span class="kw">rng_tx</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">501</span>, <span class="fl">1</span>), width = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>, <span class="fl">5</span>),
-                  names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ENST00000486554"</span>, <span class="st">"ENST00000381578"</span>))
+<span class="va">rng_tx</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">501</span>, <span class="fl">1</span><span class="op">)</span>, width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>,
+                  names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ENST00000486554"</span>, <span class="st">"ENST00000381578"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="kw">rng_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transcriptToGenome.html">transcriptToGenome</a></span>(<span class="kw">rng_tx</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="va">rng_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transcriptToGenome.html">transcriptToGenome</a></span><span class="op">(</span><span class="va">rng_tx</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <p>The function returns a <code>GRangesList</code> with the <code>GRanges</code> in each element containing the genomic coordinates to which the positions could be mapped (or an empty <code>GRanges</code> if the transcript identifier can not be found in the database or the input range is not within the transcript’s sequence). The length of each <code>GRanges</code> depends on the number of exons the region in the transcript spans.</p>
 <div class="sourceCode" id="cb62"><pre class="downlit">
-<span class="kw">rng_gnm</span>
-</pre></div>
+<span class="va">rng_gnm</span></pre></div>
 <pre><code>## GRangesList object of length 2:
 ## $ENST00000486554
 ## GRanges object with 2 ranges and 5 metadata columns:
@@ -705,14 +664,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Next we map variants in the gene PKP2 to the corresponding genomic coordinates. The variants are <em>PKP2 c.1643DelG</em> and <em>c.1881DelC</em> and the positions we are looking for are thus nucleotides 1643 and 1881 within the <strong>CDS</strong> of the gene/transcript. Looking up the available transcripts for this gene we identified <em>ENST00000070846</em> as the representative transcript for the gene. Since the positions are not relative to the transcription start site we can not use the <code>transcriptToGenome</code> function for the mapping, but we have to map the cds-relative positions first to transcript-relative coordinates. We do this below using the <code>cdsToTranscript</code> function.</p>
 <div class="sourceCode" id="cb64"><pre class="downlit">
 <span class="co">## Define the position within the CDS of the transcript</span>
-<span class="kw">pkp2_cds</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1643</span>, <span class="fl">1881</span>), width = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">1</span>),
-                    name = <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"ENST00000070846"</span>, <span class="fl">2</span>))
+<span class="va">pkp2_cds</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1643</span>, <span class="fl">1881</span><span class="op">)</span>, width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,
+                    name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="st">"ENST00000070846"</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Convert cds-relative to transcript-relative coordinates</span>
-<span class="kw">pkp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cdsToTranscript.html">cdsToTranscript</a></span>(<span class="kw">pkp2_cds</span>, <span class="kw">EnsDb.Hsapiens.v86</span>)
+<span class="va">pkp2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cdsToTranscript.html">cdsToTranscript</a></span><span class="op">(</span><span class="va">pkp2_cds</span>, <span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 
-<span class="kw">pkp2</span>
-</pre></div>
+<span class="va">pkp2</span></pre></div>
 <pre><code>## IRanges object with 2 ranges and 2 metadata columns:
 ##                       start       end     width | cds_start   cds_end
 ##                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;integer&gt; &lt;integer&gt;
@@ -720,10 +678,9 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   ENST00000070846      1906      1906         1 |      1881      1881</code></pre>
 <p>With the coordinates being now relative to the first nucleotide of the transcript we can use the <code>transcriptToGenome</code> function for the final mapping of the position to the genome.</p>
 <div class="sourceCode" id="cb66"><pre class="downlit">
-<span class="kw">pkp2_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transcriptToGenome.html">transcriptToGenome</a></span>(<span class="kw">pkp2</span>, <span class="kw">EnsDb.Hsapiens.v86</span>)
+<span class="va">pkp2_gnm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transcriptToGenome.html">transcriptToGenome</a></span><span class="op">(</span><span class="va">pkp2</span>, <span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 
-<span class="kw">pkp2_gnm</span>
-</pre></div>
+<span class="va">pkp2_gnm</span></pre></div>
 <pre><code>## GRangesList object of length 2:
 ## $ENST00000070846
 ## GRanges object with 1 range and 5 metadata columns:
@@ -748,8 +705,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
 <p>To verify that the nucleotides at the positions are indeed <em>G</em> and <em>C</em> as stated in the definition of the variant (<em>c.1643DelG</em> and <em>c.1881DelC</em>) we extract below the nucleotide at the identified genomic position. We thus load the package providing the genome sequence for GRCh38 on which Ensembl release 86 is based.</p>
 <div class="sourceCode" id="cb68"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">BSgenome.Hsapiens.NCBI.GRCh38</span>)
-</pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">BSgenome.Hsapiens.NCBI.GRCh38</span><span class="op">)</span></pre></div>
 <pre><code>## Loading required package: BSgenome</code></pre>
 <pre><code>## Loading required package: Biostrings</code></pre>
 <pre><code>## Loading required package: XVector</code></pre>
@@ -760,8 +716,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##     strsplit</code></pre>
 <pre><code>## Loading required package: rtracklayer</code></pre>
 <div class="sourceCode" id="cb75"><pre class="downlit">
-<span class="fu">getSeq</span>(<span class="kw">BSgenome.Hsapiens.NCBI.GRCh38</span>, <span class="kw">pkp2_gnm</span>)
-</pre></div>
+<span class="fu">getSeq</span><span class="op">(</span><span class="va">BSgenome.Hsapiens.NCBI.GRCh38</span>, <span class="va">pkp2_gnm</span><span class="op">)</span></pre></div>
 <pre><code>## DNAStringSetList of length 2
 ## [["ENST00000070846"]] G
 ## [["ENST00000070846"]] C</code></pre>
@@ -772,11 +727,10 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The <code>transcriptToProtein</code> function can be used to map coordinates within a transcript to the corresponding coordinates within the encoded protein. Note that only regions within protein coding transcripts can be mapped and that coordinates within the transcript are assumed to be relative to the first nucleotide of the transcript (not of the CDS).</p>
 <p>Below we define regions within several transcripts and map these to the corresponding amino acid residues in the protein.</p>
 <div class="sourceCode" id="cb77"><pre class="downlit">
-<span class="kw">rng_tx</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span>(start = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">501</span>, <span class="fl">1</span>, <span class="fl">200</span>), width = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">4</span>),
-                  names = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"ENST00000486554"</span>, <span class="st">"ENST00000381578"</span>,
-                            <span class="st">"ENST00000431238"</span>))
-<span class="kw">rng_prt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transcriptToProtein.html">transcriptToProtein</a></span>(<span class="kw">rng_tx</span>, <span class="kw">edbx</span>)
-</pre></div>
+<span class="va">rng_tx</span> <span class="op">&lt;-</span> <span class="fu">IRanges</span><span class="op">(</span>start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">501</span>, <span class="fl">1</span>, <span class="fl">200</span><span class="op">)</span>, width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span>, <span class="fl">4</span><span class="op">)</span>,
+                  names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"ENST00000486554"</span>, <span class="st">"ENST00000381578"</span>,
+                            <span class="st">"ENST00000431238"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">rng_prt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/transcriptToProtein.html">transcriptToProtein</a></span><span class="op">(</span><span class="va">rng_tx</span>, <span class="va">edbx</span><span class="op">)</span></pre></div>
 <pre><code>## Warning: Transcript(s) 'ENST00000431238' do/does not encode a protein</code></pre>
 <pre><code>## Warning: Provided coordinates for 'ENST00000381578' are not within the coding
 ## region</code></pre>
@@ -785,8 +739,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## correct</code></pre>
 <p>The mapping did throw several warnings. The region within transcript <em>ENST00000431238</em> can not be mapped to protein coordinates, because the transcript does not encode a protein. Transcript <em>ENST00000381578</em> encodes a protein, but the specified nucleotides 1 to 5 are located in the 5’ UTR of the transcript and can therefore also not be mapped. Finally, the CDS of the transcript <em>ENST00000486554</em> is not complete and, while the coordinates were mapped to protein residues, they might not be correct.</p>
 <div class="sourceCode" id="cb81"><pre class="downlit">
-<span class="kw">rng_prt</span>
-</pre></div>
+<span class="va">rng_prt</span></pre></div>
 <pre><code>## IRanges object with 3 ranges and 4 metadata columns:
 ##                       start       end     width |           tx_id  tx_start
 ##                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt;
@@ -804,14 +757,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h1>
 <div class="sourceCode" id="cb83"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()
-</pre></div>
-<pre><code>## R version 4.0.2 Patched (2020-09-10 r79182)
+<span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></pre></div>
+<pre><code>## R version 4.0.3 Patched (2020-10-21 r79360)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Ubuntu 20.04.1 LTS
 ## 
 ## Matrix products: default
-## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-openmp/libopenblasp-r0.3.8.so
+## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
 ## 
 ## locale:
 ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -827,13 +779,13 @@ document.addEventListener("DOMContentLoaded", function() {
 ## 
 ## other attached packages:
 ##  [1] BSgenome.Hsapiens.NCBI.GRCh38_1.3.1000
-##  [2] BSgenome_1.57.6                       
+##  [2] BSgenome_1.57.7                       
 ##  [3] rtracklayer_1.49.5                    
 ##  [4] Biostrings_2.57.2                     
 ##  [5] XVector_0.29.3                        
 ##  [6] Gviz_1.33.2                           
 ##  [7] EnsDb.Hsapiens.v86_2.99.0             
-##  [8] ensembldb_2.13.1                      
+##  [8] ensembldb_2.15.0                      
 ##  [9] AnnotationFilter_1.13.0               
 ## [10] GenomicFeatures_1.41.3                
 ## [11] AnnotationDbi_1.51.3                  
@@ -841,60 +793,61 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [13] GenomicRanges_1.41.6                  
 ## [14] GenomeInfoDb_1.25.11                  
 ## [15] IRanges_2.23.10                       
-## [16] S4Vectors_0.27.12                     
+## [16] S4Vectors_0.27.14                     
 ## [17] BiocGenerics_0.35.4                   
-## [18] BiocStyle_2.17.0                      
+## [18] BiocStyle_2.17.2                      
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] ProtGenerics_1.21.0         bitops_1.0-6               
-##  [3] matrixStats_0.56.0          fs_1.5.0                   
-##  [5] bit64_4.0.5                 RColorBrewer_1.1-2         
-##  [7] progress_1.2.2              httr_1.4.2                 
-##  [9] rprojroot_1.3-2             tools_4.0.2                
-## [11] backports_1.1.10            R6_2.4.1                   
-## [13] rpart_4.1-15                Hmisc_4.4-1                
-## [15] DBI_1.1.0                   lazyeval_0.2.2             
-## [17] colorspace_1.4-1            nnet_7.3-14                
-## [19] gridExtra_2.3               tidyselect_1.1.0           
-## [21] prettyunits_1.1.1           bit_4.0.4                  
-## [23] curl_4.3                    compiler_4.0.2             
-## [25] htmlTable_2.1.0             desc_1.2.0                 
-## [27] DelayedArray_0.15.7         bookdown_0.20              
-## [29] checkmate_2.0.0             scales_1.1.1               
-## [31] askpass_1.1                 rappdirs_0.3.1             
-## [33] pkgdown_1.6.1.9000          systemfonts_0.3.1          
-## [35] stringr_1.4.0               digest_0.6.25              
-## [37] Rsamtools_2.5.3             foreign_0.8-80             
-## [39] rmarkdown_2.3               dichromat_2.0-0            
-## [41] base64enc_0.1-3             jpeg_0.1-8.1               
-## [43] pkgconfig_2.0.3             htmltools_0.5.0            
-## [45] dbplyr_1.4.4                htmlwidgets_1.5.1          
-## [47] rlang_0.4.7                 rstudioapi_0.11            
-## [49] RSQLite_2.2.0               generics_0.0.2             
-## [51] BiocParallel_1.23.2         dplyr_1.0.2                
-## [53] VariantAnnotation_1.35.3    RCurl_1.98-1.2             
-## [55] magrittr_1.5                Formula_1.2-3              
-## [57] GenomeInfoDbData_1.2.3      Matrix_1.2-18              
-## [59] Rcpp_1.0.5                  munsell_0.5.0              
-## [61] lifecycle_0.2.0             stringi_1.5.3              
-## [63] yaml_2.2.1                  SummarizedExperiment_1.19.6
-## [65] zlibbioc_1.35.0             BiocFileCache_1.13.1       
-## [67] blob_1.2.1                  crayon_1.3.4               
-## [69] lattice_0.20-41             splines_4.0.2              
-## [71] hms_0.5.3                   knitr_1.29                 
-## [73] pillar_1.4.6                biomaRt_2.45.2             
-## [75] XML_3.99-0.5                glue_1.4.2                 
-## [77] evaluate_0.14               biovizBase_1.37.0          
-## [79] latticeExtra_0.6-29         data.table_1.13.0          
-## [81] BiocManager_1.30.10         vctrs_0.3.4                
-## [83] png_0.1-7                   gtable_0.3.0               
-## [85] openssl_1.4.2               purrr_0.3.4                
-## [87] assertthat_0.2.1            ggplot2_3.3.2              
-## [89] cpp11_0.2.1                 xfun_0.17                  
-## [91] ragg_0.3.1                  survival_3.2-3             
-## [93] tibble_3.0.3                GenomicAlignments_1.25.3   
-## [95] memoise_1.1.0               cluster_2.1.0              
-## [97] ellipsis_0.3.1</code></pre>
+##  [1] colorspace_1.4-1            ellipsis_0.3.1             
+##  [3] rprojroot_1.3-2             biovizBase_1.37.0          
+##  [5] htmlTable_2.1.0             base64enc_0.1-3            
+##  [7] fs_1.5.0                    dichromat_2.0-0            
+##  [9] rstudioapi_0.11             bit64_4.0.5                
+## [11] xml2_1.3.2                  splines_4.0.3              
+## [13] knitr_1.30                  Formula_1.2-3              
+## [15] Rsamtools_2.5.3             cluster_2.1.0              
+## [17] dbplyr_1.4.4                png_0.1-7                  
+## [19] BiocManager_1.30.10         compiler_4.0.3             
+## [21] httr_1.4.2                  backports_1.1.10           
+## [23] assertthat_0.2.1            Matrix_1.2-18              
+## [25] lazyeval_0.2.2              htmltools_0.5.0            
+## [27] prettyunits_1.1.1           tools_4.0.3                
+## [29] gtable_0.3.0                glue_1.4.2                 
+## [31] GenomeInfoDbData_1.2.4      dplyr_1.0.2                
+## [33] rappdirs_0.3.1              Rcpp_1.0.5                 
+## [35] pkgdown_1.6.1.9000          vctrs_0.3.4                
+## [37] xfun_0.18                   stringr_1.4.0              
+## [39] lifecycle_0.2.0             XML_3.99-0.5               
+## [41] zlibbioc_1.35.0             scales_1.1.1               
+## [43] VariantAnnotation_1.35.4    ragg_0.4.0                 
+## [45] hms_0.5.3                   MatrixGenerics_1.1.8       
+## [47] ProtGenerics_1.21.0         SummarizedExperiment_1.19.9
+## [49] RColorBrewer_1.1-2          yaml_2.2.1                 
+## [51] curl_4.3                    memoise_1.1.0              
+## [53] gridExtra_2.3               ggplot2_3.3.2              
+## [55] biomaRt_2.45.9              rpart_4.1-15               
+## [57] latticeExtra_0.6-29         stringi_1.5.3              
+## [59] RSQLite_2.2.1               desc_1.2.0                 
+## [61] checkmate_2.0.0             BiocParallel_1.23.3        
+## [63] rlang_0.4.8                 pkgconfig_2.0.3            
+## [65] systemfonts_0.3.2           matrixStats_0.57.0         
+## [67] bitops_1.0-6                evaluate_0.14              
+## [69] lattice_0.20-41             purrr_0.3.4                
+## [71] GenomicAlignments_1.25.3    htmlwidgets_1.5.2          
+## [73] bit_4.0.4                   tidyselect_1.1.0           
+## [75] magrittr_1.5                bookdown_0.20              
+## [77] R6_2.4.1                    generics_0.0.2             
+## [79] Hmisc_4.4-1                 DelayedArray_0.15.17       
+## [81] DBI_1.1.0                   pillar_1.4.6               
+## [83] foreign_0.8-80              survival_3.2-7             
+## [85] RCurl_1.98-1.2              nnet_7.3-14                
+## [87] tibble_3.0.4                crayon_1.3.4               
+## [89] BiocFileCache_1.13.1        rmarkdown_2.4              
+## [91] jpeg_0.1-8.1                progress_1.2.2             
+## [93] data.table_1.13.0           blob_1.2.1                 
+## [95] digest_0.6.25               textshaping_0.1.2          
+## [97] openssl_1.4.3               munsell_0.5.0              
+## [99] askpass_1.1</code></pre>
 </div>
   </div>
 

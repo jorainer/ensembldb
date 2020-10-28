@@ -84,19 +84,13 @@ EnsDb object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.13.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/ensembldb.html">Get started</a>
 </li>
 <li>
@@ -165,28 +159,28 @@ names of all filters and the corresponding field supported by the
 <code>EnsDb</code> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>OnlyCodingTxFilter</span>()
+    <pre class="usage"><span class='fu'>OnlyCodingTxFilter</span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='fu'>ProtDomIdFilter</span>(<span class='kw'>value</span>, condition = <span class='st'>"=="</span>)
+<span class='fu'>ProtDomIdFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
-<span class='fu'>ProteinDomainIdFilter</span>(<span class='kw'>value</span>, condition = <span class='st'>"=="</span>)
+<span class='fu'>ProteinDomainIdFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
-<span class='fu'>ProteinDomainSourceFilter</span>(<span class='kw'>value</span>, condition = <span class='st'>"=="</span>)
+<span class='fu'>ProteinDomainSourceFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
-<span class='fu'>UniprotDbFilter</span>(<span class='kw'>value</span>, condition = <span class='st'>"=="</span>)
+<span class='fu'>UniprotDbFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
-<span class='fu'>UniprotMappingTypeFilter</span>(<span class='kw'>value</span>, condition = <span class='st'>"=="</span>)
+<span class='fu'>UniprotMappingTypeFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
-<span class='fu'>TxSupportLevelFilter</span>(<span class='kw'>value</span>, condition = <span class='st'>"=="</span>)
-
-<span class='co'># S4 method for GRangesFilter</span>
-<span class='fu'>seqnames</span>(<span class='kw'>x</span>)
+<span class='fu'>TxSupportLevelFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
 <span class='co'># S4 method for GRangesFilter</span>
-<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span>(<span class='kw'>x</span>)
+<span class='fu'>seqnames</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+
+<span class='co'># S4 method for GRangesFilter</span>
+<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>supportedFilters</span>(<span class='kw'>object</span>, <span class='kw'>...</span>)</pre>
+<span class='fu'>supportedFilters</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -342,14 +336,14 @@ filter objects.</p>
     <pre class="examples"><div class='input'>
 <span class='co'>## Create a filter that could be used to retrieve all informations for</span>
 <span class='co'>## the respective gene.</span>
-<span class='kw'>gif</span> <span class='op'>&lt;-</span> <span class='fu'>GeneIdFilter</span>(<span class='st'>"ENSG00000012817"</span>)
-<span class='kw'>gif</span>
+<span class='va'>gif</span> <span class='op'>&lt;-</span> <span class='fu'>GeneIdFilter</span><span class='op'>(</span><span class='st'>"ENSG00000012817"</span><span class='op'>)</span>
+<span class='va'>gif</span>
 </div><div class='output co'>#&gt; class: GeneIdFilter 
 #&gt; condition: == 
 #&gt; value: ENSG00000012817 </div><div class='input'>
 <span class='co'>## Create a filter for a chromosomal end position of a gene</span>
-<span class='kw'>sef</span> <span class='op'>&lt;-</span> <span class='fu'>GeneEndFilter</span>(<span class='fl'>10000</span>, condition = <span class='st'>"&gt;"</span>)
-<span class='kw'>sef</span>
+<span class='va'>sef</span> <span class='op'>&lt;-</span> <span class='fu'>GeneEndFilter</span><span class='op'>(</span><span class='fl'>10000</span>, condition <span class='op'>=</span> <span class='st'>"&gt;"</span><span class='op'>)</span>
+<span class='va'>sef</span>
 </div><div class='output co'>#&gt; class: GeneEndFilter 
 #&gt; condition: &gt; 
 #&gt; value: 10000 </div><div class='input'>
@@ -358,11 +352,11 @@ filter objects.</p>
 
 <span class='co'>## Example for GRangesFilter:</span>
 <span class='co'>## retrieve all genes overlapping the specified region</span>
-<span class='kw'>grf</span> <span class='op'>&lt;-</span> <span class='fu'>GRangesFilter</span>(<span class='fu'>GRanges</span>(<span class='st'>"11"</span>, ranges = <span class='fu'>IRanges</span>(<span class='fl'>114129278</span>, <span class='fl'>114129328</span>),
-                             strand = <span class='st'>"+"</span>), type = <span class='st'>"any"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='kw'>EnsDb.Hsapiens.v86</span>)
-<span class='kw'>edb</span> <span class='op'>&lt;-</span> <span class='kw'>EnsDb.Hsapiens.v86</span>
-<span class='fu'><a href='exonsBy.html'>genes</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>grf</span>)
+<span class='va'>grf</span> <span class='op'>&lt;-</span> <span class='fu'>GRangesFilter</span><span class='op'>(</span><span class='fu'>GRanges</span><span class='op'>(</span><span class='st'>"11"</span>, ranges <span class='op'>=</span> <span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>114129278</span>, <span class='fl'>114129328</span><span class='op'>)</span>,
+                             strand <span class='op'>=</span> <span class='st'>"+"</span><span class='op'>)</span>, type <span class='op'>=</span> <span class='st'>"any"</span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
+<span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span>
+<span class='fu'><a href='exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 1 range and 6 metadata columns:
 #&gt;                   seqnames              ranges strand |         gene_id
 #&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -376,7 +370,7 @@ filter objects.</p>
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Get also all transcripts overlapping that region.</span>
-<span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>grf</span>)
+<span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 4 ranges and 6 metadata columns:
 #&gt;                   seqnames              ranges strand |           tx_id
 #&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -399,25 +393,25 @@ filter objects.</p>
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Retrieve all transcripts for the above gene</span>
-<span class='kw'>gn</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>genes</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>grf</span>)
-<span class='kw'>txs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneNameFilter</span>(<span class='kw'>gn</span><span class='op'>$</span><span class='kw'>gene_name</span>))
+<span class='va'>gn</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
+<span class='va'>txs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='va'>gn</span><span class='op'>$</span><span class='va'>gene_name</span><span class='op'>)</span><span class='op'>)</span>
 <span class='co'>## Next we simply plot their start and end coordinates.</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span>(<span class='fl'>3</span>, <span class='fl'>3</span>, pch=<span class='fl'>NA</span>, xlim=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span>(<span class='kw'>gn</span>), <span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span>(<span class='kw'>gn</span>)), ylim=<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>txs</span>)),
-yaxt=<span class='st'>"n"</span>, ylab=<span class='st'>""</span>)
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, pch<span class='op'>=</span><span class='cn'>NA</span>, xlim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>gn</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>gn</span><span class='op'>)</span><span class='op'>)</span>, ylim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span><span class='op'>)</span>,
+yaxt<span class='op'>=</span><span class='st'>"n"</span>, ylab<span class='op'>=</span><span class='st'>""</span><span class='op'>)</span>
 </div><div class='input'><span class='co'>## Highlight the GRangesFilter region</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span>(xleft=<span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span>(<span class='kw'>grf</span>), xright=<span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span>(<span class='kw'>grf</span>), ybottom=<span class='fl'>0</span>, ytop=<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>txs</span>),
-col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
-</div><div class='input'><span class='co'>for</span>(<span class='kw'>i</span> <span class='co'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='kw'>txs</span>)){
-    <span class='kw'>current</span> <span class='op'>&lt;-</span> <span class='kw'>txs</span>[<span class='kw'>i</span>]
-    <span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span>(xleft=<span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span>(<span class='kw'>current</span>), xright=<span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span>(<span class='kw'>current</span>), ybottom=<span class='kw'>i</span><span class='op'>-</span><span class='fl'>0.975</span>, ytop=<span class='kw'>i</span><span class='op'>-</span><span class='fl'>0.125</span>, border=<span class='st'>"grey"</span>)
-    <span class='fu'><a href='https://rdrr.io/r/graphics/text.html'>text</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span>(<span class='kw'>current</span>), y=<span class='kw'>i</span><span class='op'>-</span><span class='fl'>0.5</span>,pos=<span class='fl'>4</span>, cex=<span class='fl'>0.75</span>, labels=<span class='kw'>current</span><span class='op'>$</span><span class='kw'>tx_id</span>)
-}
+<span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span><span class='op'>(</span>xleft<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>grf</span><span class='op'>)</span>, xright<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>grf</span><span class='op'>)</span>, ybottom<span class='op'>=</span><span class='fl'>0</span>, ytop<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span>,
+col<span class='op'>=</span><span class='st'>"red"</span>, border<span class='op'>=</span><span class='st'>"red"</span><span class='op'>)</span>
+</div><div class='input'><span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='va'>current</span> <span class='op'>&lt;-</span> <span class='va'>txs</span><span class='op'>[</span><span class='va'>i</span><span class='op'>]</span>
+    <span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span><span class='op'>(</span>xleft<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, xright<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, ybottom<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.975</span>, ytop<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.125</span>, border<span class='op'>=</span><span class='st'>"grey"</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/graphics/text.html'>text</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, y<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.5</span>,pos<span class='op'>=</span><span class='fl'>4</span>, cex<span class='op'>=</span><span class='fl'>0.75</span>, labels<span class='op'>=</span><span class='va'>current</span><span class='op'>$</span><span class='va'>tx_id</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div><div class='img'><img src='Filter-classes-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'>## Thus, we can see that only 4 transcripts of that gene are indeed</span>
 <span class='co'>## overlapping the region.</span>
 
 
 <span class='co'>## No exon is overlapping that region, thus we're not getting anything</span>
-<span class='fu'><a href='exonsBy.html'>exons</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>grf</span>)
+<span class='fu'><a href='exonsBy.html'>exons</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 0 ranges and 1 metadata column:
 #&gt;    seqnames    ranges strand |     exon_id
 #&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
@@ -427,9 +421,9 @@ col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
 <span class='co'>## Example for ExonRankFilter</span>
 <span class='co'>## Extract all exons 1 and (if present) 2 for all genes encoded on the</span>
 <span class='co'>## Y chromosome</span>
-<span class='fu'><a href='exonsBy.html'>exons</a></span>(<span class='kw'>edb</span>, columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"tx_id"</span>, <span class='st'>"exon_idx"</span>),
-      filter=<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'>SeqNameFilter</span>(<span class='st'>"Y"</span>),
-                  <span class='fu'>ExonRankFilter</span>(<span class='fl'>3</span>, condition = <span class='st'>"&lt;"</span>)))
+<span class='fu'><a href='exonsBy.html'>exons</a></span><span class='op'>(</span><span class='va'>edb</span>, columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"tx_id"</span>, <span class='st'>"exon_idx"</span><span class='op'>)</span>,
+      filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"Y"</span><span class='op'>)</span>,
+                  <span class='fu'>ExonRankFilter</span><span class='op'>(</span><span class='fl'>3</span>, condition <span class='op'>=</span> <span class='st'>"&lt;"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 1294 ranges and 3 metadata columns:
 #&gt;                   seqnames            ranges strand |           tx_id  exon_idx
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt; &lt;integer&gt;
@@ -461,7 +455,7 @@ col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 
 <span class='co'>## Get all transcripts for the gene SKA2</span>
-<span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='fu'>GeneNameFilter</span>(<span class='st'>"SKA2"</span>))
+<span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='st'>"SKA2"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 10 ranges and 7 metadata columns:
 #&gt;                   seqnames            ranges strand |           tx_id
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -502,7 +496,7 @@ col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## Which is the same as using a SymbolFilter</span>
-<span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='fu'>SymbolFilter</span>(<span class='st'>"SKA2"</span>))
+<span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>SymbolFilter</span><span class='op'>(</span><span class='st'>"SKA2"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 10 ranges and 7 metadata columns:
 #&gt;                   seqnames            ranges strand |           tx_id
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -544,16 +538,16 @@ col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 
 <span class='co'>## Create a ProteinIdFilter:</span>
-<span class='kw'>pf</span> <span class='op'>&lt;-</span> <span class='fu'>ProteinIdFilter</span>(<span class='st'>"ENSP00000362111"</span>)
-<span class='kw'>pf</span>
+<span class='va'>pf</span> <span class='op'>&lt;-</span> <span class='fu'>ProteinIdFilter</span><span class='op'>(</span><span class='st'>"ENSP00000362111"</span><span class='op'>)</span>
+<span class='va'>pf</span>
 </div><div class='output co'>#&gt; class: ProteinIdFilter 
 #&gt; condition: == 
 #&gt; value: ENSP00000362111 </div><div class='input'><span class='co'>## Using this filter would retrieve all database entries that are associated</span>
 <span class='co'>## with a protein with the ID "ENSP00000362111"</span>
-<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>)) {
-    <span class='kw'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>genes</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>pf</span>)
-    <span class='kw'>res</span>
-}
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>pf</span><span class='op'>)</span>
+    <span class='va'>res</span>
+<span class='op'>}</span>
 </div><div class='output co'>#&gt; GRanges object with 1 range and 7 metadata columns:
 #&gt;                   seqnames              ranges strand |         gene_id
 #&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -567,14 +561,14 @@ col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## UniprotFilter:</span>
-<span class='kw'>uf</span> <span class='op'>&lt;-</span> <span class='fu'>UniprotFilter</span>(<span class='st'>"O60762"</span>)
+<span class='va'>uf</span> <span class='op'>&lt;-</span> <span class='fu'>UniprotFilter</span><span class='op'>(</span><span class='st'>"O60762"</span><span class='op'>)</span>
 <span class='co'>## Get the transcripts encoding that protein:</span>
-<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>)) {
-    <span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>uf</span>)
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>uf</span><span class='op'>)</span>
     <span class='co'>## The mapping Ensembl protein ID to Uniprot ID can however be 1:n:</span>
-    <span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='fu'>TxIdFilter</span>(<span class='st'>"ENST00000371588"</span>),
-        columns = <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"protein_id"</span>, <span class='st'>"uniprot_id"</span>))
-}
+    <span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>TxIdFilter</span><span class='op'>(</span><span class='st'>"ENST00000371588"</span><span class='op'>)</span>,
+        columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"protein_id"</span>, <span class='st'>"uniprot_id"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div><div class='output co'>#&gt; GRanges object with 2 ranges and 3 metadata columns:
 #&gt;                   seqnames            ranges strand |      protein_id
 #&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -587,11 +581,11 @@ col=<span class='st'>"red"</span>, border=<span class='st'>"red"</span>)
 #&gt;   -------
 #&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
 <span class='co'>## ProtDomIdFilter:</span>
-<span class='kw'>pdf</span> <span class='op'>&lt;-</span> <span class='fu'>ProtDomIdFilter</span>(<span class='st'>"PF00335"</span>)
+<span class='va'>pdf</span> <span class='op'>&lt;-</span> <span class='fu'>ProtDomIdFilter</span><span class='op'>(</span><span class='st'>"PF00335"</span><span class='op'>)</span>
 <span class='co'>## Also here we could get all transcripts related to that protein domain</span>
-<span class='co'>if</span> (<span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span>(<span class='kw'>edb</span>)) {
-    <span class='fu'><a href='exonsBy.html'>transcripts</a></span>(<span class='kw'>edb</span>, filter = <span class='kw'>pdf</span>, columns = <span class='st'>"protein_id"</span>)
-}
+<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData,EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'><a href='exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>pdf</span>, columns <span class='op'>=</span> <span class='st'>"protein_id"</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div><div class='output co'>#&gt; GRanges object with 165 ranges and 3 metadata columns:
 #&gt;                   seqnames              ranges strand |      protein_id
 #&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
