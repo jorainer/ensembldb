@@ -378,7 +378,7 @@ jobs:
 
       - name: Set BiocVersion
         run: |
-          BiocManager::install(version = Sys.getenv('BIOCVERSIONNUM'), ask = FALSE)
+          BiocManager::install(version = sub("RELEASE_", "", sub("_", ".", Sys.getenv('BIOCVERSIONNUM'))), ask = FALSE)
         shell: Rscript {0}
 
       - name: Install dependencies
