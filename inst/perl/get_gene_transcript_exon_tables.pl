@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.6: * Add column canonical_transcript to gene table.
 ## version 0.3.5: * Add column gc_content to transcript table.
 ## version 0.3.4: * Add columns gene_id_version and tx_id_version to the gene
 ##                  and transcript tables.
@@ -33,7 +34,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.5";
+my $script_version = "0.3.6";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
@@ -133,7 +134,7 @@ print $infostring;
 
 ## preparing output files:
 open(GENE , ">ens_gene.txt");
-print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\tdescription\tgene_id_version\n";
+print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\tdescription\tgene_id_version\tcanonical_transcript\n";
 
 open(TRANSCRIPT , ">ens_tx.txt");
 print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\tgc_content\n";
@@ -233,12 +234,17 @@ foreach my $gene_id (@gene_ids){
     if(!defined($description)){
       $description = "NULL";
     }
+    my $can_tx = $gene->canonical_transcript();
+    my $canonical_transcript = "";
+    if (defined($can_tx)) {
+      $canonical_transcript = $can_tx->stable_id;
+    }
     ## get entrezgene ID, if any...
     my $all_entries = $gene->get_all_DBLinks("EntrezGene");
     foreach my $dbe (@{$all_entries}){
       print ENTREZGENE "$gene_id\t".$dbe->primary_id."\n";
     }
-    print GENE "$gene_id\t$gene_external_name\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\t$description\t$gene_id_version\n";
+    print GENE "$gene_id\t$gene_external_name\t$gene_biotype\t$gene_seq_start\t$gene_seq_end\t$chrom\t$strand\t$coord_system\t$description\t$gene_id_version\t$canonical_transcript\n";
 
     ## process transcript(s)
     my @transcripts = @{ $gene->get_all_Transcripts };
