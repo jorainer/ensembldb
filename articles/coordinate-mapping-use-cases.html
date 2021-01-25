@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.2</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/jorainer/ensembldb/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -82,7 +82,7 @@
 
       
 
-      </header><script src="coordinate-mapping-use-cases_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="coordinate-mapping-use-cases_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Use cases for coordinate mapping with ensembldb</h1>
@@ -360,7 +360,7 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 <a href="#session-information" class="anchor"></a>Session information</h1>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R Under development (unstable) (2020-11-05 r79401)
+<pre><code>## R Under development (unstable) (2021-01-21 r79854)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Ubuntu 20.04.1 LTS
 ## 
@@ -380,90 +380,91 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 ##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.35.0               EnsDb.Hsapiens.v86_2.99.0
-##  [3] ensembldb_2.15.1          AnnotationFilter_1.15.0  
-##  [5] GenomicFeatures_1.43.2    AnnotationDbi_1.53.0     
-##  [7] Biobase_2.51.0            GenomicRanges_1.43.0     
-##  [9] GenomeInfoDb_1.27.0       IRanges_2.25.2           
-## [11] S4Vectors_0.29.3          BiocGenerics_0.37.0      
-## [13] BiocStyle_2.19.0         
+##  [1] Gviz_1.35.4               EnsDb.Hsapiens.v86_2.99.0
+##  [3] ensembldb_2.15.2          AnnotationFilter_1.15.0  
+##  [5] GenomicFeatures_1.43.3    AnnotationDbi_1.53.0     
+##  [7] Biobase_2.51.0            GenomicRanges_1.43.3     
+##  [9] GenomeInfoDb_1.27.5       IRanges_2.25.6           
+## [11] S4Vectors_0.29.6          BiocGenerics_0.37.0      
+## [13] BiocStyle_2.19.1         
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] colorspace_2.0-0            ellipsis_0.3.1             
-##   [3] rprojroot_1.3-2             biovizBase_1.39.0          
-##   [5] htmlTable_2.1.0             XVector_0.31.0             
-##   [7] base64enc_0.1-3             fs_1.5.0                   
-##   [9] dichromat_2.0-0             rstudioapi_0.13            
-##  [11] bit64_4.0.5                 xml2_1.3.2                 
-##  [13] splines_4.1.0               knitr_1.30                 
-##  [15] Formula_1.2-4               Rsamtools_2.7.0            
-##  [17] cluster_2.1.0               dbplyr_2.0.0               
-##  [19] png_0.1-7                   BiocManager_1.30.10        
-##  [21] compiler_4.1.0              httr_1.4.2                 
-##  [23] backports_1.2.0             assertthat_0.2.1           
-##  [25] Matrix_1.2-18               lazyeval_0.2.2             
-##  [27] htmltools_0.5.0             prettyunits_1.1.1          
-##  [29] tools_4.1.0                 gtable_0.3.0               
-##  [31] glue_1.4.2                  GenomeInfoDbData_1.2.4     
-##  [33] dplyr_1.0.2                 rappdirs_0.3.1             
-##  [35] Rcpp_1.0.5                  pkgdown_1.6.1.9000         
-##  [37] vctrs_0.3.4                 Biostrings_2.59.0          
-##  [39] rtracklayer_1.51.0          xfun_0.19                  
-##  [41] stringr_1.4.0               lifecycle_0.2.0            
-##  [43] XML_3.99-0.5                zlibbioc_1.37.0            
-##  [45] scales_1.1.1                BSgenome_1.59.0            
-##  [47] VariantAnnotation_1.37.0    ragg_0.4.0                 
-##  [49] hms_0.5.3                   MatrixGenerics_1.3.0       
-##  [51] ProtGenerics_1.23.1         SummarizedExperiment_1.21.0
-##  [53] RColorBrewer_1.1-2          yaml_2.2.1                 
-##  [55] curl_4.3                    memoise_1.1.0              
-##  [57] gridExtra_2.3               ggplot2_3.3.2              
-##  [59] biomaRt_2.47.1              rpart_4.1-15               
-##  [61] latticeExtra_0.6-29         stringi_1.5.3              
-##  [63] RSQLite_2.2.1               highr_0.8                  
-##  [65] desc_1.2.0                  checkmate_2.0.0            
-##  [67] filelock_1.0.2              BiocParallel_1.25.1        
-##  [69] rlang_0.4.8                 pkgconfig_2.0.3            
-##  [71] systemfonts_0.3.2           matrixStats_0.57.0         
-##  [73] bitops_1.0-6                evaluate_0.14              
-##  [75] lattice_0.20-41             purrr_0.3.4                
-##  [77] GenomicAlignments_1.27.1    htmlwidgets_1.5.2          
-##  [79] bit_4.0.4                   tidyselect_1.1.0           
-##  [81] magrittr_1.5                bookdown_0.21              
-##  [83] R6_2.5.0                    generics_0.1.0             
-##  [85] Hmisc_4.4-1                 DelayedArray_0.17.0        
-##  [87] DBI_1.1.0                   pillar_1.4.6               
-##  [89] foreign_0.8-80              survival_3.2-7             
-##  [91] RCurl_1.98-1.2              nnet_7.3-14                
-##  [93] tibble_3.0.4                crayon_1.3.4               
-##  [95] BiocFileCache_1.15.1        rmarkdown_2.5              
-##  [97] jpeg_0.1-8.1                progress_1.2.2             
-##  [99] data.table_1.13.2           blob_1.2.1                 
-## [101] digest_0.6.27               textshaping_0.2.0          
-## [103] openssl_1.4.3               munsell_0.5.0              
-## [105] askpass_1.1</code></pre>
+##   [1] colorspace_2.0-0            rjson_0.2.20               
+##   [3] ellipsis_0.3.1              rprojroot_2.0.2            
+##   [5] biovizBase_1.39.0           htmlTable_2.1.0            
+##   [7] XVector_0.31.1              base64enc_0.1-3            
+##   [9] fs_1.5.0                    dichromat_2.0-0            
+##  [11] rstudioapi_0.13             bit64_4.0.5                
+##  [13] xml2_1.3.2                  splines_4.1.0              
+##  [15] knitr_1.30                  Formula_1.2-4              
+##  [17] Rsamtools_2.7.1             cluster_2.1.0              
+##  [19] dbplyr_2.0.0                png_0.1-7                  
+##  [21] BiocManager_1.30.10         compiler_4.1.0             
+##  [23] httr_1.4.2                  backports_1.2.1            
+##  [25] assertthat_0.2.1            Matrix_1.3-2               
+##  [27] lazyeval_0.2.2              htmltools_0.5.1.1          
+##  [29] prettyunits_1.1.1           tools_4.1.0                
+##  [31] gtable_0.3.0                glue_1.4.2                 
+##  [33] GenomeInfoDbData_1.2.4      dplyr_1.0.3                
+##  [35] rappdirs_0.3.1              Rcpp_1.0.6                 
+##  [37] pkgdown_1.6.1.9000          vctrs_0.3.6                
+##  [39] Biostrings_2.59.2           rtracklayer_1.51.4         
+##  [41] xfun_0.20                   stringr_1.4.0              
+##  [43] lifecycle_0.2.0             restfulr_0.0.13            
+##  [45] XML_3.99-0.5                zlibbioc_1.37.0            
+##  [47] scales_1.1.1                BSgenome_1.59.2            
+##  [49] VariantAnnotation_1.37.1    ragg_0.4.1                 
+##  [51] hms_1.0.0                   MatrixGenerics_1.3.0       
+##  [53] ProtGenerics_1.23.6         SummarizedExperiment_1.21.1
+##  [55] RColorBrewer_1.1-2          yaml_2.2.1                 
+##  [57] curl_4.3                    memoise_1.1.0              
+##  [59] gridExtra_2.3               ggplot2_3.3.3              
+##  [61] biomaRt_2.47.1              rpart_4.1-15               
+##  [63] latticeExtra_0.6-29         stringi_1.5.3              
+##  [65] RSQLite_2.2.3               highr_0.8                  
+##  [67] BiocIO_1.1.2                desc_1.2.0                 
+##  [69] checkmate_2.0.0             filelock_1.0.2             
+##  [71] BiocParallel_1.25.2         rlang_0.4.10               
+##  [73] pkgconfig_2.0.3             systemfonts_0.3.2          
+##  [75] matrixStats_0.57.0          bitops_1.0-6               
+##  [77] evaluate_0.14               lattice_0.20-41            
+##  [79] purrr_0.3.4                 htmlwidgets_1.5.3          
+##  [81] GenomicAlignments_1.27.2    bit_4.0.4                  
+##  [83] tidyselect_1.1.0            magrittr_2.0.1             
+##  [85] bookdown_0.21               R6_2.5.0                   
+##  [87] generics_0.1.0              Hmisc_4.4-2                
+##  [89] DelayedArray_0.17.7         DBI_1.1.1                  
+##  [91] pillar_1.4.7                foreign_0.8-81             
+##  [93] survival_3.2-7              RCurl_1.98-1.2             
+##  [95] nnet_7.3-14                 tibble_3.0.5               
+##  [97] crayon_1.3.4                BiocFileCache_1.15.1       
+##  [99] rmarkdown_2.6               jpeg_0.1-8.1               
+## [101] progress_1.2.2              data.table_1.13.6          
+## [103] blob_1.2.1                  digest_0.6.27              
+## [105] textshaping_0.2.1           openssl_1.4.3              
+## [107] munsell_0.5.0               askpass_1.1</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div id="refs" class="references">
-<div id="ref-Chakrabarti:2010dt">
-<p>Chakrabarti, Lina, Tyler K Best, Nathan P Cramer, Rosalind S E Carney, John T R Isaac, Zygmunt Galdzicki, and Tarik F Haydar. 2010. “Olig1 and Olig2 triplication causes developmental brain defects in Down syndrome.” <em>Nature Neuroscience</em> 13 (8): 927–34.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Chakrabarti:2010dt" class="csl-entry">
+Chakrabarti, Lina, Tyler K Best, Nathan P Cramer, Rosalind S E Carney, John T R Isaac, Zygmunt Galdzicki, and Tarik F Haydar. 2010. <span>“<span class="nocase">Olig1 and Olig2 triplication causes developmental brain defects in Down syndrome.</span>”</span> <em>Nature Neuroscience</em> 13 (8): 927–34.
 </div>
-<div id="ref-Gardiner:2006uj">
-<p>Gardiner, Katheleen, and Alberto C S Costa. 2006. “The proteins of human chromosome 21.” <em>American Journal of Medical Genetics. Part C, Seminars in Medical Genetics</em> 142C (3): 196–205.</p>
+<div id="ref-Gardiner:2006uj" class="csl-entry">
+Gardiner, Katheleen, and Alberto C S Costa. 2006. <span>“<span class="nocase">The proteins of human chromosome 21.</span>”</span> <em>American Journal of Medical Genetics. Part C, Seminars in Medical Genetics</em> 142C (3): 196–205.
 </div>
-<div id="ref-Hahne:2016ha">
-<p>Hahne, Florian, and Robert Ivanek. 2016. “Visualizing Genomic Data Using Gviz and Bioconductor.” <em>Methods in Molecular Biology (Clifton, N.J.)</em> 1418 (Chapter 16): 335–51.</p>
+<div id="ref-Hahne:2016ha" class="csl-entry">
+Hahne, Florian, and Robert Ivanek. 2016. <span>“<span class="nocase">Visualizing Genomic Data Using Gviz and Bioconductor.</span>”</span> <em>Methods in Molecular Biology (Clifton, N.J.)</em> 1418 (Chapter 16): 335–51.
 </div>
-<div id="ref-LanaElola:2011fl">
-<p>Lana-Elola, Eva, Sheona D Watson-Scales, Elizabeth M C Fisher, and Victor L J Tybulewicz. 2011. “Down syndrome: searching for the genetic culprits.” <em>Disease Models &amp; Mechanisms</em> 4 (5): 586–95.</p>
+<div id="ref-LanaElola:2011fl" class="csl-entry">
+Lana-Elola, Eva, Sheona D Watson-Scales, Elizabeth M C Fisher, and Victor L J Tybulewicz. 2011. <span>“<span class="nocase">Down syndrome: searching for the genetic culprits.</span>”</span> <em>Disease Models <span>&amp;</span> Mechanisms</em> 4 (5): 586–95.
 </div>
-<div id="ref-Massari:2000um">
-<p>Massari, M E, and C Murre. 2000. “Helix-loop-helix proteins: regulators of transcription in eucaryotic organisms.” <em>Molecular and Cellular Biology</em> 20 (2): 429–40.</p>
+<div id="ref-Massari:2000um" class="csl-entry">
+Massari, M E, and C Murre. 2000. <span>“<span class="nocase">Helix-loop-helix proteins: regulators of transcription in eucaryotic organisms.</span>”</span> <em>Molecular and Cellular Biology</em> 20 (2): 429–40.
 </div>
-<div id="ref-Valverde:1995if">
-<p>Valverde, P, E Healy, I Jackson, J L Rees, and A J Thody. 1995. “Variants of the melanocyte-stimulating hormone receptor gene are associated with red hair and fair skin in humans.” <em>Nature Genetics</em> 11 (3): 328–30.</p>
+<div id="ref-Valverde:1995if" class="csl-entry">
+Valverde, P, E Healy, I Jackson, J L Rees, and A J Thody. 1995. <span>“<span class="nocase">Variants of the melanocyte-stimulating hormone receptor gene are associated with red hair and fair skin in humans.</span>”</span> <em>Nature Genetics</em> 11 (3): 328–30.
 </div>
 </div>
 </div>

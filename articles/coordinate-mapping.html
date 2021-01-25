@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.2</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/jorainer/ensembldb/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -82,7 +82,7 @@
 
       
 
-      </header><script src="coordinate-mapping_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="coordinate-mapping_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Mapping between genome, transcript and protein coordinates</h1>
@@ -761,7 +761,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <a href="#session-information" class="anchor"></a>Session information</h1>
 <div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R Under development (unstable) (2020-11-05 r79401)
+<pre><code>## R Under development (unstable) (2021-01-21 r79854)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Ubuntu 20.04.1 LTS
 ## 
@@ -782,75 +782,77 @@ document.addEventListener("DOMContentLoaded", function() {
 ## 
 ## other attached packages:
 ##  [1] BSgenome.Hsapiens.NCBI.GRCh38_1.3.1000
-##  [2] BSgenome_1.59.0                       
-##  [3] rtracklayer_1.51.0                    
-##  [4] Biostrings_2.59.0                     
-##  [5] XVector_0.31.0                        
-##  [6] Gviz_1.35.0                           
+##  [2] BSgenome_1.59.2                       
+##  [3] rtracklayer_1.51.4                    
+##  [4] Biostrings_2.59.2                     
+##  [5] XVector_0.31.1                        
+##  [6] Gviz_1.35.4                           
 ##  [7] EnsDb.Hsapiens.v86_2.99.0             
-##  [8] ensembldb_2.15.1                      
+##  [8] ensembldb_2.15.2                      
 ##  [9] AnnotationFilter_1.15.0               
-## [10] GenomicFeatures_1.43.2                
+## [10] GenomicFeatures_1.43.3                
 ## [11] AnnotationDbi_1.53.0                  
 ## [12] Biobase_2.51.0                        
-## [13] GenomicRanges_1.43.0                  
-## [14] GenomeInfoDb_1.27.0                   
-## [15] IRanges_2.25.2                        
-## [16] S4Vectors_0.29.3                      
+## [13] GenomicRanges_1.43.3                  
+## [14] GenomeInfoDb_1.27.5                   
+## [15] IRanges_2.25.6                        
+## [16] S4Vectors_0.29.6                      
 ## [17] BiocGenerics_0.37.0                   
-## [18] BiocStyle_2.19.0                      
+## [18] BiocStyle_2.19.1                      
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] colorspace_2.0-0            ellipsis_0.3.1             
-##   [3] rprojroot_1.3-2             biovizBase_1.39.0          
-##   [5] htmlTable_2.1.0             base64enc_0.1-3            
-##   [7] fs_1.5.0                    dichromat_2.0-0            
-##   [9] rstudioapi_0.13             bit64_4.0.5                
-##  [11] xml2_1.3.2                  splines_4.1.0              
-##  [13] knitr_1.30                  Formula_1.2-4              
-##  [15] Rsamtools_2.7.0             cluster_2.1.0              
-##  [17] dbplyr_2.0.0                png_0.1-7                  
-##  [19] BiocManager_1.30.10         compiler_4.1.0             
-##  [21] httr_1.4.2                  backports_1.2.0            
-##  [23] assertthat_0.2.1            Matrix_1.2-18              
-##  [25] lazyeval_0.2.2              htmltools_0.5.0            
-##  [27] prettyunits_1.1.1           tools_4.1.0                
-##  [29] gtable_0.3.0                glue_1.4.2                 
-##  [31] GenomeInfoDbData_1.2.4      dplyr_1.0.2                
-##  [33] rappdirs_0.3.1              Rcpp_1.0.5                 
-##  [35] pkgdown_1.6.1.9000          vctrs_0.3.4                
-##  [37] xfun_0.19                   stringr_1.4.0              
-##  [39] lifecycle_0.2.0             XML_3.99-0.5               
-##  [41] zlibbioc_1.37.0             scales_1.1.1               
-##  [43] VariantAnnotation_1.37.0    ragg_0.4.0                 
-##  [45] hms_0.5.3                   MatrixGenerics_1.3.0       
-##  [47] ProtGenerics_1.23.1         SummarizedExperiment_1.21.0
-##  [49] RColorBrewer_1.1-2          yaml_2.2.1                 
-##  [51] curl_4.3                    memoise_1.1.0              
-##  [53] gridExtra_2.3               ggplot2_3.3.2              
-##  [55] biomaRt_2.47.1              rpart_4.1-15               
-##  [57] latticeExtra_0.6-29         stringi_1.5.3              
-##  [59] RSQLite_2.2.1               desc_1.2.0                 
-##  [61] checkmate_2.0.0             filelock_1.0.2             
-##  [63] BiocParallel_1.25.1         rlang_0.4.8                
-##  [65] pkgconfig_2.0.3             systemfonts_0.3.2          
-##  [67] matrixStats_0.57.0          bitops_1.0-6               
-##  [69] evaluate_0.14               lattice_0.20-41            
-##  [71] purrr_0.3.4                 GenomicAlignments_1.27.1   
-##  [73] htmlwidgets_1.5.2           bit_4.0.4                  
-##  [75] tidyselect_1.1.0            magrittr_1.5               
-##  [77] bookdown_0.21               R6_2.5.0                   
-##  [79] generics_0.1.0              Hmisc_4.4-1                
-##  [81] DelayedArray_0.17.0         DBI_1.1.0                  
-##  [83] pillar_1.4.6                foreign_0.8-80             
-##  [85] survival_3.2-7              RCurl_1.98-1.2             
-##  [87] nnet_7.3-14                 tibble_3.0.4               
-##  [89] crayon_1.3.4                BiocFileCache_1.15.1       
-##  [91] rmarkdown_2.5               jpeg_0.1-8.1               
-##  [93] progress_1.2.2              data.table_1.13.2          
-##  [95] blob_1.2.1                  digest_0.6.27              
-##  [97] textshaping_0.2.0           openssl_1.4.3              
-##  [99] munsell_0.5.0               askpass_1.1</code></pre>
+##   [1] colorspace_2.0-0            rjson_0.2.20               
+##   [3] ellipsis_0.3.1              rprojroot_2.0.2            
+##   [5] biovizBase_1.39.0           htmlTable_2.1.0            
+##   [7] base64enc_0.1-3             fs_1.5.0                   
+##   [9] dichromat_2.0-0             rstudioapi_0.13            
+##  [11] bit64_4.0.5                 xml2_1.3.2                 
+##  [13] splines_4.1.0               knitr_1.30                 
+##  [15] Formula_1.2-4               Rsamtools_2.7.1            
+##  [17] cluster_2.1.0               dbplyr_2.0.0               
+##  [19] png_0.1-7                   BiocManager_1.30.10        
+##  [21] compiler_4.1.0              httr_1.4.2                 
+##  [23] backports_1.2.1             assertthat_0.2.1           
+##  [25] Matrix_1.3-2                lazyeval_0.2.2             
+##  [27] htmltools_0.5.1.1           prettyunits_1.1.1          
+##  [29] tools_4.1.0                 gtable_0.3.0               
+##  [31] glue_1.4.2                  GenomeInfoDbData_1.2.4     
+##  [33] dplyr_1.0.3                 rappdirs_0.3.1             
+##  [35] Rcpp_1.0.6                  pkgdown_1.6.1.9000         
+##  [37] vctrs_0.3.6                 xfun_0.20                  
+##  [39] stringr_1.4.0               lifecycle_0.2.0            
+##  [41] restfulr_0.0.13             XML_3.99-0.5               
+##  [43] zlibbioc_1.37.0             scales_1.1.1               
+##  [45] VariantAnnotation_1.37.1    ragg_0.4.1                 
+##  [47] hms_1.0.0                   MatrixGenerics_1.3.0       
+##  [49] ProtGenerics_1.23.6         SummarizedExperiment_1.21.1
+##  [51] RColorBrewer_1.1-2          yaml_2.2.1                 
+##  [53] curl_4.3                    memoise_1.1.0              
+##  [55] gridExtra_2.3               ggplot2_3.3.3              
+##  [57] biomaRt_2.47.1              rpart_4.1-15               
+##  [59] latticeExtra_0.6-29         stringi_1.5.3              
+##  [61] RSQLite_2.2.3               BiocIO_1.1.2               
+##  [63] desc_1.2.0                  checkmate_2.0.0            
+##  [65] filelock_1.0.2              BiocParallel_1.25.2        
+##  [67] rlang_0.4.10                pkgconfig_2.0.3            
+##  [69] systemfonts_0.3.2           matrixStats_0.57.0         
+##  [71] bitops_1.0-6                evaluate_0.14              
+##  [73] lattice_0.20-41             purrr_0.3.4                
+##  [75] htmlwidgets_1.5.3           GenomicAlignments_1.27.2   
+##  [77] bit_4.0.4                   tidyselect_1.1.0           
+##  [79] magrittr_2.0.1              bookdown_0.21              
+##  [81] R6_2.5.0                    generics_0.1.0             
+##  [83] Hmisc_4.4-2                 DelayedArray_0.17.7        
+##  [85] DBI_1.1.1                   pillar_1.4.7               
+##  [87] foreign_0.8-81              survival_3.2-7             
+##  [89] RCurl_1.98-1.2              nnet_7.3-14                
+##  [91] tibble_3.0.5                crayon_1.3.4               
+##  [93] BiocFileCache_1.15.1        rmarkdown_2.6              
+##  [95] jpeg_0.1-8.1                progress_1.2.2             
+##  [97] data.table_1.13.6           blob_1.2.1                 
+##  [99] digest_0.6.27               textshaping_0.2.1          
+## [101] openssl_1.4.3               munsell_0.5.0              
+## [103] askpass_1.1</code></pre>
 </div>
   </div>
 
