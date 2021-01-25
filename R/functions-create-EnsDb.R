@@ -124,7 +124,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     }
     rm(tmp)
     message("OK")
-    
+
     if (as.numeric(info[info$name == "DBSCHEMAVERSION", "value"]) > 1) {
         message("Processing 'entrezgene' table ... ", appendLF = FALSE)
         ## process genes: some gene names might have fancy names...
@@ -135,7 +135,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
         rm(tmp)
         message("OK")
     }
-    
+
     message("Processing 'trancript' table ... ", appendLF = FALSE)
     ## process transcripts:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"),
@@ -343,7 +343,7 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     }
     ## processing the metadata:
     ## first read the header...
-    tmp <- readLines(gtf, n = 10)
+    tmp <- .read_lines_compressed(gtf, n = 10)
     tmp <- tmp[grep(tmp, pattern = "^#")]
     haveHeader <- FALSE
     if (length(tmp) > 0) {
@@ -391,7 +391,7 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     gtfFilename <- gtfFilename[length(gtfFilename)]
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
-    con <- dbConnect(lite, dbname = dbname )
+    con <- dbConnect(lite, dbname = dbname)
     bla <- dbExecute(con, paste0("update metadata set value='",
                                  gtfFilename, "' where name='source_file';"))
     dbDisconnect(con)
@@ -534,7 +534,7 @@ ensDbFromGff <- function(gff, outfile, path, organism, genomeVersion,
     orgFromFile <- Parms["organism"]
     genFromFile <- Parms["genomeVersion"]
     ## Reading some info from the header.
-    tmp <- readLines(gff, n=500)
+    tmp <- .read_lines_compressed(gff, n = 500)
     if(length(grep(tmp[1], pattern="##gff-version")) == 0)
         stop("File ", gff, " does not seem to be a correct GFF file! ",
              "The ##gff-version line is missing!")
@@ -737,7 +737,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     }
 
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
-    on.exit(dbDisconnect(con))
+    on.exit(suppressWarnings(dbDisconnect(con)))
     ## ----------------------------
     ## metadata table:
     message("Processing metadata ... ", appendLF=FALSE)
@@ -972,6 +972,7 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     message("OK")
     message("  -------------")
     message("Verifying validity of the information in the database:")
+    dbDisconnect(con)
     checkValidEnsDb(EnsDb(dbname))
     return(dbname)
 }
@@ -1721,3 +1722,14 @@ elementFromEnsemblFilename <- function(x, which=1){
     return(tmp)
 }
 
+#' Utility function to read lines from a compressed file. While pure `readLines`
+#' works on local files it fails on remote files.
+#'
+#' @noRd
+.read_lines_compressed <- function(x, n = 10) {
+    if (length(grep(".gz$", x, ignore.case = TRUE)))
+        con <- gzcon(file(x, open = "rb"))
+    else con <- x
+    on.exit(suppressWarnings(close(con)))
+    readLines(con, n = n)
+}
