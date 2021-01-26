@@ -169,7 +169,7 @@ jobs:
 
           ## Pass #1b install manually defined packages
           message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: manual dependencies ****'))
-          BiocManager::install(c("GenomicRanges", "Hmisc", "rtracklayer", "GenomicFeatures"))
+          BiocManager::install(c("GenomicRanges", "Hmisc", "rtracklayer", "GenomicFeatures", "EnsDb.Hsapiens.v86"))
         continue-on-error: true
         shell: Rscript {0}
 
