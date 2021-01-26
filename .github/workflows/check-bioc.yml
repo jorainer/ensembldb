@@ -166,6 +166,10 @@ jobs:
           ## Pass #1 at installing dependencies
           message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: local dependencies ****'))
           remotes::install_local(dependencies = TRUE, repos = BiocManager::repositories(), build_vignettes = TRUE, upgrade = TRUE)
+
+          ## Pass #1b install manually defined packages
+          message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: manual dependencies ****'))
+          BiocManager::install(c("GenomicRanges", "Hmisc", "rtracklayer", "GenomicFeatures"))
         continue-on-error: true
         shell: Rscript {0}
 
