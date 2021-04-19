@@ -852,7 +852,7 @@ annotations from Ensembl version 86.
 Since Bioconductor version 3.5 `EnsDb` databases can also be retrieved directly
 from `AnnotationHub`.
 
-```{r  AnnotationHub-query, message = FALSE, eval = use_network }
+```{r  AnnotationHub-query, message = FALSE, eval = use_network}
 library(AnnotationHub)
 ## Load the annotation resource.
 ah <- AnnotationHub()
@@ -864,7 +864,7 @@ query(ah, "EnsDb")
 
 We can simply fetch one of the databases.
 
-```{r  AnnotationHub-query-2, message = FALSE, eval = use_network }
+```{r  AnnotationHub-query-2, message = FALSE, eval = use_network}
 ahDb <- query(ah, pattern = c("Xiphophorus Maculatus", "EnsDb", 87))
 ## What have we got
 ahDb
@@ -983,7 +983,7 @@ In the example below we load a `GRanges` containing gene definitions for genes
 encoded on chromosome Y and generate a `EnsDb` SQLite database from that
 information.
 
-```{r  EnsDb-from-Y-GRanges, message = FALSE, eval = use_network }
+```{r  EnsDb-from-Y-GRanges, message = FALSE, eval = use_network}
 ## Generate a sqlite database from a GRanges object specifying
 ## genes encoded on chromosome Y
 load(system.file("YGRanges.RData", package = "ensembldb"))

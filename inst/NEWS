@@ -1,3 +1,7 @@
+Changes in version 2.15.3
+
+- Fix missing declaration of rmarkdown.
+
 Changes in version 2.15.2
 
 - Ensure remote gzipped files are handled properly by `ensDbFromGtf`.
