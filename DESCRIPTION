@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.14.0
+Version: 2.14.1
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre"),
@@ -55,6 +55,7 @@ Suggests:
     ggbio (>= 1.24.0),
     Gviz (>= 1.20.0),
     magrittr,
+    rmarkdown,
     AnnotationHub
 Enhances:
     RMariaDB,
