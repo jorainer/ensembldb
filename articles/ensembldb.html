@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
       </span>
     </div>
 
@@ -67,7 +69,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jorainer/ensembldb/">
+  <a href="https://github.com/jorainer/ensembldb/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -82,14 +84,14 @@
 
       
 
-      </header><script src="ensembldb_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
+      </header><script src="ensembldb_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generating an using Ensembl based annotation packages</h1>
-                        <h4 class="author">Johannes Rainer</h4>
+                        <h4 data-toc-skip class="author">Johannes Rainer</h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jorainer/ensembldb/blob/master/vignettes/ensembldb.Rmd"><code>vignettes/ensembldb.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jorainer/ensembldb/blob/master/vignettes/ensembldb.Rmd" class="external-link"><code>vignettes/ensembldb.Rmd</code></a></small>
       <div class="hidden name"><code>ensembldb.Rmd</code></div>
 
     </div>
@@ -114,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Another main goal of this package is to generate <em>versioned</em> annotation packages, i.e. annotation packages that are build for a specific Ensembl release, and are also named according to that (e.g. <code>EnsDb.Hsapiens.v86</code> for human gene definitions of the Ensembl code database version 86). This ensures reproducibility, as it allows to load annotations from a specific Ensembl release also if newer versions of annotation packages/releases are available. It also allows to load multiple annotation packages at the same time in order to e.g. compare gene models between Ensembl releases.</p>
 <p>In the example below we load an Ensembl based annotation package for Homo sapiens, Ensembl version 86. The <code>EnsDb</code> object providing access to the underlying SQLite database is bound to the variable name <code>EnsDb.Hsapiens.v86</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 
 <span class="co">## Making a "short cut"</span>
 <span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span>
@@ -180,9 +182,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>These filters can be divided into 3 main filter types:</p>
 <ul>
 <li>
-<code>IntegerFilter</code>: filter classes extending this basic object can take a single numeric value as input and support the conditions <code><a href="https://rdrr.io/r/base/Comparison.html">==</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">!=</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">&gt;</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">&lt;</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">&gt;=</a></code> and <code><a href="https://rdrr.io/r/base/Comparison.html">&lt;=</a></code>. All filters that work on chromosomal coordinates, such as the <code>GeneEndFilter</code> extend <code>IntegerFilter</code>.</li>
+<code>IntegerFilter</code>: filter classes extending this basic object can take a single numeric value as input and support the conditions <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">==</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">!=</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">&gt;</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">&lt;</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">&gt;=</a></code> and <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">&lt;=</a></code>. All filters that work on chromosomal coordinates, such as the <code>GeneEndFilter</code> extend <code>IntegerFilter</code>.</li>
 <li>
-<code>CharacterFilter</code>: filter classes extending this object can take a single or multiple character values as input and allow conditions: <code><a href="https://rdrr.io/r/base/Comparison.html">==</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html">!=</a></code>, <code>"startsWith"</code> , <code>"endsWith"</code> and <code>"contains"</code>. All filters working on IDs extend this class.</li>
+<code>CharacterFilter</code>: filter classes extending this object can take a single or multiple character values as input and allow conditions: <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">==</a></code>, <code><a href="https://rdrr.io/r/base/Comparison.html" class="external-link">!=</a></code>, <code>"startsWith"</code> , <code>"endsWith"</code> and <code>"contains"</code>. All filters working on IDs extend this class.</li>
 <li>
 <code>GRangesFilter</code>: takes a <code>GRanges</code> object as input and supports all conditions that <code>findOverlaps</code> from the <code>IRanges</code> package supports (<code>"any"</code>, <code>"start"</code>, <code>"end"</code>, <code>"within"</code>, <code>"equal"</code>). Note that these have to be passed using the parameter <code>type</code> to the constructor function.</li>
 </ul>
@@ -246,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p><code>EnsDb</code> databases for more recent Ensembl versions (starting from Ensembl 87) provide also evidence levels for individual transcripts in the <code>tx_support_level</code> database column. Such databases support also a <code>TxSupportLevelFilter</code> filter to use this columns for filtering.</p>
 <p>A simple use case for the filter framework would be to get all transcripts for the gene <em>BCL2L11</em>. To this end we specify a <code>GeneNameFilter</code> with the value <em>BCL2L11</em>. As a result we get a <code>GRanges</code> object with <code>start</code>, <code>end</code>, <code>strand</code> and <code>seqname</code> being the start coordinate, end coordinate, chromosome name and strand for the respective transcripts. All additional annotations are available as metadata columns. Alternatively, by setting <code>return.type</code> to “DataFrame”, or “data.frame” the method would return a <code>DataFrame</code> or <code>data.frame</code> object instead of the default <code>GRanges</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">Tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"BCL2L11"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">Tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"BCL2L11"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">Tx</span></code></pre></div>
 <pre><code>## GRanges object with 28 ranges and 7 metadata columns:
@@ -293,18 +295,18 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## as this is a GRanges object we can access e.g. the start coordinates with</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/start.html">start</a></span><span class="op">(</span><span class="va">Tx</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/start.html" class="external-link">start</a></span><span class="op">(</span><span class="va">Tx</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 111119378 111120914 111120914 111120914 111120914 111120914</code></pre>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## or extract the biotype with</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">Tx</span><span class="op">$</span><span class="va">tx_biotype</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Tx</span><span class="op">$</span><span class="va">tx_biotype</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "protein_coding" "protein_coding" "protein_coding" "protein_coding"
 ## [5] "protein_coding" "protein_coding"</code></pre>
 <p>The parameter <code>columns</code> of the extractor methods (such as <code>exons</code>, <code>genes</code> or <code>transcripts)</code> allows to specify which database attributes (columns) should be retrieved. The <code>exons</code> method returns by default all exon-related columns, the <code>transcripts</code> all columns from the transcript database table and the <code>genes</code> all from the gene table. Note however that in the example above we got also a column <code>gene_name</code> although this column is not present in the transcript database table. By default the methods return also all columns that are used by any of the filters submitted with the <code>filter</code> argument (thus, because a <code>GeneNameFilter</code> was used, the column <code>gene_name</code> is also returned). Setting <code>returnFilterColumns(edb) &lt;- FALSE</code> disables this option and only the columns specified by the <code>columns</code> parameter are retrieved.</p>
 <p>Instead of passing a filter <em>object</em> to the method it is also possible to provide a filter <em>expression</em> written as a <code>formula</code>. The <code>formula</code> has to be written in the form <code>~ &lt;field&gt; &lt;condition&gt; &lt;value&gt;</code> with <code>&lt;field&gt;</code> being the field (database column) in the database, <code>&lt;condition&gt;</code> the condition for the filter object and <code>&lt;value&gt;</code> its value. Use the <code>supportedFilter</code> method to get the field names corresponding to each filter class.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Use a filter expression to perform the filtering.</span>
-<span class="fu"><a href="../reference/exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_name</span> <span class="op">==</span> <span class="st">"ZBTB16"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_name</span> <span class="op">==</span> <span class="st">"ZBTB16"</span><span class="op">)</span></code></pre></div>
 <pre><code>## GRanges object with 9 ranges and 7 metadata columns:
 ##                   seqnames              ranges strand |           tx_id
 ##                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -341,12 +343,12 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   ENST00000535509 ENSG00000109906 ENST00000535509      ZBTB16
 ##   -------
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
-<p>Filter expression have to be written as a formula (i.e. starting with a <code><a href="https://rdrr.io/r/base/tilde.html">~</a></code>) in the form <em>column name</em> followed by the logical condition.</p>
-<p>Alternatively, <code>EnsDb</code> objects can be filtered directly using the <code>filter</code> function. In the example below we use the <code>filter</code> function to filter the <code>EnsDb</code> object and pass that filtered database to the <code>transcripts</code> method using the <code><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></code> from the <code>magrittr</code> package.</p>
+<p>Filter expression have to be written as a formula (i.e. starting with a <code><a href="https://rdrr.io/r/base/tilde.html" class="external-link">~</a></code>) in the form <em>column name</em> followed by the logical condition.</p>
+<p>Alternatively, <code>EnsDb</code> objects can be filtered directly using the <code>filter</code> function. In the example below we use the <code>filter</code> function to filter the <code>EnsDb</code> object and pass that filtered database to the <code>transcripts</code> method using the <code><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></code> from the <code>magrittr</code> package.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span>
 
-<span class="va">edb</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/addFilter,EnsDb-method.html">filter</a></span><span class="op">(</span><span class="op">~</span> <span class="va">symbol</span> <span class="op">==</span> <span class="st">"BCL2"</span> <span class="op">&amp;</span> <span class="va">tx_biotype</span> <span class="op">!=</span> <span class="st">"protein_coding"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">edb</span> <span class="op">%&gt;%</span> <span class="fu"><a href="../reference/global-filters.html">filter</a></span><span class="op">(</span><span class="op">~</span> <span class="va">symbol</span> <span class="op">==</span> <span class="st">"BCL2"</span> <span class="op">&amp;</span> <span class="va">tx_biotype</span> <span class="op">!=</span> <span class="st">"protein_coding"</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="va">transcripts</span></code></pre></div>
 <pre><code>## GRanges object with 1 range and 6 metadata columns:
 ##                   seqnames            ranges strand |           tx_id
@@ -362,11 +364,11 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
 <p>Adding a filter to an <code>EnsDb</code> enables this filter (globally) on all subsequent queries on that object. We could thus filter an <code>EnsDb</code> to (virtually) contain only features encoded on chromosome Y.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">edb_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addFilter,EnsDb-method.html">addFilter</a></span><span class="op">(</span><span class="va">edb</span>, <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">edb_y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/global-filters.html">addFilter</a></span><span class="op">(</span><span class="va">edb</span>, <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## All subsequent filters on that EnsDb will only work on features encoded on</span>
 <span class="co">## chromosome Y</span>
-<span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb_y</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb_y</span><span class="op">)</span></code></pre></div>
 <pre><code>## GRanges object with 523 ranges and 6 metadata columns:
 ##                   seqnames            ranges strand |         gene_id
 ##                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -411,7 +413,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get all lincRNAs on chromosome Y</span>
-<span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb_y</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_biotype</span> <span class="op">==</span> <span class="st">"lincRNA"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb_y</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_biotype</span> <span class="op">==</span> <span class="st">"lincRNA"</span><span class="op">)</span></code></pre></div>
 <pre><code>## GRanges object with 52 ranges and 6 metadata columns:
 ##                   seqnames            ranges strand |         gene_id
 ##                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -499,11 +501,11 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [5] "tx_cds_seq_start" "tx_cds_seq_end"   "gene_id"          "tx_name"</code></pre>
 <p>Thus, we could retrieve all transcripts of the biotype <em>nonsense_mediated_decay</em> (which, according to the definitions by Ensembl are transcribed, but most likely not translated in a protein, but rather degraded after transcription) along with the name of the gene for each transcript. Note that we are changing here the <code>return.type</code> to <code>DataFrame</code>, so the method will return a <code>DataFrame</code> with the results instead of the default <code>GRanges</code>.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">Tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>,
-          columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span><span class="op">(</span><span class="va">edb</span> , <span class="st">"tx"</span><span class="op">)</span>, <span class="st">"gene_name"</span><span class="op">)</span>,
+<code class="sourceCode R"><span class="va">Tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>,
+          columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span><span class="op">(</span><span class="va">edb</span> , <span class="st">"tx"</span><span class="op">)</span>, <span class="st">"gene_name"</span><span class="op">)</span>,
           filter <span class="op">=</span> <span class="fu">TxBiotypeFilter</span><span class="op">(</span><span class="st">"nonsense_mediated_decay"</span><span class="op">)</span>,
           return.type <span class="op">=</span> <span class="st">"DataFrame"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Tx</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Tx</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 14423</code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">Tx</span></code></pre></div>
@@ -549,7 +551,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## 14423      ZNF692</code></pre>
 <p>For protein coding transcripts, we can also specifically extract their coding region. In the example below we extract the CDS for all transcripts encoded on chromosome Y.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">yCds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">yCds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">yCds</span></code></pre></div>
 <pre><code>## GRangesList object of length 151:
 ## $ENST00000155093
@@ -596,7 +598,7 @@ document.addEventListener("DOMContentLoaded", function() {
                  strand <span class="op">=</span> <span class="st">"+"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"any"</span><span class="op">)</span>
 
 <span class="co">## Query genes:</span>
-<span class="va">gn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="va">grf</span><span class="op">)</span>
+<span class="va">gn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="va">grf</span><span class="op">)</span>
 <span class="va">gn</span></code></pre></div>
 <pre><code>## GRanges object with 1 range and 6 metadata columns:
 ##                   seqnames              ranges strand |         gene_id
@@ -612,11 +614,11 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh38 genome</code></pre>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Next we retrieve all transcripts for that gene so that we can plot them.</span>
-<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="va">gn</span><span class="op">$</span><span class="va">gene_name</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="va">gn</span><span class="op">$</span><span class="va">gene_name</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="ensembldb_files/figure-html/granges-zbtb16-1.png" width="700"></p>
 <p>As we can see, 4 transcripts of the gene ZBTB16 are also overlapping the region. Below we fetch these 4 transcripts. Note, that a call to <code>exons</code> will not return any features from the database, as no exon is overlapping with the region.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="va">grf</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="va">grf</span><span class="op">)</span></code></pre></div>
 <pre><code>## GRanges object with 4 ranges and 6 metadata columns:
 ##                   seqnames              ranges strand |           tx_id
 ##                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
@@ -698,11 +700,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Data can be fetched in an analogous way using the <code>exons</code> and <code>genes</code> methods. In the example below we retrieve <code>gene_name</code>, <code>entrezid</code> and the <code>gene_biotype</code> of all genes in the database which names start with “BCL2”.</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## We're going to fetch all genes which names start with BCL.</span>
-<span class="va">BCLs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>,
-          columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"gene_name"</span>, <span class="st">"entrezid"</span>, <span class="st">"gene_biotype"</span><span class="op">)</span>,
+<span class="va">BCLs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>,
+          columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gene_name"</span>, <span class="st">"entrezid"</span>, <span class="st">"gene_biotype"</span><span class="op">)</span>,
           filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"BCL"</span>, condition <span class="op">=</span> <span class="st">"startsWith"</span><span class="op">)</span>,
           return.type <span class="op">=</span> <span class="st">"DataFrame"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">BCLs</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">BCLs</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 30</code></pre>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">BCLs</span></code></pre></div>
@@ -724,25 +726,25 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## determine the average length of snRNA, snoRNA and rRNA genes encoded on</span>
 <span class="co">## chromosomes X and Y.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="../reference/lengthOf.html">lengthOf</a></span><span class="op">(</span><span class="va">edb</span>, of <span class="op">=</span> <span class="st">"tx"</span>,
+<span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="../reference/EnsDb-lengths.html">lengthOf</a></span><span class="op">(</span><span class="va">edb</span>, of <span class="op">=</span> <span class="st">"tx"</span>,
           filter <span class="op">=</span> <span class="fu">AnnotationFilterList</span><span class="op">(</span>
-          <span class="fu">GeneBiotypeFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"snRNA"</span>, <span class="st">"snoRNA"</span>, <span class="st">"rRNA"</span><span class="op">)</span><span class="op">)</span>,
-          <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+          <span class="fu">GeneBiotypeFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"snRNA"</span>, <span class="st">"snoRNA"</span>, <span class="st">"rRNA"</span><span class="op">)</span><span class="op">)</span>,
+          <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 118.2458</code></pre>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## determine the average length of protein coding genes encoded on the same</span>
 <span class="co">## chromosomes.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="fu"><a href="../reference/lengthOf.html">lengthOf</a></span><span class="op">(</span><span class="va">edb</span>, of <span class="op">=</span> <span class="st">"tx"</span>,
+<span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="../reference/EnsDb-lengths.html">lengthOf</a></span><span class="op">(</span><span class="va">edb</span>, of <span class="op">=</span> <span class="st">"tx"</span>,
           filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_biotype</span> <span class="op">==</span> <span class="st">"protein_coding"</span> <span class="op">&amp;</span>
-          <span class="va">seq_name</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+          <span class="va">seq_name</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 1943.554</code></pre>
 <p>Not unexpectedly, transcripts of protein coding genes are longer than those of snRNA, snoRNA or rRNA genes.</p>
 <p>At last we extract the first two exons of each transcript model from the database.</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Extract all exons 1 and (if present) 2 for all genes encoded on the</span>
 <span class="co">## Y chromosome</span>
-<span class="fu"><a href="../reference/exonsBy.html">exons</a></span><span class="op">(</span><span class="va">edb</span>, columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"tx_id"</span>, <span class="st">"exon_idx"</span><span class="op">)</span>,
-      filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span>,
+<span class="fu"><a href="../reference/EnsDb-exonsBy.html">exons</a></span><span class="op">(</span><span class="va">edb</span>, columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tx_id"</span>, <span class="st">"exon_idx"</span><span class="op">)</span>,
+      filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span>,
                     <span class="fu">ExonRankFilter</span><span class="op">(</span><span class="fl">3</span>, condition <span class="op">=</span> <span class="st">"&lt;"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## GRanges object with 1294 ranges and 3 metadata columns:
 ##                   seqnames            ranges strand |           tx_id  exon_idx
@@ -780,7 +782,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>For the feature counting step of an RNAseq experiment, the gene or transcript models (defined by the chromosomal start and end positions of their exons) have to be known. To extract these from an Ensembl based annotation package, the <code>exonsBy</code>, <code>genesBy</code> and <code>transcriptsBy</code> methods can be used in an analogous way as in <code>TxDb</code> packages generated by the <code>GenomicFeatures</code> package. However, the <code>transcriptsBy</code> method does not, in contrast to the method in the <code>GenomicFeatures</code> package, allow to return transcripts by “cds”. While the annotation packages built by the <code>ensembldb</code> contain the chromosomal start and end coordinates of the coding region (for protein coding genes) they do not assign an ID to each CDS.</p>
 <p>A simple use case is to retrieve all genes encoded on chromosomes X and Y from the database.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">TxByGns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">transcriptsBy</a></span><span class="op">(</span><span class="va">edb</span>, by <span class="op">=</span> <span class="st">"gene"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">TxByGns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcriptsBy</a></span><span class="op">(</span><span class="va">edb</span>, by <span class="op">=</span> <span class="st">"gene"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">TxByGns</span></code></pre></div>
 <pre><code>## GRangesList object of length 2922:
 ## $ENSG00000000003
@@ -859,20 +861,20 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## will just get exons for all genes on chromosomes 1 to 22, X and Y.</span>
 <span class="co">## Note: want to get rid of the "LRG" genes!!!</span>
-<span class="va">EnsGenes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">exonsBy</a></span><span class="op">(</span><span class="va">edb</span>, by <span class="op">=</span> <span class="st">"gene"</span>, filter <span class="op">=</span> <span class="fu">AnnotationFilterList</span><span class="op">(</span>
-                      <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">22</span>, <span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>,
+<span class="va">EnsGenes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">exonsBy</a></span><span class="op">(</span><span class="va">edb</span>, by <span class="op">=</span> <span class="st">"gene"</span>, filter <span class="op">=</span> <span class="fu">AnnotationFilterList</span><span class="op">(</span>
+                      <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">22</span>, <span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>,
                       <span class="fu">GeneIdFilter</span><span class="op">(</span><span class="st">"ENSG"</span>, <span class="st">"startsWith"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>The code above returns a <code>GRangesList</code> that can be used directly as an input for the <code>summarizeOverlaps</code> function from the <code>GenomicAlignments</code> package <sup><a id="fnr.3" class="footref" href="#fn.3">3</a></sup>.</p>
 <p>Alternatively, the above <code>GRangesList</code> can be transformed to a <code>data.frame</code> in <em>SAF</em> format that can be used as an input to the <code>featureCounts</code> function of the <code>Rsubread</code> package <sup><a id="fnr.4" class="footref" href="#fn.4">4</a></sup>.</p>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Transforming the GRangesList into a data.frame in SAF format</span>
-<span class="va">EnsGenes.SAF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">toSAF</a></span><span class="op">(</span><span class="va">EnsGenes</span><span class="op">)</span></code></pre></div>
+<span class="va">EnsGenes.SAF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">toSAF</a></span><span class="op">(</span><span class="va">EnsGenes</span><span class="op">)</span></code></pre></div>
 <p>Note that the ID by which the <code>GRangesList</code> is split is used in the SAF formatted <code>data.frame</code> as the <code>GeneID</code>. In the example below this would be the Ensembl gene IDs, while the start, end coordinates (along with the strand and chromosomes) are those of the the exons.</p>
 <p>In addition, the <code>disjointExons</code> function (similar to the one defined in <code>GenomicFeatures</code>) can be used to generate a <code>GRanges</code> of non-overlapping exon parts which can be used in the <code>DEXSeq</code> package.</p>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Create a GRanges of non-overlapping exon parts.</span>
 <span class="va">DJE</span> <span class="op">&lt;-</span> <span class="fu">disjointExons</span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">AnnotationFilterList</span><span class="op">(</span>
-                  <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">22</span>, <span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>,
+                  <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">22</span>, <span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>,
                   <span class="fu">GeneIdFilter</span><span class="op">(</span><span class="st">"ENSG%"</span>, <span class="st">"startsWith"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="retrieving-sequences-for-genetranscriptexon-models" class="section level1">
@@ -881,15 +883,15 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The methods to retrieve exons, transcripts and genes (i.e. <code>exons</code>, <code>transcripts</code> and <code>genes</code>) return by default <code>GRanges</code> objects that can be used to retrieve sequences using the <code>getSeq</code> method e.g. from BSgenome packages. The basic workflow is thus identical to the one for <code>TxDb</code> packages, however, it is not straight forward to identify the BSgenome package with the matching genomic sequence. Most BSgenome packages are named according to the genome build identifier used in UCSC which does not (always) match the genome build name used by Ensembl. Using the Ensembl version provided by the <code>EnsDb</code>, the correct genomic sequence can however be retrieved easily from the <code>AnnotationHub</code> using the <code>getGenomeTeoBitFile</code>. If no 2bit file matching the Ensembl version is available, the function tries to identify a file with the correct genome build from the <em>closest</em> Ensembl release and returns that instead.</p>
 <p>In the code block below we retrieve first the <code>TwoBitFile</code> with the genomic DNA sequence, extract the genomic start and end coordinates for all genes defined in the package, subset to genes encoded on sequences available in the <code>TwoBitFile</code> and extract all of their sequences. Note: these sequences represent the sequence between the chromosomal start and end coordinates of the gene.</p>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 <span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span>
 
 <span class="co">## Get the TwoBit with the genomic sequence matching the Ensembl version</span>
 <span class="co">## using the AnnotationHub package.</span>
-<span class="va">dna</span> <span class="op">&lt;-</span> <span class="fu">ensembldb</span><span class="fu">:::</span><span class="fu"><a href="../reference/getGenomeFaFile.html">getGenomeTwoBitFile</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span>
+<span class="va">dna</span> <span class="op">&lt;-</span> <span class="fu">ensembldb</span><span class="fu">:::</span><span class="fu"><a href="../reference/EnsDb-sequences.html">getGenomeTwoBitFile</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span>
 
 <span class="co">## Get start/end coordinates of all genes.</span>
-<span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span>
+<span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span>
 <span class="co">## Subset to all genes that are encoded on chromosomes for which</span>
 <span class="co">## we do have DNA sequence available.</span>
 <span class="va">genes</span> <span class="op">&lt;-</span> <span class="va">genes</span><span class="op">[</span><span class="fu">seqnames</span><span class="op">(</span><span class="va">genes</span><span class="op">)</span> <span class="op">%in%</span> <span class="fu">seqnames</span><span class="op">(</span><span class="fu"><a href="../reference/EnsDb-class.html">seqinfo</a></span><span class="op">(</span><span class="va">dna</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>
@@ -900,35 +902,35 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>To retrieve the (exonic) sequence of transcripts (i.e. without introns) we can use directly the <code>extractTranscriptSeqs</code> method defined in the <code>GenomicFeatures</code> on the <code>EnsDb</code> object, eventually using a filter to restrict the query.</p>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## get all exons of all transcripts encoded on chromosome Y</span>
-<span class="va">yTx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">exonsBy</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">yTx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">exonsBy</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Retrieve the sequences for these transcripts from the TwoBitile.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/GenomicFeatures">GenomicFeatures</a></span><span class="op">)</span>
-<span class="va">yTxSeqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html">extractTranscriptSeqs</a></span><span class="op">(</span><span class="va">dna</span>, <span class="va">yTx</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/GenomicFeatures" class="external-link">GenomicFeatures</a></span><span class="op">)</span>
+<span class="va">yTxSeqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html" class="external-link">extractTranscriptSeqs</a></span><span class="op">(</span><span class="va">dna</span>, <span class="va">yTx</span><span class="op">)</span>
 <span class="va">yTxSeqs</span>
 
 <span class="co">## Extract the sequences of all transcripts encoded on chromosome Y.</span>
-<span class="va">yTx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html">extractTranscriptSeqs</a></span><span class="op">(</span><span class="va">dna</span>, <span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">yTx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html" class="external-link">extractTranscriptSeqs</a></span><span class="op">(</span><span class="va">dna</span>, <span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Along these lines, we could use the method also to retrieve the coding sequence</span>
 <span class="co">## of all transcripts on the Y chromosome.</span>
-<span class="va">cdsY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html">extractTranscriptSeqs</a></span><span class="op">(</span><span class="va">dna</span>, <span class="va">cdsY</span><span class="op">)</span></code></pre></div>
+<span class="va">cdsY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html" class="external-link">extractTranscriptSeqs</a></span><span class="op">(</span><span class="va">dna</span>, <span class="va">cdsY</span><span class="op">)</span></code></pre></div>
 <p>Next we retrieve transcript sequences from genes encoded on chromosome Y using the <code>BSGenome</code> package for the human genome. Ensembl version 86 based on the <code>GRCh38</code> genome build and we thus load the corresponding <code>BSGenome</code> package.</p>
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">BSgenome.Hsapiens.NCBI.GRCh38</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BSgenome.Hsapiens.NCBI.GRCh38</span><span class="op">)</span>
 <span class="va">bsg</span> <span class="op">&lt;-</span> <span class="va">BSgenome.Hsapiens.NCBI.GRCh38</span>
 
 <span class="co">## Get the genome version</span>
-<span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="fu">genome</span><span class="op">(</span><span class="va">bsg</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu">genome</span><span class="op">(</span><span class="va">bsg</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "GRCh38"</code></pre>
 <div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="fu">genome</span><span class="op">(</span><span class="va">edb</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu">genome</span><span class="op">(</span><span class="va">edb</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "GRCh38"</code></pre>
 <div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Extract the full transcript sequences.</span>
-<span class="va">yTxSeqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html">extractTranscriptSeqs</a></span><span class="op">(</span>
-  <span class="va">bsg</span>, <span class="fu"><a href="../reference/exonsBy.html">exonsBy</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"tx"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">yTxSeqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html" class="external-link">extractTranscriptSeqs</a></span><span class="op">(</span>
+  <span class="va">bsg</span>, <span class="fu"><a href="../reference/EnsDb-exonsBy.html">exonsBy</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"tx"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">yTxSeqs</span></code></pre></div>
 <pre><code>## DNAStringSet object of length 740:
@@ -946,9 +948,9 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [740]   890 CTCTCCCAGCTTCTACCCACAG...GCATACTATAAAAATGCTTTAA ENST00000635343</code></pre>
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Extract just the CDS</span>
-<span class="va">Test</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"tx"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">yTxCds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html">extractTranscriptSeqs</a></span><span class="op">(</span>
-  <span class="va">bsg</span>, <span class="fu"><a href="../reference/exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"tx"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Test</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"tx"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">yTxCds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicFeatures/man/extractTranscriptSeqs.html" class="external-link">extractTranscriptSeqs</a></span><span class="op">(</span>
+  <span class="va">bsg</span>, <span class="fu"><a href="../reference/EnsDb-exonsBy.html">cdsBy</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"tx"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="va">yTxCds</span></code></pre></div>
 <pre><code>## DNAStringSet object of length 151:
 ##       width seq                                             names               
@@ -971,19 +973,19 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>In the example below we change the seqnames style to UCSC.</p>
 <div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Change the seqlevels style form Ensembl (default) to UCSC:</span>
-<span class="fu"><a href="../reference/seqlevelsStyle.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UCSC"</span>
+<span class="fu"><a href="../reference/EnsDb-seqlevels.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UCSC"</span>
 
 <span class="co">## Now we can use UCSC style seqnames in SeqNameFilters or GRangesFilter:</span>
-<span class="va">genesY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">seq_name</span> <span class="op">==</span> <span class="st">"chrY"</span><span class="op">)</span>
+<span class="va">genesY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">seq_name</span> <span class="op">==</span> <span class="st">"chrY"</span><span class="op">)</span>
 <span class="co">## The seqlevels of the returned GRanges are also in UCSC style</span>
 <span class="fu"><a href="../reference/EnsDb-class.html">seqlevels</a></span><span class="op">(</span><span class="va">genesY</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "chrY"</code></pre>
 <p>Note that in most instances no mapping is available for sequences not corresponding to the main chromosomes (i.e. contigs, patched chromosomes etc). What is returned in cases in which no mapping is available can be specified with the global <code>ensembldb.seqnameNotFound</code> option. By default (with <code>ensembldb.seqnameNotFound</code> set to “ORIGINAL”), the original seqnames (i.e. the ones from Ensembl) are returned. With <code>ensembldb.seqnameNotFound</code> “MISSING” each time a seqname can not be found an error is thrown. For all other cases (e.g. <code>ensembldb.seqnameNotFound = NA</code>) the value of the option is returned.</p>
 <div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/seqlevelsStyle.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UCSC"</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-seqlevels.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UCSC"</span>
 
 <span class="co">## Getting the default option:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">getOption</a></span><span class="op">(</span><span class="st">"ensembldb.seqnameNotFound"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"ensembldb.seqnameNotFound"</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "ORIGINAL"</code></pre>
 <div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Listing all seqlevels in the database.</span>
@@ -1009,7 +1011,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Setting the option to NA, thus, for each seqname for which no mapping is available,</span>
 <span class="co">## NA is returned.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ensembldb.seqnameNotFound<span class="op">=</span><span class="cn">NA</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>ensembldb.seqnameNotFound<span class="op">=</span><span class="cn">NA</span><span class="op">)</span>
 <span class="fu"><a href="../reference/EnsDb-class.html">seqlevels</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span><span class="op">]</span></code></pre></div>
 <pre><code>## Warning in .formatSeqnameByStyleFromQuery(x, sn, ifNotFound): More than 5
 ## seqnames with seqlevels style of the database (Ensembl) could not be mapped to
@@ -1020,10 +1022,10 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [28] NA      NA      NA</code></pre>
 <div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Resetting the option.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ensembldb.seqnameNotFound <span class="op">=</span> <span class="st">"ORIGINAL"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>ensembldb.seqnameNotFound <span class="op">=</span> <span class="st">"ORIGINAL"</span><span class="op">)</span></code></pre></div>
 <p>At last changing the seqname style to the default value <code>"Ensembl"</code>.</p>
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/seqlevelsStyle.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"Ensembl"</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-seqlevels.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"Ensembl"</span></code></pre></div>
 </div>
 <div id="interactive-annotation-lookup-using-the-shiny-web-app" class="section level1">
 <h1 class="hasAnchor">
@@ -1036,33 +1038,33 @@ document.addEventListener("DOMContentLoaded", function() {
 </h1>
 <p>The <code>Gviz</code> package provides functions to plot genes and transcripts along with other data on a genomic scale. Gene models can be provided either as a <code>data.frame</code>, <code>GRanges</code>, <code>TxDB</code> database, can be fetched from biomart and can also be retrieved from <code>ensembldb</code>.</p>
 <p>Below we generate a <code>GeneRegionTrack</code> fetching all transcripts from a certain region on chromosome Y.</p>
-<p>Note that if we want in addition to work also with BAM files that were aligned against DNA sequences retrieved from Ensembl or FASTA files representing genomic DNA sequences from Ensembl we should change the <code>ucscChromosomeNames</code> option from <code>Gviz</code> to <code>FALSE</code> (i.e. by calling <code><a href="https://rdrr.io/r/base/options.html">options(ucscChromosomeNames = FALSE)</a></code>). This is not necessary if we just want to retrieve gene models from an <code>EnsDb</code> object, as the <code>ensembldb</code> package internally checks the <code>ucscChromosomeNames</code> option and, depending on that, maps Ensembl chromosome names to UCSC chromosome names.</p>
+<p>Note that if we want in addition to work also with BAM files that were aligned against DNA sequences retrieved from Ensembl or FASTA files representing genomic DNA sequences from Ensembl we should change the <code>ucscChromosomeNames</code> option from <code>Gviz</code> to <code>FALSE</code> (i.e. by calling <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options(ucscChromosomeNames = FALSE)</a></code>). This is not necessary if we just want to retrieve gene models from an <code>EnsDb</code> object, as the <code>ensembldb</code> package internally checks the <code>ucscChromosomeNames</code> option and, depending on that, maps Ensembl chromosome names to UCSC chromosome names.</p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Loading the Gviz library</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ivanek/Gviz">Gviz</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ivanek/Gviz" class="external-link">Gviz</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 <span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span>
 
 <span class="co">## Retrieving a Gviz compatible GRanges object with all genes</span>
 <span class="co">## encoded on chromosome Y.</span>
-<span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"Y"</span>,
+<span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"Y"</span>,
                 start <span class="op">=</span> <span class="fl">20400000</span>, end <span class="op">=</span> <span class="fl">21400000</span><span class="op">)</span>
 <span class="co">## Define a genome axis track</span>
-<span class="va">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html" class="external-link">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co">## We have to change the ucscChromosomeNames option to FALSE to enable Gviz usage</span>
 <span class="co">## with non-UCSC chromosome names.</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ucscChromosomeNames <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>ucscChromosomeNames <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span><span class="op">(</span><span class="va">gr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html" class="external-link">GeneRegionTrack</a></span><span class="op">(</span><span class="va">gr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="ensembldb_files/figure-html/gviz-plot-1.png" width="700"></p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>ucscChromosomeNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>ucscChromosomeNames <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p>Above we had to change the option <code>ucscChromosomeNames</code> to <code>FALSE</code> in order to use it with non-UCSC chromosome names. Alternatively, we could however also change the <code>seqnamesStyle</code> of the <code>EnsDb</code> object to <code>UCSC</code>. Note that we have to use now also chromosome names in the <em>UCSC style</em> in the <code>SeqNameFilter</code> (i.e. “chrY” instead of “Y”).</p>
 <div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/seqlevelsStyle.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UCSC"</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-seqlevels.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UCSC"</span>
 <span class="co">## Retrieving the GRanges objects with seqnames corresponding to UCSC chromosome names.</span>
-<span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"chrY"</span>,
+<span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"chrY"</span>,
                                 start <span class="op">=</span> <span class="fl">20400000</span>, end <span class="op">=</span> <span class="fl">21400000</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning in .formatSeqnameByStyleForQuery(x, sn, ifNotFound): Seqnames: Y could
 ## not be mapped to the seqlevels style of the database (Ensembl)!Returning the
@@ -1075,36 +1077,36 @@ document.addEventListener("DOMContentLoaded", function() {
 ## Levels(1): chrY</code></pre>
 <div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Define a genome axis track</span>
-<span class="va">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span><span class="op">(</span><span class="va">gr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">gat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html" class="external-link">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html" class="external-link">GeneRegionTrack</a></span><span class="op">(</span><span class="va">gr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="ensembldb_files/figure-html/unnamed-chunk-1-1.png" width="700"></p>
 <p>We can also use the filters from the <code>ensembldb</code> package to further refine what transcripts are fetched, like in the example below, in which we create two different gene region tracks, one for protein coding genes and one for lincRNAs.</p>
 <div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">protCod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"chrY"</span>,
+<code class="sourceCode R"><span class="va">protCod</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"chrY"</span>,
                      start <span class="op">=</span> <span class="fl">20400000</span>, end <span class="op">=</span> <span class="fl">21400000</span>,
                      filter <span class="op">=</span> <span class="fu">GeneBiotypeFilter</span><span class="op">(</span><span class="st">"protein_coding"</span><span class="op">)</span><span class="op">)</span>
-<span class="va">lincs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGeneRegionTrackForGviz.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"chrY"</span>,
+<span class="va">lincs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, chromosome <span class="op">=</span> <span class="st">"chrY"</span>,
                    start <span class="op">=</span> <span class="fl">20400000</span>, end <span class="op">=</span> <span class="fl">21400000</span>,
                    filter <span class="op">=</span> <span class="fu">GeneBiotypeFilter</span><span class="op">(</span><span class="st">"lincRNA"</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span><span class="op">(</span><span class="va">protCod</span>, name <span class="op">=</span> <span class="st">"protein coding"</span><span class="op">)</span>,
-        <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html">GeneRegionTrack</a></span><span class="op">(</span><span class="va">lincs</span>, name <span class="op">=</span> <span class="st">"lincRNAs"</span><span class="op">)</span><span class="op">)</span>, transcriptAnnotation <span class="op">=</span> <span class="st">"symbol"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gat</span>, <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html" class="external-link">GeneRegionTrack</a></span><span class="op">(</span><span class="va">protCod</span>, name <span class="op">=</span> <span class="st">"protein coding"</span><span class="op">)</span>,
+        <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GeneRegionTrack-class.html" class="external-link">GeneRegionTrack</a></span><span class="op">(</span><span class="va">lincs</span>, name <span class="op">=</span> <span class="st">"lincRNAs"</span><span class="op">)</span><span class="op">)</span>, transcriptAnnotation <span class="op">=</span> <span class="st">"symbol"</span><span class="op">)</span></code></pre></div>
 <p><img src="ensembldb_files/figure-html/gviz-separate-tracks-1.png" width="700"></p>
 <div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## At last we change the seqlevels style again to Ensembl</span>
 <span class="va">seqlevelsStyle</span> <span class="op">&lt;-</span> <span class="st">"Ensembl"</span></code></pre></div>
 <p>Alternatively, we can also use <code>ggbio</code> for plotting. For <code>ggbio</code> we can directly pass the <code>EnsDb</code> object along with optional filters (or as in the example below a filter expression as a <code>formula</code>).</p>
 <div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://tengfei.github.com/ggbio/">ggbio</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://tengfei.github.com/ggbio/" class="external-link">ggbio</a></span><span class="op">)</span>
 
 <span class="co">## Create a plot for all transcripts of the gene SKA2</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggbio/man/autoplot-method.html">autoplot</a></span><span class="op">(</span><span class="va">edb</span>, <span class="op">~</span> <span class="va">gene_name</span> <span class="op">==</span> <span class="st">"SKA2"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/ggbio/man/autoplot-method.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">edb</span>, <span class="op">~</span> <span class="va">gene_name</span> <span class="op">==</span> <span class="st">"SKA2"</span><span class="op">)</span></code></pre></div>
 <p>To plot the genomic region and plot genes from both strands we can use a <code>GRangesFilter</code>.</p>
 <div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get the chromosomal region in which the gene is encoded</span>
-<span class="va">ska2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_name</span> <span class="op">==</span> <span class="st">"SKA2"</span><span class="op">)</span>
+<span class="va">ska2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">gene_name</span> <span class="op">==</span> <span class="st">"SKA2"</span><span class="op">)</span>
 <span class="fu">strand</span><span class="op">(</span><span class="va">ska2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"*"</span>
-<span class="fu"><a href="https://rdrr.io/pkg/ggbio/man/autoplot-method.html">autoplot</a></span><span class="op">(</span><span class="va">edb</span>, <span class="fu">GRangesFilter</span><span class="op">(</span><span class="va">ska2</span><span class="op">)</span>, names.expr <span class="op">=</span> <span class="st">"gene_name"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/ggbio/man/autoplot-method.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">edb</span>, <span class="fu">GRangesFilter</span><span class="op">(</span><span class="va">ska2</span><span class="op">)</span>, names.expr <span class="op">=</span> <span class="st">"gene_name"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="using-ensdb-objects-in-the-annotationdbi-framework" class="section level1">
 <h1 class="hasAnchor">
@@ -1112,7 +1114,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Most of the methods defined for objects extending the basic annotation package class <code>AnnotationDbi</code> are also defined for <code>EnsDb</code> objects (i.e. methods <code>columns</code>, <code>keytypes</code>, <code>keys</code>, <code>mapIds</code> and <code>select</code>). While these methods can be used analogously to basic annotation packages, the implementation for <code>EnsDb</code> objects also support the filtering framework of the <code>ensembldb</code> package.</p>
 <p>In the example below we first evaluate all the available columns and keytypes in the database and extract then the gene names for all genes encoded on chromosome X.</p>
 <div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
 <span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span>
 
 <span class="co">## List all available columns in the database.</span>
@@ -1158,18 +1160,18 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get all gene ids from the database.</span>
 <span class="va">gids</span> <span class="op">&lt;-</span> <span class="fu">keys</span><span class="op">(</span><span class="va">edb</span>, keytype <span class="op">=</span> <span class="st">"GENEID"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">gids</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">gids</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 63970</code></pre>
 <div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get all gene names for genes encoded on chromosome Y.</span>
 <span class="va">gnames</span> <span class="op">&lt;-</span> <span class="fu">keys</span><span class="op">(</span><span class="va">edb</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">gnames</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gnames</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "KDM5D"   "DDX3Y"   "ZFY"     "TBL1Y"   "PCDH11Y" "AMELY"</code></pre>
 <p>In the next example we retrieve specific information from the database using the <code>select</code> method. First we fetch all transcripts for the genes <em>BCL2</em> and <em>BCL2L11</em>. In the first call we provide the gene names, while in the second call we employ the filtering system to perform a more fine-grained query to fetch only the protein coding transcripts for these genes.</p>
 <div class="sourceCode" id="cb98"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Use the /standard/ way to fetch data.</span>
-<span class="fu"><a href="../reference/select.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span>,
-       columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"GENEID"</span>, <span class="st">"GENENAME"</span>, <span class="st">"TXID"</span>, <span class="st">"TXBIOTYPE"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/EnsDb-AnnotationDbi.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span>,
+       columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GENEID"</span>, <span class="st">"GENENAME"</span>, <span class="st">"TXID"</span>, <span class="st">"TXBIOTYPE"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##             GENEID GENENAME            TXID               TXBIOTYPE
 ## 1  ENSG00000171791     BCL2 ENST00000398117          protein_coding
 ## 2  ENSG00000171791     BCL2 ENST00000333681          protein_coding
@@ -1205,9 +1207,9 @@ document.addEventListener("DOMContentLoaded", function() {
 ## 32         LRG_620  BCL2L11       LRG_620t5                LRG_gene</code></pre>
 <div class="sourceCode" id="cb100"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Use the filtering system of ensembldb</span>
-<span class="fu"><a href="../reference/select.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="op">~</span> <span class="va">gene_name</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span> <span class="op">&amp;</span>
+<span class="fu"><a href="../reference/EnsDb-AnnotationDbi.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="op">~</span> <span class="va">gene_name</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span> <span class="op">&amp;</span>
         <span class="va">tx_biotype</span> <span class="op">==</span> <span class="st">"protein_coding"</span>,
-       columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"GENEID"</span>, <span class="st">"GENENAME"</span>, <span class="st">"TXID"</span>, <span class="st">"TXBIOTYPE"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+       columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GENEID"</span>, <span class="st">"GENENAME"</span>, <span class="st">"TXID"</span>, <span class="st">"TXBIOTYPE"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##             GENEID GENENAME            TXID      TXBIOTYPE
 ## 1  ENSG00000171791     BCL2 ENST00000398117 protein_coding
 ## 2  ENSG00000171791     BCL2 ENST00000333681 protein_coding
@@ -1230,12 +1232,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Finally, we use the <code>mapIds</code> method to establish a mapping between ids and values. In the example below we fetch transcript ids for the two genes from the example above.</p>
 <div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Use the default method, which just returns the first value for multi mappings.</span>
-<span class="fu">mapIds</span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span>, column <span class="op">=</span> <span class="st">"TXID"</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span><span class="op">)</span></code></pre></div>
+<span class="fu">mapIds</span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span>, column <span class="op">=</span> <span class="st">"TXID"</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span><span class="op">)</span></code></pre></div>
 <pre><code>##              BCL2           BCL2L11 
 ## "ENST00000398117" "ENST00000432179"</code></pre>
 <div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Alternatively, specify multiVals="list" to return all mappings.</span>
-<span class="fu">mapIds</span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span>, column <span class="op">=</span> <span class="st">"TXID"</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span>,
+<span class="fu">mapIds</span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span>, column <span class="op">=</span> <span class="st">"TXID"</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span>,
        multiVals <span class="op">=</span> <span class="st">"list"</span><span class="op">)</span></code></pre></div>
 <pre><code>## $BCL2
 ## [1] "ENST00000398117" "ENST00000333681" "ENST00000590515" "ENST00000589955"
@@ -1250,7 +1252,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [25] "LRG_620t2"       "LRG_620t3"       "LRG_620t4"       "LRG_620t5"</code></pre>
 <div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## And, just like before, we can use filters to map only to protein coding transcripts.</span>
-<span class="fu">mapIds</span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu">GeneNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span><span class="op">)</span>,
+<span class="fu">mapIds</span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">GeneNameFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BCL2"</span>, <span class="st">"BCL2L11"</span><span class="op">)</span><span class="op">)</span>,
                         <span class="fu">TxBiotypeFilter</span><span class="op">(</span><span class="st">"protein_coding"</span><span class="op">)</span><span class="op">)</span>, column <span class="op">=</span> <span class="st">"TXID"</span>,
        multiVals <span class="op">=</span> <span class="st">"list"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning in .mapIds(x = x, keys = keys, column = column, keytype = keytype, : Got
@@ -1288,14 +1290,14 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Some <code>EnsDb</code> databases are available as <code>R</code> packages from Bioconductor and can be simply installed with the <code>install</code> function from the <code>BiocManager</code> package. The name of such annotation packages starts with <em>EnsDb</em> followed by the abbreviation of the organism and the Ensembl version on which the annotation bases. <code>EnsDb.Hsapiens.v86</code> provides thus an <code>EnsDb</code> database for homo sapiens with annotations from Ensembl version 86.</p>
 <p>Since Bioconductor version 3.5 <code>EnsDb</code> databases can also be retrieved directly from <code>AnnotationHub</code>.</p>
 <div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span>
 <span class="co">## Load the annotation resource.</span>
-<span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co">## Query for all available EnsDb databases</span>
-<span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="st">"EnsDb"</span><span class="op">)</span></code></pre></div>
-<pre><code>## AnnotationHub with 2233 records
-## # snapshotDate(): 2021-01-14
+<span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="st">"EnsDb"</span><span class="op">)</span></code></pre></div>
+<pre><code>## AnnotationHub with 2476 records
+## # snapshotDate(): 2021-04-15
 ## # $dataprovider: Ensembl
 ## # $species: Homo sapiens, Xiphophorus maculatus, Xenopus tropicalis, Vicugna...
 ## # $rdataclass: EnsDb
@@ -1311,18 +1313,18 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   AH53188 | Ensembl 87 EnsDb for Anas Platyrhynchos     
 ##   AH53189 | Ensembl 87 EnsDb for Bos Taurus             
 ##   ...       ...                                         
-##   AH89321 | Ensembl 102 EnsDb for Xiphophorus couchianus
-##   AH89322 | Ensembl 102 EnsDb for Xiphophorus maculatus 
-##   AH89323 | Ensembl 102 EnsDb for Xenopus tropicalis    
-##   AH89324 | Ensembl 102 EnsDb for Zonotrichia albicollis
-##   AH89325 | Ensembl 102 EnsDb for Zalophus californianus</code></pre>
+##   AH89567 | Ensembl 103 EnsDb for Xiphophorus couchianus
+##   AH89568 | Ensembl 103 EnsDb for Xiphophorus maculatus 
+##   AH89569 | Ensembl 103 EnsDb for Xenopus tropicalis    
+##   AH89570 | Ensembl 103 EnsDb for Zonotrichia albicollis
+##   AH89571 | Ensembl 103 EnsDb for Zalophus californianus</code></pre>
 <p>We can simply fetch one of the databases.</p>
 <div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ahDb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html">query</a></span><span class="op">(</span><span class="va">ah</span>, pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Xiphophorus Maculatus"</span>, <span class="st">"EnsDb"</span>, <span class="fl">87</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">ahDb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, pattern <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Xiphophorus Maculatus"</span>, <span class="st">"EnsDb"</span>, <span class="fl">87</span><span class="op">)</span><span class="op">)</span>
 <span class="co">## What have we got</span>
 <span class="va">ahDb</span></code></pre></div>
 <pre><code>## AnnotationHub with 1 record
-## # snapshotDate(): 2021-01-14
+## # snapshotDate(): 2021-04-15
 ## # names(): AH53251
 ## # $dataprovider: Ensembl
 ## # $species: Xiphophorus maculatus
@@ -1343,7 +1345,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <code class="sourceCode R"><span class="va">ahEdb</span> <span class="op">&lt;-</span> <span class="va">ahDb</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
 
 <span class="co">## retriebe all genes</span>
-<span class="va">gns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">genes</a></span><span class="op">(</span><span class="va">ahEdb</span><span class="op">)</span></code></pre></div>
+<span class="va">gns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">ahEdb</span><span class="op">)</span></code></pre></div>
 <p>We could even make an annotation package from this <code>EnsDb</code> object using the <code>makeEnsembldbPackage</code> and passing <code>dbfile(dbconn(ahEdb))</code> as <code>ensdb</code> argument.</p>
 </div>
 <div id="building-annotation-packages" class="section level2">
@@ -1355,20 +1357,20 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The <code>fetchTablesFromEnsembl</code> function uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site <em>ensembldb.ensembl.org</em>). Thus, to use this functionality to build databases, the Ensembl Perl API needs to be installed (see <sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup> for details).</p>
 <p>Below we create an <code>EnsDb</code> database by fetching the required data directly from the Ensembl core databases. The <code>makeEnsembldbPackage</code> function is then used to create an annotation package from this <code>EnsDb</code> containing all human genes for Ensembl version 75.</p>
 <div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb">ensembldb</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb" class="external-link">ensembldb</a></span><span class="op">)</span>
 
 <span class="co">## get all human gene/transcript/exon annotations from Ensembl (75)</span>
 <span class="co">## the resulting tables will be stored by default to the current working</span>
 <span class="co">## directory</span>
-<span class="fu"><a href="../reference/makeEnsembldbPackage.html">fetchTablesFromEnsembl</a></span><span class="op">(</span><span class="fl">75</span>, species <span class="op">=</span> <span class="st">"human"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/makeEnsemblDbPackage.html">fetchTablesFromEnsembl</a></span><span class="op">(</span><span class="fl">75</span>, species <span class="op">=</span> <span class="st">"human"</span><span class="op">)</span>
 
 <span class="co">## These tables can then be processed to generate a SQLite database</span>
 <span class="co">## containing the annotations (again, the function assumes the required</span>
 <span class="co">## txt files to be present in the current working directory)</span>
-<span class="va">DBFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsembldbPackage.html">makeEnsemblSQLiteFromTables</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">DBFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsemblDbPackage.html">makeEnsemblSQLiteFromTables</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co">## and finally we can generate the package</span>
-<span class="fu"><a href="../reference/makeEnsembldbPackage.html">makeEnsembldbPackage</a></span><span class="op">(</span>ensdb <span class="op">=</span> <span class="va">DBFile</span>, version <span class="op">=</span> <span class="st">"0.99.12"</span>,
+<span class="fu"><a href="../reference/makeEnsemblDbPackage.html">makeEnsembldbPackage</a></span><span class="op">(</span>ensdb <span class="op">=</span> <span class="va">DBFile</span>, version <span class="op">=</span> <span class="st">"0.99.12"</span>,
                      maintainer <span class="op">=</span> <span class="st">"Johannes Rainer &lt;johannes.rainer@eurac.edu&gt;"</span>,
                      author <span class="op">=</span> <span class="st">"J Rainer"</span><span class="op">)</span></code></pre></div>
 <p>The generated package can then be build using <code>R CMD build EnsDb.Hsapiens.v75</code> and installed with <code>R CMD INSTALL EnsDb.Hsapiens.v75*</code>. Note that we could directly generate an <code>EnsDb</code> instance by loading the database file, i.e. by calling <code>edb &lt;- EnsDb(DBFile)</code> and work with that annotation object.</p>
@@ -1381,32 +1383,32 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>In the next example we create an <code>EnsDb</code> database using the <code>AnnotationHub</code> package and load also the corresponding genomic DNA sequence matching the Ensembl version. We thus first query the <code>AnnotationHub</code> package for all resources available for <code>Mus musculus</code> and the Ensembl release 77. Next we create the <code>EnsDb</code> object from the appropriate <code>AnnotationHub</code> resource. We then use the <code>getGenomeTwoBitFile</code> method on the <code>EnsDb</code> to directly look up and retrieve the correct or best matching <code>TwoBitFile</code> with the genomic DNA sequence. At last we retrieve the sequences of all exons using the <code>getSeq</code> method.</p>
 <div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Load the AnnotationHub data.</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span>
-<span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span>
+<span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="co">## Query all available files for Ensembl release 77 for</span>
 <span class="co">## Mus musculus.</span>
-<span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Mus musculus"</span>, <span class="st">"release-77"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Mus musculus"</span>, <span class="st">"release-77"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Get the resource for the gtf file with the gene/transcript definitions.</span>
 <span class="va">Gtf</span> <span class="op">&lt;-</span> <span class="va">ah</span><span class="op">[</span><span class="st">"AH28822"</span><span class="op">]</span>
 <span class="co">## Create a EnsDb database file from this.</span>
-<span class="va">DbFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsembldbPackage.html">ensDbFromAH</a></span><span class="op">(</span><span class="va">Gtf</span><span class="op">)</span>
+<span class="va">DbFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsemblDbPackage.html">ensDbFromAH</a></span><span class="op">(</span><span class="va">Gtf</span><span class="op">)</span>
 <span class="co">## We can either generate a database package, or directly load the data</span>
 <span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DbFile</span><span class="op">)</span>
 
 
 <span class="co">## Identify and get the TwoBit object with the genomic DNA sequence matching</span>
 <span class="co">## the EnsDb annotation.</span>
-<span class="va">Dna</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getGenomeFaFile.html">getGenomeTwoBitFile</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span>
+<span class="va">Dna</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-sequences.html">getGenomeTwoBitFile</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span>
 <span class="co">## We next retrieve the sequence of all exons on chromosome Y.</span>
-<span class="va">exons</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/exonsBy.html">exons</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">exons</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">exons</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">SeqNameFilter</span><span class="op">(</span><span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">exonSeq</span> <span class="op">&lt;-</span> <span class="fu">getSeq</span><span class="op">(</span><span class="va">Dna</span>, <span class="va">exons</span><span class="op">)</span></code></pre></div>
 <p>In the example below we load a <code>GRanges</code> containing gene definitions for genes encoded on chromosome Y and generate a <code>EnsDb</code> SQLite database from that information.</p>
 <div class="sourceCode" id="cb116"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Generate a sqlite database from a GRanges object specifying</span>
 <span class="co">## genes encoded on chromosome Y</span>
-<span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"YGRanges.RData"</span>, package <span class="op">=</span> <span class="st">"ensembldb"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"YGRanges.RData"</span>, package <span class="op">=</span> <span class="st">"ensembldb"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">Y</span></code></pre></div>
 <pre><code>## GRanges object with 7155 ranges and 16 metadata columns:
 ##          seqnames            ranges strand |               source       type
@@ -1465,7 +1467,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ##   seqinfo: 1 sequence from GRCh37 genome</code></pre>
 <div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Create the EnsDb database file</span>
-<span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsembldbPackage.html">ensDbFromGRanges</a></span><span class="op">(</span><span class="va">Y</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">75</span>,
+<span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsemblDbPackage.html">ensDbFromGRanges</a></span><span class="op">(</span><span class="va">Y</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, version <span class="op">=</span> <span class="fl">75</span>,
                organism <span class="op">=</span> <span class="st">"Homo_sapiens"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Warning in ensDbFromGRanges(Y, path = tempdir(), version = 75, organism =
 ## "Homo_sapiens"): I'm missing column(s): 'entrezid'. The corresponding database
@@ -1481,7 +1483,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## |Supporting package: ensembldb
 ## |Db created by: ensembldb package from Bioconductor
 ## |script_version: 0.0.1
-## |Creation time: Tue Jan 26 14:57:17 2021
+## |Creation time: Mon Apr 19 07:11:31 2021
 ## |ensembl_version: 75
 ## |ensembl_host: unknown
 ## |Organism: Homo_sapiens
@@ -1493,20 +1495,20 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Alternatively we can build the annotation database using the <code>ensDbFromGtf</code> <code>ensDbFromGff</code> functions, that extract most of the required data from a GTF respectively GFF (version 3) file which can be downloaded from Ensembl (e.g. from <a href="ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens" class="uri">ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens</a> for human gene definitions from Ensembl version 75; for plant genomes etc, files can be retrieved from <a href="ftp://ftp.ensemblgenomes.org" class="uri">ftp://ftp.ensemblgenomes.org</a>). All information except the chromosome lengths, the NCBI Entrezgene IDs and protein annotations can be extracted from these GTF files. The function also tries to retrieve chromosome length information automatically from Ensembl.</p>
 <p>Below we create the annotation from a gtf file that we fetch directly from Ensembl.</p>
 <div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb">ensembldb</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb" class="external-link">ensembldb</a></span><span class="op">)</span>
 
 <span class="co">## the GTF file can be downloaded from</span>
 <span class="co">## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/</span>
 <span class="va">gtffile</span> <span class="op">&lt;-</span> <span class="st">"Homo_sapiens.GRCh37.75.gtf.gz"</span>
 <span class="co">## generate the SQLite database file</span>
-<span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsembldbPackage.html">ensDbFromGtf</a></span><span class="op">(</span>gtf <span class="op">=</span> <span class="va">gtffile</span><span class="op">)</span>
+<span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/makeEnsemblDbPackage.html">ensDbFromGtf</a></span><span class="op">(</span>gtf <span class="op">=</span> <span class="va">gtffile</span><span class="op">)</span>
 
 <span class="co">## load the DB file directly</span>
 <span class="va">EDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span>
 
 <span class="co">## alternatively, build the annotation package</span>
 <span class="co">## and finally we can generate the package</span>
-<span class="fu"><a href="../reference/makeEnsembldbPackage.html">makeEnsembldbPackage</a></span><span class="op">(</span>ensdb <span class="op">=</span> <span class="va">DB</span>, version <span class="op">=</span> <span class="st">"0.99.12"</span>,
+<span class="fu"><a href="../reference/makeEnsemblDbPackage.html">makeEnsembldbPackage</a></span><span class="op">(</span>ensdb <span class="op">=</span> <span class="va">DB</span>, version <span class="op">=</span> <span class="st">"0.99.12"</span>,
                      maintainer <span class="op">=</span> <span class="st">"Johannes Rainer &lt;johannes.rainer@eurac.edu&gt;"</span>,
                      author <span class="op">=</span> <span class="st">"J Rainer"</span><span class="op">)</span></code></pre></div>
 </div>
@@ -1672,10 +1674,10 @@ document.addEventListener("DOMContentLoaded", function() {
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session information</h1>
 <div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R Under development (unstable) (2021-01-21 r79854)
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<pre><code>## R Under development (unstable) (2021-04-15 r80175)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 20.04.1 LTS
+## Running under: Ubuntu 20.04.2 LTS
 ## 
 ## Matrix products: default
 ## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
@@ -1693,94 +1695,97 @@ document.addEventListener("DOMContentLoaded", function() {
 ##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] AnnotationHub_2.23.0                  
-##  [2] BiocFileCache_1.15.1                  
-##  [3] dbplyr_2.0.0                          
-##  [4] Gviz_1.35.4                           
+##  [1] AnnotationHub_2.99.5                  
+##  [2] BiocFileCache_1.99.6                  
+##  [3] dbplyr_2.1.1                          
+##  [4] Gviz_1.35.5                           
 ##  [5] BSgenome.Hsapiens.NCBI.GRCh38_1.3.1000
 ##  [6] BSgenome_1.59.2                       
-##  [7] rtracklayer_1.51.4                    
+##  [7] rtracklayer_1.51.5                    
 ##  [8] Biostrings_2.59.2                     
 ##  [9] XVector_0.31.1                        
 ## [10] magrittr_2.0.1                        
 ## [11] EnsDb.Hsapiens.v86_2.99.0             
-## [12] ensembldb_2.15.2                      
+## [12] ensembldb_2.15.3                      
 ## [13] AnnotationFilter_1.15.0               
-## [14] GenomicFeatures_1.43.3                
-## [15] AnnotationDbi_1.53.0                  
+## [14] GenomicFeatures_1.43.8                
+## [15] AnnotationDbi_1.53.1                  
 ## [16] Biobase_2.51.0                        
-## [17] GenomicRanges_1.43.3                  
-## [18] GenomeInfoDb_1.27.5                   
-## [19] IRanges_2.25.6                        
-## [20] S4Vectors_0.29.6                      
-## [21] BiocGenerics_0.37.0                   
-## [22] BiocStyle_2.19.1                      
+## [17] GenomicRanges_1.43.4                  
+## [18] GenomeInfoDb_1.27.11                  
+## [19] IRanges_2.25.9                        
+## [20] S4Vectors_0.29.15                     
+## [21] BiocGenerics_0.37.2                   
+## [22] BiocStyle_2.19.2                      
 ## 
 ## loaded via a namespace (and not attached):
 ##   [1] colorspace_2.0-0              rjson_0.2.20                 
 ##   [3] ellipsis_0.3.1                rprojroot_2.0.2              
-##   [5] biovizBase_1.39.0             htmlTable_2.1.0              
+##   [5] htmlTable_2.1.0               biovizBase_1.39.0            
 ##   [7] base64enc_0.1-3               fs_1.5.0                     
 ##   [9] dichromat_2.0-0               rstudioapi_0.13              
 ##  [11] bit64_4.0.5                   interactiveDisplayBase_1.29.0
-##  [13] xml2_1.3.2                    splines_4.1.0                
-##  [15] knitr_1.30                    Formula_1.2-4                
-##  [17] Rsamtools_2.7.1               cluster_2.1.0                
-##  [19] png_0.1-7                     shiny_1.6.0                  
-##  [21] BiocManager_1.30.10           compiler_4.1.0               
-##  [23] httr_1.4.2                    backports_1.2.1              
-##  [25] fastmap_1.1.0                 assertthat_0.2.1             
-##  [27] Matrix_1.3-2                  lazyeval_0.2.2               
-##  [29] later_1.1.0.1                 htmltools_0.5.1.1            
-##  [31] prettyunits_1.1.1             tools_4.1.0                  
-##  [33] gtable_0.3.0                  glue_1.4.2                   
-##  [35] GenomeInfoDbData_1.2.4        dplyr_1.0.3                  
-##  [37] rappdirs_0.3.1                Rcpp_1.0.6                   
-##  [39] pkgdown_1.6.1.9000            vctrs_0.3.6                  
-##  [41] xfun_0.20                     stringr_1.4.0                
-##  [43] mime_0.9                      lifecycle_0.2.0              
-##  [45] restfulr_0.0.13               XML_3.99-0.5                 
-##  [47] zlibbioc_1.37.0               scales_1.1.1                 
-##  [49] VariantAnnotation_1.37.1      promises_1.1.1               
-##  [51] ragg_0.4.1                    hms_1.0.0                    
-##  [53] MatrixGenerics_1.3.0          ProtGenerics_1.23.6          
-##  [55] SummarizedExperiment_1.21.1   RColorBrewer_1.1-2           
-##  [57] yaml_2.2.1                    curl_4.3                     
-##  [59] memoise_1.1.0                 gridExtra_2.3                
-##  [61] ggplot2_3.3.3                 biomaRt_2.47.1               
-##  [63] rpart_4.1-15                  latticeExtra_0.6-29          
-##  [65] stringi_1.5.3                 RSQLite_2.2.3                
-##  [67] BiocVersion_3.13.1            BiocIO_1.1.2                 
-##  [69] desc_1.2.0                    checkmate_2.0.0              
-##  [71] filelock_1.0.2                BiocParallel_1.25.3          
-##  [73] rlang_0.4.10                  pkgconfig_2.0.3              
-##  [75] systemfonts_0.3.2             matrixStats_0.57.0           
-##  [77] bitops_1.0-6                  evaluate_0.14                
-##  [79] lattice_0.20-41               purrr_0.3.4                  
-##  [81] htmlwidgets_1.5.3             GenomicAlignments_1.27.2     
-##  [83] bit_4.0.4                     tidyselect_1.1.0             
-##  [85] bookdown_0.21                 R6_2.5.0                     
-##  [87] generics_0.1.0                Hmisc_4.4-2                  
-##  [89] DelayedArray_0.17.7           DBI_1.1.1                    
-##  [91] withr_2.4.0                   pillar_1.4.7                 
-##  [93] foreign_0.8-81                survival_3.2-7               
-##  [95] RCurl_1.98-1.2                nnet_7.3-15                  
-##  [97] tibble_3.0.5                  crayon_1.3.4                 
-##  [99] rmarkdown_2.6                 jpeg_0.1-8.1                 
-## [101] progress_1.2.2                data.table_1.13.6            
-## [103] blob_1.2.1                    digest_0.6.27                
-## [105] xtable_1.8-4                  httpuv_1.5.5                 
-## [107] textshaping_0.2.1             openssl_1.4.3                
-## [109] munsell_0.5.0                 askpass_1.1</code></pre>
+##  [13] fansi_0.4.2                   splines_4.1.0                
+##  [15] cachem_1.0.4                  knitr_1.32                   
+##  [17] Formula_1.2-4                 jsonlite_1.7.2               
+##  [19] Rsamtools_2.7.2               cluster_2.1.2                
+##  [21] png_0.1-7                     shiny_1.6.0                  
+##  [23] BiocManager_1.30.12           compiler_4.1.0               
+##  [25] httr_1.4.2                    backports_1.2.1              
+##  [27] assertthat_0.2.1              Matrix_1.3-2                 
+##  [29] fastmap_1.1.0                 lazyeval_0.2.2               
+##  [31] later_1.1.0.1                 htmltools_0.5.1.1            
+##  [33] prettyunits_1.1.1             tools_4.1.0                  
+##  [35] gtable_0.3.0                  glue_1.4.2                   
+##  [37] GenomeInfoDbData_1.2.4        dplyr_1.0.5                  
+##  [39] rappdirs_0.3.3                Rcpp_1.0.6                   
+##  [41] jquerylib_0.1.3               pkgdown_1.6.1.9001           
+##  [43] vctrs_0.3.7                   xfun_0.22                    
+##  [45] stringr_1.4.0                 mime_0.10                    
+##  [47] lifecycle_1.0.0               restfulr_0.0.13              
+##  [49] XML_3.99-0.6                  zlibbioc_1.37.0              
+##  [51] scales_1.1.1                  VariantAnnotation_1.37.1     
+##  [53] promises_1.2.0.1              ragg_1.1.2                   
+##  [55] hms_1.0.0                     MatrixGenerics_1.3.1         
+##  [57] ProtGenerics_1.23.9           SummarizedExperiment_1.21.3  
+##  [59] RColorBrewer_1.1-2            yaml_2.2.1                   
+##  [61] curl_4.3                      gridExtra_2.3                
+##  [63] memoise_2.0.0                 ggplot2_3.3.3                
+##  [65] sass_0.3.1                    biomaRt_2.47.7               
+##  [67] rpart_4.1-15                  latticeExtra_0.6-29          
+##  [69] stringi_1.5.3                 RSQLite_2.2.6                
+##  [71] BiocVersion_3.13.1            highr_0.9                    
+##  [73] BiocIO_1.1.2                  desc_1.3.0                   
+##  [75] checkmate_2.0.0               filelock_1.0.2               
+##  [77] BiocParallel_1.25.5           rlang_0.4.10                 
+##  [79] pkgconfig_2.0.3               systemfonts_1.0.1            
+##  [81] matrixStats_0.58.0            bitops_1.0-6                 
+##  [83] evaluate_0.14                 lattice_0.20-41              
+##  [85] purrr_0.3.4                   htmlwidgets_1.5.3            
+##  [87] GenomicAlignments_1.27.2      bit_4.0.4                    
+##  [89] tidyselect_1.1.0              bookdown_0.21                
+##  [91] R6_2.5.0                      generics_0.1.0               
+##  [93] Hmisc_4.5-0                   DelayedArray_0.17.10         
+##  [95] DBI_1.1.1                     withr_2.4.2                  
+##  [97] pillar_1.6.0                  foreign_0.8-81               
+##  [99] survival_3.2-10               KEGGREST_1.31.1              
+## [101] RCurl_1.98-1.3                nnet_7.3-15                  
+## [103] tibble_3.1.1                  crayon_1.4.1                 
+## [105] utf8_1.2.1                    rmarkdown_2.7                
+## [107] jpeg_0.1-8.1                  progress_1.2.2               
+## [109] data.table_1.14.0             blob_1.2.1                   
+## [111] digest_0.6.27                 xtable_1.8-4                 
+## [113] httpuv_1.5.5                  textshaping_0.3.3            
+## [115] munsell_0.5.0                 bslib_0.2.4</code></pre>
 </div>
 <div id="footnotes" class="section level1">
 <h1 class="hasAnchor">
 <a href="#footnotes" class="anchor"></a>Footnotes</h1>
-<p><sup><a id="fn.1" href="#fnr.1">1</a></sup><a href="http://www.ensembl.org" class="uri">http://www.ensembl.org</a></p>
-<p><sup><a id="fn.2" href="#fnr.2">2</a></sup><a href="http://www.lrg-sequence.org" class="uri">http://www.lrg-sequence.org</a></p>
-<p><sup><a id="fn.3" href="#fnr.3">3</a></sup><a href="http://www.ncbi.nlm.nih.gov/pubmed/23950696" class="uri">http://www.ncbi.nlm.nih.gov/pubmed/23950696</a></p>
-<p><sup><a id="fn.4" href="#fnr.4">4</a></sup><a href="http://www.ncbi.nlm.nih.gov/pubmed/24227677" class="uri">http://www.ncbi.nlm.nih.gov/pubmed/24227677</a></p>
-<p><sup><a id="fn.5" href="#fnr.5">5</a></sup><a href="http://www.ensembl.org/info/docs/api/api_installation.html" class="uri">http://www.ensembl.org/info/docs/api/api_installation.html</a></p>
+<p><sup><a id="fn.1" href="#fnr.1">1</a></sup><a href="http://www.ensembl.org" class="external-link uri">http://www.ensembl.org</a></p>
+<p><sup><a id="fn.2" href="#fnr.2">2</a></sup><a href="http://www.lrg-sequence.org" class="external-link uri">http://www.lrg-sequence.org</a></p>
+<p><sup><a id="fn.3" href="#fnr.3">3</a></sup><a href="http://www.ncbi.nlm.nih.gov/pubmed/23950696" class="external-link uri">http://www.ncbi.nlm.nih.gov/pubmed/23950696</a></p>
+<p><sup><a id="fn.4" href="#fnr.4">4</a></sup><a href="http://www.ncbi.nlm.nih.gov/pubmed/24227677" class="external-link uri">http://www.ncbi.nlm.nih.gov/pubmed/24227677</a></p>
+<p><sup><a id="fn.5" href="#fnr.5">5</a></sup><a href="http://www.ensembl.org/info/docs/api/api_installation.html" class="external-link uri">http://www.ensembl.org/info/docs/api/api_installation.html</a></p>
 </div>
   </div>
 
@@ -1795,11 +1800,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
       <footer><div class="copyright">
-  <p>Developed by Johannes Rainer.</p>
+  <p></p>
+<p>Developed by Johannes Rainer.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -1807,6 +1814,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   
 
+
+  
 
   </body>
 </html>

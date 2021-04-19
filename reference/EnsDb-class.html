@@ -60,9 +60,18 @@
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -76,7 +85,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
       </span>
     </div>
 
@@ -222,10 +231,10 @@
 
     <p>A connection to the respective annotation database is created upon
   loading of an annotation package created with the
-  <code><a href='makeEnsembldbPackage.html'>makeEnsembldbPackage</a></code> function. In addition, the
+  <code><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></code> function. In addition, the
   <code><a href='EnsDb.html'>EnsDb</a></code> constructor specifying the SQLite database file can be
   called to generate an instance of the object (see
-  <code><a href='makeEnsembldbPackage.html'>makeEnsemblSQLiteFromTables</a></code> for an example).</p>
+  <code><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></code> for an example).</p>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     <p></p><dl>
@@ -325,11 +334,11 @@
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='EnsDb.html'>EnsDb</a></code>,
-  <code><a href='makeEnsembldbPackage.html'>makeEnsembldbPackage</a></code>,
-  <code><a href='exonsBy.html'>exonsBy</a></code>, <code><a href='exonsBy.html'>genes</a></code>,
-  <code><a href='exonsBy.html'>transcripts</a></code>,
-  <code><a href='makeEnsembldbPackage.html'>makeEnsemblSQLiteFromTables</a></code></p>  
-<p><code><a href='addFilter,EnsDb-method.html'>addFilter</a></code> for globally adding filters to an <code>EnsDb</code>
+  <code><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></code>,
+  <code><a href='EnsDb-exonsBy.html'>exonsBy</a></code>, <code><a href='EnsDb-exonsBy.html'>genes</a></code>,
+  <code><a href='EnsDb-exonsBy.html'>transcripts</a></code>,
+  <code><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></code></p>  
+<p><code><a href='global-filters.html'>addFilter</a></code> for globally adding filters to an <code>EnsDb</code>
   object.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -848,7 +857,7 @@
 </div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
 <span class='co'>## Get protein coding genes on chromosome X, specifying to return</span>
 <span class='co'>## only columns gene_name as additional column.</span>
-<span class='fu'><a href='exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"X"</span><span class='op'>)</span>,
+<span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"X"</span><span class='op'>)</span>,
                                       <span class='fu'>GeneBiotypeFilter</span><span class='op'>(</span><span class='st'>"protein_coding"</span><span class='op'>)</span><span class='op'>)</span>,
       columns<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"gene_name"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 841 ranges and 3 metadata columns:
@@ -884,7 +893,7 @@
 
 <span class='co'>## This can be changed using the returnFilterColumns option</span>
 <span class='fu'>returnFilterColumns</span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='cn'>FALSE</span>
-<span class='fu'><a href='exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"X"</span><span class='op'>)</span>,
+<span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"X"</span><span class='op'>)</span>,
                                       <span class='fu'>GeneBiotypeFilter</span><span class='op'>(</span><span class='st'>"protein_coding"</span><span class='op'>)</span><span class='op'>)</span>,
       columns<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"gene_name"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; GRanges object with 841 ranges and 2 metadata columns:
@@ -929,11 +938,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Johannes Rainer.</p>
+  <p><p>Developed by Johannes Rainer.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -941,6 +950,8 @@
 
   
 
+
+  
 
   </body>
 </html>

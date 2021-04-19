@@ -61,9 +61,18 @@
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -77,7 +86,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
       </span>
     </div>
 
@@ -144,13 +153,13 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>seqlevelsStyle</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+<span class='fu'><a href='EnsDb-seqlevels.html'>seqlevelsStyle</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>seqlevelsStyle</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+<span class='fu'><a href='EnsDb-seqlevels.html'>seqlevelsStyle</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>supportedSeqlevelsStyles</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
+<span class='fu'><a href='EnsDb-seqlevels.html'>supportedSeqlevelsStyles</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,7 +222,7 @@
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='EnsDb-class.html'>EnsDb</a></code>
-  <code><a href='exonsBy.html'>transcripts</a></code></p></div>
+  <code><a href='EnsDb-exonsBy.html'>transcripts</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
@@ -221,7 +230,7 @@
 <span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span>
 
 <span class='co'>## Get the internal, default seqlevel style.</span>
-<span class='fu'>seqlevelsStyle</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
+<span class='fu'><a href='EnsDb-seqlevels.html'>seqlevelsStyle</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] "Ensembl"</div><div class='input'>
 <span class='co'>## Get the seqlevels from the database.</span>
 <span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
@@ -583,10 +592,10 @@
 #&gt; [356] "X"                                     
 #&gt; [357] "Y"                                     </div><div class='input'>
 <span class='co'>## Get all supported mappings for the organism of the EnsDb.</span>
-<span class='fu'>supportedSeqlevelsStyles</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
+<span class='fu'><a href='EnsDb-seqlevels.html'>supportedSeqlevelsStyles</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; NULL</div><div class='input'>
 <span class='co'>## Change the seqlevels to UCSC style.</span>
-<span class='fu'>seqlevelsStyle</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"UCSC"</span>
+<span class='fu'><a href='EnsDb-seqlevels.html'>seqlevelsStyle</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='st'>"UCSC"</span>
 <span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='warning'>Warning: More than 5 seqnames with seqlevels style of the database (Ensembl) could not be mapped to the seqlevels style: UCSC!) Returning the orginal seqnames for these.</span></div><div class='output co'>#&gt;   [1] "chr1"                                  
 #&gt;   [2] "chr10"                                 
@@ -1005,11 +1014,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Johannes Rainer.</p>
+  <p><p>Developed by Johannes Rainer.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -1017,6 +1026,8 @@
 
   
 
+
+  
 
   </body>
 </html>

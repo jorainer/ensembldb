@@ -59,9 +59,18 @@
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -75,7 +84,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
       </span>
     </div>
 
@@ -140,7 +149,7 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'>lengthOf</span><span class='op'>(</span><span class='va'>x</span>, of<span class='op'>=</span><span class='st'>"gene"</span>, filter <span class='op'>=</span> <span class='fu'>AnnotationFilterList</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
+<span class='fu'><a href='EnsDb-lengths.html'>lengthOf</a></span><span class='op'>(</span><span class='va'>x</span>, of<span class='op'>=</span><span class='st'>"gene"</span>, filter <span class='op'>=</span> <span class='fu'>AnnotationFilterList</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -191,8 +200,8 @@
     <p>Johannes Rainer</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='exonsBy.html'>exonsBy</a></code>
-  <code><a href='exonsBy.html'>transcripts</a></code>
+    <div class='dont-index'><p><code><a href='EnsDb-exonsBy.html'>exonsBy</a></code>
+  <code><a href='EnsDb-exonsBy.html'>transcripts</a></code>
   <code><a href='https://rdrr.io/pkg/GenomicFeatures/man/transcriptLengths.html'>transcriptLengths</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -203,20 +212,20 @@
 <span class='co'>#####    lengthOf</span>
 <span class='co'>##</span>
 <span class='co'>## length of a specific gene.</span>
-<span class='fu'>lengthOf</span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneIdFilter</span><span class='op'>(</span><span class='st'>"ENSG00000000003"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='EnsDb-lengths.html'>lengthOf</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneIdFilter</span><span class='op'>(</span><span class='st'>"ENSG00000000003"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ENSG00000000003 
 #&gt;            4535 </div><div class='input'>
 <span class='co'>## length of a transcript</span>
-<span class='fu'>lengthOf</span><span class='op'>(</span><span class='va'>edb</span>, of <span class='op'>=</span> <span class='st'>"tx"</span>, filter <span class='op'>=</span> <span class='fu'>TxIdFilter</span><span class='op'>(</span><span class='st'>"ENST00000494424"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='EnsDb-lengths.html'>lengthOf</a></span><span class='op'>(</span><span class='va'>edb</span>, of <span class='op'>=</span> <span class='st'>"tx"</span>, filter <span class='op'>=</span> <span class='fu'>TxIdFilter</span><span class='op'>(</span><span class='st'>"ENST00000494424"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; ENST00000494424 
 #&gt;             820 </div><div class='input'>
 <span class='co'>## Average length of all protein coding genes encoded on chromosomes X</span>
-<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='fu'>lengthOf</span><span class='op'>(</span><span class='va'>edb</span>, of <span class='op'>=</span> <span class='st'>"gene"</span>,
+<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='fu'><a href='EnsDb-lengths.html'>lengthOf</a></span><span class='op'>(</span><span class='va'>edb</span>, of <span class='op'>=</span> <span class='st'>"gene"</span>,
               filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"protein_coding"</span> <span class='op'>&amp;</span>
                   <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 3934.111</div><div class='input'>
 <span class='co'>## Average length of all snoRNAs</span>
-<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='fu'>lengthOf</span><span class='op'>(</span><span class='va'>edb</span>, of <span class='op'>=</span> <span class='st'>"gene"</span>,
+<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='fu'><a href='EnsDb-lengths.html'>lengthOf</a></span><span class='op'>(</span><span class='va'>edb</span>, of <span class='op'>=</span> <span class='st'>"gene"</span>,
               filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"snoRNA"</span> <span class='op'>&amp;</span>
                   <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; [1] 125.8478</div><div class='input'>
@@ -253,11 +262,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Johannes Rainer.</p>
+  <p><p>Developed by Johannes Rainer.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -265,6 +274,8 @@
 
   
 
+
+  
 
   </body>
 </html>
