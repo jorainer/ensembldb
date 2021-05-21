@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -84,7 +84,7 @@
 
       
 
-      </header><script src="proteins_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="proteins_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Querying protein features</h1>
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script><div id="introduction" class="section level1">
 <h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<a href="#introduction" class="anchor" aria-hidden="true"></a>Introduction</h1>
 <p>From Bioconductor release 3.5 on, <code>EnsDb</code> databases/packages created by the <code>ensembldb</code> package contain also, for transcripts with a coding regions, mappings between transcripts and proteins. Thus, in addition to the RNA/DNA-based features also the following protein related information is available:</p>
 <ul>
 <li>
@@ -184,12 +184,12 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 <div id="fetch-protein-annotation-for-genes-and-transcripts" class="section level1">
 <h1 class="hasAnchor">
-<a href="#fetch-protein-annotation-for-genes-and-transcripts" class="anchor"></a>Fetch protein annotation for genes and transcripts</h1>
+<a href="#fetch-protein-annotation-for-genes-and-transcripts" class="anchor" aria-hidden="true"></a>Fetch protein annotation for genes and transcripts</h1>
 <p>Protein annotations for (protein coding) transcripts can be retrieved by simply adding the desired annotation columns to the <code>columns</code> parameter of the e.g. <code>genes</code> or <code>transcripts</code> methods.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get also protein information for ZBTB16 transcripts</span>
-<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
-           columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_id"</span>, <span class="st">"uniprot_id"</span>, <span class="st">"tx_biotype"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
+           columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_id"</span>, <span class="st">"uniprot_id"</span>, <span class="st">"tx_biotype"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">txs</span></code></pre></div>
 <pre><code>## GRanges object with 11 ranges and 5 metadata columns:
 ##                   seqnames              ranges strand |      protein_id
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the protein ID for the coding- and <code>NA</code> for the non-coding transcripts. Note also that we have a transcript targeted for nonsense mediated mRNA-decay with a protein ID associated with it, but no Uniprot ID.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Subset to transcripts with tx_biotype other than protein_coding.</span>
-<span class="va">txs</span><span class="op">[</span><span class="va">txs</span><span class="op">$</span><span class="va">tx_biotype</span> <span class="op">!=</span> <span class="st">"protein_coding"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uniprot_id"</span>, <span class="st">"tx_biotype"</span>,
+<span class="va">txs</span><span class="op">[</span><span class="va">txs</span><span class="op">$</span><span class="va">tx_biotype</span> <span class="op">!=</span> <span class="st">"protein_coding"</span>, <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uniprot_id"</span>, <span class="st">"tx_biotype"</span>,
                       <span class="st">"protein_id"</span><span class="op">)</span><span class="op">]</span></code></pre></div>
 <pre><code>## GRanges object with 5 ranges and 3 metadata columns:
 ##                   seqnames              ranges strand |  uniprot_id
@@ -258,8 +258,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>While the mapping from a protein coding transcript to a Ensembl protein ID (column <code>protein_id</code>) is 1:1, the mapping between <code>protein_id</code> and <code>uniprot_id</code> can be n:m, i.e. each Ensembl protein ID can be mapped to 1 or more Uniprot IDs and each Uniprot ID can be mapped to more than one <code>protein_id</code> (and hence <code>tx_id</code>). This should be kept in mind if querying transcripts from the database fetching Uniprot related additional columns or even protein ID features, as in such cases a redundant list of transcripts is returned.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## List the protein IDs and uniprot IDs for the coding transcripts</span>
-<span class="fu">mcols</span><span class="op">(</span><span class="va">txs</span><span class="op">[</span><span class="va">txs</span><span class="op">$</span><span class="va">tx_biotype</span> <span class="op">==</span> <span class="st">"protein_coding"</span>,
-      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tx_id"</span>, <span class="st">"protein_id"</span>, <span class="st">"uniprot_id"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">txs</span><span class="op">[</span><span class="va">txs</span><span class="op">$</span><span class="va">tx_biotype</span> <span class="op">==</span> <span class="st">"protein_coding"</span>,
+      <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tx_id"</span>, <span class="st">"protein_id"</span>, <span class="st">"uniprot_id"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></code></pre></div>
 <pre><code>## DataFrame with 6 rows and 3 columns
 ##                           tx_id      protein_id  uniprot_id
 ##                     &lt;character&gt;     &lt;character&gt; &lt;character&gt;
@@ -278,10 +278,10 @@ document.addEventListener("DOMContentLoaded", function() {
 <code class="sourceCode R"><span class="co">## Get all protein_coding transcripts of ZBTB16 along with their protein_id</span>
 <span class="co">## and Uniprot IDs, restricting to protein_id to uniprot_id mappings based</span>
 <span class="co">## on "DIRECT" mapping methods.</span>
-<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
+<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
                       <span class="fu"><a href="../reference/Filter-classes.html">UniprotMappingTypeFilter</a></span><span class="op">(</span><span class="st">"DIRECT"</span><span class="op">)</span><span class="op">)</span>,
-           columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_id"</span>, <span class="st">"uniprot_id"</span>, <span class="st">"uniprot_db"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu">mcols</span><span class="op">(</span><span class="va">txs</span><span class="op">)</span></code></pre></div>
+           columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_id"</span>, <span class="st">"uniprot_id"</span>, <span class="st">"uniprot_db"</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">txs</span><span class="op">)</span></code></pre></div>
 <pre><code>## DataFrame with 5 rows and 6 columns
 ##                      protein_id  uniprot_id  uniprot_db           tx_id
 ##                     &lt;character&gt; &lt;character&gt; &lt;character&gt;     &lt;character&gt;
@@ -307,18 +307,18 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">gns</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 9</code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">gns</span><span class="op">$</span><span class="va">gene_name</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">gns</span><span class="op">$</span><span class="va">gene_name</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] "ABTB2"  "BTBD18" "KBTBD3" "KBTBD4" "KCTD21" "KLHL35" "ZBTB16" "ZBTB3" 
 ## [9] "ZBTB44"</code></pre>
 <p>So, in total we got 152 genes with that protein domain. In addition to the <code>ProtDomIdFilter</code>, also the <code>ProteinidFilter</code> and the <code>UniprotidFilter</code> can be used to query the database for entries matching conditions on their protein ID or Uniprot ID.</p>
 </div>
 <div id="use-methods-from-the-annotationdbi-package-to-query-protein-annotation" class="section level1">
 <h1 class="hasAnchor">
-<a href="#use-methods-from-the-annotationdbi-package-to-query-protein-annotation" class="anchor"></a>Use methods from the <code>AnnotationDbi</code> package to query protein annotation</h1>
+<a href="#use-methods-from-the-annotationdbi-package-to-query-protein-annotation" class="anchor" aria-hidden="true"></a>Use methods from the <code>AnnotationDbi</code> package to query protein annotation</h1>
 <p>The <code>select</code>, <code>keys</code> and <code>mapIds</code> methods from the <code>AnnotationDbi</code> package can also be used to query <code>EnsDb</code> objects for protein annotations. Supported columns and key types are returned by the <code>columns</code> and <code>keytypes</code> methods.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Show all columns that are provided by the database</span>
-<span class="fu">columns</span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/AnnotationDbi/man/AnnotationDb-class.html" class="external-link">columns</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] "ENTREZID"            "EXONID"              "EXONIDX"            
 ##  [4] "EXONSEQEND"          "EXONSEQSTART"        "GENEBIOTYPE"        
 ##  [7] "GENEID"              "GENENAME"            "GENESEQEND"         
@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [31] "UNIPROTDB"           "UNIPROTID"           "UNIPROTMAPPINGTYPE"</code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Show all key types/filters that are supported</span>
-<span class="fu">keytypes</span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/AnnotationDbi/man/AnnotationDb-class.html" class="external-link">keytypes</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
 <pre><code>##  [1] "ENTREZID"            "EXONID"              "GENEBIOTYPE"        
 ##  [4] "GENEID"              "GENENAME"            "PROTDOMID"          
 ##  [7] "PROTEINDOMAINID"     "PROTEINDOMAINSOURCE" "PROTEINID"          
@@ -353,8 +353,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>This returns us all Uniprot IDs of all proteins encoded by the gene’s transcripts. One of the transcripts from ZBTB16, while having a CDS and being annotated to a protein, does not have an Uniprot ID assigned (thus <code>NA</code> is returned by the above call). As we see below, this transcript is targeted for non sense mediated mRNA decay.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Call select, this time providing a GeneNameFilter.</span>
-<span class="fu"><a href="../reference/EnsDb-AnnotationDbi.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
-       columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TXBIOTYPE"</span>, <span class="st">"UNIPROTID"</span>, <span class="st">"PROTEINID"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="../reference/EnsDb-AnnotationDbi.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
+       columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TXBIOTYPE"</span>, <span class="st">"UNIPROTID"</span>, <span class="st">"PROTEINID"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##                 TXBIOTYPE  UNIPROTID       PROTEINID GENENAME
 ## 1          protein_coding     Q05516 ENSP00000338157   ZBTB16
 ## 2          protein_coding A0A024R3C6 ENSP00000338157   ZBTB16
@@ -369,12 +369,12 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 <div id="retrieve-proteins-from-the-database" class="section level1">
 <h1 class="hasAnchor">
-<a href="#retrieve-proteins-from-the-database" class="anchor"></a>Retrieve proteins from the database</h1>
+<a href="#retrieve-proteins-from-the-database" class="anchor" aria-hidden="true"></a>Retrieve proteins from the database</h1>
 <p>Proteins can be fetched using the dedicated <code>proteins</code> method that returns, unlike DNA/RNA-based methods like <code>genes</code> or <code>transcripts</code>, not a <code>GRanges</code> object by default, but a <code>DataFrame</code> object. Alternatively, results can be returned as a <code>data.frame</code> or as an <code>AAStringSet</code> object from the <code>Biobase</code> package. Note that this might change in future releases if a more appropriate object to represent protein annotations becomes available.</p>
 <p>In the code chunk below we fetch all protein annotations for the gene <em>ZBTB16</em>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get all proteins and return them as an AAStringSet</span>
-<span class="va">prts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
+<span class="va">prts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
          return.type <span class="op">=</span> <span class="st">"AAStringSet"</span><span class="op">)</span>
 <span class="va">prts</span></code></pre></div>
 <pre><code>## AAStringSet object of length 5:
@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [5]    55 XGGLLPQGFIQRELFSKLGELAV...GEQCSVCGVELPDNEAVEQHRVF ENSP00000445047</code></pre>
 <p>Besides the amino acid sequence, the <code>prts</code> contains also additional annotations that can be accessed with the <code>mcols</code> method (metadata columns). All additional columns provided with the parameter <code>columns</code> are also added to the <code>mcols</code> <code>DataFrame</code>.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">mcols</span><span class="op">(</span><span class="va">prts</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">prts</span><span class="op">)</span></code></pre></div>
 <pre><code>## DataFrame with 5 rows and 3 columns
 ##                           tx_id      protein_id   gene_name
 ##                     &lt;character&gt;     &lt;character&gt; &lt;character&gt;
@@ -399,8 +399,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Querying in addition Uniprot identifiers or protein domain data will result at present in a redundant list of proteins as shown in the code block below.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get also protein domain annotations in addition to the protein annotations.</span>
-<span class="va">pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GeneNameFilter</span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
-           columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tx_id"</span>, <span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"protein_domain"</span><span class="op">)</span><span class="op">)</span>,
+<span class="va">pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
+           columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tx_id"</span>, <span class="fu"><a href="../reference/EnsDb-class.html">listColumns</a></span><span class="op">(</span><span class="va">edb</span>, <span class="st">"protein_domain"</span><span class="op">)</span><span class="op">)</span>,
            return.type <span class="op">=</span> <span class="st">"AAStringSet"</span><span class="op">)</span>
 <span class="va">pd</span></code></pre></div>
 <pre><code>## AAStringSet object of length 81:
@@ -419,13 +419,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The result contains one row/element for each protein domain in each of the proteins. The number of protein domains per protein and the <code>mcols</code> are shown below.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## The number of protein domains per protein:</span>
-<span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## 
 ## ENSP00000338157 ENSP00000376721 ENSP00000437716 ENSP00000443013 ENSP00000445047 
 ##              36              36               4               4               1</code></pre>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## The mcols</span>
-<span class="fu">mcols</span><span class="op">(</span><span class="va">pd</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span></code></pre></div>
 <pre><code>## DataFrame with 81 rows and 8 columns
 ##                           tx_id      protein_id protein_domain_id
 ##                     &lt;character&gt;     &lt;character&gt;       &lt;character&gt;
@@ -470,12 +470,12 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 <div id="map-peptide-features-within-proteins-to-the-genome" class="section level1">
 <h1 class="hasAnchor">
-<a href="#map-peptide-features-within-proteins-to-the-genome" class="anchor"></a>Map peptide features within proteins to the genome</h1>
+<a href="#map-peptide-features-within-proteins-to-the-genome" class="anchor" aria-hidden="true"></a>Map peptide features within proteins to the genome</h1>
 <p>The <em>coordinate-mapping.Rmd</em> vignette provides a detailed description of all functions that allow to map between genomic, transcript and protein coordinates.</p>
 </div>
 <div id="session-information" class="section level1">
 <h1 class="hasAnchor">
-<a href="#session-information" class="anchor"></a>Session information</h1>
+<a href="#session-information" class="anchor" aria-hidden="true"></a>Session information</h1>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
 <pre><code>## R Under development (unstable) (2021-04-15 r80175)
@@ -498,57 +498,57 @@ document.addEventListener("DOMContentLoaded", function() {
 ## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.15.3         
-##  [3] AnnotationFilter_1.15.0   GenomicFeatures_1.43.8   
-##  [5] AnnotationDbi_1.53.1      Biobase_2.51.0           
-##  [7] GenomicRanges_1.43.4      GenomeInfoDb_1.27.11     
-##  [9] IRanges_2.25.9            S4Vectors_0.29.15        
-## [11] BiocGenerics_0.37.2       BiocStyle_2.19.2         
+##  [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.17.0         
+##  [3] AnnotationFilter_1.16.0   GenomicFeatures_1.44.0   
+##  [5] AnnotationDbi_1.54.0      Biobase_2.52.0           
+##  [7] GenomicRanges_1.44.0      GenomeInfoDb_1.28.0      
+##  [9] IRanges_2.26.0            S4Vectors_0.30.0         
+## [11] BiocGenerics_0.38.0       BiocStyle_2.20.0         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] MatrixGenerics_1.3.1        httr_1.4.2                 
-##  [3] sass_0.3.1                  bit64_4.0.5                
-##  [5] jsonlite_1.7.2              bslib_0.2.4                
-##  [7] assertthat_0.2.1            BiocManager_1.30.12        
-##  [9] BiocFileCache_1.99.6        blob_1.2.1                 
-## [11] GenomeInfoDbData_1.2.4      Rsamtools_2.7.2            
+##  [1] MatrixGenerics_1.4.0        httr_1.4.2                 
+##  [3] sass_0.4.0                  bit64_4.0.5                
+##  [5] jsonlite_1.7.2              bslib_0.2.5.1              
+##  [7] assertthat_0.2.1            BiocManager_1.30.15        
+##  [9] BiocFileCache_2.0.0         blob_1.2.1                 
+## [11] GenomeInfoDbData_1.2.6      Rsamtools_2.8.0            
 ## [13] yaml_2.2.1                  progress_1.2.2             
-## [15] lattice_0.20-41             pillar_1.6.0               
-## [17] RSQLite_2.2.6               glue_1.4.2                 
-## [19] digest_0.6.27               XVector_0.31.1             
-## [21] Matrix_1.3-2                htmltools_0.5.1.1          
+## [15] lattice_0.20-44             pillar_1.6.1               
+## [17] RSQLite_2.2.7               glue_1.4.2                 
+## [19] digest_0.6.27               XVector_0.32.0             
+## [21] Matrix_1.3-3                htmltools_0.5.1.1          
 ## [23] XML_3.99-0.6                pkgconfig_2.0.3            
-## [25] biomaRt_2.47.7              bookdown_0.21              
-## [27] zlibbioc_1.37.0             purrr_0.3.4                
-## [29] BiocParallel_1.25.5         tibble_3.1.1               
-## [31] KEGGREST_1.31.1             generics_0.1.0             
-## [33] ellipsis_0.3.1              SummarizedExperiment_1.21.3
-## [35] cachem_1.0.4                lazyeval_0.2.2             
+## [25] biomaRt_2.48.0              bookdown_0.22              
+## [27] zlibbioc_1.38.0             purrr_0.3.4                
+## [29] BiocParallel_1.26.0         tibble_3.1.2               
+## [31] KEGGREST_1.32.0             generics_0.1.0             
+## [33] ellipsis_0.3.2              SummarizedExperiment_1.22.0
+## [35] cachem_1.0.5                lazyeval_0.2.2             
 ## [37] magrittr_2.0.1              crayon_1.4.1               
 ## [39] memoise_2.0.0               evaluate_0.14              
 ## [41] fs_1.5.0                    fansi_0.4.2                
-## [43] textshaping_0.3.3           tools_4.1.0                
-## [45] prettyunits_1.1.1           hms_1.0.0                  
-## [47] matrixStats_0.58.0          BiocIO_1.1.2               
+## [43] textshaping_0.3.4           tools_4.1.0                
+## [45] prettyunits_1.1.1           hms_1.1.0                  
+## [47] matrixStats_0.58.0          BiocIO_1.2.0               
 ## [49] lifecycle_1.0.0             stringr_1.4.0              
-## [51] DelayedArray_0.17.10        Biostrings_2.59.2          
+## [51] DelayedArray_0.18.0         Biostrings_2.60.0          
 ## [53] compiler_4.1.0              pkgdown_1.6.1.9001         
-## [55] jquerylib_0.1.3             systemfonts_1.0.1          
-## [57] rlang_0.4.10                grid_4.1.0                 
+## [55] jquerylib_0.1.4             systemfonts_1.0.2          
+## [57] rlang_0.4.11                grid_4.1.0                 
 ## [59] RCurl_1.98-1.3              rjson_0.2.20               
-## [61] rappdirs_0.3.3              bitops_1.0-6               
-## [63] rmarkdown_2.7               restfulr_0.0.13            
-## [65] DBI_1.1.1                   curl_4.3                   
-## [67] R6_2.5.0                    GenomicAlignments_1.27.2   
-## [69] knitr_1.32                  dplyr_1.0.5                
-## [71] rtracklayer_1.51.5          fastmap_1.1.0              
+## [61] rappdirs_0.3.3              bitops_1.0-7               
+## [63] rmarkdown_2.8               restfulr_0.0.13            
+## [65] DBI_1.1.1                   curl_4.3.1                 
+## [67] R6_2.5.0                    GenomicAlignments_1.28.0   
+## [69] knitr_1.33                  dplyr_1.0.6                
+## [71] rtracklayer_1.52.0          fastmap_1.1.0              
 ## [73] bit_4.0.4                   utf8_1.2.1                 
 ## [75] filelock_1.0.2              rprojroot_2.0.2            
-## [77] ProtGenerics_1.23.9         ragg_1.1.2                 
-## [79] desc_1.3.0                  stringi_1.5.3              
-## [81] Rcpp_1.0.6                  vctrs_0.3.7                
+## [77] ProtGenerics_1.24.0         ragg_1.1.2                 
+## [79] desc_1.3.0                  stringi_1.6.2              
+## [81] Rcpp_1.0.6                  vctrs_0.3.8                
 ## [83] png_0.1-7                   dbplyr_2.1.1               
-## [85] tidyselect_1.1.0            xfun_0.22</code></pre>
+## [85] tidyselect_1.1.1            xfun_0.23</code></pre>
 </div>
   </div>
 

@@ -70,8 +70,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -95,7 +93,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -170,25 +168,25 @@
   the <code>makeEnsembldbPackage</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromAH</a></span><span class='op'>(</span><span class='va'>ah</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>, <span class='va'>version</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>ensDbFromAH</span><span class='op'>(</span><span class='va'>ah</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>, <span class='va'>version</span><span class='op'>)</span>
 
-<span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromGRanges</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>,
+<span class='fu'>ensDbFromGRanges</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>,
                  <span class='va'>version</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromGff</a></span><span class='op'>(</span><span class='va'>gff</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>,
+<span class='fu'>ensDbFromGff</span><span class='op'>(</span><span class='va'>gff</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>,
              <span class='va'>version</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromGtf</a></span><span class='op'>(</span><span class='va'>gtf</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>,
+<span class='fu'>ensDbFromGtf</span><span class='op'>(</span><span class='va'>gtf</span>, <span class='va'>outfile</span>, <span class='va'>path</span>, <span class='va'>organism</span>, <span class='va'>genomeVersion</span>,
              <span class='va'>version</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'><a href='makeEnsemblDbPackage.html'>fetchTablesFromEnsembl</a></span><span class='op'>(</span><span class='va'>version</span>, <span class='va'>ensemblapi</span>, user<span class='op'>=</span><span class='st'>"anonymous"</span>,
+<span class='fu'>fetchTablesFromEnsembl</span><span class='op'>(</span><span class='va'>version</span>, <span class='va'>ensemblapi</span>, user<span class='op'>=</span><span class='st'>"anonymous"</span>,
                        host<span class='op'>=</span><span class='st'>"ensembldb.ensembl.org"</span>, pass<span class='op'>=</span><span class='st'>""</span>,
                        port<span class='op'>=</span><span class='fl'>5306</span>, species<span class='op'>=</span><span class='st'>"human"</span><span class='op'>)</span>
 
-<span class='fu'><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></span><span class='op'>(</span>path<span class='op'>=</span><span class='st'>"."</span>, <span class='va'>dbname</span><span class='op'>)</span>
+<span class='fu'>makeEnsemblSQLiteFromTables</span><span class='op'>(</span>path<span class='op'>=</span><span class='st'>"."</span>, <span class='va'>dbname</span><span class='op'>)</span>
 
-<span class='fu'><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></span><span class='op'>(</span><span class='va'>ensdb</span>, <span class='va'>version</span>, <span class='va'>maintainer</span>, <span class='va'>author</span>,
-                     destDir<span class='op'>=</span><span class='st'>"."</span>, license<span class='op'>=</span><span class='st'>"Artistic-2.0"</span><span class='op'>)</span></pre>
+<span class='fu'>makeEnsembldbPackage</span><span class='op'>(</span><span class='va'>ensdb</span>, <span class='va'>version</span>, <span class='va'>maintainer</span>, <span class='va'>author</span>,
+                     destDir<span class='op'>=</span><span class='st'>"."</span>, license<span class='op'>=</span><span class='st'>"Artistic-2.0"</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -371,144 +369,187 @@
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-
-    <span class='co'>## get all human gene/transcript/exon annotations from Ensembl (75)</span>
-    <span class='co'>## the resulting tables will be stored by default to the current working</span>
-    <span class='co'>## directory; if the correct Ensembl api (version 75) is defined in the</span>
-    <span class='co'>## PERL5LIB environment variable, the ensemblapi parameter can also be omitted.</span>
-    <span class='fu'><a href='makeEnsemblDbPackage.html'>fetchTablesFromEnsembl</a></span><span class='op'>(</span><span class='fl'>75</span>,
-                           ensemblapi<span class='op'>=</span><span class='st'>"/home/bioinfo/ensembl/75/API/ensembl/modules"</span>,
-                           species<span class='op'>=</span><span class='st'>"human"</span><span class='op'>)</span>
-
-    <span class='co'>## These tables can then be processed to generate a SQLite database</span>
-    <span class='co'>## containing the annotations</span>
-    <span class='va'>DBFile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></span><span class='op'>(</span><span class='op'>)</span>
-
-    <span class='co'>## and finally we can generate the package</span>
-    <span class='fu'><a href='makeEnsemblDbPackage.html'>makeEnsembldbPackage</a></span><span class='op'>(</span>ensdb<span class='op'>=</span><span class='va'>DBFile</span>, version<span class='op'>=</span><span class='st'>"0.0.1"</span>,
-                         maintainer<span class='op'>=</span><span class='st'>"Johannes Rainer &lt;johannes.rainer@eurac.edu&gt;"</span>,
-                         author<span class='op'>=</span><span class='st'>"J Rainer"</span><span class='op'>)</span>
-
-    <span class='co'>## Build an annotation database form a GFF file from Ensembl.</span>
-    <span class='co'>## ftp://ftp.ensembl.org/pub/release-83/gff3/rattus_norvegicus</span>
-    <span class='va'>gff</span> <span class='op'>&lt;-</span> <span class='st'>"Rattus_norvegicus.Rnor_6.0.83.gff3.gz"</span>
-    <span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromGff</a></span><span class='op'>(</span>gff<span class='op'>=</span><span class='va'>gff</span><span class='op'>)</span>
-    <span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span>
-    <span class='va'>edb</span>
-
-    <span class='co'>## Build an annotation file from a GTF file.</span>
-    <span class='co'>## the GTF file can be downloaded from</span>
-    <span class='co'>## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/</span>
-    <span class='va'>gtffile</span> <span class='op'>&lt;-</span> <span class='st'>"Homo_sapiens.GRCh37.75.gtf.gz"</span>
-    <span class='co'>## generate the SQLite database file</span>
-    <span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromGtf</a></span><span class='op'>(</span>gtf<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>ensemblhost</span>, <span class='va'>gtffile</span><span class='op'>)</span><span class='op'>)</span>
-
-    <span class='co'>## load the DB file directly</span>
-    <span class='va'>EDB</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span>
-
-    <span class='co'>## Alternatively, we could fetch a GTF file directly from AnnotationHub</span>
-    <span class='co'>## and build the database from that:</span>
-    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>AnnotationHub</span><span class='op'>)</span>
-    <span class='va'>ah</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html'>AnnotationHub</a></span><span class='op'>(</span><span class='op'>)</span>
-    <span class='co'>## Query for all GTF files from Ensembl for Ensembl version 81</span>
-    <span class='fu'><a href='https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html'>query</a></span><span class='op'>(</span><span class='va'>ah</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Ensembl"</span>, <span class='st'>"release-81"</span>, <span class='st'>"GTF"</span><span class='op'>)</span><span class='op'>)</span>
-    <span class='co'>## We could get the one from e.g. Bos taurus:</span>
-    <span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromAH</a></span><span class='op'>(</span><span class='va'>ah</span><span class='op'>[</span><span class='st'>"AH47941"</span><span class='op'>]</span><span class='op'>)</span>
-    <span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span>
-    <span class='va'>edb</span>
-<span class='op'>}</span>
-
-<span class='co'>## Generate a sqlite database for genes encoded on chromosome Y</span>
-<span class='va'>chrY</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"chrY"</span>, package<span class='op'>=</span><span class='st'>"ensembldb"</span><span class='op'>)</span>
-<span class='va'>DBFile</span> <span class='op'>&lt;-</span> <span class='fu'><a href='makeEnsemblDbPackage.html'>makeEnsemblSQLiteFromTables</a></span><span class='op'>(</span>path<span class='op'>=</span><span class='va'>chrY</span> ,dbname<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Processing 'chromosome' table ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing 'gene' table ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing 'trancript' table ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing 'exon' table ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing 'tx2exon' table ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Creating indices ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Checking validity of the database ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='input'><span class='co'>## load this database:</span>
-<span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DBFile</span><span class='op'>)</span>
-
-<span class='va'>edb</span>
-</div><div class='output co'>#&gt; EnsDb for Ensembl:
-#&gt; |Backend: SQLite
-#&gt; |Db type: EnsDb
-#&gt; |Type of Gene ID: Ensembl Gene ID
-#&gt; |Supporting package: ensembldb
-#&gt; |Db created by: ensembldb package from Bioconductor
-#&gt; |script_version: 0.1.2
-#&gt; |Creation time: Wed Mar 18 09:30:54 2015
-#&gt; |ensembl_version: 75
-#&gt; |ensembl_host: manny.i-med.ac.at
-#&gt; |Organism: homo_sapiens
-#&gt; |genome_build: GRCh37
-#&gt; |DBSCHEMAVERSION: 1.0
-#&gt; | No. of genes: 495.
-#&gt; | No. of transcripts: 731.</div><div class='input'>
-<span class='co'>## Generate a sqlite database from a GRanges object specifying</span>
-<span class='co'>## genes encoded on chromosome Y</span>
-<span class='fu'><a href='https://rdrr.io/r/base/load.html'>load</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"YGRanges.RData"</span>, package<span class='op'>=</span><span class='st'>"ensembldb"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='va'>Y</span>
-</div><div class='output co'>#&gt; GRanges object with 7155 ranges and 16 metadata columns:
-#&gt;          seqnames            ranges strand |               source       type
-#&gt;             &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |             &lt;factor&gt;   &lt;factor&gt;
-#&gt;      [1]        Y   2652790-2652894      + |       snRNA          gene      
-#&gt;      [2]        Y   2652790-2652894      + |       snRNA          transcript
-#&gt;      [3]        Y   2652790-2652894      + |       snRNA          exon      
-#&gt;      [4]        Y   2654896-2655740      - |       protein_coding gene      
-#&gt;      [5]        Y   2654896-2655740      - |       protein_coding transcript
-#&gt;      ...      ...               ...    ... .                  ...        ...
-#&gt;   [7151]        Y 28772667-28773306      - | processed_pseudogene transcript
-#&gt;   [7152]        Y 28772667-28773306      - | processed_pseudogene exon      
-#&gt;   [7153]        Y 59001391-59001635      + | pseudogene           gene      
-#&gt;   [7154]        Y 59001391-59001635      + | processed_pseudogene transcript
-#&gt;   [7155]        Y 59001391-59001635      + | processed_pseudogene exon      
-#&gt;              score     phase         gene_id   gene_name    gene_source
-#&gt;          &lt;numeric&gt; &lt;integer&gt;     &lt;character&gt; &lt;character&gt;    &lt;character&gt;
-#&gt;      [1]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
-#&gt;      [2]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
-#&gt;      [3]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl
-#&gt;      [4]        NA      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana
-#&gt;      [5]        NA      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana
-#&gt;      ...       ...       ...             ...         ...            ...
-#&gt;   [7151]        NA      &lt;NA&gt; ENSG00000231514     FAM58CP         havana
-#&gt;   [7152]        NA      &lt;NA&gt; ENSG00000231514     FAM58CP         havana
-#&gt;   [7153]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
-#&gt;   [7154]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
-#&gt;   [7155]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana
-#&gt;            gene_biotype   transcript_id transcript_name transcript_source
-#&gt;             &lt;character&gt;     &lt;character&gt;     &lt;character&gt;       &lt;character&gt;
-#&gt;      [1]          snRNA            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;
-#&gt;      [2]          snRNA ENST00000516032  RNU6-1334P-201           ensembl
-#&gt;      [3]          snRNA ENST00000516032  RNU6-1334P-201           ensembl
-#&gt;      [4] protein_coding            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;
-#&gt;      [5] protein_coding ENST00000383070         SRY-001    ensembl_havana
-#&gt;      ...            ...             ...             ...               ...
-#&gt;   [7151]     pseudogene ENST00000435741     FAM58CP-001            havana
-#&gt;   [7152]     pseudogene ENST00000435741     FAM58CP-001            havana
-#&gt;   [7153]     pseudogene            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;
-#&gt;   [7154]     pseudogene ENST00000431853     CTBP2P1-001            havana
-#&gt;   [7155]     pseudogene ENST00000431853     CTBP2P1-001            havana
-#&gt;          exon_number         exon_id         tag     ccds_id  protein_id
-#&gt;            &lt;numeric&gt;     &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;
-#&gt;      [1]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [2]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [3]           1 ENSE00002088309        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [4]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;      [5]          NA            &lt;NA&gt;        CCDS   CCDS14772        &lt;NA&gt;
-#&gt;      ...         ...             ...         ...         ...         ...
-#&gt;   [7151]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   [7152]           1 ENSE00001616687        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   [7153]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   [7154]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   [7155]           1 ENSE00001794473        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh37 genome</div><div class='input'>
-<span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'><a href='makeEnsemblDbPackage.html'>ensDbFromGRanges</a></span><span class='op'>(</span><span class='va'>Y</span>, path<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, version<span class='op'>=</span><span class='fl'>75</span>,
-                       organism<span class='op'>=</span><span class='st'>"Homo_sapiens"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Processing metadata ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing genes ... </span></div><div class='output co'>#&gt; <span class='warning'>Warning:  I'm missing column(s): 'entrezid'. The corresponding database column(s) will be empty!</span></div><div class='output co'>#&gt; <span class='message'> Attribute availability:</span></div><div class='output co'>#&gt; <span class='message'>  o gene_id ... OK</span></div><div class='output co'>#&gt; <span class='message'>  o gene_name ... OK</span></div><div class='output co'>#&gt; <span class='message'>  o entrezid ... Nope</span></div><div class='output co'>#&gt; <span class='message'>  o gene_biotype ... OK</span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing transcripts ... </span></div><div class='output co'>#&gt; <span class='message'> Attribute availability:</span></div><div class='output co'>#&gt; <span class='message'>  o transcript_id ... OK</span></div><div class='output co'>#&gt; <span class='message'>  o gene_id ... OK</span></div><div class='output co'>#&gt; <span class='message'>  o source ... OK</span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing exons ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Processing chromosomes ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>Generating index ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='output co'>#&gt; <span class='message'>  -------------</span></div><div class='output co'>#&gt; <span class='message'>Verifying validity of the information in the database:</span></div><div class='output co'>#&gt; <span class='message'>Checking transcripts ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span>
-#&gt; <span class='message'>Checking exons ... </span></div><div class='output co'>#&gt; <span class='message'>OK</span></div><div class='input'><span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span>
-
-
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## get all human gene/transcript/exon annotations from Ensembl (75)</span></span>
+<span class='r-in'>    <span class='co'>## the resulting tables will be stored by default to the current working</span></span>
+<span class='r-in'>    <span class='co'>## directory; if the correct Ensembl api (version 75) is defined in the</span></span>
+<span class='r-in'>    <span class='co'>## PERL5LIB environment variable, the ensemblapi parameter can also be omitted.</span></span>
+<span class='r-in'>    <span class='fu'>fetchTablesFromEnsembl</span><span class='op'>(</span><span class='fl'>75</span>,</span>
+<span class='r-in'>                           ensemblapi<span class='op'>=</span><span class='st'>"/home/bioinfo/ensembl/75/API/ensembl/modules"</span>,</span>
+<span class='r-in'>                           species<span class='op'>=</span><span class='st'>"human"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## These tables can then be processed to generate a SQLite database</span></span>
+<span class='r-in'>    <span class='co'>## containing the annotations</span></span>
+<span class='r-in'>    <span class='va'>DBFile</span> <span class='op'>&lt;-</span> <span class='fu'>makeEnsemblSQLiteFromTables</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## and finally we can generate the package</span></span>
+<span class='r-in'>    <span class='fu'>makeEnsembldbPackage</span><span class='op'>(</span>ensdb<span class='op'>=</span><span class='va'>DBFile</span>, version<span class='op'>=</span><span class='st'>"0.0.1"</span>,</span>
+<span class='r-in'>                         maintainer<span class='op'>=</span><span class='st'>"Johannes Rainer &lt;johannes.rainer@eurac.edu&gt;"</span>,</span>
+<span class='r-in'>                         author<span class='op'>=</span><span class='st'>"J Rainer"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## Build an annotation database form a GFF file from Ensembl.</span></span>
+<span class='r-in'>    <span class='co'>## ftp://ftp.ensembl.org/pub/release-83/gff3/rattus_norvegicus</span></span>
+<span class='r-in'>    <span class='va'>gff</span> <span class='op'>&lt;-</span> <span class='st'>"Rattus_norvegicus.Rnor_6.0.83.gff3.gz"</span></span>
+<span class='r-in'>    <span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'>ensDbFromGff</span><span class='op'>(</span>gff<span class='op'>=</span><span class='va'>gff</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>edb</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## Build an annotation file from a GTF file.</span></span>
+<span class='r-in'>    <span class='co'>## the GTF file can be downloaded from</span></span>
+<span class='r-in'>    <span class='co'>## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/</span></span>
+<span class='r-in'>    <span class='va'>gtffile</span> <span class='op'>&lt;-</span> <span class='st'>"Homo_sapiens.GRCh37.75.gtf.gz"</span></span>
+<span class='r-in'>    <span class='co'>## generate the SQLite database file</span></span>
+<span class='r-in'>    <span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'>ensDbFromGtf</span><span class='op'>(</span>gtf<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>ensemblhost</span>, <span class='va'>gtffile</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## load the DB file directly</span></span>
+<span class='r-in'>    <span class='va'>EDB</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'>    <span class='co'>## Alternatively, we could fetch a GTF file directly from AnnotationHub</span></span>
+<span class='r-in'>    <span class='co'>## and build the database from that:</span></span>
+<span class='r-in'>    <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>AnnotationHub</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>ah</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html'>AnnotationHub</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='co'>## Query for all GTF files from Ensembl for Ensembl version 81</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html'>query</a></span><span class='op'>(</span><span class='va'>ah</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Ensembl"</span>, <span class='st'>"release-81"</span>, <span class='st'>"GTF"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='co'>## We could get the one from e.g. Bos taurus:</span></span>
+<span class='r-in'>    <span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'>ensDbFromAH</span><span class='op'>(</span><span class='va'>ah</span><span class='op'>[</span><span class='st'>"AH47941"</span><span class='op'>]</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>edb</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Generate a sqlite database for genes encoded on chromosome Y</span></span>
+<span class='r-in'><span class='va'>chrY</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"chrY"</span>, package<span class='op'>=</span><span class='st'>"ensembldb"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>DBFile</span> <span class='op'>&lt;-</span> <span class='fu'>makeEnsemblSQLiteFromTables</span><span class='op'>(</span>path<span class='op'>=</span><span class='va'>chrY</span> ,dbname<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing 'chromosome' table ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing 'gene' table ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing 'trancript' table ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing 'exon' table ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing 'tx2exon' table ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Creating indices ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Checking validity of the database ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-in'><span class='co'>## load this database:</span></span>
+<span class='r-in'><span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DBFile</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>edb</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> EnsDb for Ensembl:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Backend: SQLite</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Db type: EnsDb</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Type of Gene ID: Ensembl Gene ID</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Supporting package: ensembldb</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Db created by: ensembldb package from Bioconductor</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |script_version: 0.1.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Creation time: Wed Mar 18 09:30:54 2015</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |ensembl_version: 75</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |ensembl_host: manny.i-med.ac.at</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |Organism: homo_sapiens</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |genome_build: GRCh37</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> |DBSCHEMAVERSION: 1.0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> | No. of genes: 495.</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> | No. of transcripts: 731.</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Generate a sqlite database from a GRanges object specifying</span></span>
+<span class='r-in'><span class='co'>## genes encoded on chromosome Y</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/load.html'>load</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"YGRanges.RData"</span>, package<span class='op'>=</span><span class='st'>"ensembldb"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>Y</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 7155 ranges and 16 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          seqnames            ranges strand |               source       type</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |             &lt;factor&gt;   &lt;factor&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [1]        Y   2652790-2652894      + |       snRNA          gene      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [2]        Y   2652790-2652894      + |       snRNA          transcript</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [3]        Y   2652790-2652894      + |       snRNA          exon      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [4]        Y   2654896-2655740      - |       protein_coding gene      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [5]        Y   2654896-2655740      - |       protein_coding transcript</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      ...      ...               ...    ... .                  ...        ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7151]        Y 28772667-28773306      - | processed_pseudogene transcript</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7152]        Y 28772667-28773306      - | processed_pseudogene exon      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7153]        Y 59001391-59001635      + | pseudogene           gene      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7154]        Y 59001391-59001635      + | processed_pseudogene transcript</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7155]        Y 59001391-59001635      + | processed_pseudogene exon      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>              score     phase         gene_id   gene_name    gene_source</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          &lt;numeric&gt; &lt;integer&gt;     &lt;character&gt; &lt;character&gt;    &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [1]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [2]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [3]        NA      &lt;NA&gt; ENSG00000251841  RNU6-1334P        ensembl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [4]        NA      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [5]        NA      &lt;NA&gt; ENSG00000184895         SRY ensembl_havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      ...       ...       ...             ...         ...            ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7151]        NA      &lt;NA&gt; ENSG00000231514     FAM58CP         havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7152]        NA      &lt;NA&gt; ENSG00000231514     FAM58CP         havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7153]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7154]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7155]        NA      &lt;NA&gt; ENSG00000235857     CTBP2P1         havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>            gene_biotype   transcript_id transcript_name transcript_source</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             &lt;character&gt;     &lt;character&gt;     &lt;character&gt;       &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [1]          snRNA            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [2]          snRNA ENST00000516032  RNU6-1334P-201           ensembl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [3]          snRNA ENST00000516032  RNU6-1334P-201           ensembl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [4] protein_coding            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [5] protein_coding ENST00000383070         SRY-001    ensembl_havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      ...            ...             ...             ...               ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7151]     pseudogene ENST00000435741     FAM58CP-001            havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7152]     pseudogene ENST00000435741     FAM58CP-001            havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7153]     pseudogene            &lt;NA&gt;            &lt;NA&gt;              &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7154]     pseudogene ENST00000431853     CTBP2P1-001            havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7155]     pseudogene ENST00000431853     CTBP2P1-001            havana</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          exon_number         exon_id         tag     ccds_id  protein_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>            &lt;numeric&gt;     &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [1]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [2]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [3]           1 ENSE00002088309        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [4]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [5]          NA            &lt;NA&gt;        CCDS   CCDS14772        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      ...         ...             ...         ...         ...         ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7151]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7152]           1 ENSE00001616687        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7153]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7154]          NA            &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [7155]           1 ENSE00001794473        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh37 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>DB</span> <span class='op'>&lt;-</span> <span class='fu'>ensDbFromGRanges</span><span class='op'>(</span><span class='va'>Y</span>, path<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempdir</a></span><span class='op'>(</span><span class='op'>)</span>, version<span class='op'>=</span><span class='fl'>75</span>,</span>
+<span class='r-in'>                       organism<span class='op'>=</span><span class='st'>"Homo_sapiens"</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing metadata ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing genes ... </span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span> I'm missing column(s): 'entrezid'. The corresponding database column(s) will be empty!</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  Attribute availability:</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o gene_id ... OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o gene_name ... OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o entrezid ... Nope</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o gene_biotype ... OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing transcripts ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  Attribute availability:</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o transcript_id ... OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o gene_id ... OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   o source ... OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing exons ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Processing chromosomes ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Generating index ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>   -------------</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Verifying validity of the information in the database:</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Checking transcripts ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Checking exons ... </span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> OK</span>
+<span class='r-in'><span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb.html'>EnsDb</a></span><span class='op'>(</span><span class='va'>DB</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

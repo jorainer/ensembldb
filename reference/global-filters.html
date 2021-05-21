@@ -66,8 +66,6 @@ filter filters an EnsDb object. filter is
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -91,7 +89,7 @@ filter filters an EnsDb object. filter is
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -162,16 +160,16 @@ filter filters an EnsDb object. filter is
     an alias for the <code>addFilter</code> function.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S4 method for EnsDb</span>
-<span class='fu'><a href='global-filters.html'>addFilter</a></span><span class='op'>(</span><span class='va'>x</span>, filter <span class='op'>=</span> <span class='fu'>AnnotationFilterList</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S4 method for EnsDb</span>
+<span class='fu'>addFilter</span><span class='op'>(</span><span class='va'>x</span>, filter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilterList.html'>AnnotationFilterList</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'><a href='global-filters.html'>dropFilter</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+<span class='fu'>dropFilter</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'><a href='global-filters.html'>activeFilter</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
+<span class='fu'>activeFilter</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
-<span class='fu'><a href='global-filters.html'>filter</a></span><span class='op'>(</span><span class='va'>x</span>, filter <span class='op'>=</span> <span class='fu'>AnnotationFilterList</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
+<span class='fu'>filter</span><span class='op'>(</span><span class='va'>x</span>, filter <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilterList.html'>AnnotationFilterList</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,73 +211,77 @@ expression. See</p></td>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-<span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span>
-
-<span class='co'>## Add a global SeqNameFilter to the database such that all subsequent</span>
-<span class='co'>## queries will be applied on the filtered database.</span>
-<span class='va'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='global-filters.html'>addFilter</a></span><span class='op'>(</span><span class='va'>edb</span>, <span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"Y"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'>## Note: using the filter function is equivalent to a call to addFilter.</span>
-
-<span class='co'>## Each call returns now only features encoded on chromosome Y</span>
-<span class='va'>gns</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
-
-<span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>gns</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "Y"</div><div class='input'>
-<span class='co'>## Get all lincRNA gene transcripts on chromosome Y</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb_y</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"lincRNA"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 73 ranges and 7 metadata columns:
-#&gt;                   seqnames            ranges strand |           tx_id
-#&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENST00000611750        Y   2934406-2934771      - | ENST00000611750
-#&gt;   ENST00000444263        Y   3002912-3097217      + | ENST00000444263
-#&gt;   ENST00000425031        Y   3002998-3102272      + | ENST00000425031
-#&gt;   ENST00000426699        Y   4036497-4100320      + | ENST00000426699
-#&gt;   ENST00000622595        Y   4993858-4997719      - | ENST00000622595
-#&gt;               ...      ...               ...    ... .             ...
-#&gt;   ENST00000421387        Y 25183643-25184773      - | ENST00000421387
-#&gt;   ENST00000427373        Y 25378300-25394719      - | ENST00000427373
-#&gt;   ENST00000611754        Y 25378671-25391610      - | ENST00000611754
-#&gt;   ENST00000306641        Y 25482908-25486705      + | ENST00000306641
-#&gt;   ENST00000417334        Y 25728490-25733388      + | ENST00000417334
-#&gt;                    tx_biotype tx_cds_seq_start tx_cds_seq_end         gene_id
-#&gt;                   &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;     &lt;character&gt;
-#&gt;   ENST00000611750     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000278847
-#&gt;   ENST00000444263     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000231535
-#&gt;   ENST00000425031     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000231535
-#&gt;   ENST00000426699     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000229308
-#&gt;   ENST00000622595     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000277930
-#&gt;               ...         ...              ...            ...             ...
-#&gt;   ENST00000421387     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000223641
-#&gt;   ENST00000427373     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000228786
-#&gt;   ENST00000611754     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000228786
-#&gt;   ENST00000306641     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000240450
-#&gt;   ENST00000417334     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000231141
-#&gt;                           tx_name gene_biotype
-#&gt;                       &lt;character&gt;  &lt;character&gt;
-#&gt;   ENST00000611750 ENST00000611750      lincRNA
-#&gt;   ENST00000444263 ENST00000444263      lincRNA
-#&gt;   ENST00000425031 ENST00000425031      lincRNA
-#&gt;   ENST00000426699 ENST00000426699      lincRNA
-#&gt;   ENST00000622595 ENST00000622595      lincRNA
-#&gt;               ...             ...          ...
-#&gt;   ENST00000421387 ENST00000421387      lincRNA
-#&gt;   ENST00000427373 ENST00000427373      lincRNA
-#&gt;   ENST00000611754 ENST00000611754      lincRNA
-#&gt;   ENST00000306641 ENST00000306641      lincRNA
-#&gt;   ENST00000417334 ENST00000417334      lincRNA
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-<span class='co'>## Get the currently active global filter:</span>
-<span class='fu'><a href='global-filters.html'>activeFilter</a></span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; AnnotationFilterList of length 1 
-#&gt; seq_name == 'Y'</div><div class='input'>
-<span class='co'>## Delete this filter again.</span>
-<span class='va'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='global-filters.html'>dropFilter</a></span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
-
-<span class='fu'><a href='global-filters.html'>activeFilter</a></span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] NA</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Add a global SeqNameFilter to the database such that all subsequent</span></span>
+<span class='r-in'><span class='co'>## queries will be applied on the filtered database.</span></span>
+<span class='r-in'><span class='va'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'>addFilter</span><span class='op'>(</span><span class='va'>edb</span>, <span class='fu'><a href='https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html'>SeqNameFilter</a></span><span class='op'>(</span><span class='st'>"Y"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Note: using the filter function is equivalent to a call to addFilter.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Each call returns now only features encoded on chromosome Y</span></span>
+<span class='r-in'><span class='va'>gns</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>gns</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Y"</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get all lincRNA gene transcripts on chromosome Y</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb_y</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"lincRNA"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 73 ranges and 7 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames            ranges strand |           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000611750        Y   2934406-2934771      - | ENST00000611750</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000444263        Y   3002912-3097217      + | ENST00000444263</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000425031        Y   3002998-3102272      + | ENST00000425031</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000426699        Y   4036497-4100320      + | ENST00000426699</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000622595        Y   4993858-4997719      - | ENST00000622595</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...      ...               ...    ... .             ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000421387        Y 25183643-25184773      - | ENST00000421387</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000427373        Y 25378300-25394719      - | ENST00000427373</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000611754        Y 25378671-25391610      - | ENST00000611754</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000306641        Y 25482908-25486705      + | ENST00000306641</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000417334        Y 25728490-25733388      + | ENST00000417334</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    tx_biotype tx_cds_seq_start tx_cds_seq_end         gene_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000611750     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000278847</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000444263     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000231535</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000425031     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000231535</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000426699     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000229308</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000622595     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000277930</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...         ...              ...            ...             ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000421387     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000223641</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000427373     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000228786</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000611754     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000228786</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000306641     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000240450</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000417334     lincRNA             &lt;NA&gt;           &lt;NA&gt; ENSG00000231141</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           tx_name gene_biotype</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       &lt;character&gt;  &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000611750 ENST00000611750      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000444263 ENST00000444263      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000425031 ENST00000425031      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000426699 ENST00000426699      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000622595 ENST00000622595      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...             ...          ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000421387 ENST00000421387      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000427373 ENST00000427373      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000611754 ENST00000611754      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000306641 ENST00000306641      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000417334 ENST00000417334      lincRNA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get the currently active global filter:</span></span>
+<span class='r-in'><span class='fu'>activeFilter</span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> AnnotationFilterList of length 1 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> seq_name == 'Y'</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Delete this filter again.</span></span>
+<span class='r-in'><span class='va'>edb_y</span> <span class='op'>&lt;-</span> <span class='fu'>dropFilter</span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>activeFilter</span><span class='op'>(</span><span class='va'>edb_y</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] NA</span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

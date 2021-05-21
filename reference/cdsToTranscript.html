@@ -61,8 +61,6 @@ relative to the start of the transcript and hence including its 5' UTR." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -86,7 +84,7 @@ relative to the start of the transcript and hence including its 5' UTR." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -151,7 +149,7 @@ the transcript</h1>
 relative to the start of the transcript and hence including its 5' UTR.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cdsToTranscript</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>db</span>, id <span class='op'>=</span> <span class='st'>"name"</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>cdsToTranscript</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>db</span>, id <span class='op'>=</span> <span class='st'>"name"</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -170,8 +168,8 @@ in one of its metadata columns.</p></td>
     </tr>
     <tr>
       <th>id</th>
-      <td><p><code><a href='https://rdrr.io/r/base/character.html'>character(1)</a></code> specifying where the transcript identifier can be
-found. Has to be either <code>"name"</code> or one of <code><a href='https://rdrr.io/r/base/colnames.html'>colnames(mcols(prng))</a></code>.</p></td>
+      <td><p><code>character(1)</code> specifying where the transcript identifier can be
+found. Has to be either <code>"name"</code> or one of <code>colnames(mcols(prng))</code>.</p></td>
     </tr>
     </table>
 
@@ -199,44 +197,47 @@ provided start and/or end coordinates are not within the coding region.</p>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-<span class='co'>## Defining transcript-relative coordinates for 4 transcripts of the gene</span>
-<span class='co'>## BCL2</span>
-<span class='va'>txcoords</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fl'>3</span>, <span class='fl'>143</span>, <span class='fl'>147</span><span class='op'>)</span>, width <span class='op'>=</span> <span class='fl'>1</span>,
-    names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ENST00000398117"</span>, <span class='st'>"ENST00000333681"</span>,
-    <span class='st'>"ENST00000590515"</span>, <span class='st'>"ENST00000589955"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='fu'>cdsToTranscript</span><span class='op'>(</span><span class='va'>txcoords</span>, <span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 of 4 transcript(s) are non-coding: ENST00000590515</span></div><div class='output co'>#&gt; IRanges object with 4 ranges and 2 metadata columns:
-#&gt;                       start       end     width | cds_start   cds_end
-#&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;integer&gt; &lt;integer&gt;
-#&gt;   ENST00000398117      1466      1466         1 |         4         4
-#&gt;   ENST00000333681       902       902         1 |         3         3
-#&gt;   ENST00000590515        -1        -1         1 |       143       143
-#&gt;   ENST00000589955       293       293         1 |       147       147</div><div class='input'>
-<span class='co'>## Next we map the coordinate for variants within the gene PKP2 to the</span>
-<span class='co'>## genome. The variants is PKP2 c.1643DelG and the provided</span>
-<span class='co'>## position is thus relative to the CDS. We have to convert the</span>
-<span class='co'>## position first to transcript-relative coordinates.</span>
-<span class='va'>pkp2</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>1643</span>, width <span class='op'>=</span> <span class='fl'>1</span>, name <span class='op'>=</span> <span class='st'>"ENST00000070846"</span><span class='op'>)</span>
-
-<span class='co'>## Map the coordinates by first converting the CDS- to transcript-relative</span>
-<span class='co'>## coordinates</span>
-<span class='fu'><a href='transcriptToGenome.html'>transcriptToGenome</a></span><span class='op'>(</span><span class='fu'>cdsToTranscript</span><span class='op'>(</span><span class='va'>pkp2</span>, <span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>,
-    <span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRangesList object of length 1:
-#&gt; $ENST00000070846
-#&gt; GRanges object with 1 range and 5 metadata columns:
-#&gt;       seqnames    ranges strand |         exon_id           tx_id exon_rank
-#&gt;          &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt; &lt;integer&gt;
-#&gt;   [1]       12  32841073      - | ENSE00000936503 ENST00000070846         7
-#&gt;        tx_start    tx_end
-#&gt;       &lt;integer&gt; &lt;integer&gt;
-#&gt;   [1]      1668      1668
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome
-#&gt; </div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Defining transcript-relative coordinates for 4 transcripts of the gene</span></span>
+<span class='r-in'><span class='co'>## BCL2</span></span>
+<span class='r-in'><span class='va'>txcoords</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fl'>3</span>, <span class='fl'>143</span>, <span class='fl'>147</span><span class='op'>)</span>, width <span class='op'>=</span> <span class='fl'>1</span>,</span>
+<span class='r-in'>    names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ENST00000398117"</span>, <span class='st'>"ENST00000333681"</span>,</span>
+<span class='r-in'>    <span class='st'>"ENST00000590515"</span>, <span class='st'>"ENST00000589955"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>cdsToTranscript</span><span class='op'>(</span><span class='va'>txcoords</span>, <span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>1 of 4 transcript(s) are non-coding: ENST00000590515</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> IRanges object with 4 ranges and 2 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       start       end     width | cds_start   cds_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000398117      1466      1466         1 |         4         4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000333681       902       902         1 |         3         3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000590515        -1        -1         1 |       143       143</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000589955       293       293         1 |       147       147</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Next we map the coordinate for variants within the gene PKP2 to the</span></span>
+<span class='r-in'><span class='co'>## genome. The variants is PKP2 c.1643DelG and the provided</span></span>
+<span class='r-in'><span class='co'>## position is thus relative to the CDS. We have to convert the</span></span>
+<span class='r-in'><span class='co'>## position first to transcript-relative coordinates.</span></span>
+<span class='r-in'><span class='va'>pkp2</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>1643</span>, width <span class='op'>=</span> <span class='fl'>1</span>, name <span class='op'>=</span> <span class='st'>"ENST00000070846"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Map the coordinates by first converting the CDS- to transcript-relative</span></span>
+<span class='r-in'><span class='co'>## coordinates</span></span>
+<span class='r-in'><span class='fu'><a href='transcriptToGenome.html'>transcriptToGenome</a></span><span class='op'>(</span><span class='fu'>cdsToTranscript</span><span class='op'>(</span><span class='va'>pkp2</span>, <span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>,</span>
+<span class='r-in'>    <span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRangesList object of length 1:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ENST00000070846</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 1 range and 5 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       seqnames    ranges strand |         exon_id           tx_id exon_rank</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]       12  32841073      - | ENSE00000936503 ENST00000070846         7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        tx_start    tx_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]      1668      1668</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

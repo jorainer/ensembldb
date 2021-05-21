@@ -67,8 +67,6 @@ cdsToTranscript() function." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -92,7 +90,7 @@ cdsToTranscript() function." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -163,7 +161,7 @@ transcript-relative coordinates. This can be done with the
 <code><a href='cdsToTranscript.html'>cdsToTranscript()</a></code> function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>db</span>, id <span class='op'>=</span> <span class='st'>"name"</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>db</span>, id <span class='op'>=</span> <span class='st'>"name"</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -181,8 +179,8 @@ as <code>names</code> of the <code>IRanges</code>, or in one of its metadata col
     </tr>
     <tr>
       <th>id</th>
-      <td><p><code><a href='https://rdrr.io/r/base/character.html'>character(1)</a></code> specifying where the transcript identifier can be
-found. Has to be either <code>"name"</code> or one of <code><a href='https://rdrr.io/r/base/colnames.html'>colnames(mcols(prng))</a></code>.</p></td>
+      <td><p><code>character(1)</code> specifying where the transcript identifier can be
+found. Has to be either <code>"name"</code> or one of <code>colnames(mcols(prng))</code>.</p></td>
     </tr>
     </table>
 
@@ -222,64 +220,70 @@ CDS- and transcript-relative coordinates.</p>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-<span class='co'>## Restrict all further queries to chromosome x to speed up the examples</span>
-<span class='va'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='global-filters.html'>filter</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span><span class='op'>)</span>
-
-<span class='co'>## Define an IRanges with the positions of the first 2 nucleotides of the</span>
-<span class='co'>## coding region for the transcript ENST00000381578</span>
-<span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>692</span>, width <span class='op'>=</span> <span class='fl'>2</span>, names <span class='op'>=</span> <span class='st'>"ENST00000381578"</span><span class='op'>)</span>
-
-<span class='co'>## Map these to the corresponding residues in the protein sequence</span>
-<span class='co'>## The protein-relative coordinates are returned as an `IRanges` object,</span>
-<span class='co'>## with the original, transcript-relative coordinates provided in metadata</span>
-<span class='co'>## columns tx_start and tx_end</span>
-<span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; IRanges object with 1 range and 4 metadata columns:
-#&gt;                       start       end     width |           tx_id  tx_start
-#&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt;
-#&gt;   ENSP00000370990         1         1         1 | ENST00000381578       692
-#&gt;                      tx_end    cds_ok
-#&gt;                   &lt;integer&gt; &lt;logical&gt;
-#&gt;   ENSP00000370990       693      TRUE</div><div class='input'>
-<span class='co'>## We can also map multiple ranges. Note that for any of the 3 nucleotides</span>
-<span class='co'>## encoding the same amino acid the position of this residue in the</span>
-<span class='co'>## protein sequence is returned. To illustrate this we map below each of the</span>
-<span class='co'>## first 4 nucleotides of the CDS to the corresponding position within the</span>
-<span class='co'>## protein.</span>
-<span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>692</span>, <span class='fl'>693</span>, <span class='fl'>694</span>, <span class='fl'>695</span><span class='op'>)</span>,
-    width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='st'>"ENST00000381578"</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; IRanges object with 4 ranges and 4 metadata columns:
-#&gt;                       start       end     width |           tx_id  tx_start
-#&gt;                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt;
-#&gt;   ENSP00000370990         1         1         1 | ENST00000381578       692
-#&gt;   ENSP00000370990         1         1         1 | ENST00000381578       693
-#&gt;   ENSP00000370990         1         1         1 | ENST00000381578       694
-#&gt;   ENSP00000370990         2         2         1 | ENST00000381578       695
-#&gt;                      tx_end    cds_ok
-#&gt;                   &lt;integer&gt; &lt;logical&gt;
-#&gt;   ENSP00000370990       692      TRUE
-#&gt;   ENSP00000370990       693      TRUE
-#&gt;   ENSP00000370990       694      TRUE
-#&gt;   ENSP00000370990       695      TRUE</div><div class='input'>
-<span class='co'>## If the mapping fails, an IRanges with negative start position is returned.</span>
-<span class='co'>## Mapping can fail (as below) because the ID is not known.</span>
-<span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, names <span class='op'>=</span> <span class='st'>"unknown"</span><span class='op'>)</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Transcript(s) 'unknown' could not be found</span></div><div class='output co'>#&gt; IRanges object with 1 range and 4 metadata columns:
-#&gt;           start       end     width |       tx_id  tx_start    tx_end    cds_ok
-#&gt;       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;logical&gt;
-#&gt;   [1]        -1        -1         1 |     unknown         1         1      &lt;NA&gt;</div><div class='input'>
-<span class='co'>## Or because the provided coordinates are not within the CDS</span>
-<span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, names <span class='op'>=</span> <span class='st'>"ENST00000381578"</span><span class='op'>)</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Provided coordinates for 'ENST00000381578' are not within the coding region</span></div><div class='output co'>#&gt; IRanges object with 1 range and 4 metadata columns:
-#&gt;           start       end     width |           tx_id  tx_start    tx_end
-#&gt;       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt; &lt;integer&gt;
-#&gt;   [1]        -1        -1         1 | ENST00000381578         1         1
-#&gt;          cds_ok
-#&gt;       &lt;logical&gt;
-#&gt;   [1]      &lt;NA&gt;</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Restrict all further queries to chromosome x to speed up the examples</span></span>
+<span class='r-in'><span class='va'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='global-filters.html'>filter</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Define an IRanges with the positions of the first 2 nucleotides of the</span></span>
+<span class='r-in'><span class='co'>## coding region for the transcript ENST00000381578</span></span>
+<span class='r-in'><span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>692</span>, width <span class='op'>=</span> <span class='fl'>2</span>, names <span class='op'>=</span> <span class='st'>"ENST00000381578"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Map these to the corresponding residues in the protein sequence</span></span>
+<span class='r-in'><span class='co'>## The protein-relative coordinates are returned as an `IRanges` object,</span></span>
+<span class='r-in'><span class='co'>## with the original, transcript-relative coordinates provided in metadata</span></span>
+<span class='r-in'><span class='co'>## columns tx_start and tx_end</span></span>
+<span class='r-in'><span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> IRanges object with 1 range and 4 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       start       end     width |           tx_id  tx_start</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990         1         1         1 | ENST00000381578       692</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      tx_end    cds_ok</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;integer&gt; &lt;logical&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990       693      TRUE</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## We can also map multiple ranges. Note that for any of the 3 nucleotides</span></span>
+<span class='r-in'><span class='co'>## encoding the same amino acid the position of this residue in the</span></span>
+<span class='r-in'><span class='co'>## protein sequence is returned. To illustrate this we map below each of the</span></span>
+<span class='r-in'><span class='co'>## first 4 nucleotides of the CDS to the corresponding position within the</span></span>
+<span class='r-in'><span class='co'>## protein.</span></span>
+<span class='r-in'><span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>692</span>, <span class='fl'>693</span>, <span class='fl'>694</span>, <span class='fl'>695</span><span class='op'>)</span>,</span>
+<span class='r-in'>    width <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span>, names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='st'>"ENST00000381578"</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> IRanges object with 4 ranges and 4 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       start       end     width |           tx_id  tx_start</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990         1         1         1 | ENST00000381578       692</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990         1         1         1 | ENST00000381578       693</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990         1         1         1 | ENST00000381578       694</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990         2         2         1 | ENST00000381578       695</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      tx_end    cds_ok</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;integer&gt; &lt;logical&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990       692      TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990       693      TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990       694      TRUE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSP00000370990       695      TRUE</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## If the mapping fails, an IRanges with negative start position is returned.</span></span>
+<span class='r-in'><span class='co'>## Mapping can fail (as below) because the ID is not known.</span></span>
+<span class='r-in'><span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, names <span class='op'>=</span> <span class='st'>"unknown"</span><span class='op'>)</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Transcript(s) 'unknown' could not be found</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> IRanges object with 1 range and 4 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           start       end     width |       tx_id  tx_start    tx_end    cds_ok</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;logical&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]        -1        -1         1 |     unknown         1         1      &lt;NA&gt;</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Or because the provided coordinates are not within the CDS</span></span>
+<span class='r-in'><span class='fu'>transcriptToProtein</span><span class='op'>(</span><span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span>, names <span class='op'>=</span> <span class='st'>"ENST00000381578"</span><span class='op'>)</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Provided coordinates for 'ENST00000381578' are not within the coding region</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> IRanges object with 1 range and 4 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           start       end     width |           tx_id  tx_start    tx_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]        -1        -1         1 | ENST00000381578         1         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          cds_ok</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;logical&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]      &lt;NA&gt;</span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -70,8 +70,6 @@ EnsDb object." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -95,7 +93,7 @@ EnsDb object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -170,7 +168,7 @@ names of all filters and the corresponding field supported by the
 <code>EnsDb</code> object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>OnlyCodingTxFilter</span><span class='op'>(</span><span class='op'>)</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>OnlyCodingTxFilter</span><span class='op'>(</span><span class='op'>)</span>
 
 <span class='fu'>ProtDomIdFilter</span><span class='op'>(</span><span class='va'>value</span>, condition <span class='op'>=</span> <span class='st'>"=="</span><span class='op'>)</span>
 
@@ -191,7 +189,7 @@ names of all filters and the corresponding field supported by the
 <span class='fu'><a href='EnsDb-class.html'>seqlevels</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'>supportedFilters</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>supportedFilters</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -203,7 +201,7 @@ names of all filters and the corresponding field supported by the
     </tr>
     <tr>
       <th>condition</th>
-      <td><p><code><a href='https://rdrr.io/r/base/character.html'>character(1)</a></code> specifying the <em>condition</em> of the
+      <td><p><code>character(1)</code> specifying the <em>condition</em> of the
 filter. For <code>character</code>-based filters (such as
 <code>GeneIdFilter</code>) <code>"=="</code>, <code>"!="</code>, <code>"startsWith"</code> and <code>"endsWith"</code> are
 supported. Allowed values for <code>integer</code>-based filters (such as
@@ -344,289 +342,302 @@ filter objects.</p>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'>## Create a filter that could be used to retrieve all informations for</span>
-<span class='co'>## the respective gene.</span>
-<span class='va'>gif</span> <span class='op'>&lt;-</span> <span class='fu'>GeneIdFilter</span><span class='op'>(</span><span class='st'>"ENSG00000012817"</span><span class='op'>)</span>
-<span class='va'>gif</span>
-</div><div class='output co'>#&gt; class: GeneIdFilter 
-#&gt; condition: == 
-#&gt; value: ENSG00000012817 </div><div class='input'>
-<span class='co'>## Create a filter for a chromosomal end position of a gene</span>
-<span class='va'>sef</span> <span class='op'>&lt;-</span> <span class='fu'>GeneEndFilter</span><span class='op'>(</span><span class='fl'>10000</span>, condition <span class='op'>=</span> <span class='st'>"&gt;"</span><span class='op'>)</span>
-<span class='va'>sef</span>
-</div><div class='output co'>#&gt; class: GeneEndFilter 
-#&gt; condition: &gt; 
-#&gt; value: 10000 </div><div class='input'>
-<span class='co'>## For additional examples see the help page of "genes".</span>
-
-
-<span class='co'>## Example for GRangesFilter:</span>
-<span class='co'>## retrieve all genes overlapping the specified region</span>
-<span class='va'>grf</span> <span class='op'>&lt;-</span> <span class='fu'>GRangesFilter</span><span class='op'>(</span><span class='fu'>GRanges</span><span class='op'>(</span><span class='st'>"11"</span>, ranges <span class='op'>=</span> <span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>114129278</span>, <span class='fl'>114129328</span><span class='op'>)</span>,
-                             strand <span class='op'>=</span> <span class='st'>"+"</span><span class='op'>)</span>, type <span class='op'>=</span> <span class='st'>"any"</span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-<span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 1 range and 6 metadata columns:
-#&gt;                   seqnames              ranges strand |         gene_id
-#&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENSG00000109906       11 114059593-114250676      + | ENSG00000109906
-#&gt;                     gene_name   gene_biotype seq_coord_system      symbol
-#&gt;                   &lt;character&gt;    &lt;character&gt;      &lt;character&gt; &lt;character&gt;
-#&gt;   ENSG00000109906      ZBTB16 protein_coding       chromosome      ZBTB16
-#&gt;                   entrezid
-#&gt;                     &lt;list&gt;
-#&gt;   ENSG00000109906     7704
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-<span class='co'>## Get also all transcripts overlapping that region.</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 4 ranges and 6 metadata columns:
-#&gt;                   seqnames              ranges strand |           tx_id
-#&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENST00000335953       11 114059593-114250676      + | ENST00000335953
-#&gt;   ENST00000541602       11 114059725-114189764      + | ENST00000541602
-#&gt;   ENST00000392996       11 114060507-114250652      + | ENST00000392996
-#&gt;   ENST00000539918       11 114064412-114247344      + | ENST00000539918
-#&gt;                               tx_biotype tx_cds_seq_start tx_cds_seq_end
-#&gt;                              &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;
-#&gt;   ENST00000335953         protein_coding        114063301      114250555
-#&gt;   ENST00000541602        retained_intron             &lt;NA&gt;           &lt;NA&gt;
-#&gt;   ENST00000392996         protein_coding        114063301      114250555
-#&gt;   ENST00000539918 nonsense_mediated_de..        114064412      114121827
-#&gt;                           gene_id         tx_name
-#&gt;                       &lt;character&gt;     &lt;character&gt;
-#&gt;   ENST00000335953 ENSG00000109906 ENST00000335953
-#&gt;   ENST00000541602 ENSG00000109906 ENST00000541602
-#&gt;   ENST00000392996 ENSG00000109906 ENST00000392996
-#&gt;   ENST00000539918 ENSG00000109906 ENST00000539918
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-<span class='co'>## Retrieve all transcripts for the above gene</span>
-<span class='va'>gn</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
-<span class='va'>txs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='va'>gn</span><span class='op'>$</span><span class='va'>gene_name</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'>## Next we simply plot their start and end coordinates.</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, pch<span class='op'>=</span><span class='cn'>NA</span>, xlim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>gn</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>gn</span><span class='op'>)</span><span class='op'>)</span>, ylim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span><span class='op'>)</span>,
-yaxt<span class='op'>=</span><span class='st'>"n"</span>, ylab<span class='op'>=</span><span class='st'>""</span><span class='op'>)</span>
-</div><div class='input'><span class='co'>## Highlight the GRangesFilter region</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span><span class='op'>(</span>xleft<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>grf</span><span class='op'>)</span>, xright<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>grf</span><span class='op'>)</span>, ybottom<span class='op'>=</span><span class='fl'>0</span>, ytop<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span>,
-col<span class='op'>=</span><span class='st'>"red"</span>, border<span class='op'>=</span><span class='st'>"red"</span><span class='op'>)</span>
-</div><div class='input'><span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
-    <span class='va'>current</span> <span class='op'>&lt;-</span> <span class='va'>txs</span><span class='op'>[</span><span class='va'>i</span><span class='op'>]</span>
-    <span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span><span class='op'>(</span>xleft<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, xright<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, ybottom<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.975</span>, ytop<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.125</span>, border<span class='op'>=</span><span class='st'>"grey"</span><span class='op'>)</span>
-    <span class='fu'><a href='https://rdrr.io/r/graphics/text.html'>text</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, y<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.5</span>,pos<span class='op'>=</span><span class='fl'>4</span>, cex<span class='op'>=</span><span class='fl'>0.75</span>, labels<span class='op'>=</span><span class='va'>current</span><span class='op'>$</span><span class='va'>tx_id</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='img'><img src='Filter-classes-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'>## Thus, we can see that only 4 transcripts of that gene are indeed</span>
-<span class='co'>## overlapping the region.</span>
-
-
-<span class='co'>## No exon is overlapping that region, thus we're not getting anything</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>exons</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 0 ranges and 1 metadata column:
-#&gt;    seqnames    ranges strand |     exon_id
-#&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
-#&gt;   -------
-#&gt;   seqinfo: no sequences</div><div class='input'>
-
-<span class='co'>## Example for ExonRankFilter</span>
-<span class='co'>## Extract all exons 1 and (if present) 2 for all genes encoded on the</span>
-<span class='co'>## Y chromosome</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>exons</a></span><span class='op'>(</span><span class='va'>edb</span>, columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"tx_id"</span>, <span class='st'>"exon_idx"</span><span class='op'>)</span>,
-      filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"Y"</span><span class='op'>)</span>,
-                  <span class='fu'>ExonRankFilter</span><span class='op'>(</span><span class='fl'>3</span>, condition <span class='op'>=</span> <span class='st'>"&lt;"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 1294 ranges and 3 metadata columns:
-#&gt;                   seqnames            ranges strand |           tx_id  exon_idx
-#&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt; &lt;integer&gt;
-#&gt;   ENSE00002088309        Y   2784749-2784853      + | ENST00000516032         1
-#&gt;   ENSE00001494622        Y   2786855-2787699      - | ENST00000383070         1
-#&gt;   ENSE00001772499        Y   2789827-2790328      + | ENST00000454281         1
-#&gt;   ENSE00001614266        Y   2827982-2828218      + | ENST00000430735         1
-#&gt;   ENSE00002490412        Y   2841486-2841627      + | ENST00000250784         1
-#&gt;               ...      ...               ...    ... .             ...       ...
-#&gt;   ENSE00001632993        Y 26591548-26591601      - | ENST00000456738         1
-#&gt;   ENSE00001616687        Y 26626520-26627159      - | ENST00000435741         1
-#&gt;   ENSE00001638296        Y 26633345-26633431      - | ENST00000435945         2
-#&gt;   ENSE00001797328        Y 26634523-26634652      - | ENST00000435945         1
-#&gt;   ENSE00001794473        Y 56855244-56855488      + | ENST00000431853         1
-#&gt;                           exon_id
-#&gt;                       &lt;character&gt;
-#&gt;   ENSE00002088309 ENSE00002088309
-#&gt;   ENSE00001494622 ENSE00001494622
-#&gt;   ENSE00001772499 ENSE00001772499
-#&gt;   ENSE00001614266 ENSE00001614266
-#&gt;   ENSE00002490412 ENSE00002490412
-#&gt;               ...             ...
-#&gt;   ENSE00001632993 ENSE00001632993
-#&gt;   ENSE00001616687 ENSE00001616687
-#&gt;   ENSE00001638296 ENSE00001638296
-#&gt;   ENSE00001797328 ENSE00001797328
-#&gt;   ENSE00001794473 ENSE00001794473
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-
-<span class='co'>## Get all transcripts for the gene SKA2</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='st'>"SKA2"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 10 ranges and 7 metadata columns:
-#&gt;                   seqnames            ranges strand |           tx_id
-#&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENST00000330137       17 59109951-59155269      - | ENST00000330137
-#&gt;   ENST00000580541       17 59111886-59155184      - | ENST00000580541
-#&gt;   ENST00000578105       17 59111888-59155184      - | ENST00000578105
-#&gt;   ENST00000578519       17 59111890-59155182      - | ENST00000578519
-#&gt;   ENST00000583927       17 59111943-59155260      - | ENST00000583927
-#&gt;   ENST00000581068       17 59111956-59155248      - | ENST00000581068
-#&gt;   ENST00000437036       17 59112047-59155194      - | ENST00000437036
-#&gt;   ENST00000583380       17 59112091-59155174      - | ENST00000583380
-#&gt;   ENST00000583976       17 59112262-59155177      - | ENST00000583976
-#&gt;   ENST00000584089       17 59119387-59151801      - | ENST00000584089
-#&gt;                               tx_biotype tx_cds_seq_start tx_cds_seq_end
-#&gt;                              &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;
-#&gt;   ENST00000330137         protein_coding         59112277       59155163
-#&gt;   ENST00000580541         protein_coding         59112333       59155083
-#&gt;   ENST00000578105         protein_coding         59112277       59155163
-#&gt;   ENST00000578519 nonsense_mediated_de..         59124363       59155163
-#&gt;   ENST00000583927   processed_transcript             &lt;NA&gt;           &lt;NA&gt;
-#&gt;   ENST00000581068         protein_coding         59112277       59155163
-#&gt;   ENST00000437036         protein_coding         59112333       59155083
-#&gt;   ENST00000583380         protein_coding         59112333       59155163
-#&gt;   ENST00000583976 nonsense_mediated_de..         59119474       59155083
-#&gt;   ENST00000584089         protein_coding         59119387       59151771
-#&gt;                           gene_id         tx_name   gene_name
-#&gt;                       &lt;character&gt;     &lt;character&gt; &lt;character&gt;
-#&gt;   ENST00000330137 ENSG00000182628 ENST00000330137        SKA2
-#&gt;   ENST00000580541 ENSG00000182628 ENST00000580541        SKA2
-#&gt;   ENST00000578105 ENSG00000182628 ENST00000578105        SKA2
-#&gt;   ENST00000578519 ENSG00000182628 ENST00000578519        SKA2
-#&gt;   ENST00000583927 ENSG00000182628 ENST00000583927        SKA2
-#&gt;   ENST00000581068 ENSG00000182628 ENST00000581068        SKA2
-#&gt;   ENST00000437036 ENSG00000182628 ENST00000437036        SKA2
-#&gt;   ENST00000583380 ENSG00000182628 ENST00000583380        SKA2
-#&gt;   ENST00000583976 ENSG00000182628 ENST00000583976        SKA2
-#&gt;   ENST00000584089 ENSG00000182628 ENST00000584089        SKA2
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-<span class='co'>## Which is the same as using a SymbolFilter</span>
-<span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>SymbolFilter</span><span class='op'>(</span><span class='st'>"SKA2"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRanges object with 10 ranges and 7 metadata columns:
-#&gt;                   seqnames            ranges strand |           tx_id
-#&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENST00000330137       17 59109951-59155269      - | ENST00000330137
-#&gt;   ENST00000580541       17 59111886-59155184      - | ENST00000580541
-#&gt;   ENST00000578105       17 59111888-59155184      - | ENST00000578105
-#&gt;   ENST00000578519       17 59111890-59155182      - | ENST00000578519
-#&gt;   ENST00000583927       17 59111943-59155260      - | ENST00000583927
-#&gt;   ENST00000581068       17 59111956-59155248      - | ENST00000581068
-#&gt;   ENST00000437036       17 59112047-59155194      - | ENST00000437036
-#&gt;   ENST00000583380       17 59112091-59155174      - | ENST00000583380
-#&gt;   ENST00000583976       17 59112262-59155177      - | ENST00000583976
-#&gt;   ENST00000584089       17 59119387-59151801      - | ENST00000584089
-#&gt;                               tx_biotype tx_cds_seq_start tx_cds_seq_end
-#&gt;                              &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;
-#&gt;   ENST00000330137         protein_coding         59112277       59155163
-#&gt;   ENST00000580541         protein_coding         59112333       59155083
-#&gt;   ENST00000578105         protein_coding         59112277       59155163
-#&gt;   ENST00000578519 nonsense_mediated_de..         59124363       59155163
-#&gt;   ENST00000583927   processed_transcript             &lt;NA&gt;           &lt;NA&gt;
-#&gt;   ENST00000581068         protein_coding         59112277       59155163
-#&gt;   ENST00000437036         protein_coding         59112333       59155083
-#&gt;   ENST00000583380         protein_coding         59112333       59155163
-#&gt;   ENST00000583976 nonsense_mediated_de..         59119474       59155083
-#&gt;   ENST00000584089         protein_coding         59119387       59151771
-#&gt;                           gene_id         tx_name      symbol
-#&gt;                       &lt;character&gt;     &lt;character&gt; &lt;character&gt;
-#&gt;   ENST00000330137 ENSG00000182628 ENST00000330137        SKA2
-#&gt;   ENST00000580541 ENSG00000182628 ENST00000580541        SKA2
-#&gt;   ENST00000578105 ENSG00000182628 ENST00000578105        SKA2
-#&gt;   ENST00000578519 ENSG00000182628 ENST00000578519        SKA2
-#&gt;   ENST00000583927 ENSG00000182628 ENST00000583927        SKA2
-#&gt;   ENST00000581068 ENSG00000182628 ENST00000581068        SKA2
-#&gt;   ENST00000437036 ENSG00000182628 ENST00000437036        SKA2
-#&gt;   ENST00000583380 ENSG00000182628 ENST00000583380        SKA2
-#&gt;   ENST00000583976 ENSG00000182628 ENST00000583976        SKA2
-#&gt;   ENST00000584089 ENSG00000182628 ENST00000584089        SKA2
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-
-<span class='co'>## Create a ProteinIdFilter:</span>
-<span class='va'>pf</span> <span class='op'>&lt;-</span> <span class='fu'>ProteinIdFilter</span><span class='op'>(</span><span class='st'>"ENSP00000362111"</span><span class='op'>)</span>
-<span class='va'>pf</span>
-</div><div class='output co'>#&gt; class: ProteinIdFilter 
-#&gt; condition: == 
-#&gt; value: ENSP00000362111 </div><div class='input'><span class='co'>## Using this filter would retrieve all database entries that are associated</span>
-<span class='co'>## with a protein with the ID "ENSP00000362111"</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>pf</span><span class='op'>)</span>
-    <span class='va'>res</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; GRanges object with 1 range and 7 metadata columns:
-#&gt;                   seqnames              ranges strand |         gene_id
-#&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENSG00000000003        X 100627109-100639991      - | ENSG00000000003
-#&gt;                     gene_name   gene_biotype seq_coord_system      symbol
-#&gt;                   &lt;character&gt;    &lt;character&gt;      &lt;character&gt; &lt;character&gt;
-#&gt;   ENSG00000000003      TSPAN6 protein_coding       chromosome      TSPAN6
-#&gt;                   entrezid      protein_id
-#&gt;                     &lt;list&gt;     &lt;character&gt;
-#&gt;   ENSG00000000003     7105 ENSP00000362111
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-<span class='co'>## UniprotFilter:</span>
-<span class='va'>uf</span> <span class='op'>&lt;-</span> <span class='fu'>UniprotFilter</span><span class='op'>(</span><span class='st'>"O60762"</span><span class='op'>)</span>
-<span class='co'>## Get the transcripts encoding that protein:</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>uf</span><span class='op'>)</span>
-    <span class='co'>## The mapping Ensembl protein ID to Uniprot ID can however be 1:n:</span>
-    <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>TxIdFilter</span><span class='op'>(</span><span class='st'>"ENST00000371588"</span><span class='op'>)</span>,
-        columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"protein_id"</span>, <span class='st'>"uniprot_id"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; GRanges object with 2 ranges and 3 metadata columns:
-#&gt;                   seqnames            ranges strand |      protein_id
-#&gt;                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENST00000371588       20 50934867-50958550      - | ENSP00000360644
-#&gt;   ENST00000371588       20 50934867-50958550      - | ENSP00000360644
-#&gt;                    uniprot_id           tx_id
-#&gt;                   &lt;character&gt;     &lt;character&gt;
-#&gt;   ENST00000371588      O60762 ENST00000371588
-#&gt;   ENST00000371588  A0A0S2Z4Y5 ENST00000371588
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome</div><div class='input'>
-<span class='co'>## ProtDomIdFilter:</span>
-<span class='va'>pdf</span> <span class='op'>&lt;-</span> <span class='fu'>ProtDomIdFilter</span><span class='op'>(</span><span class='st'>"PF00335"</span><span class='op'>)</span>
-<span class='co'>## Also here we could get all transcripts related to that protein domain</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>pdf</span>, columns <span class='op'>=</span> <span class='st'>"protein_id"</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div><div class='output co'>#&gt; GRanges object with 165 ranges and 3 metadata columns:
-#&gt;                   seqnames              ranges strand |      protein_id
-#&gt;                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;
-#&gt;   ENST00000372003        1   46175087-46185958      + | ENSP00000361072
-#&gt;   ENST00000271324        1 110873154-110899928      + | ENSP00000271324
-#&gt;   ENST00000369516        1 115048011-115089464      - | ENSP00000358529
-#&gt;   ENST00000369515        1 115050356-115089500      - | ENSP00000358528
-#&gt;   ENST00000433172        1 115050383-115089414      - | ENSP00000415256
-#&gt;               ...      ...                 ...    ... .             ...
-#&gt;   ENST00000378482        X   38561370-38688913      + | ENSP00000367743
-#&gt;   ENST00000286824        X   38561544-38688397      + | ENSP00000286824
-#&gt;   ENST00000612152        X 100627109-100637104      - | ENSP00000482130
-#&gt;   ENST00000373020        X 100628670-100636806      - | ENSP00000362111
-#&gt;   ENST00000614008        X 100632063-100637104      - | ENSP00000482894
-#&gt;                             tx_id protein_domain_id
-#&gt;                       &lt;character&gt;       &lt;character&gt;
-#&gt;   ENST00000372003 ENST00000372003           PF00335
-#&gt;   ENST00000271324 ENST00000271324           PF00335
-#&gt;   ENST00000369516 ENST00000369516           PF00335
-#&gt;   ENST00000369515 ENST00000369515           PF00335
-#&gt;   ENST00000433172 ENST00000433172           PF00335
-#&gt;               ...             ...               ...
-#&gt;   ENST00000378482 ENST00000378482           PF00335
-#&gt;   ENST00000286824 ENST00000286824           PF00335
-#&gt;   ENST00000612152 ENST00000612152           PF00335
-#&gt;   ENST00000373020 ENST00000373020           PF00335
-#&gt;   ENST00000614008 ENST00000614008           PF00335
-#&gt;   -------
-#&gt;   seqinfo: 13 sequences from GRCh38 genome</div><div class='input'>
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='co'>## Create a filter that could be used to retrieve all informations for</span></span>
+<span class='r-in'><span class='co'>## the respective gene.</span></span>
+<span class='r-in'><span class='va'>gif</span> <span class='op'>&lt;-</span> <span class='fu'>GeneIdFilter</span><span class='op'>(</span><span class='st'>"ENSG00000012817"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>gif</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> class: GeneIdFilter </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> condition: == </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> value: ENSG00000012817 </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Create a filter for a chromosomal end position of a gene</span></span>
+<span class='r-in'><span class='va'>sef</span> <span class='op'>&lt;-</span> <span class='fu'>GeneEndFilter</span><span class='op'>(</span><span class='fl'>10000</span>, condition <span class='op'>=</span> <span class='st'>"&gt;"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>sef</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> class: GeneEndFilter </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> condition: &gt; </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> value: 10000 </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## For additional examples see the help page of "genes".</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Example for GRangesFilter:</span></span>
+<span class='r-in'><span class='co'>## retrieve all genes overlapping the specified region</span></span>
+<span class='r-in'><span class='va'>grf</span> <span class='op'>&lt;-</span> <span class='fu'>GRangesFilter</span><span class='op'>(</span><span class='fu'>GRanges</span><span class='op'>(</span><span class='st'>"11"</span>, ranges <span class='op'>=</span> <span class='fu'>IRanges</span><span class='op'>(</span><span class='fl'>114129278</span>, <span class='fl'>114129328</span><span class='op'>)</span>,</span>
+<span class='r-in'>                             strand <span class='op'>=</span> <span class='st'>"+"</span><span class='op'>)</span>, type <span class='op'>=</span> <span class='st'>"any"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 1 range and 6 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames              ranges strand |         gene_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSG00000109906       11 114059593-114250676      + | ENSG00000109906</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     gene_name   gene_biotype seq_coord_system      symbol</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;character&gt;    &lt;character&gt;      &lt;character&gt; &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSG00000109906      ZBTB16 protein_coding       chromosome      ZBTB16</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   entrezid</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     &lt;list&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSG00000109906     7704</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get also all transcripts overlapping that region.</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 4 ranges and 6 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames              ranges strand |           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000335953       11 114059593-114250676      + | ENST00000335953</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000541602       11 114059725-114189764      + | ENST00000541602</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000392996       11 114060507-114250652      + | ENST00000392996</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000539918       11 114064412-114247344      + | ENST00000539918</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                               tx_biotype tx_cds_seq_start tx_cds_seq_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                              &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000335953         protein_coding        114063301      114250555</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000541602        retained_intron             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000392996         protein_coding        114063301      114250555</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000539918 nonsense_mediated_de..        114064412      114121827</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           gene_id         tx_name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       &lt;character&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000335953 ENSG00000109906 ENST00000335953</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000541602 ENSG00000109906 ENST00000541602</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000392996 ENSG00000109906 ENST00000392996</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000539918 ENSG00000109906 ENST00000539918</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Retrieve all transcripts for the above gene</span></span>
+<span class='r-in'><span class='va'>gn</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>txs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='va'>gn</span><span class='op'>$</span><span class='va'>gene_name</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Next we simply plot their start and end coordinates.</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>3</span>, pch<span class='op'>=</span><span class='cn'>NA</span>, xlim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>gn</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>gn</span><span class='op'>)</span><span class='op'>)</span>, ylim<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>yaxt<span class='op'>=</span><span class='st'>"n"</span>, ylab<span class='op'>=</span><span class='st'>""</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Highlight the GRangesFilter region</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span><span class='op'>(</span>xleft<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>grf</span><span class='op'>)</span>, xright<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>grf</span><span class='op'>)</span>, ybottom<span class='op'>=</span><span class='fl'>0</span>, ytop<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span>,</span>
+<span class='r-in'>col<span class='op'>=</span><span class='st'>"red"</span>, border<span class='op'>=</span><span class='st'>"red"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txs</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span></span>
+<span class='r-in'>    <span class='va'>current</span> <span class='op'>&lt;-</span> <span class='va'>txs</span><span class='op'>[</span><span class='va'>i</span><span class='op'>]</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/r/graphics/rect.html'>rect</a></span><span class='op'>(</span>xleft<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, xright<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>end</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, ybottom<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.975</span>, ytop<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.125</span>, border<span class='op'>=</span><span class='st'>"grey"</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/r/graphics/text.html'>text</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/start.html'>start</a></span><span class='op'>(</span><span class='va'>current</span><span class='op'>)</span>, y<span class='op'>=</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>0.5</span>,pos<span class='op'>=</span><span class='fl'>4</span>, cex<span class='op'>=</span><span class='fl'>0.75</span>, labels<span class='op'>=</span><span class='va'>current</span><span class='op'>$</span><span class='va'>tx_id</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-plt'><img src='Filter-classes-1.png' alt='' width='700' height='433' /></span>
+<span class='r-in'><span class='co'>## Thus, we can see that only 4 transcripts of that gene are indeed</span></span>
+<span class='r-in'><span class='co'>## overlapping the region.</span></span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## No exon is overlapping that region, thus we're not getting anything</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>exons</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>grf</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 0 ranges and 1 metadata column:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    seqnames    ranges strand |     exon_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: no sequences</span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Example for ExonRankFilter</span></span>
+<span class='r-in'><span class='co'>## Extract all exons 1 and (if present) 2 for all genes encoded on the</span></span>
+<span class='r-in'><span class='co'>## Y chromosome</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>exons</a></span><span class='op'>(</span><span class='va'>edb</span>, columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"tx_id"</span>, <span class='st'>"exon_idx"</span><span class='op'>)</span>,</span>
+<span class='r-in'>      filter<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"Y"</span><span class='op'>)</span>,</span>
+<span class='r-in'>                  <span class='fu'>ExonRankFilter</span><span class='op'>(</span><span class='fl'>3</span>, condition <span class='op'>=</span> <span class='st'>"&lt;"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 1294 ranges and 3 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames            ranges strand |           tx_id  exon_idx</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00002088309        Y   2784749-2784853      + | ENST00000516032         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001494622        Y   2786855-2787699      - | ENST00000383070         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001772499        Y   2789827-2790328      + | ENST00000454281         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001614266        Y   2827982-2828218      + | ENST00000430735         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00002490412        Y   2841486-2841627      + | ENST00000250784         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...      ...               ...    ... .             ...       ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001632993        Y 26591548-26591601      - | ENST00000456738         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001616687        Y 26626520-26627159      - | ENST00000435741         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001638296        Y 26633345-26633431      - | ENST00000435945         2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001797328        Y 26634523-26634652      - | ENST00000435945         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001794473        Y 56855244-56855488      + | ENST00000431853         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           exon_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00002088309 ENSE00002088309</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001494622 ENSE00001494622</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001772499 ENSE00001772499</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001614266 ENSE00001614266</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00002490412 ENSE00002490412</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...             ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001632993 ENSE00001632993</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001616687 ENSE00001616687</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001638296 ENSE00001638296</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001797328 ENSE00001797328</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSE00001794473 ENSE00001794473</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get all transcripts for the gene SKA2</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='st'>"SKA2"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 10 ranges and 7 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames            ranges strand |           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000330137       17 59109951-59155269      - | ENST00000330137</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000580541       17 59111886-59155184      - | ENST00000580541</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578105       17 59111888-59155184      - | ENST00000578105</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578519       17 59111890-59155182      - | ENST00000578519</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583927       17 59111943-59155260      - | ENST00000583927</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000581068       17 59111956-59155248      - | ENST00000581068</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000437036       17 59112047-59155194      - | ENST00000437036</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583380       17 59112091-59155174      - | ENST00000583380</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583976       17 59112262-59155177      - | ENST00000583976</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000584089       17 59119387-59151801      - | ENST00000584089</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                               tx_biotype tx_cds_seq_start tx_cds_seq_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                              &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000330137         protein_coding         59112277       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000580541         protein_coding         59112333       59155083</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578105         protein_coding         59112277       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578519 nonsense_mediated_de..         59124363       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583927   processed_transcript             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000581068         protein_coding         59112277       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000437036         protein_coding         59112333       59155083</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583380         protein_coding         59112333       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583976 nonsense_mediated_de..         59119474       59155083</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000584089         protein_coding         59119387       59151771</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           gene_id         tx_name   gene_name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       &lt;character&gt;     &lt;character&gt; &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000330137 ENSG00000182628 ENST00000330137        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000580541 ENSG00000182628 ENST00000580541        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578105 ENSG00000182628 ENST00000578105        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578519 ENSG00000182628 ENST00000578519        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583927 ENSG00000182628 ENST00000583927        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000581068 ENSG00000182628 ENST00000581068        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000437036 ENSG00000182628 ENST00000437036        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583380 ENSG00000182628 ENST00000583380        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583976 ENSG00000182628 ENST00000583976        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000584089 ENSG00000182628 ENST00000584089        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Which is the same as using a SymbolFilter</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>SymbolFilter</span><span class='op'>(</span><span class='st'>"SKA2"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 10 ranges and 7 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames            ranges strand |           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000330137       17 59109951-59155269      - | ENST00000330137</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000580541       17 59111886-59155184      - | ENST00000580541</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578105       17 59111888-59155184      - | ENST00000578105</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578519       17 59111890-59155182      - | ENST00000578519</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583927       17 59111943-59155260      - | ENST00000583927</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000581068       17 59111956-59155248      - | ENST00000581068</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000437036       17 59112047-59155194      - | ENST00000437036</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583380       17 59112091-59155174      - | ENST00000583380</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583976       17 59112262-59155177      - | ENST00000583976</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000584089       17 59119387-59151801      - | ENST00000584089</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                               tx_biotype tx_cds_seq_start tx_cds_seq_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                              &lt;character&gt;        &lt;integer&gt;      &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000330137         protein_coding         59112277       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000580541         protein_coding         59112333       59155083</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578105         protein_coding         59112277       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578519 nonsense_mediated_de..         59124363       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583927   processed_transcript             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000581068         protein_coding         59112277       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000437036         protein_coding         59112333       59155083</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583380         protein_coding         59112333       59155163</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583976 nonsense_mediated_de..         59119474       59155083</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000584089         protein_coding         59119387       59151771</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                           gene_id         tx_name      symbol</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       &lt;character&gt;     &lt;character&gt; &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000330137 ENSG00000182628 ENST00000330137        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000580541 ENSG00000182628 ENST00000580541        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578105 ENSG00000182628 ENST00000578105        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000578519 ENSG00000182628 ENST00000578519        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583927 ENSG00000182628 ENST00000583927        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000581068 ENSG00000182628 ENST00000581068        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000437036 ENSG00000182628 ENST00000437036        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583380 ENSG00000182628 ENST00000583380        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000583976 ENSG00000182628 ENST00000583976        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000584089 ENSG00000182628 ENST00000584089        SKA2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Create a ProteinIdFilter:</span></span>
+<span class='r-in'><span class='va'>pf</span> <span class='op'>&lt;-</span> <span class='fu'>ProteinIdFilter</span><span class='op'>(</span><span class='st'>"ENSP00000362111"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>pf</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> class: ProteinIdFilter </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> condition: == </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> value: ENSP00000362111 </span>
+<span class='r-in'><span class='co'>## Using this filter would retrieve all database entries that are associated</span></span>
+<span class='r-in'><span class='co'>## with a protein with the ID "ENSP00000362111"</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-exonsBy.html'>genes</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>pf</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>res</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 1 range and 7 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames              ranges strand |         gene_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSG00000000003        X 100627109-100639991      - | ENSG00000000003</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     gene_name   gene_biotype seq_coord_system      symbol</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;character&gt;    &lt;character&gt;      &lt;character&gt; &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSG00000000003      TSPAN6 protein_coding       chromosome      TSPAN6</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   entrezid      protein_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                     &lt;list&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENSG00000000003     7105 ENSP00000362111</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## UniprotFilter:</span></span>
+<span class='r-in'><span class='va'>uf</span> <span class='op'>&lt;-</span> <span class='fu'>UniprotFilter</span><span class='op'>(</span><span class='st'>"O60762"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Get the transcripts encoding that protein:</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>uf</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='co'>## The mapping Ensembl protein ID to Uniprot ID can however be 1:n:</span></span>
+<span class='r-in'>    <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='fu'>TxIdFilter</span><span class='op'>(</span><span class='st'>"ENST00000371588"</span><span class='op'>)</span>,</span>
+<span class='r-in'>        columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"protein_id"</span>, <span class='st'>"uniprot_id"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 2 ranges and 3 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames            ranges strand |      protein_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000371588       20 50934867-50958550      - | ENSP00000360644</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000371588       20 50934867-50958550      - | ENSP00000360644</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                    uniprot_id           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   &lt;character&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000371588      O60762 ENST00000371588</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000371588  A0A0S2Z4Y5 ENST00000371588</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## ProtDomIdFilter:</span></span>
+<span class='r-in'><span class='va'>pdf</span> <span class='op'>&lt;-</span> <span class='fu'>ProtDomIdFilter</span><span class='op'>(</span><span class='st'>"PF00335"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Also here we could get all transcripts related to that protein domain</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='hasProteinData-EnsDb-method.html'>hasProteinData</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='fu'><a href='EnsDb-exonsBy.html'>transcripts</a></span><span class='op'>(</span><span class='va'>edb</span>, filter <span class='op'>=</span> <span class='va'>pdf</span>, columns <span class='op'>=</span> <span class='st'>"protein_id"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 165 ranges and 3 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   seqnames              ranges strand |      protein_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                      &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000372003        1   46175087-46185958      + | ENSP00000361072</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000271324        1 110873154-110899928      + | ENSP00000271324</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000369516        1 115048011-115089464      - | ENSP00000358529</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000369515        1 115050356-115089500      - | ENSP00000358528</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000433172        1 115050383-115089414      - | ENSP00000415256</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...      ...                 ...    ... .             ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000378482        X   38561370-38688913      + | ENSP00000367743</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000286824        X   38561544-38688397      + | ENSP00000286824</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000612152        X 100627109-100637104      - | ENSP00000482130</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000373020        X 100628670-100636806      - | ENSP00000362111</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000614008        X 100632063-100637104      - | ENSP00000482894</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                             tx_id protein_domain_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                       &lt;character&gt;       &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000372003 ENST00000372003           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000271324 ENST00000271324           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000369516 ENST00000369516           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000369515 ENST00000369515           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000433172 ENST00000433172           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               ...             ...               ...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000378482 ENST00000378482           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000286824 ENST00000286824           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000612152 ENST00000612152           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000373020 ENST00000373020           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENST00000614008 ENST00000614008           PF00335</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 13 sequences from GRCh38 genome</span>
+<span class='r-in'></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

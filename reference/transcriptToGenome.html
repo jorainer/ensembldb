@@ -62,8 +62,6 @@ cdsToTranscript() function." />
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -87,7 +85,7 @@ cdsToTranscript() function." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -154,7 +152,7 @@ have to be converted to transcript-relative positions first with the
 <code><a href='cdsToTranscript.html'>cdsToTranscript()</a></code> function.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>db</span>, id <span class='op'>=</span> <span class='st'>"name"</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>db</span>, id <span class='op'>=</span> <span class='st'>"name"</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -172,8 +170,8 @@ as <code>names</code> of the <code>IRanges</code>, or in one of its metadata col
     </tr>
     <tr>
       <th>id</th>
-      <td><p><code><a href='https://rdrr.io/r/base/character.html'>character(1)</a></code> specifying where the transcript identifier can be
-found. Has to be either <code>"name"</code> or one of <code><a href='https://rdrr.io/r/base/colnames.html'>colnames(mcols(prng))</a></code>.</p></td>
+      <td><p><code>character(1)</code> specifying where the transcript identifier can be
+found. Has to be either <code>"name"</code> or one of <code>colnames(mcols(prng))</code>.</p></td>
     </tr>
     </table>
 
@@ -202,104 +200,110 @@ CDS- and transcript-relative coordinates.</p>
     <p>Johannes Rainer</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-<span class='co'>## Restrict all further queries to chromosome x to speed up the examples</span>
-<span class='va'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='global-filters.html'>filter</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span><span class='op'>)</span>
-
-<span class='co'>## Below we map positions 1 to 5 within the transcript ENST00000381578 to</span>
-<span class='co'>## the genome. The ID of the transcript has to be provided either as names</span>
-<span class='co'>## or in one of the IRanges' metadata columns</span>
-<span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>1</span>, end <span class='op'>=</span> <span class='fl'>5</span>, names <span class='op'>=</span> <span class='st'>"ENST00000381578"</span><span class='op'>)</span>
-
-<span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRangesList object of length 1:
-#&gt; $ENST00000381578
-#&gt; GRanges object with 1 range and 5 metadata columns:
-#&gt;       seqnames        ranges strand |         exon_id           tx_id exon_rank
-#&gt;          &lt;Rle&gt;     &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt; &lt;integer&gt;
-#&gt;   [1]        X 624344-624348      + | ENSE00001489178 ENST00000381578         1
-#&gt;        tx_start    tx_end
-#&gt;       &lt;integer&gt; &lt;integer&gt;
-#&gt;   [1]         1         5
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome
-#&gt; </div><div class='input'><span class='co'>## The object returns a GRangesList with the genomic coordinates, in this</span>
-<span class='co'>## example the coordinates are within the same exon and map to a single</span>
-<span class='co'>## genomic region.</span>
-
-<span class='co'>## Next we map nucleotides 501 to 505 of ENST00000486554 to the genome</span>
-<span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>501</span>, end <span class='op'>=</span> <span class='fl'>505</span>, names <span class='op'>=</span> <span class='st'>"ENST00000486554"</span><span class='op'>)</span>
-
-<span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; GRangesList object of length 1:
-#&gt; $ENST00000486554
-#&gt; GRanges object with 2 ranges and 5 metadata columns:
-#&gt;       seqnames              ranges strand |         exon_id           tx_id
-#&gt;          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;
-#&gt;   [1]        X 107715899-107715901      - | ENSE00001927337 ENST00000486554
-#&gt;   [2]        X 107714748-107714749      - | ENSE00001837666 ENST00000486554
-#&gt;       exon_rank  tx_start    tx_end
-#&gt;       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
-#&gt;   [1]         1       501       505
-#&gt;   [2]         2       501       505
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome
-#&gt; </div><div class='input'><span class='co'>## The positions within the transcript are located within two of the</span>
-<span class='co'>## transcripts exons and thus a `GRanges` of length 2 is returned.</span>
-
-<span class='co'>## Next we map multiple regions, two within the same transcript and one</span>
-<span class='co'>## in a transcript that does not exist.</span>
-<span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>501</span>, <span class='fl'>1</span>, <span class='fl'>5</span><span class='op'>)</span>, end <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>505</span>, <span class='fl'>10</span>, <span class='fl'>6</span><span class='op'>)</span>,
-    names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ENST00000486554"</span>, <span class='st'>"ENST00000486554"</span>, <span class='st'>"some"</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: 1 transcript(s) could either not be found in the database or the specified range is outside the transcript's sequence</span></div><div class='input'>
-<span class='co'>## The length of the result GRangesList has the same length than the</span>
-<span class='co'>## input IRanges</span>
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
-<span class='co'>## The result for the last region is an empty GRanges, because the</span>
-<span class='co'>## transcript could not be found in the database</span>
-<span class='va'>res</span><span class='op'>[[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; GRanges object with 0 ranges and 0 metadata columns:
-#&gt;    seqnames    ranges strand
-#&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
-#&gt;   -------
-#&gt;   seqinfo: no sequences</div><div class='input'>
-<span class='va'>res</span>
-</div><div class='output co'>#&gt; GRangesList object of length 3:
-#&gt; $ENST00000486554
-#&gt; GRanges object with 2 ranges and 5 metadata columns:
-#&gt;       seqnames              ranges strand |         exon_id           tx_id
-#&gt;          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;
-#&gt;   [1]        X 107715899-107715901      - | ENSE00001927337 ENST00000486554
-#&gt;   [2]        X 107714748-107714749      - | ENSE00001837666 ENST00000486554
-#&gt;       exon_rank  tx_start    tx_end
-#&gt;       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
-#&gt;   [1]         1       501       505
-#&gt;   [2]         2       501       505
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome
-#&gt; 
-#&gt; $ENST00000486554
-#&gt; GRanges object with 1 range and 5 metadata columns:
-#&gt;       seqnames              ranges strand |         exon_id           tx_id
-#&gt;          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;
-#&gt;   [1]        X 107716392-107716401      - | ENSE00001927337 ENST00000486554
-#&gt;       exon_rank  tx_start    tx_end
-#&gt;       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
-#&gt;   [1]         1         1        10
-#&gt;   -------
-#&gt;   seqinfo: 1 sequence from GRCh38 genome
-#&gt; 
-#&gt; $some
-#&gt; GRanges object with 0 ranges and 0 metadata columns:
-#&gt;    seqnames    ranges strand
-#&gt;       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
-#&gt;   -------
-#&gt;   seqinfo: no sequences
-#&gt; </div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'>## Restrict all further queries to chromosome x to speed up the examples</span></span>
+<span class='r-in'><span class='va'>edbx</span> <span class='op'>&lt;-</span> <span class='fu'><a href='global-filters.html'>filter</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span>, filter <span class='op'>=</span> <span class='op'>~</span> <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"X"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Below we map positions 1 to 5 within the transcript ENST00000381578 to</span></span>
+<span class='r-in'><span class='co'>## the genome. The ID of the transcript has to be provided either as names</span></span>
+<span class='r-in'><span class='co'>## or in one of the IRanges' metadata columns</span></span>
+<span class='r-in'><span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>1</span>, end <span class='op'>=</span> <span class='fl'>5</span>, names <span class='op'>=</span> <span class='st'>"ENST00000381578"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRangesList object of length 1:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ENST00000381578</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 1 range and 5 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       seqnames        ranges strand |         exon_id           tx_id exon_rank</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          &lt;Rle&gt;     &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]        X 624344-624348      + | ENSE00001489178 ENST00000381578         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        tx_start    tx_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]         1         5</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'>## The object returns a GRangesList with the genomic coordinates, in this</span></span>
+<span class='r-in'><span class='co'>## example the coordinates are within the same exon and map to a single</span></span>
+<span class='r-in'><span class='co'>## genomic region.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Next we map nucleotides 501 to 505 of ENST00000486554 to the genome</span></span>
+<span class='r-in'><span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fl'>501</span>, end <span class='op'>=</span> <span class='fl'>505</span>, names <span class='op'>=</span> <span class='st'>"ENST00000486554"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRangesList object of length 1:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 2 ranges and 5 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       seqnames              ranges strand |         exon_id           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]        X 107715899-107715901      - | ENSE00001927337 ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [2]        X 107714748-107714749      - | ENSE00001837666 ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       exon_rank  tx_start    tx_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]         1       501       505</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [2]         2       501       505</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'>## The positions within the transcript are located within two of the</span></span>
+<span class='r-in'><span class='co'>## transcripts exons and thus a `GRanges` of length 2 is returned.</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Next we map multiple regions, two within the same transcript and one</span></span>
+<span class='r-in'><span class='co'>## in a transcript that does not exist.</span></span>
+<span class='r-in'><span class='va'>txpos</span> <span class='op'>&lt;-</span> <span class='fu'>IRanges</span><span class='op'>(</span>start <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>501</span>, <span class='fl'>1</span>, <span class='fl'>5</span><span class='op'>)</span>, end <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>505</span>, <span class='fl'>10</span>, <span class='fl'>6</span><span class='op'>)</span>,</span>
+<span class='r-in'>    names <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"ENST00000486554"</span>, <span class='st'>"ENST00000486554"</span>, <span class='st'>"some"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'>transcriptToGenome</span><span class='op'>(</span><span class='va'>txpos</span>, <span class='va'>edbx</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>1 transcript(s) could either not be found in the database or the specified range is outside the transcript's sequence</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## The length of the result GRangesList has the same length than the</span></span>
+<span class='r-in'><span class='co'>## input IRanges</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 3</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## The result for the last region is an empty GRanges, because the</span></span>
+<span class='r-in'><span class='co'>## transcript could not be found in the database</span></span>
+<span class='r-in'><span class='va'>res</span><span class='op'>[[</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 0 ranges and 0 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    seqnames    ranges strand</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: no sequences</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='va'>res</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRangesList object of length 3:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 2 ranges and 5 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       seqnames              ranges strand |         exon_id           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]        X 107715899-107715901      - | ENSE00001927337 ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [2]        X 107714748-107714749      - | ENSE00001837666 ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       exon_rank  tx_start    tx_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]         1       501       505</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [2]         2       501       505</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 1 range and 5 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       seqnames              ranges strand |         exon_id           tx_id</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt;     &lt;character&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]        X 107716392-107716401      - | ENSE00001927337 ENST00000486554</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       exon_rank  tx_start    tx_end</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   [1]         1         1        10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: 1 sequence from GRCh38 genome</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $some</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> GRanges object with 0 ranges and 0 metadata columns:</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    seqnames    ranges strand</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   -------</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   seqinfo: no sequences</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

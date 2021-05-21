@@ -66,8 +66,6 @@
 
 
 
-<!-- dependencies from examples -->
-
 
   
 
@@ -91,7 +89,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -162,7 +160,7 @@
   fine-grained queries to retrieve data.</p>
     </div>
 
-    <pre class="usage"><span class='co'># S4 method for EnsDb</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='co'># S4 method for EnsDb</span>
 <span class='fu'>columns</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
 <span class='co'># S4 method for EnsDb</span>
 <span class='fu'>keys</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>keytype</span>, <span class='va'>filter</span>,<span class='va'>...</span><span class='op'>)</span>
@@ -171,7 +169,7 @@
 <span class='co'># S4 method for EnsDb</span>
 <span class='fu'>mapIds</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>keys</span>, <span class='va'>column</span>, <span class='va'>keytype</span>, <span class='va'>...</span>, <span class='va'>multiVals</span><span class='op'>)</span>
 <span class='co'># S4 method for EnsDb</span>
-<span class='fu'><a href='EnsDb-AnnotationDbi.html'>select</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>keys</span>, <span class='va'>columns</span>, <span class='va'>keytype</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>select</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>keys</span>, <span class='va'>columns</span>, <span class='va'>keytype</span>, <span class='va'>...</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -291,192 +289,210 @@
   <code><a href='EnsDb-exonsBy.html'>transcripts</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span>
-<span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span>
-
-<span class='co'>## List all supported keytypes.</span>
-<span class='fu'>keytypes</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "ENTREZID"            "EXONID"              "GENEBIOTYPE"        
-#&gt;  [4] "GENEID"              "GENENAME"            "PROTDOMID"          
-#&gt;  [7] "PROTEINDOMAINID"     "PROTEINDOMAINSOURCE" "PROTEINID"          
-#&gt; [10] "SEQNAME"             "SEQSTRAND"           "SYMBOL"             
-#&gt; [13] "TXBIOTYPE"           "TXID"                "TXNAME"             
-#&gt; [16] "UNIPROTID"          </div><div class='input'>
-<span class='co'>## List all supported columns for the select and mapIds methods.</span>
-<span class='fu'>columns</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "ENTREZID"            "EXONID"              "EXONIDX"            
-#&gt;  [4] "EXONSEQEND"          "EXONSEQSTART"        "GENEBIOTYPE"        
-#&gt;  [7] "GENEID"              "GENENAME"            "GENESEQEND"         
-#&gt; [10] "GENESEQSTART"        "INTERPROACCESSION"   "ISCIRCULAR"         
-#&gt; [13] "PROTDOMEND"          "PROTDOMSTART"        "PROTEINDOMAINID"    
-#&gt; [16] "PROTEINDOMAINSOURCE" "PROTEINID"           "PROTEINSEQUENCE"    
-#&gt; [19] "SEQCOORDSYSTEM"      "SEQLENGTH"           "SEQNAME"            
-#&gt; [22] "SEQSTRAND"           "SYMBOL"              "TXBIOTYPE"          
-#&gt; [25] "TXCDSSEQEND"         "TXCDSSEQSTART"       "TXID"               
-#&gt; [28] "TXNAME"              "TXSEQEND"            "TXSEQSTART"         
-#&gt; [31] "UNIPROTDB"           "UNIPROTID"           "UNIPROTMAPPINGTYPE" </div><div class='input'>
-<span class='co'>## List /real/ database column names.</span>
-<span class='fu'><a href='EnsDb-class.html'>listColumns</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "seq_name"              "seq_length"            "is_circular"          
-#&gt;  [4] "gene_id"               "entrezid"              "exon_id"              
-#&gt;  [7] "exon_seq_start"        "exon_seq_end"          "gene_name"            
-#&gt; [10] "gene_biotype"          "gene_seq_start"        "gene_seq_end"         
-#&gt; [13] "seq_strand"            "seq_coord_system"      "symbol"               
-#&gt; [16] "name"                  "value"                 "tx_id"                
-#&gt; [19] "protein_id"            "protein_sequence"      "protein_domain_id"    
-#&gt; [22] "protein_domain_source" "interpro_accession"    "prot_dom_start"       
-#&gt; [25] "prot_dom_end"          "tx_biotype"            "tx_seq_start"         
-#&gt; [28] "tx_seq_end"            "tx_cds_seq_start"      "tx_cds_seq_end"       
-#&gt; [31] "tx_name"               "exon_idx"              "uniprot_id"           
-#&gt; [34] "uniprot_db"            "uniprot_mapping_type" </div><div class='input'>
-<span class='co'>## Retrieve all keys corresponding to transcript ids.</span>
-<span class='va'>txids</span> <span class='op'>&lt;-</span> <span class='fu'>keys</span><span class='op'>(</span><span class='va'>edb</span>, keytype <span class='op'>=</span> <span class='st'>"TXID"</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txids</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 216741</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>txids</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "ENST00000000233" "ENST00000000412" "ENST00000000442" "ENST00000001008"
-#&gt; [5] "ENST00000001146" "ENST00000002125"</div><div class='input'>
-<span class='co'>## Retrieve all keys corresponding to gene names of genes encoded on chromosome X</span>
-<span class='va'>gids</span> <span class='op'>&lt;-</span> <span class='fu'>keys</span><span class='op'>(</span><span class='va'>edb</span>, keytype <span class='op'>=</span> <span class='st'>"GENENAME"</span>, filter <span class='op'>=</span> <span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"X"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>gids</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 2300</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>gids</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "TSPAN6" "TNMD"   "LAS1L"  "CD99"   "KLHL13" "ARX"   </div><div class='input'>
-<span class='co'>## Get a mapping of the genes BCL2 and BCL2L11 to all of their</span>
-<span class='co'>## transcript ids and return the result as list</span>
-<span class='va'>maps</span> <span class='op'>&lt;-</span> <span class='fu'>mapIds</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BCL2"</span>, <span class='st'>"BCL2L11"</span><span class='op'>)</span>, column <span class='op'>=</span> <span class='st'>"TXID"</span>,
-               keytype <span class='op'>=</span> <span class='st'>"GENENAME"</span>, multiVals <span class='op'>=</span> <span class='st'>"list"</span><span class='op'>)</span>
-<span class='va'>maps</span>
-</div><div class='output co'>#&gt; $BCL2
-#&gt; [1] "ENST00000398117" "ENST00000333681" "ENST00000590515" "ENST00000589955"
-#&gt; 
-#&gt; $BCL2L11
-#&gt;  [1] "ENST00000432179" "ENST00000308659" "ENST00000393256" "ENST00000393252"
-#&gt;  [5] "ENST00000433098" "ENST00000405953" "ENST00000415458" "ENST00000436733"
-#&gt;  [9] "ENST00000437029" "ENST00000452231" "ENST00000361493" "ENST00000431217"
-#&gt; [13] "ENST00000439718" "ENST00000438054" "ENST00000337565" "ENST00000622509"
-#&gt; [17] "ENST00000619294" "ENST00000610735" "ENST00000622612" "ENST00000357757"
-#&gt; [21] "ENST00000615946" "ENST00000621302" "ENST00000620862" "LRG_620t1"      
-#&gt; [25] "LRG_620t2"       "LRG_620t3"       "LRG_620t4"       "LRG_620t5"      
-#&gt; </div><div class='input'>
-<span class='co'>## Perform the same query using a combination of a GeneNameFilter and a</span>
-<span class='co'>## TxBiotypeFilter to just retrieve protein coding transcripts for these</span>
-<span class='co'>## two genes.</span>
-<span class='fu'>mapIds</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BCL2"</span>, <span class='st'>"BCL2L11"</span><span class='op'>)</span><span class='op'>)</span>,
-                        <span class='fu'>TxBiotypeFilter</span><span class='op'>(</span><span class='st'>"protein_coding"</span><span class='op'>)</span><span class='op'>)</span>, column <span class='op'>=</span> <span class='st'>"TXID"</span>,
-       multiVals <span class='op'>=</span> <span class='st'>"list"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Got 2 filter objects. Will use the keys of the first for the mapping!</span></div><div class='output co'>#&gt; <span class='message'>Note: ordering of the results might not match ordering of keys!</span></div><div class='output co'>#&gt; $BCL2
-#&gt; [1] "ENST00000398117" "ENST00000333681" "ENST00000589955"
-#&gt; 
-#&gt; $BCL2L11
-#&gt;  [1] "ENST00000432179" "ENST00000308659" "ENST00000393256" "ENST00000393252"
-#&gt;  [5] "ENST00000405953" "ENST00000438054" "ENST00000337565" "ENST00000622509"
-#&gt;  [9] "ENST00000619294" "ENST00000610735" "ENST00000622612" "ENST00000357757"
-#&gt; [13] "ENST00000615946" "ENST00000621302" "ENST00000620862"
-#&gt; </div><div class='input'>
-<span class='co'>## select:</span>
-<span class='co'>## Retrieve all transcript and gene related information for the above example.</span>
-<span class='fu'><a href='EnsDb-AnnotationDbi.html'>select</a></span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BCL2"</span>, <span class='st'>"BCL2L11"</span><span class='op'>)</span><span class='op'>)</span>,
-                        <span class='fu'>TxBiotypeFilter</span><span class='op'>(</span><span class='st'>"protein_coding"</span><span class='op'>)</span><span class='op'>)</span>,
-       columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GENEID"</span>, <span class='st'>"GENENAME"</span>, <span class='st'>"TXID"</span>, <span class='st'>"TXBIOTYPE"</span>, <span class='st'>"TXSEQSTART"</span>,
-                   <span class='st'>"TXSEQEND"</span>, <span class='st'>"SEQNAME"</span>, <span class='st'>"SEQSTRAND"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Note: ordering of the results might not match ordering of keys!</span></div><div class='output co'>#&gt;             GENEID GENENAME            TXID      TXBIOTYPE TXSEQSTART  TXSEQEND
-#&gt; 1  ENSG00000171791     BCL2 ENST00000398117 protein_coding   63123346  63320128
-#&gt; 2  ENSG00000171791     BCL2 ENST00000333681 protein_coding   63127035  63319786
-#&gt; 3  ENSG00000171791     BCL2 ENST00000589955 protein_coding   63313802  63318812
-#&gt; 4  ENSG00000153094  BCL2L11 ENST00000432179 protein_coding  111119378 111124112
-#&gt; 5  ENSG00000153094  BCL2L11 ENST00000308659 protein_coding  111120914 111165048
-#&gt; 6  ENSG00000153094  BCL2L11 ENST00000393256 protein_coding  111120929 111168447
-#&gt; 7  ENSG00000153094  BCL2L11 ENST00000393252 protein_coding  111122670 111123960
-#&gt; 8  ENSG00000153094  BCL2L11 ENST00000405953 protein_coding  111123746 111128837
-#&gt; 9  ENSG00000153094  BCL2L11 ENST00000438054 protein_coding  111123752 111146284
-#&gt; 10 ENSG00000153094  BCL2L11 ENST00000337565 protein_coding  111120914 111128844
-#&gt; 11 ENSG00000153094  BCL2L11 ENST00000622509 protein_coding  111120914 111168445
-#&gt; 12 ENSG00000153094  BCL2L11 ENST00000619294 protein_coding  111120914 111168445
-#&gt; 13 ENSG00000153094  BCL2L11 ENST00000610735 protein_coding  111120914 111168445
-#&gt; 14 ENSG00000153094  BCL2L11 ENST00000622612 protein_coding  111120914 111168445
-#&gt; 15 ENSG00000153094  BCL2L11 ENST00000357757 protein_coding  111120914 111146281
-#&gt; 16 ENSG00000153094  BCL2L11 ENST00000615946 protein_coding  111120914 111168445
-#&gt; 17 ENSG00000153094  BCL2L11 ENST00000621302 protein_coding  111120914 111168445
-#&gt; 18 ENSG00000153094  BCL2L11 ENST00000620862 protein_coding  111120914 111168445
-#&gt;    SEQNAME SEQSTRAND
-#&gt; 1       18        -1
-#&gt; 2       18        -1
-#&gt; 3       18        -1
-#&gt; 4        2         1
-#&gt; 5        2         1
-#&gt; 6        2         1
-#&gt; 7        2         1
-#&gt; 8        2         1
-#&gt; 9        2         1
-#&gt; 10       2         1
-#&gt; 11       2         1
-#&gt; 12       2         1
-#&gt; 13       2         1
-#&gt; 14       2         1
-#&gt; 15       2         1
-#&gt; 16       2         1
-#&gt; 17       2         1
-#&gt; 18       2         1</div><div class='input'>
-<span class='co'>## Get all data for genes encoded on chromosome Y</span>
-<span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-AnnotationDbi.html'>select</a></span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='st'>"Y"</span>, keytype <span class='op'>=</span> <span class='st'>"SEQNAME"</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   ENTREZID          EXONID EXONIDX EXONSEQEND EXONSEQSTART    GENEBIOTYPE
-#&gt; 1     8284 ENSE00001902471       1   19716695     19716596 protein_coding
-#&gt; 2     8284 ENSE00003665408       2   19716473     19716279 protein_coding
-#&gt; 3     8284 ENSE00003572891       3   19716004     19715823 protein_coding
-#&gt; 4     8284 ENSE00003452486       4   19715739     19715584 protein_coding
-#&gt; 5     8284 ENSE00003535737       5   19710472     19710376 protein_coding
-#&gt; 6     8284 ENSE00003306433       6   19710260     19709451 protein_coding
-#&gt;            GENEID GENENAME GENESEQEND GENESEQSTART INTERPROACCESSION ISCIRCULAR
-#&gt; 1 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0
-#&gt; 2 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0
-#&gt; 3 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0
-#&gt; 4 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0
-#&gt; 5 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0
-#&gt; 6 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0
-#&gt;   PROTDOMEND PROTDOMSTART PROTEINDOMAINID PROTEINDOMAINSOURCE PROTEINID
-#&gt; 1         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;
-#&gt; 2         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;
-#&gt; 3         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;
-#&gt; 4         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;
-#&gt; 5         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;
-#&gt; 6         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;
-#&gt;   PROTEINSEQUENCE SEQCOORDSYSTEM SEQLENGTH SEQNAME SEQSTRAND SYMBOL
-#&gt; 1            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D
-#&gt; 2            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D
-#&gt; 3            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D
-#&gt; 4            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D
-#&gt; 5            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D
-#&gt; 6            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D
-#&gt;         TXBIOTYPE TXCDSSEQEND TXCDSSEQSTART            TXID          TXNAME
-#&gt; 1 retained_intron          NA            NA ENST00000469599 ENST00000469599
-#&gt; 2 retained_intron          NA            NA ENST00000469599 ENST00000469599
-#&gt; 3 retained_intron          NA            NA ENST00000469599 ENST00000469599
-#&gt; 4 retained_intron          NA            NA ENST00000469599 ENST00000469599
-#&gt; 5 retained_intron          NA            NA ENST00000469599 ENST00000469599
-#&gt; 6 retained_intron          NA            NA ENST00000469599 ENST00000469599
-#&gt;   TXSEQEND TXSEQSTART UNIPROTDB UNIPROTID UNIPROTMAPPINGTYPE
-#&gt; 1 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;
-#&gt; 2 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;
-#&gt; 3 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;
-#&gt; 4 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;
-#&gt; 5 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;
-#&gt; 6 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 28264</div><div class='input'>
-<span class='co'>## Get selected columns for all lincRNAs encoded on chromosome Y. Here we use</span>
-<span class='co'>## a filter expression to define what data to retrieve.</span>
-<span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='EnsDb-AnnotationDbi.html'>select</a></span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='op'>~</span> <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"Y"</span> <span class='op'>&amp;</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"lincRNA"</span>,
-            columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GENEID"</span>, <span class='st'>"GENEBIOTYPE"</span>, <span class='st'>"TXID"</span>, <span class='st'>"GENENAME"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Note: ordering of the results might not match ordering of keys!</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;            GENEID GENEBIOTYPE            TXID GENENAME SEQNAME
-#&gt; 1 ENSG00000129816     lincRNA ENST00000250776   TTTY1B       Y
-#&gt; 2 ENSG00000129845     lincRNA ENST00000250805    TTTY1       Y
-#&gt; 3 ENSG00000131538     lincRNA ENST00000253838    TTTY6       Y
-#&gt; 4 ENSG00000147753     lincRNA ENST00000457100    TTTY7       Y
-#&gt; 5 ENSG00000147753     lincRNA ENST00000276770    TTTY7       Y
-#&gt; 6 ENSG00000147753     lincRNA ENST00000449828    TTTY7       Y</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 73</div><div class='input'>
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>EnsDb.Hsapiens.v86</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>edb</span> <span class='op'>&lt;-</span> <span class='va'>EnsDb.Hsapiens.v86</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## List all supported keytypes.</span></span>
+<span class='r-in'><span class='fu'>keytypes</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ENTREZID"            "EXONID"              "GENEBIOTYPE"        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [4] "GENEID"              "GENENAME"            "PROTDOMID"          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "PROTEINDOMAINID"     "PROTEINDOMAINSOURCE" "PROTEINID"          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [10] "SEQNAME"             "SEQSTRAND"           "SYMBOL"             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "TXBIOTYPE"           "TXID"                "TXNAME"             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] "UNIPROTID"          </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## List all supported columns for the select and mapIds methods.</span></span>
+<span class='r-in'><span class='fu'>columns</span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ENTREZID"            "EXONID"              "EXONIDX"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [4] "EXONSEQEND"          "EXONSEQSTART"        "GENEBIOTYPE"        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "GENEID"              "GENENAME"            "GENESEQEND"         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [10] "GENESEQSTART"        "INTERPROACCESSION"   "ISCIRCULAR"         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "PROTDOMEND"          "PROTDOMSTART"        "PROTEINDOMAINID"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] "PROTEINDOMAINSOURCE" "PROTEINID"           "PROTEINSEQUENCE"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "SEQCOORDSYSTEM"      "SEQLENGTH"           "SEQNAME"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [22] "SEQSTRAND"           "SYMBOL"              "TXBIOTYPE"          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "TXCDSSEQEND"         "TXCDSSEQSTART"       "TXID"               </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [28] "TXNAME"              "TXSEQEND"            "TXSEQSTART"         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "UNIPROTDB"           "UNIPROTID"           "UNIPROTMAPPINGTYPE" </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## List /real/ database column names.</span></span>
+<span class='r-in'><span class='fu'><a href='EnsDb-class.html'>listColumns</a></span><span class='op'>(</span><span class='va'>edb</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "seq_name"              "seq_length"            "is_circular"          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [4] "gene_id"               "entrezid"              "exon_id"              </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "exon_seq_start"        "exon_seq_end"          "gene_name"            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [10] "gene_biotype"          "gene_seq_start"        "gene_seq_end"         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "seq_strand"            "seq_coord_system"      "symbol"               </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] "name"                  "value"                 "tx_id"                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "protein_id"            "protein_sequence"      "protein_domain_id"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [22] "protein_domain_source" "interpro_accession"    "prot_dom_start"       </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "prot_dom_end"          "tx_biotype"            "tx_seq_start"         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [28] "tx_seq_end"            "tx_cds_seq_start"      "tx_cds_seq_end"       </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "tx_name"               "exon_idx"              "uniprot_id"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [34] "uniprot_db"            "uniprot_mapping_type" </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Retrieve all keys corresponding to transcript ids.</span></span>
+<span class='r-in'><span class='va'>txids</span> <span class='op'>&lt;-</span> <span class='fu'>keys</span><span class='op'>(</span><span class='va'>edb</span>, keytype <span class='op'>=</span> <span class='st'>"TXID"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>txids</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 216741</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>txids</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "ENST00000000233" "ENST00000000412" "ENST00000000442" "ENST00000001008"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5] "ENST00000001146" "ENST00000002125"</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Retrieve all keys corresponding to gene names of genes encoded on chromosome X</span></span>
+<span class='r-in'><span class='va'>gids</span> <span class='op'>&lt;-</span> <span class='fu'>keys</span><span class='op'>(</span><span class='va'>edb</span>, keytype <span class='op'>=</span> <span class='st'>"GENENAME"</span>, filter <span class='op'>=</span> <span class='fu'>SeqNameFilter</span><span class='op'>(</span><span class='st'>"X"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>gids</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 2300</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>gids</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "TSPAN6" "TNMD"   "LAS1L"  "CD99"   "KLHL13" "ARX"   </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get a mapping of the genes BCL2 and BCL2L11 to all of their</span></span>
+<span class='r-in'><span class='co'>## transcript ids and return the result as list</span></span>
+<span class='r-in'><span class='va'>maps</span> <span class='op'>&lt;-</span> <span class='fu'>mapIds</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BCL2"</span>, <span class='st'>"BCL2L11"</span><span class='op'>)</span>, column <span class='op'>=</span> <span class='st'>"TXID"</span>,</span>
+<span class='r-in'>               keytype <span class='op'>=</span> <span class='st'>"GENENAME"</span>, multiVals <span class='op'>=</span> <span class='st'>"list"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>maps</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $BCL2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "ENST00000398117" "ENST00000333681" "ENST00000590515" "ENST00000589955"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $BCL2L11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ENST00000432179" "ENST00000308659" "ENST00000393256" "ENST00000393252"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [5] "ENST00000433098" "ENST00000405953" "ENST00000415458" "ENST00000436733"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [9] "ENST00000437029" "ENST00000452231" "ENST00000361493" "ENST00000431217"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "ENST00000439718" "ENST00000438054" "ENST00000337565" "ENST00000622509"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [17] "ENST00000619294" "ENST00000610735" "ENST00000622612" "ENST00000357757"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] "ENST00000615946" "ENST00000621302" "ENST00000620862" "LRG_620t1"      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "LRG_620t2"       "LRG_620t3"       "LRG_620t4"       "LRG_620t5"      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Perform the same query using a combination of a GeneNameFilter and a</span></span>
+<span class='r-in'><span class='co'>## TxBiotypeFilter to just retrieve protein coding transcripts for these</span></span>
+<span class='r-in'><span class='co'>## two genes.</span></span>
+<span class='r-in'><span class='fu'>mapIds</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BCL2"</span>, <span class='st'>"BCL2L11"</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>                        <span class='fu'>TxBiotypeFilter</span><span class='op'>(</span><span class='st'>"protein_coding"</span><span class='op'>)</span><span class='op'>)</span>, column <span class='op'>=</span> <span class='st'>"TXID"</span>,</span>
+<span class='r-in'>       multiVals <span class='op'>=</span> <span class='st'>"list"</span><span class='op'>)</span></span>
+<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>Got 2 filter objects. Will use the keys of the first for the mapping!</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Note: ordering of the results might not match ordering of keys!</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $BCL2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "ENST00000398117" "ENST00000333681" "ENST00000589955"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $BCL2L11</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "ENST00000432179" "ENST00000308659" "ENST00000393256" "ENST00000393252"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [5] "ENST00000405953" "ENST00000438054" "ENST00000337565" "ENST00000622509"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [9] "ENST00000619294" "ENST00000610735" "ENST00000622612" "ENST00000357757"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "ENST00000615946" "ENST00000621302" "ENST00000620862"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## select:</span></span>
+<span class='r-in'><span class='co'>## Retrieve all transcript and gene related information for the above example.</span></span>
+<span class='r-in'><span class='fu'>select</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'>GeneNameFilter</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"BCL2"</span>, <span class='st'>"BCL2L11"</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>                        <span class='fu'>TxBiotypeFilter</span><span class='op'>(</span><span class='st'>"protein_coding"</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>       columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GENEID"</span>, <span class='st'>"GENENAME"</span>, <span class='st'>"TXID"</span>, <span class='st'>"TXBIOTYPE"</span>, <span class='st'>"TXSEQSTART"</span>,</span>
+<span class='r-in'>                   <span class='st'>"TXSEQEND"</span>, <span class='st'>"SEQNAME"</span>, <span class='st'>"SEQSTRAND"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Note: ordering of the results might not match ordering of keys!</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             GENEID GENENAME            TXID      TXBIOTYPE TXSEQSTART  TXSEQEND</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1  ENSG00000171791     BCL2 ENST00000398117 protein_coding   63123346  63320128</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2  ENSG00000171791     BCL2 ENST00000333681 protein_coding   63127035  63319786</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3  ENSG00000171791     BCL2 ENST00000589955 protein_coding   63313802  63318812</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4  ENSG00000153094  BCL2L11 ENST00000432179 protein_coding  111119378 111124112</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5  ENSG00000153094  BCL2L11 ENST00000308659 protein_coding  111120914 111165048</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6  ENSG00000153094  BCL2L11 ENST00000393256 protein_coding  111120929 111168447</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7  ENSG00000153094  BCL2L11 ENST00000393252 protein_coding  111122670 111123960</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8  ENSG00000153094  BCL2L11 ENST00000405953 protein_coding  111123746 111128837</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9  ENSG00000153094  BCL2L11 ENST00000438054 protein_coding  111123752 111146284</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10 ENSG00000153094  BCL2L11 ENST00000337565 protein_coding  111120914 111128844</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11 ENSG00000153094  BCL2L11 ENST00000622509 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12 ENSG00000153094  BCL2L11 ENST00000619294 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 13 ENSG00000153094  BCL2L11 ENST00000610735 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 14 ENSG00000153094  BCL2L11 ENST00000622612 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 15 ENSG00000153094  BCL2L11 ENST00000357757 protein_coding  111120914 111146281</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 16 ENSG00000153094  BCL2L11 ENST00000615946 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 17 ENSG00000153094  BCL2L11 ENST00000621302 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 18 ENSG00000153094  BCL2L11 ENST00000620862 protein_coding  111120914 111168445</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    SEQNAME SEQSTRAND</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1       18        -1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2       18        -1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3       18        -1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4        2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5        2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6        2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 7        2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 8        2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 9        2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 13       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 14       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 15       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 16       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 17       2         1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 18       2         1</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get all data for genes encoded on chromosome Y</span></span>
+<span class='r-in'><span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='fu'>select</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='st'>"Y"</span>, keytype <span class='op'>=</span> <span class='st'>"SEQNAME"</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ENTREZID          EXONID EXONIDX EXONSEQEND EXONSEQSTART    GENEBIOTYPE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1     8284 ENSE00001902471       1   19716695     19716596 protein_coding</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2     8284 ENSE00003665408       2   19716473     19716279 protein_coding</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3     8284 ENSE00003572891       3   19716004     19715823 protein_coding</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4     8284 ENSE00003452486       4   19715739     19715584 protein_coding</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5     8284 ENSE00003535737       5   19710472     19710376 protein_coding</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6     8284 ENSE00003306433       6   19710260     19709451 protein_coding</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>            GENEID GENENAME GENESEQEND GENESEQSTART INTERPROACCESSION ISCIRCULAR</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6 ENSG00000012817    KDM5D   19744939     19703865              &lt;NA&gt;          0</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   PROTDOMEND PROTDOMSTART PROTEINDOMAINID PROTEINDOMAINSOURCE PROTEINID</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6         NA           NA            &lt;NA&gt;                &lt;NA&gt;      &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   PROTEINSEQUENCE SEQCOORDSYSTEM SEQLENGTH SEQNAME SEQSTRAND SYMBOL</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6            &lt;NA&gt;     chromosome  57227415       Y        -1  KDM5D</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         TXBIOTYPE TXCDSSEQEND TXCDSSEQSTART            TXID          TXNAME</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 retained_intron          NA            NA ENST00000469599 ENST00000469599</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 retained_intron          NA            NA ENST00000469599 ENST00000469599</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 retained_intron          NA            NA ENST00000469599 ENST00000469599</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 retained_intron          NA            NA ENST00000469599 ENST00000469599</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 retained_intron          NA            NA ENST00000469599 ENST00000469599</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6 retained_intron          NA            NA ENST00000469599 ENST00000469599</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   TXSEQEND TXSEQSTART UNIPROTDB UNIPROTID UNIPROTMAPPINGTYPE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6 19716695   19703865      &lt;NA&gt;      &lt;NA&gt;               &lt;NA&gt;</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 28264</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'>## Get selected columns for all lincRNAs encoded on chromosome Y. Here we use</span></span>
+<span class='r-in'><span class='co'>## a filter expression to define what data to retrieve.</span></span>
+<span class='r-in'><span class='va'>Y</span> <span class='op'>&lt;-</span> <span class='fu'>select</span><span class='op'>(</span><span class='va'>edb</span>, keys <span class='op'>=</span> <span class='op'>~</span> <span class='va'>seq_name</span> <span class='op'>==</span> <span class='st'>"Y"</span> <span class='op'>&amp;</span> <span class='va'>gene_biotype</span> <span class='op'>==</span> <span class='st'>"lincRNA"</span>,</span>
+<span class='r-in'>            columns <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GENEID"</span>, <span class='st'>"GENEBIOTYPE"</span>, <span class='st'>"TXID"</span>, <span class='st'>"GENENAME"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Note: ordering of the results might not match ordering of keys!</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>            GENEID GENEBIOTYPE            TXID GENENAME SEQNAME</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1 ENSG00000129816     lincRNA ENST00000250776   TTTY1B       Y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2 ENSG00000129845     lincRNA ENST00000250805    TTTY1       Y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3 ENSG00000131538     lincRNA ENST00000253838    TTTY6       Y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4 ENSG00000147753     lincRNA ENST00000457100    TTTY7       Y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5 ENSG00000147753     lincRNA ENST00000276770    TTTY7       Y</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6 ENSG00000147753     lincRNA ENST00000449828    TTTY7       Y</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>Y</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 73</span>
+<span class='r-in'></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

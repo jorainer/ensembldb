@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.15.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
       </span>
     </div>
 
@@ -84,7 +84,7 @@
 
       
 
-      </header><script src="coordinate-mapping-use-cases_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="coordinate-mapping-use-cases_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Use cases for coordinate mapping with ensembldb</h1>
@@ -112,9 +112,9 @@ document.addEventListener("DOMContentLoaded", function() {
 </script><p>This documents describes two use cases for the coordinate system mapping functionality of <code>ensembldb</code>: mapping of regions within protein sequences to the genome and mapping of genomic to protein sequence-relative coordinates. In addition, it showcases the advanced filtering capabilities implemented in <code>ensembldb</code>.</p>
 <div id="query-for-helix-loop-helix-transcription-factors-on-chromosome-21" class="section level1">
 <h1 class="hasAnchor">
-<a href="#query-for-helix-loop-helix-transcription-factors-on-chromosome-21" class="anchor"></a>Query for <em>helix-loop-helix</em> transcription factors on chromosome 21</h1>
+<a href="#query-for-helix-loop-helix-transcription-factors-on-chromosome-21" class="anchor" aria-hidden="true"></a>Query for <em>helix-loop-helix</em> transcription factors on chromosome 21</h1>
 <p>Down syndrome is a genetic disorder characterized by the presence of all or parts of a third copy of chromosome 21. It is associated, among other, with characteristic facial features and mild to moderate intellectual disability. The phenotypes are most likely the result from a gene dosage-dependent increased expression of the genes encoded on chromosome 21 <span class="citation">(Lana-Elola et al. 2011)</span>. Compared to other gene classes, transcription factors are more likely to have an immediate impact, even due to a moderate over-expression (which might be the result from gene duplication). One of the largest dimerizing transcription factor families is characterized by a <em>basic helix-loop-helix</em> domain <span class="citation">(Massari and Murre 2000)</span>, a protein structural motif facilitating DNA binding.</p>
-<p>The example below aims at identifying transcription factors with a basic helix-loop-helix domain (Pfam ID PF00010) that are encoded on chromosome 21. To this end we first load an R-library providing human annotations from Ensembl release 86 and pass the loaded <code>EnsDb</code> object along with a filter expression to the <code>genes</code> method that retrieves the corresponding genes. Filter expressions have to be written in the form <code>~ &lt;field&gt; &lt;condition&gt; &lt;value&gt;</code> with <code>&lt;field&gt;</code> representing the database column to be used for the filter. Several such filter expressions can be concatenated with standard R logical expressions (such as <code><a href="https://rdrr.io/r/base/Logic.html" class="external-link">&amp;</a></code> or <code><a href="https://rdrr.io/r/base/Logic.html" class="external-link">|</a></code>). To get a list of all available filters and their corresponding fields, the <code>supportedFilters(edb)</code> function could be used.</p>
+<p>The example below aims at identifying transcription factors with a basic helix-loop-helix domain (Pfam ID PF00010) that are encoded on chromosome 21. To this end we first load an R-library providing human annotations from Ensembl release 86 and pass the loaded <code>EnsDb</code> object along with a filter expression to the <code>genes</code> method that retrieves the corresponding genes. Filter expressions have to be written in the form <code>~ &lt;field&gt; &lt;condition&gt; &lt;value&gt;</code> with <code>&lt;field&gt;</code> representing the database column to be used for the filter. Several such filter expressions can be concatenated with standard R logical expressions (such as <code>&amp;</code> or <code>|</code>). To get a list of all available filters and their corresponding fields, the <code>supportedFilters(edb)</code> function could be used.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb" class="external-link">ensembldb</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
@@ -151,11 +151,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <code class="sourceCode R"><span class="co">## Retrieve the transcript models for OLIG1 and OLIG2 that encode the</span>
 <span class="co">## the protein domain</span>
 <span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span>
-    <span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">genename</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OLIG1"</span>, <span class="st">"OLIG2"</span><span class="op">)</span> <span class="op">&amp;</span>
+    <span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">genename</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OLIG1"</span>, <span class="st">"OLIG2"</span><span class="op">)</span> <span class="op">&amp;</span>
              <span class="va">protein_domain_id</span> <span class="op">==</span> <span class="st">"PF00010"</span><span class="op">)</span></code></pre></div>
 <p>Next we fetch the coordinates of all Pfam protein domains encoded by these transcripts with the <code>proteins</code> method, asking for columns <code>"prot_dom_start"</code>, <code>"prot_dom_end"</code> and <code>"protein_domain_id"</code> to be returned by the function. Note that we restrict the results in addition to protein domains defined in Pfam.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pdoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">tx_id</span> <span class="op">%in%</span> <span class="va">txs</span><span class="op">$</span><span class="va">transcript</span> <span class="op">&amp;</span>
+<code class="sourceCode R"><span class="va">pdoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">tx_id</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">txs</span><span class="op">$</span><span class="va">transcript</span> <span class="op">&amp;</span>
                            <span class="va">protein_domain_source</span> <span class="op">==</span> <span class="st">"pfam"</span>,
                   columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_domain_id"</span>, <span class="st">"prot_dom_start"</span>,
                               <span class="st">"prot_dom_end"</span><span class="op">)</span><span class="op">)</span>
@@ -215,9 +215,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>Column <code>cds_ok</code> in the result object indicates whether the length of the CDS of the encoding transcript matches the length of the protein sequence. For transcripts with unknown 3’ and/or 5’ CDS ends these will differ. The mapping result has to be re-organized before being plotted: <code>Gviz</code> expects a single <code>GRanges</code> object, with specific metadata columns for the grouping of the individual genomic regions. This is performed in the code block below.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Convert the list to a GRanges with grouping information</span>
-<span class="va">pdoms_gnm_grng</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu">GRangesList</span><span class="op">(</span><span class="va">pdoms_gnm</span><span class="op">)</span><span class="op">)</span>
+<span class="va">pdoms_gnm_grng</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/GRangesList-class.html" class="external-link">GRangesList</a></span><span class="op">(</span><span class="va">pdoms_gnm</span><span class="op">)</span><span class="op">)</span>
 <span class="va">pdoms_gnm_grng</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">pdoms</span><span class="op">$</span><span class="va">protein_domain_id</span>, <span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">pdoms_gnm</span><span class="op">)</span><span class="op">)</span>
-<span class="va">pdoms_gnm_grng</span><span class="op">$</span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pdoms</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">pdoms_gnm</span><span class="op">)</span><span class="op">)</span>
+<span class="va">pdoms_gnm_grng</span><span class="op">$</span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pdoms</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/lengths.html" class="external-link">lengths</a></span><span class="op">(</span><span class="va">pdoms_gnm</span><span class="op">)</span><span class="op">)</span>
 
 <span class="va">pdoms_gnm_grng</span></code></pre></div>
 <pre><code>## GRanges object with 3 ranges and 9 metadata columns:
@@ -270,9 +270,9 @@ Transcripts of genes OLIG1 and OLIG2 encoding a helix-loop-helix protein domain.
 <span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">genename</span> <span class="op">==</span> <span class="st">"SIM2"</span> <span class="op">&amp;</span>
                                           <span class="va">protein_domain_id</span> <span class="op">==</span> <span class="st">"PF00010"</span><span class="op">)</span>
 <span class="co">## Fetch all Pfam protein domains within these transcripts</span>
-<span class="va">pdoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">tx_id</span> <span class="op">%in%</span> <span class="va">txs</span><span class="op">$</span><span class="va">transcript</span> <span class="op">&amp;</span>
+<span class="va">pdoms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="op">~</span> <span class="va">tx_id</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">txs</span><span class="op">$</span><span class="va">transcript</span> <span class="op">&amp;</span>
                            <span class="va">protein_domain_source</span> <span class="op">==</span> <span class="st">"pfam"</span>,
-                  columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_domain_id"</span>, <span class="st">"prot_dom_start"</span>,
+                  columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"protein_domain_id"</span>, <span class="st">"prot_dom_start"</span>,
                               <span class="st">"prot_dom_end"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>At last we have to map the protein domain coordinates to the genome and prepare the data for the plot. Since the code is essentially identical to the one for <em>OLIG1</em> and <em>OLIG2</em> it is not displayed.</p>
 <div class="figure" style="text-align: center">
@@ -284,10 +284,10 @@ Transcripts of the gene SIM2 encoding a helix-loop-helix domain. Shown are all t
 </div>
 <div id="mapping-of-genomic-coordinates-to-protein-relative-positions" class="section level1">
 <h1 class="hasAnchor">
-<a href="#mapping-of-genomic-coordinates-to-protein-relative-positions" class="anchor"></a>Mapping of genomic coordinates to protein-relative positions</h1>
+<a href="#mapping-of-genomic-coordinates-to-protein-relative-positions" class="anchor" aria-hidden="true"></a>Mapping of genomic coordinates to protein-relative positions</h1>
 <p>One of the known mutations for human red hair color is located at position 16:89920138 (dbSNP ID rs1805009) on the human genome (version GRCh38). Below we map this genomic coordinate to the respective coordinate within the protein sequence encoded at that location using the <code>genomeToProtein</code> function. Note that we use <code>"chr16"</code> as the name of the chromosome, since we changed the chromosome naming style to UCSC in the previous example.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gnm_pos</span> <span class="op">&lt;-</span> <span class="fu">GRanges</span><span class="op">(</span><span class="st">"chr16"</span>, <span class="fu">IRanges</span><span class="op">(</span><span class="fl">89920138</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">gnm_pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></span><span class="op">(</span><span class="st">"chr16"</span>, <span class="fu"><a href="https://rdrr.io/pkg/IRanges/man/IRanges-constructor.html" class="external-link">IRanges</a></span><span class="op">(</span><span class="fl">89920138</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 <span class="va">prt_pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genomeToProtein.html">genomeToProtein</a></span><span class="op">(</span><span class="va">gnm_pos</span>, <span class="va">edb</span><span class="op">)</span>
 <span class="va">prt_pos</span></code></pre></div>
 <pre><code>## IRangesList object of length 1:
@@ -318,12 +318,12 @@ Transcripts of the gene SIM2 encoding a helix-loop-helix domain. Shown are all t
 <p>Two proteins are from the <em>MC1R</em> gene and one from <em>RP11-566K11.2</em> (ENSG00000198211) a gene which exons overlap exons from <em>MC1R</em> as well as exons of the more downstream located gene <em>TUBB3</em>. To visualize this we first fetch transcripts overlapping the genomic position of interest and subsequently all additional transcripts within the region defined by the most downstream and upstream exons of the transcripts.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get transcripts overlapping the genomic position.</span>
-<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GRangesFilter</span><span class="op">(</span><span class="va">gnm_pos</span><span class="op">)</span><span class="op">)</span>
+<span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GRangesFilter</a></span><span class="op">(</span><span class="va">gnm_pos</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Get all transcripts within the region from the start of the most 5'</span>
 <span class="co">## and end of the most 3' exon.</span>
 <span class="va">all_txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-utils.html">getGeneRegionTrackForGviz</a></span><span class="op">(</span>
-    <span class="va">edb</span>, filter <span class="op">=</span> <span class="fu">GRangesFilter</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/RangeTrack-class.html" class="external-link">range</a></span><span class="op">(</span><span class="va">txs</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"within"</span><span class="op">)</span><span class="op">)</span>
+    <span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GRangesFilter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/RangeTrack-class.html" class="external-link">range</a></span><span class="op">(</span><span class="va">txs</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"within"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">## Plot the data</span>
 <span class="co">## - Ideogram</span>
@@ -359,7 +359,7 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 </div>
 <div id="session-information" class="section level1">
 <h1 class="hasAnchor">
-<a href="#session-information" class="anchor"></a>Session information</h1>
+<a href="#session-information" class="anchor" aria-hidden="true"></a>Session information</h1>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <pre><code>## R Under development (unstable) (2021-04-15 r80175)
@@ -382,76 +382,76 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 ##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.35.5               EnsDb.Hsapiens.v86_2.99.0
-##  [3] ensembldb_2.15.3          AnnotationFilter_1.15.0  
-##  [5] GenomicFeatures_1.43.8    AnnotationDbi_1.53.1     
-##  [7] Biobase_2.51.0            GenomicRanges_1.43.4     
-##  [9] GenomeInfoDb_1.27.11      IRanges_2.25.9           
-## [11] S4Vectors_0.29.15         BiocGenerics_0.37.2      
-## [13] BiocStyle_2.19.2         
+##  [1] Gviz_1.36.0               EnsDb.Hsapiens.v86_2.99.0
+##  [3] ensembldb_2.17.0          AnnotationFilter_1.16.0  
+##  [5] GenomicFeatures_1.44.0    AnnotationDbi_1.54.0     
+##  [7] Biobase_2.52.0            GenomicRanges_1.44.0     
+##  [9] GenomeInfoDb_1.28.0       IRanges_2.26.0           
+## [11] S4Vectors_0.30.0          BiocGenerics_0.38.0      
+## [13] BiocStyle_2.20.0         
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] colorspace_2.0-0            rjson_0.2.20               
-##   [3] ellipsis_0.3.1              rprojroot_2.0.2            
-##   [5] biovizBase_1.39.0           htmlTable_2.1.0            
-##   [7] XVector_0.31.1              base64enc_0.1-3            
+##   [1] colorspace_2.0-1            rjson_0.2.20               
+##   [3] ellipsis_0.3.2              rprojroot_2.0.2            
+##   [5] biovizBase_1.40.0           htmlTable_2.2.1            
+##   [7] XVector_0.32.0              base64enc_0.1-3            
 ##   [9] fs_1.5.0                    dichromat_2.0-0            
 ##  [11] rstudioapi_0.13             bit64_4.0.5                
 ##  [13] fansi_0.4.2                 splines_4.1.0              
-##  [15] cachem_1.0.4                knitr_1.32                 
+##  [15] cachem_1.0.5                knitr_1.33                 
 ##  [17] Formula_1.2-4               jsonlite_1.7.2             
-##  [19] Rsamtools_2.7.2             cluster_2.1.2              
+##  [19] Rsamtools_2.8.0             cluster_2.1.2              
 ##  [21] dbplyr_2.1.1                png_0.1-7                  
-##  [23] BiocManager_1.30.12         compiler_4.1.0             
+##  [23] BiocManager_1.30.15         compiler_4.1.0             
 ##  [25] httr_1.4.2                  backports_1.2.1            
-##  [27] assertthat_0.2.1            Matrix_1.3-2               
+##  [27] assertthat_0.2.1            Matrix_1.3-3               
 ##  [29] fastmap_1.1.0               lazyeval_0.2.2             
 ##  [31] htmltools_0.5.1.1           prettyunits_1.1.1          
 ##  [33] tools_4.1.0                 gtable_0.3.0               
-##  [35] glue_1.4.2                  GenomeInfoDbData_1.2.4     
-##  [37] dplyr_1.0.5                 rappdirs_0.3.3             
-##  [39] Rcpp_1.0.6                  jquerylib_0.1.3            
-##  [41] pkgdown_1.6.1.9001          vctrs_0.3.7                
-##  [43] Biostrings_2.59.2           rtracklayer_1.51.5         
-##  [45] xfun_0.22                   stringr_1.4.0              
+##  [35] glue_1.4.2                  GenomeInfoDbData_1.2.6     
+##  [37] dplyr_1.0.6                 rappdirs_0.3.3             
+##  [39] Rcpp_1.0.6                  jquerylib_0.1.4            
+##  [41] pkgdown_1.6.1.9001          vctrs_0.3.8                
+##  [43] Biostrings_2.60.0           rtracklayer_1.52.0         
+##  [45] xfun_0.23                   stringr_1.4.0              
 ##  [47] lifecycle_1.0.0             restfulr_0.0.13            
-##  [49] XML_3.99-0.6                zlibbioc_1.37.0            
-##  [51] scales_1.1.1                BSgenome_1.59.2            
-##  [53] VariantAnnotation_1.37.1    ragg_1.1.2                 
-##  [55] hms_1.0.0                   MatrixGenerics_1.3.1       
-##  [57] ProtGenerics_1.23.9         SummarizedExperiment_1.21.3
+##  [49] XML_3.99-0.6                zlibbioc_1.38.0            
+##  [51] scales_1.1.1                BSgenome_1.60.0            
+##  [53] VariantAnnotation_1.38.0    ragg_1.1.2                 
+##  [55] hms_1.1.0                   MatrixGenerics_1.4.0       
+##  [57] ProtGenerics_1.24.0         SummarizedExperiment_1.22.0
 ##  [59] RColorBrewer_1.1-2          yaml_2.2.1                 
-##  [61] curl_4.3                    memoise_2.0.0              
+##  [61] curl_4.3.1                  memoise_2.0.0              
 ##  [63] gridExtra_2.3               ggplot2_3.3.3              
-##  [65] sass_0.3.1                  biomaRt_2.47.7             
+##  [65] sass_0.4.0                  biomaRt_2.48.0             
 ##  [67] rpart_4.1-15                latticeExtra_0.6-29        
-##  [69] stringi_1.5.3               RSQLite_2.2.6              
-##  [71] highr_0.9                   BiocIO_1.1.2               
+##  [69] stringi_1.6.2               RSQLite_2.2.7              
+##  [71] highr_0.9                   BiocIO_1.2.0               
 ##  [73] desc_1.3.0                  checkmate_2.0.0            
-##  [75] filelock_1.0.2              BiocParallel_1.25.5        
-##  [77] rlang_0.4.10                pkgconfig_2.0.3            
-##  [79] systemfonts_1.0.1           matrixStats_0.58.0         
-##  [81] bitops_1.0-6                evaluate_0.14              
-##  [83] lattice_0.20-41             purrr_0.3.4                
-##  [85] htmlwidgets_1.5.3           GenomicAlignments_1.27.2   
-##  [87] bit_4.0.4                   tidyselect_1.1.0           
-##  [89] magrittr_2.0.1              bookdown_0.21              
+##  [75] filelock_1.0.2              BiocParallel_1.26.0        
+##  [77] rlang_0.4.11                pkgconfig_2.0.3            
+##  [79] systemfonts_1.0.2           matrixStats_0.58.0         
+##  [81] bitops_1.0-7                evaluate_0.14              
+##  [83] lattice_0.20-44             purrr_0.3.4                
+##  [85] htmlwidgets_1.5.3           GenomicAlignments_1.28.0   
+##  [87] bit_4.0.4                   tidyselect_1.1.1           
+##  [89] magrittr_2.0.1              bookdown_0.22              
 ##  [91] R6_2.5.0                    generics_0.1.0             
-##  [93] Hmisc_4.5-0                 DelayedArray_0.17.10       
-##  [95] DBI_1.1.1                   pillar_1.6.0               
-##  [97] foreign_0.8-81              survival_3.2-10            
-##  [99] KEGGREST_1.31.1             RCurl_1.98-1.3             
-## [101] nnet_7.3-15                 tibble_3.1.1               
+##  [93] Hmisc_4.5-0                 DelayedArray_0.18.0        
+##  [95] DBI_1.1.1                   pillar_1.6.1               
+##  [97] foreign_0.8-81              survival_3.2-11            
+##  [99] KEGGREST_1.32.0             RCurl_1.98-1.3             
+## [101] nnet_7.3-16                 tibble_3.1.2               
 ## [103] crayon_1.4.1                utf8_1.2.1                 
-## [105] BiocFileCache_1.99.6        rmarkdown_2.7              
+## [105] BiocFileCache_2.0.0         rmarkdown_2.8              
 ## [107] jpeg_0.1-8.1                progress_1.2.2             
 ## [109] data.table_1.14.0           blob_1.2.1                 
-## [111] digest_0.6.27               textshaping_0.3.3          
-## [113] munsell_0.5.0               bslib_0.2.4</code></pre>
+## [111] digest_0.6.27               textshaping_0.3.4          
+## [113] munsell_0.5.0               bslib_0.2.5.1</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h1>
+<a href="#references" class="anchor" aria-hidden="true"></a>References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Chakrabarti:2010dt" class="csl-entry">
 Chakrabarti, Lina, Tyler K Best, Nathan P Cramer, Rosalind S E Carney, John T R Isaac, Zygmunt Galdzicki, and Tarik F Haydar. 2010. <span>“<span class="nocase">Olig1 and Olig2 triplication causes developmental brain defects in Down syndrome.</span>”</span> <em>Nature Neuroscience</em> 13 (8): 927–34.
