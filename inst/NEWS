@@ -1,3 +1,7 @@
+Changes in version 2.17.1
+
+- Fix error when importing uncompressed GTF files.
+
 Changes in version 2.15.3
 
 - Fix missing declaration of rmarkdown.
