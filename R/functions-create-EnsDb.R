@@ -1729,7 +1729,7 @@ elementFromEnsemblFilename <- function(x, which=1){
 .read_lines_compressed <- function(x, n = 10) {
     if (length(grep(".gz$", x, ignore.case = TRUE)))
         con <- gzcon(file(x, open = "rb"))
-    else con <- x
+    else con <- file(x, open = "rb")
     on.exit(suppressWarnings(close(con)))
     readLines(con, n = n)
 }
