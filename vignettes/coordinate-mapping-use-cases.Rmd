@@ -163,8 +163,8 @@ We next define the individual tracks we want to visualize and plot them with the
 library(Gviz)
 
 ## Define the individual tracks:
-## - Ideagram
-ideo_track <- IdeogramTrack(genome = "hg38", chromosome = "chr21")
+## - Ideogram
+## ideo_track <- IdeogramTrack(genome = "hg38", chromosome = "chr21")
 ## - Genome axis
 gaxis_track <- GenomeAxisTrack()
 ## - Transcripts
@@ -177,7 +177,7 @@ pdom_track <- AnnotationTrack(pdoms_gnm_grng, group = pdoms_gnm_grng$grp,
                               name = "Protein domains", size = 0.5)
 
 ## Generate the plot
-plotTracks(list(ideo_track, gaxis_track, gene_track, pdom_track))
+plotTracks(list(gaxis_track, gene_track, pdom_track))
 
 ```
 
@@ -225,7 +225,7 @@ pdom_track <- AnnotationTrack(pdoms_gnm_grng, group = pdoms_gnm_grng$grp,
                               name = "Protein domains", size = 0.5)
 
 ## Generate the plot
-plotTracks(list(ideo_track, gaxis_track, gene_track, pdom_track))
+plotTracks(list(gaxis_track, gene_track, pdom_track))
 
 ```
 
@@ -274,7 +274,7 @@ all_txs <- getGeneRegionTrackForGviz(
 
 ## Plot the data
 ## - Ideogram
-ideo_track <- IdeogramTrack(genome = "hg38", chromosome = "chr16")
+## ideo_track <- IdeogramTrack(genome = "hg38", chromosome = "chr16")
 ## - Genome axis
 gaxis_track <- GenomeAxisTrack()
 ## - Transcripts
@@ -284,7 +284,7 @@ gene_track <- GeneRegionTrack(all_txs, showId = TRUE, just.group = "right",
 hl_track <- HighlightTrack(list(gaxis_track, gene_track), range = gnm_pos)
 
 ## Generate the plot
-plotTracks(list(ideo_track, hl_track))
+plotTracks(list(hl_track))
 
 ```
 

@@ -1,3 +1,7 @@
+Changes in version 2.16.2
+
+- Disable ideogram plotting in vignettes.
+
 Changes in version 2.16.1
 
 - Fix error when importing an uncompressed GTF file.
