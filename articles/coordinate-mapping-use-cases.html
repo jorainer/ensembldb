@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.17.2</span>
       </span>
     </div>
 
@@ -84,7 +84,7 @@
 
       
 
-      </header><script src="coordinate-mapping-use-cases_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="coordinate-mapping-use-cases_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Use cases for coordinate mapping with ensembldb</h1>
@@ -243,8 +243,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ivanek/Gviz" class="external-link">Gviz</a></span><span class="op">)</span>
 
 <span class="co">## Define the individual tracks:</span>
-<span class="co">## - Ideagram</span>
-<span class="va">ideo_track</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/IdeogramTrack-class.html" class="external-link">IdeogramTrack</a></span><span class="op">(</span>genome <span class="op">=</span> <span class="st">"hg38"</span>, chromosome <span class="op">=</span> <span class="st">"chr21"</span><span class="op">)</span>
+<span class="co">## - Ideogram</span>
+<span class="co">## ideo_track &lt;- IdeogramTrack(genome = "hg38", chromosome = "chr21")</span>
 <span class="co">## - Genome axis</span>
 <span class="va">gaxis_track</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html" class="external-link">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">## - Transcripts</span>
@@ -257,7 +257,7 @@ document.addEventListener("DOMContentLoaded", function() {
                               name <span class="op">=</span> <span class="st">"Protein domains"</span>, size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
 
 <span class="co">## Generate the plot</span>
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ideo_track</span>, <span class="va">gaxis_track</span>, <span class="va">gene_track</span>, <span class="va">pdom_track</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gaxis_track</span>, <span class="va">gene_track</span>, <span class="va">pdom_track</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="coordinate-mapping-use-cases_files/figure-html/olig-plot-1.png" alt="Transcripts of genes OLIG1 and OLIG2 encoding a helix-loop-helix protein domain. Shown are all transcripts of the genes OLIG1 and OLIG2 that encode a protein with a helix-loop-helix protein domain (PF00010). Genomic positions encoding protein domains defined in Pfam are shown in light blue." width="768"><p class="caption">
 Transcripts of genes OLIG1 and OLIG2 encoding a helix-loop-helix protein domain. Shown are all transcripts of the genes OLIG1 and OLIG2 that encode a protein with a helix-loop-helix protein domain (PF00010). Genomic positions encoding protein domains defined in Pfam are shown in light blue.
@@ -327,7 +327,7 @@ Transcripts of the gene SIM2 encoding a helix-loop-helix domain. Shown are all t
 
 <span class="co">## Plot the data</span>
 <span class="co">## - Ideogram</span>
-<span class="va">ideo_track</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/IdeogramTrack-class.html" class="external-link">IdeogramTrack</a></span><span class="op">(</span>genome <span class="op">=</span> <span class="st">"hg38"</span>, chromosome <span class="op">=</span> <span class="st">"chr16"</span><span class="op">)</span>
+<span class="co">## ideo_track &lt;- IdeogramTrack(genome = "hg38", chromosome = "chr16")</span>
 <span class="co">## - Genome axis</span>
 <span class="va">gaxis_track</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/GenomeAxisTrack-class.html" class="external-link">GenomeAxisTrack</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">## - Transcripts</span>
@@ -337,7 +337,7 @@ Transcripts of the gene SIM2 encoding a helix-loop-helix domain. Shown are all t
 <span class="va">hl_track</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/HighlightTrack-class.html" class="external-link">HighlightTrack</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">gaxis_track</span>, <span class="va">gene_track</span><span class="op">)</span>, range <span class="op">=</span> <span class="va">gnm_pos</span><span class="op">)</span>
 
 <span class="co">## Generate the plot</span>
-<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">ideo_track</span>, <span class="va">hl_track</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/pkg/Gviz/man/plotTracks.html" class="external-link">plotTracks</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">hl_track</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="figure">
 <img src="coordinate-mapping-use-cases_files/figure-html/ex2-plot-1.png" alt="Transcripts overlapping, or close to, the genomic position of interest. Shown are all transcripts The genomic position of the variant is highlighted in red." width="768"><p class="caption">
 Transcripts overlapping, or close to, the genomic position of interest. Shown are all transcripts The genomic position of the variant is highlighted in red.
@@ -362,7 +362,7 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 <a href="#session-information" class="anchor" aria-hidden="true"></a>Session information</h1>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## R Under development (unstable) (2021-04-15 r80175)
+<pre><code>## R version 4.1.0 (2021-05-18)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
 ## Running under: Ubuntu 20.04.2 LTS
 ## 
@@ -378,76 +378,77 @@ Transcripts overlapping, or close to, the genomic position of interest. Shown ar
 ## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
-##  [8] datasets  methods   base     
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
 ## 
 ## other attached packages:
-##  [1] Gviz_1.36.0               EnsDb.Hsapiens.v86_2.99.0
-##  [3] ensembldb_2.17.0          AnnotationFilter_1.16.0  
-##  [5] GenomicFeatures_1.44.0    AnnotationDbi_1.54.0     
-##  [7] Biobase_2.52.0            GenomicRanges_1.44.0     
-##  [9] GenomeInfoDb_1.28.0       IRanges_2.26.0           
-## [11] S4Vectors_0.30.0          BiocGenerics_0.38.0      
-## [13] BiocStyle_2.20.0         
+##  [1] Gviz_1.37.1               EnsDb.Hsapiens.v86_2.99.0
+##  [3] ensembldb_2.17.2          AnnotationFilter_1.17.0  
+##  [5] GenomicFeatures_1.45.0    AnnotationDbi_1.55.1     
+##  [7] Biobase_2.53.0            GenomicRanges_1.45.0     
+##  [9] GenomeInfoDb_1.29.2       IRanges_2.27.0           
+## [11] S4Vectors_0.31.0          BiocGenerics_0.39.1      
+## [13] BiocStyle_2.21.3         
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] colorspace_2.0-1            rjson_0.2.20               
+##   [1] colorspace_2.0-2            rjson_0.2.20               
 ##   [3] ellipsis_0.3.2              rprojroot_2.0.2            
-##   [5] biovizBase_1.40.0           htmlTable_2.2.1            
-##   [7] XVector_0.32.0              base64enc_0.1-3            
+##   [5] htmlTable_2.2.1             biovizBase_1.41.0          
+##   [7] XVector_0.33.0              base64enc_0.1-3            
 ##   [9] fs_1.5.0                    dichromat_2.0-0            
 ##  [11] rstudioapi_0.13             bit64_4.0.5                
-##  [13] fansi_0.4.2                 splines_4.1.0              
-##  [15] cachem_1.0.5                knitr_1.33                 
-##  [17] Formula_1.2-4               jsonlite_1.7.2             
-##  [19] Rsamtools_2.8.0             cluster_2.1.2              
-##  [21] dbplyr_2.1.1                png_0.1-7                  
-##  [23] BiocManager_1.30.15         compiler_4.1.0             
-##  [25] httr_1.4.2                  backports_1.2.1            
-##  [27] assertthat_0.2.1            Matrix_1.3-3               
-##  [29] fastmap_1.1.0               lazyeval_0.2.2             
-##  [31] htmltools_0.5.1.1           prettyunits_1.1.1          
-##  [33] tools_4.1.0                 gtable_0.3.0               
-##  [35] glue_1.4.2                  GenomeInfoDbData_1.2.6     
-##  [37] dplyr_1.0.6                 rappdirs_0.3.3             
-##  [39] Rcpp_1.0.6                  jquerylib_0.1.4            
-##  [41] pkgdown_1.6.1.9001          vctrs_0.3.8                
-##  [43] Biostrings_2.60.0           rtracklayer_1.52.0         
-##  [45] xfun_0.23                   stringr_1.4.0              
-##  [47] lifecycle_1.0.0             restfulr_0.0.13            
-##  [49] XML_3.99-0.6                zlibbioc_1.38.0            
-##  [51] scales_1.1.1                BSgenome_1.60.0            
-##  [53] VariantAnnotation_1.38.0    ragg_1.1.2                 
-##  [55] hms_1.1.0                   MatrixGenerics_1.4.0       
-##  [57] ProtGenerics_1.24.0         SummarizedExperiment_1.22.0
-##  [59] RColorBrewer_1.1-2          yaml_2.2.1                 
-##  [61] curl_4.3.1                  memoise_2.0.0              
-##  [63] gridExtra_2.3               ggplot2_3.3.3              
-##  [65] sass_0.4.0                  biomaRt_2.48.0             
-##  [67] rpart_4.1-15                latticeExtra_0.6-29        
-##  [69] stringi_1.6.2               RSQLite_2.2.7              
-##  [71] highr_0.9                   BiocIO_1.2.0               
-##  [73] desc_1.3.0                  checkmate_2.0.0            
-##  [75] filelock_1.0.2              BiocParallel_1.26.0        
-##  [77] rlang_0.4.11                pkgconfig_2.0.3            
-##  [79] systemfonts_1.0.2           matrixStats_0.58.0         
-##  [81] bitops_1.0-7                evaluate_0.14              
-##  [83] lattice_0.20-44             purrr_0.3.4                
-##  [85] htmlwidgets_1.5.3           GenomicAlignments_1.28.0   
-##  [87] bit_4.0.4                   tidyselect_1.1.1           
-##  [89] magrittr_2.0.1              bookdown_0.22              
-##  [91] R6_2.5.0                    generics_0.1.0             
-##  [93] Hmisc_4.5-0                 DelayedArray_0.18.0        
-##  [95] DBI_1.1.1                   pillar_1.6.1               
-##  [97] foreign_0.8-81              survival_3.2-11            
-##  [99] KEGGREST_1.32.0             RCurl_1.98-1.3             
-## [101] nnet_7.3-16                 tibble_3.1.2               
-## [103] crayon_1.4.1                utf8_1.2.1                 
-## [105] BiocFileCache_2.0.0         rmarkdown_2.8              
-## [107] jpeg_0.1-8.1                progress_1.2.2             
-## [109] data.table_1.14.0           blob_1.2.1                 
-## [111] digest_0.6.27               textshaping_0.3.4          
-## [113] munsell_0.5.0               bslib_0.2.5.1</code></pre>
+##  [13] fansi_0.5.0                 xml2_1.3.2                 
+##  [15] splines_4.1.0               cachem_1.0.5               
+##  [17] knitr_1.33                  Formula_1.2-4              
+##  [19] jsonlite_1.7.2              Rsamtools_2.9.1            
+##  [21] cluster_2.1.2               dbplyr_2.1.1               
+##  [23] png_0.1-7                   BiocManager_1.30.16        
+##  [25] compiler_4.1.0              httr_1.4.2                 
+##  [27] backports_1.2.1             assertthat_0.2.1           
+##  [29] Matrix_1.3-4                fastmap_1.1.0              
+##  [31] lazyeval_0.2.2              htmltools_0.5.1.1          
+##  [33] prettyunits_1.1.1           tools_4.1.0                
+##  [35] gtable_0.3.0                glue_1.4.2                 
+##  [37] GenomeInfoDbData_1.2.6      dplyr_1.0.7                
+##  [39] rappdirs_0.3.3              Rcpp_1.0.6                 
+##  [41] jquerylib_0.1.4             pkgdown_1.6.1.9001         
+##  [43] vctrs_0.3.8                 Biostrings_2.61.1          
+##  [45] rtracklayer_1.53.0          xfun_0.24                  
+##  [47] stringr_1.4.0               lifecycle_1.0.0            
+##  [49] restfulr_0.0.13             XML_3.99-0.6               
+##  [51] zlibbioc_1.39.0             scales_1.1.1               
+##  [53] BSgenome_1.61.0             VariantAnnotation_1.39.0   
+##  [55] ragg_1.1.3                  hms_1.1.0                  
+##  [57] MatrixGenerics_1.5.0        ProtGenerics_1.25.0        
+##  [59] parallel_4.1.0              SummarizedExperiment_1.23.1
+##  [61] RColorBrewer_1.1-2          yaml_2.2.1                 
+##  [63] curl_4.3.2                  gridExtra_2.3              
+##  [65] memoise_2.0.0               ggplot2_3.3.5              
+##  [67] sass_0.4.0                  biomaRt_2.49.2             
+##  [69] rpart_4.1-15                latticeExtra_0.6-29        
+##  [71] stringi_1.6.2               RSQLite_2.2.7              
+##  [73] highr_0.9                   BiocIO_1.3.0               
+##  [75] desc_1.3.0                  checkmate_2.0.0            
+##  [77] filelock_1.0.2              BiocParallel_1.27.0        
+##  [79] rlang_0.4.11                pkgconfig_2.0.3            
+##  [81] systemfonts_1.0.2           matrixStats_0.59.0         
+##  [83] bitops_1.0-7                evaluate_0.14              
+##  [85] lattice_0.20-44             purrr_0.3.4                
+##  [87] htmlwidgets_1.5.3           GenomicAlignments_1.29.0   
+##  [89] bit_4.0.4                   tidyselect_1.1.1           
+##  [91] magrittr_2.0.1              bookdown_0.22              
+##  [93] R6_2.5.0                    generics_0.1.0             
+##  [95] Hmisc_4.5-0                 DelayedArray_0.19.1        
+##  [97] DBI_1.1.1                   pillar_1.6.1               
+##  [99] foreign_0.8-81              survival_3.2-11            
+## [101] KEGGREST_1.33.0             RCurl_1.98-1.3             
+## [103] nnet_7.3-16                 tibble_3.1.2               
+## [105] crayon_1.4.1                utf8_1.2.1                 
+## [107] BiocFileCache_2.1.1         rmarkdown_2.9              
+## [109] jpeg_0.1-8.1                progress_1.2.2             
+## [111] data.table_1.14.0           blob_1.2.1                 
+## [113] digest_0.6.27               textshaping_0.3.5          
+## [115] munsell_0.5.0               bslib_0.2.5.1</code></pre>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
