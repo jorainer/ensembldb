@@ -5,11 +5,11 @@ library(RMariaDB)
 library(ensembldb)
 
 #' @description Get core database names from the specified folder.
-#' 
+#'
 #' @param ftp_folder The ftp url to the per-species mysql folders.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @noRd
 listCoreDbsInFolder <- function(ftp_folder) {
     if (missing(ftp_folder))
@@ -33,27 +33,27 @@ listCoreDbsInFolder <- function(ftp_folder) {
 #' @param ftp_folder The ftp url to the per-species mysql folders. If not
 #'     provided it will use the default Ensembl ftp:
 #'     \code{ftp://ftp.ensembl.org/pub/release-<ens_version>/mysql/}.
-#' 
+#'
 #' @param ens_version The Ensembl version (version of the Ensembl Perl API).
-#' 
+#'
 #' @param species The name of the species (e.g. "homo_sapiens").
-#' 
+#'
 #' @param user The user name for the MySQL/MariaDB database (write access).
-#' 
+#'
 #' @param host The host on which the MySQL/MariaDB database is running.
-#' 
+#'
 #' @param pass The password for the MySQL/MariaDB database.
-#' 
+#'
 #' @param port The port of the MySQL/MariaDB database.
-#' 
+#'
 #' @param local_tmp Local directory that will be used to temporarily store the
 #'     downloaded MySQL/MariaDB database files.
-#' 
+#'
 #' @param dropDb Whether the Ensembl core database should be deleted once the
 #'     EnsDb has been created.
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @examples
 #'
 #' ## For Ensemblgenomes:
@@ -61,7 +61,7 @@ listCoreDbsInFolder <- function(ftp_folder) {
 #' @noRd
 createEnsDbForSpecies <- function(ftp_folder,
                                   ens_version = 86, species, user, host, pass,
-                                  port = 3306, local_tmp = tempdir(),
+                                  port = NULL, local_tmp = tempdir(),
                                   sub_dir = "",
                                   dropDb = TRUE) {
     ## if ftp_folder is missing use the default one:
@@ -120,31 +120,31 @@ createEnsDbForSpecies <- function(ftp_folder,
 #'
 #' @param ftp_folder The folder on Ensembl's ftp server containing the mysql
 #'     database files. Has to be the full path to these files.
-#' 
+#'
 #' @param ens_version The Ensembl version (version of the Ensembl Perl API).
-#' 
+#'
 #' @param species The name of the species (e.g. "homo_sapiens").
-#' 
+#'
 #' @param user The user name for the MySQL/MariaDB database (write access).
-#' 
+#'
 #' @param host The host on which the MySQL/MariaDB database is running.
-#' 
+#'
 #' @param pass The password for the MySQL/MariaDB database.
-#' 
+#'
 #' @param port The port of the MySQL/MariaDB database.
-#' 
+#'
 #' @param local_tmp Local directory that will be used to temporarily store the
 #'     downloaded MySQL/MariaDB database files.
-#' 
+#'
 #' @param dropDb Whether the Ensembl core database should be deleted once the
 #'     EnsDb has been created.
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @noRd
 processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
                               host = "localhost",
-                              pass, port = 3306, local_tmp = tempdir(),
+                              pass, port = NULL, local_tmp = tempdir(),
                               dropDb = TRUE) {
     if (missing(ftp_folder))
         stop("'ftp_folder' has to be specified!")
@@ -169,8 +169,12 @@ processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
     unlink("*.txt")
     ## (5) Delete the database.
     if (dropDb) {
-        con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
-                         port = port, dbname = "mysql")
+        if (length(port))
+            con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
+                             port = port, dbname = "mysql")
+        else
+            con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
+                             dbname = "mysql")
         dbSendStatement(con, paste("drop database ", db_name))
         dbDisconnect(con)
     }
@@ -187,7 +191,7 @@ processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
 #' @return A character string with the path of the local directory.
 #'
 #' @author Johannes Rainer
-#' 
+#'
 #' @noRd
 #'
 #' @examples
@@ -214,20 +218,20 @@ downloadFilesFromFtpFolder <- function(url, dest = tempdir()) {
 #'     argument \code{dbname} is missing.
 #'
 #' @param dir The path to the local directory where the database files are.
-#' 
+#'
 #' @param host The host running the MySQL database.
-#' 
+#'
 #' @param dbname The name of the database. If not provided the name of the
 #'     provided directory will be used instead.
-#' 
+#'
 #' @param user The user name for the MySQL database (rw access).
-#' 
+#'
 #' @param pass The password for the MySQL database.
-#' 
+#'
 #' @param port The port of the MySQL database.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @noRd
 #'
 #' @examples
@@ -236,10 +240,10 @@ downloadFilesFromFtpFolder <- function(url, dest = tempdir()) {
 #' dbname <- "homo_sapiens_core_88_38"
 #' ## set to directory returned by the downloadFilesFromFtpFolder
 #' dir <- local_dir
-#' 
+#'
 #' installEnsemblDb(dir = dir, dbname = dbname, user = user, pass = pass)
 installEnsemblDb <- function(dir, host = "localhost", dbname, user, pass,
-                              port = 3306) {
+                              port = NULL) {
     if (missing(dir))
         stop("Argument 'dir' missing!")
     if (missing(dbname))
@@ -249,17 +253,24 @@ installEnsemblDb <- function(dir, host = "localhost", dbname, user, pass,
     ## Eventually unzip the files...
     tmp <- system(paste0("gunzip ", dir, "/*.gz"))
     ## Create the database
-    con <- dbConnect(MariaDB(), host = host, user = user, pass = pass, port = port,
-                     dbname = "mysql")
+    if (length(port))
+        con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
+                         port = port, dbname = "mysql")
+    else
+        con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
+                         dbname = "mysql")
+
     dbSendStatement(con, paste0("create database ", dbname))
     dbDisconnect(con)
     ## Now create the tables and stuff.
+    if (length(port))
+        port <- paste0(" -P ", port)
     tmp <- system(paste0("mysql -h ", host, " -u ", user, " --password=", pass,
-                         " -P ", port, " ", dbname, " < ", dir, "/", dbname,
+                         port, " ", dbname, " < ", dir, "/", dbname,
                          ".sql"))
     ## Importing the data.
     cmd <- paste0("mysqlimport -h ", host, " -u ", user,
-                  " --password=", pass, " -P ", port,
+                  " --password=", pass, port,
                   " ", dbname, " -L ", dir, "/*.txt")
     tmp <- system(cmd)
 }
