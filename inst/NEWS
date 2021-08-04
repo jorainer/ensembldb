@@ -1,3 +1,7 @@
+Changes in version 2.16.4
+
+- GRanges with 0 width are returned for transcripts without UTRs.
+
 Changes in version 2.16.3
 
 - Fix in the R scripts to create EnsDb databases from Ensembl.
