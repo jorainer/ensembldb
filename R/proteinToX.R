@@ -118,12 +118,12 @@ proteinToTranscript <- function(x, db, id = "name",
     message(sum(!miss), " found")
     ## 2) ensure that the CDS matches the AA sequence length
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
-    cds_genome <- .cds_matching_protein(db, cds_genome)
-    are_ok <- unlist(lapply(cds_genome, function(z) {
+    cds_genome <- ensembldb:::.cds_matching_protein(db, cds_genome)
+    are_ok <- vapply(cds_genome, function(z) {
         if (is(z, "GRangesList"))
             all(z[[1]]$cds_ok)
         else NA
-    }))
+    }, FUN.VALUE = logical(1))
     are_ok <- are_ok[!is.na(are_ok)]
     ## We've got now a list of GRanges
     message(sum(are_ok), "/", length(are_ok), " OK")
@@ -156,14 +156,14 @@ proteinToTranscript <- function(x, db, id = "name",
                                end = end(cds) + five_width[ids],
                                names = ids)
                 ## Populate mcols
-                mc <- DataFrame(protein_id = unlist(lapply(gnm,
-                                                           function(z)
-                                                               z$protein_id[1])),
-                                tx_id = ids,
-                                cds_ok = gnm[[1]]$cds_ok[1],
-                                protein_start = start(prt),
-                                protein_end = end(prt)
-                                )
+                mc <- DataFrame(
+                    protein_id = unlist(
+                        lapply(gnm, function(z) z$protein_id[1])),
+                    tx_id = ids,
+                    cds_ok = gnm[[1]]$cds_ok[1],
+                    protein_start = start(prt),
+                    protein_end = end(prt)
+                )
                 if (idType == "uniprot_id")
                     mc$uniprot_id <- names(prt)
                 mcols(res) <- mc

@@ -107,7 +107,7 @@ test_that("exonsBy works", {
     )
     expect_identical(sort(colnames(mcols(ExnsBy[[1]]))),
                      sort(c("exon_id", "exon_rank", "tx_name")))
-    
+
     ## Check what happens if we specify tx_id.
     ExnsBy <- exonsBy(edb, filter=list(SeqNameFilter("Y")), by="tx",
                       columns=c("tx_id"))
@@ -400,6 +400,23 @@ test_that("UTRs work", {
                                              filter = TxIdFilter("ENST00000335953"))
     res_2 <- threeUTRsByTranscript(edb, filter = TxIdFilter("ENST00000335953"))
     expect_identical(res_1, res_2)
+
+    ## transcript without UTR:
+    res_1 <- fiveUTRsByTranscript(edb, filter = TxIdFilter("ENST00000165524"))
+    expect_true(width(res_1[[1L]]) == 0)
+    res_2 <- fiveUTRsByTranscript(edb, filter = TxIdFilter("ENST00000335953"))
+    res_a <- fiveUTRsByTranscript(edb, filter = TxIdFilter(c("ENST00000165524",
+                                                             "ENST00000335953")))
+    expect_true(width(res_a[[1L]]) == 0)
+    expect_equal(width(res_2[[1L]]), width(res_a[[2L]]))
+
+    res_1 <- threeUTRsByTranscript(edb, filter = TxIdFilter("ENST00000165524"))
+    expect_true(width(res_1[[1L]]) == 0)
+    res_2 <- threeUTRsByTranscript(edb, filter = TxIdFilter("ENST00000335953"))
+    res_a <- threeUTRsByTranscript(edb, filter = TxIdFilter(c("ENST00000165524",
+                                                             "ENST00000335953")))
+    expect_true(width(res_a[[1L]]) == 0)
+    expect_equal(width(res_2[[1L]]), width(res_a[[2L]]))
 })
 
 test_that("lengthOf works", {
@@ -554,12 +571,12 @@ test_that("supportedFilters works", {
     res <- ensembldb:::.supportedFilters(edb)
     if (!hasProteinData(edb))
         expect_equal(nrow(res), 20)
-    else 
+    else
         expect_equal(nrow(res), 27)
     res <- supportedFilters(edb)
     if (!hasProteinData(edb))
         expect_equal(nrow(res), 20)
-    else 
+    else
         expect_equal(nrow(res), 27)
 })
 
@@ -942,4 +959,3 @@ test_that("intronsByTranscript works", {
     expect_equal(names(exns), names(res))
     expect_equal(lengths(res), lengths(exns) - 1)
 })
-

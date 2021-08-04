@@ -1,3 +1,7 @@
+Changes in version 2.17.4
+
+- Fix issue with extracting 5' or 3' UTRs for transcript without UTRs.
+
 Changes in version 2.17.3
 
 - Make parameter `port` optional in the script to create EnsDb databases.

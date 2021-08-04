@@ -1154,8 +1154,8 @@ getUTRsByTranscript <- function(x, what, columns = NULL,
     if (any(nas))
         Res <- Res[!nas, ]
     ## Remove exons that are within the cds.
-    Res <- Res[Res$exon_seq_start < Res$tx_cds_seq_start |
-               Res$exon_seq_end > Res$tx_cds_seq_end, , drop=FALSE]
+    Res <- Res[Res$exon_seq_start <= Res$tx_cds_seq_start |
+               Res$exon_seq_end >= Res$tx_cds_seq_end, , drop=FALSE]
     if (nrow(Res) == 0) {
         warning(paste0("No ", what, "UTR found!"))
         return(NULL)
@@ -1170,14 +1170,18 @@ getUTRsByTranscript <- function(x, what, columns = NULL,
         ## All those on the forward strand for which the exon start is smaller
         ## than the cds start and those on the reverse strand with an exon end
         ## larger than the cds end.
-        Res <- Res[(Res$seq_strand > 0 & Res$exon_seq_start < Res$tx_cds_seq_start)
-                   | (Res$seq_strand < 0 & Res$exon_seq_end > Res$tx_cds_seq_end),
-                 , drop=FALSE]
+        Res <- Res[(Res$seq_strand > 0 &
+                    Res$exon_seq_start <= Res$tx_cds_seq_start) |
+                   (Res$seq_strand < 0 &
+                    Res$exon_seq_end >= Res$tx_cds_seq_end),
+                 , drop = FALSE]
     } else {
         ## Other way round.
-        Res <- Res[(Res$seq_strand > 0 & Res$exon_seq_end > Res$tx_cds_seq_end) |
-                   (Res$seq_strand < 0 & Res$exon_seq_start < Res$tx_cds_seq_start),
-                 , drop=FALSE]
+        Res <- Res[(Res$seq_strand > 0 &
+                    Res$exon_seq_end >= Res$tx_cds_seq_end) |
+                   (Res$seq_strand < 0 &
+                    Res$exon_seq_start <= Res$tx_cds_seq_start),
+                 , drop = FALSE]
     }
     if (nrow(Res) == 0) {
         warning(paste0("No ", what, "UTR found!"))
@@ -1187,8 +1191,23 @@ getUTRsByTranscript <- function(x, what, columns = NULL,
     ## avoiding that the UTR overlaps the cds
     Res$tx_cds_seq_end <- Res$tx_cds_seq_end + 1L
     Res$tx_cds_seq_start <- Res$tx_cds_seq_start - 1L
-    utrStarts <- rep(0, nrow(Res))
-    utrEnds <- utrStarts
+    if (what == "five") {
+        utrStarts <- Res$tx_cds_seq_start
+        utrEnds <- utrStarts - 1L
+        rs <- which(Res$seq_strand != 1)
+        if (length(rs)) {
+            utrStarts[rs] <- Res$tx_cds_seq_end[rs]
+            utrEnds[rs] <- utrStarts[rs] -1L
+        }
+    } else {
+        utrStarts <- Res$tx_cds_seq_end
+        utrEnds <- utrStarts - 1L
+        rs <- which(Res$seq_strand != 1)
+        if (length(rs)) {
+            utrStarts[rs] <- Res$tx_cds_seq_start[rs]
+            utrEnds[rs] <- utrStarts[rs] -1L
+        }
+    }
     ## Distinguish between stuff which is left of and right of the CDS:
     ## Left of the CDS: can be either 5' for + strand or 3' for - strand.
     bm <- which(Res$exon_seq_start <= Res$tx_cds_seq_start)
