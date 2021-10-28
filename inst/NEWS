@@ -1,6 +1,7 @@
 Changes in version 2.19.1
 
-- Add column tx_name.
+- Add database column tx_name to store the external transcript names.
+- Update TxNameFilter to allow filtering on this database column.
 
 Changes in version 2.17.4
 
