@@ -320,7 +320,7 @@ addRequiredTables <- function(x, tab){
         ## add the columns needed for the filter
         filtercolumns <- unlist(lapply(filter, ensDbColumn, x))
         ## remove the prefix (column name for these)
-        filtercolumns <- sapply(filtercolumns, removePrefix, USE.NAMES = FALSE)
+        filtercolumns <- removePrefix(filtercolumns)
         columns <- unique(c(columns, filtercolumns))
     }
     ## 2) get all column names for the order.by:
@@ -344,7 +344,6 @@ addRequiredTables <- function(x, tab){
                                      startWith = startWith)
     ## b) the filter part of the query
     if (length(filter) > 0) {
-        ## USE THE ensDbQuery method here!!!
         filterquery <- paste0(" where ", ensDbQuery(filter, x,
                                                     with.tables = need.tables))
     } else {
@@ -376,15 +375,13 @@ addRequiredTables <- function(x, tab){
            )
 }
 
-
 ## remove the prefix again...
-removePrefix <- function(x, split=".", fixed=TRUE){
-    return(sapply(x, function(z){
+removePrefix <- function(x, split=".", fixed = TRUE) {
+    vapply(x, function(z) {
         tmp <- unlist(strsplit(z, split=split, fixed=fixed))
-        return(tmp[ length(tmp) ])
-    }))
+        tmp[length(tmp)]
+    }, character(1), USE.NAMES = FALSE)
 }
-
 
 ## just to add another layer; basically just calls buildQuery and executes the
 ## query
@@ -430,7 +427,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                          skip.order.check = skip.order.check, join = join,
                          startWith = startWith)
         ## Get the data
-        ## cat("Query: ", Q, "\n")
+        ## message("Query: ", Q, "\n")
         Res <- dbGetQuery(dbconn(x), Q)
         ## Note: we can only order by the columns that we did get back from the
         ## database; that might be different for the SQL sorting!
@@ -444,7 +441,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                          skip.order.check = skip.order.check, join = join,
                          startWith = startWith)
         ## Get the data
-        ## cat("Query: ", Q, "\n")
+        ## message("Query: ", Q, "\n")
         Res <- dbGetQuery(dbconn(x), Q)
     }
     if(any(columns == "tx_cds_seq_start")) {

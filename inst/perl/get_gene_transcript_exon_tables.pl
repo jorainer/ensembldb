@@ -287,7 +287,7 @@ foreach my $gene_id (@gene_ids){
       my $gc_count = ($seqs =~ tr/[G|C]//) / $seql * 100;
       my $tx_name = $transcript->external_name;
       if (!defined($tx_name)) {
-	$tx_name = "NULL";
+	$tx_name = "";
       }
       ## write info.
       print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\t$gc_count\t$tx_name\n";

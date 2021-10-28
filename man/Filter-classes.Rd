@@ -109,8 +109,10 @@ gene names.
 \item \code{GeneEndFilter}: filter based on the genomic end coordinate of genes.
 \item \code{EntrezidFilter}: filter based on the genes' NCBI Entrezgene ID.
 \item \code{TxIdFilter}: filter based on the Ensembld transcript ID.
-\item \code{TxNameFilter}: filter based on the Ensembld transcript ID; no transcript
-names are provided in \code{EnsDb} databases.
+\item \code{TxNameFilter}: filter based on the transcript name if available; if not
+available the data will be filtered on the transcript ID. The transcripts'
+\emph{external name} is used as transcript name, but not for all transcripts
+this information is provided in Ensembl's Core databases.
 \item \code{TxBiotypeFilter}: filter based on the transcripts' biotype.
 \item \code{TxStartFilter}: filter based on the genomic start coordinate of the
 transcripts.

@@ -381,3 +381,30 @@ setMethod("ensDbQuery", "TxSupportLevelFilter",
                        "can not be used.")
               .queryForEnsDbWithTables(object, db, with.tables)
           })
+
+setMethod("ensDbColumn", "TxNameFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  callNextMethod()
+              else {
+                  if (.has_tx_name(db))
+                      "tx.tx_name"
+                  else callNextMethod()
+              }
+          })
+
+setMethod("ensDbQuery", "TxNameFilter",
+          function(object, db, with.tables = character()) {
+              if (missing(db))
+                  callNextMethod()
+              else {
+                  if (.has_tx_name(db))
+                      paste("tx.tx_name", .conditionForEnsDb(object),
+                            .valueForEnsDb(object))
+                  else {
+                      warning("Column 'tx_name' not available in the database,",
+                              " using 'tx_id' instead.")
+                      callNextMethod()
+                  }
+              }
+          })

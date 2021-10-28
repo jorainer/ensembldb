@@ -39,29 +39,45 @@ setClass("EnsDb",
 #' package:
 #'
 #' - `GeneIdFilter`: filter based on the Ensembl gene ID.
+#'
 #' - `GeneNameFilter`: filter based on the name of the gene as provided
 #'   Ensembl. In most cases this will correspond to the official gene symbol.
+#'
 #' - `SymbolFilter` filter based on the gene names. `EnsDb` objects don't
 #'   have a dedicated *symbol* column, the filtering is hence based on the
 #'   gene names.
+#'
 #' - `GeneBiotype`: filter based on the biotype of genes (e.g.
 #'   `"protein_coding"`).
+#'
 #' - `GeneStartFilter`: filter based on the genomic start coordinate of genes.
+#'
 #' - `GeneEndFilter`: filter based on the genomic end coordinate of genes.
+#'
 #' - `EntrezidFilter`: filter based on the genes' NCBI Entrezgene ID.
+#'
 #' - `TxIdFilter`: filter based on the Ensembld transcript ID.
-#' - `TxNameFilter`: filter based on the Ensembld transcript ID; no transcript
-#'   names are provided in `EnsDb` databases.
+#'
+#' - `TxNameFilter`: filter based on the transcript name if available; if not
+#'   available the data will be filtered on the transcript ID. The transcripts'
+#'   *external name* is used as transcript name, but not for all transcripts
+#'   this information is provided in Ensembl's Core databases.
 #' - `TxBiotypeFilter`: filter based on the transcripts' biotype.
+#'
 #' - `TxStartFilter`: filter based on the genomic start coordinate of the
 #'   transcripts.
+#'
 #' - `TxEndFilter`: filter based on the genonic end coordinates of the
 #'   transcripts.
+#'
 #' - `ExonIdFilter`: filter based on Ensembl exon IDs.
+#'
 #' - `ExonRankFilter`: filter based on the index/rank of the exon within the
 #'   transcrips.
+#'
 #' - `ExonStartFilter`: filter based on the genomic start coordinates of the
 #'   exons.
+#'
 #' - `ExonEndFilter`: filter based on the genomic end coordinates of the exons.
 #'
 #' - `GRangesFilter`: Allows to fetch features within or overlapping specified
@@ -92,12 +108,15 @@ setClass("EnsDb",
 #'   more information.
 #'
 #' - `SeqNameFilter`: filter based on chromosome names.
+#'
 #' - `SeqStrandFilter`: filter based on the chromosome strand. The strand can
 #'   be specified with `value = "+"`, `value = "-"`, `value = -1` or
 #'   `value = 1`.
+#'
 #' - `ProteinIdFilter`: filter based on Ensembl protein IDs. This filter is
 #'   only supported if the `EnsDb` provides protein annotations; use the
 #'   [hasProteinData()] method to check.
+#'
 #' - `UniprotFilter`: filter based on Uniprot IDs. This filter is only
 #'   supported if the `EnsDb` provides protein annotations; use the
 #'   [hasProteinData()] method to check.

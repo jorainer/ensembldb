@@ -144,8 +144,7 @@
         clmn <- unlist(prefixColumns(db, clmn, with.tables = tables))
     }
     res <- paste(clmn, .conditionForEnsDb(x), .valueForEnsDb(x))
-    ## cat("  ", res, "\n")
-    return(res)
+    res
 }
 
 #' Simple helper function to convert expressions to AnnotationFilter or

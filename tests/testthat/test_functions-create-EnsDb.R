@@ -24,6 +24,7 @@ test_that("ensDbFromGRanges works", {
                                  version = "0.0.1", author = "J Rainer",
                                  maintainer = "")
     expect_true(ensembldb:::checkValidEnsDb(db))
+    expect_equal(ensDbColumn(TxNameFilter("a"), db), "tx.tx_name")
 })
 
 test_that("ensDbFromGtf and Gff works", {

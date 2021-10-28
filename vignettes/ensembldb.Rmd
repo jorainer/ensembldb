@@ -140,8 +140,10 @@ The supported filters are:
   the `listTxbiotypes` method to list all available biotypes.
 - `TxEndFilter`: filter using the chromosomal end coordinate of transcripts.
 - `TxIdFilter`: filter on the Ensembl transcript identifiers.
-- `TxNameFilter`: filter on the Ensembl transcript names (currently identical to
-  the transcript IDs).
+- `TxNameFilter`: filter on the Ensembl transcript names (if available). These
+  represent the *external name* of the transcripts as provided by Ensembl. The
+  data is filtered on the transcript IDs if no transcript names are available in
+  the database.
 - `TxStartFilter`: filter using the chromosomal start coordinate of transcripts.
 
 In addition to the above listed *DNA-RNA-based* filters, *protein-specific*

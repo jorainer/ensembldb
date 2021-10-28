@@ -112,7 +112,7 @@ test_that("ensDbColumn works", {
     expect_equal(unname(ensembldb:::ensDbColumn(fl)), "uniprot_mapping_type")
     expect_equal(unname(ensembldb:::ensDbColumn(fl, edb)),
                  "uniprot.uniprot_mapping_type")
-    expect_error(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))    
+    expect_error(unname(ensembldb:::ensDbColumn(fl, edb, "gene")))
 })
 
 test_that("ensDbQuery works", {
@@ -139,7 +139,7 @@ test_that("ensDbQuery works", {
     ##
     fl <- OnlyCodingTxFilter()
     expect_equal(ensembldb:::ensDbQuery(fl), "tx.tx_cds_seq_start is not null")
-    ## 
+    ##
     fL <- AnnotationFilterList(GeneIdFilter("a"),
                                TxBiotypeFilter("coding", condition = "!="),
                                GeneStartFilter(123, condition = "<"))
@@ -163,7 +163,7 @@ test_that("ensDbQuery works", {
     expect_equal(unname(ensembldb:::ensDbQuery(fl, edb)),
                  "protein.protein_id = 'a'")
     expect_equal(unname(ensembldb:::ensDbQuery(fl, edb, "uniprot")),
-                 "uniprot.protein_id = 'a'")    
+                 "uniprot.protein_id = 'a'")
     fl <- ProtDomIdFilter("a")
     expect_equal(ensembldb:::ensDbQuery(fl), "protein_domain_id = 'a'")
     expect_equal(ensembldb:::ensDbQuery(fl, edb),
@@ -209,7 +209,7 @@ test_that("ensDbQuery works for AnnotationFilterList", {
     afl <- AnnotationFilterList(gnf, snf, ssf, logicOp = c("|", "&"))
     Q <- ensembldb:::ensDbQuery(afl)
     expect_equal(Q, "(gene_name != 'BCL2' or seq_name = '4' and seq_strand = 1)")
-    
+
     ## Nested AnnotationFilterLists.
     afl1 <- AnnotationFilterList(GenenameFilter("BCL2"),
                                  GenenameFilter("BCL2L11"), logicOp = "|")
@@ -236,7 +236,7 @@ test_that("ensDbQuery works for AnnotationFilterList", {
                            "='18'))"))
     res <- dbGetQuery(dbconn(edb), paste0("select distinct gene_name from gene",
                                           " where ", Q))
-    expect_equal(res$gene_name, "BCL2")    
+    expect_equal(res$gene_name, "BCL2")
 })
 
 test_that("ensDbQuery works for SeqNameFilter", {
@@ -283,7 +283,7 @@ test_that("ensDbQuery works for GRangesFilter", {
     expect_equal(ensembldb:::ensDbQuery(F, edb),
                  paste0("(gene.gene_seq_start<=5 and gene.gene_seq_end",
                         ">=1 and gene.seq_name='a')"))
-    
+
     ## tx
     F <- GRangesFilter(value = gr, feature = "tx", type = "within")
     expect_equal(unname(ensembldb:::ensDbColumn(F)), c("tx_seq_start",
@@ -543,7 +543,7 @@ test_that("convertFilter works", {
     flt <- AnnotationFilter(~ genename == "BCL2")
     expect_equal(convertFilter(flt), "genename == 'BCL2'")
     expect_equal(convertFilter(flt, edb), "gene.gene_name = 'BCL2'")
-    
+
     flt_list <- AnnotationFilter(~ genename %in% c("BCL2", "BCL2L11") &
                                      tx_biotype == "protein_coding")
     expect_equal(
@@ -552,4 +552,10 @@ test_that("convertFilter works", {
     expect_equal(
         convertFilter(flt_list, edb),
         "(gene.gene_name in ('BCL2','BCL2L11') and tx.tx_biotype = 'protein_coding')")
+})
+
+test_that("ensDbColumns,TxNameFilter", {
+    txf <- TxNameFilter("bla")
+    expect_equal(unname(ensDbColumn(txf)), "tx_id")
+    expect_equal(ensDbColumn(txf, edb), "tx.tx_id")
 })

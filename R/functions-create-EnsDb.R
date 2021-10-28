@@ -167,6 +167,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
         })
         tmp$tx_support_level <- unlist(tsl, use.names = FALSE)
     }
+    if (any(colnames(tmp) == "tx_name"))
+        tmp$tx_name[which(tmp$tx_name == "")] <- NA_character_
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
     message("OK")
