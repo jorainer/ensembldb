@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.7: * Add column tx_name to transcript table.
 ## version 0.3.6: * Add column canonical_transcript to gene table.
 ## version 0.3.5: * Add column gc_content to transcript table.
 ## version 0.3.4: * Add columns gene_id_version and tx_id_version to the gene
@@ -34,7 +35,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.6";
+my $script_version = "0.3.7";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 
 ## connecting to the ENSEMBL data base
@@ -137,7 +138,7 @@ open(GENE , ">ens_gene.txt");
 print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\tdescription\tgene_id_version\tcanonical_transcript\n";
 
 open(TRANSCRIPT , ">ens_tx.txt");
-print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\tgc_content\n";
+print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\tgc_content\ttx_name\n";
 
 open(EXON , ">ens_exon.txt");
 print EXON "exon_id\texon_seq_start\texon_seq_end\n";
@@ -284,11 +285,12 @@ foreach my $gene_id (@gene_ids){
       my $seqs = $transcript->seq()->seq();
       my $seql = $transcript->length();
       my $gc_count = ($seqs =~ tr/[G|C]//) / $seql * 100;
-      # if (!defined($tx_description)) {
-      # 	$tx_description = "NULL";
-      # }
+      my $tx_name = $transcript->external_name;
+      if (!defined($tx_name)) {
+	$tx_name = "NULL";
+      }
       ## write info.
-      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\t$gc_count\n";
+      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\t$gc_count\t$tx_name\n";
 ##      print G2T "$gene_id\t$tx_id\n";
 
       ## Process proteins/translations (if possible)
@@ -368,7 +370,7 @@ print INFO "ensembl_host\t$host\n";
 print INFO "Organism\t$scientific_name\n";
 print INFO "taxonomy_id\t$taxonomy_id\n";
 print INFO "genome_build\t$coord_system_version\n";
-print INFO "DBSCHEMAVERSION\t2.1\n";
+print INFO "DBSCHEMAVERSION\t2.2\n";
 
 print COUNTS "$count_gene\t$count_tx\t$count_exon\t$count_protein\n";
 

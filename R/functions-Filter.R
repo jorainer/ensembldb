@@ -229,31 +229,6 @@ isProteinFilter <- function(x) {
                is(x, "UniprotMappingTypeFilter"))
 }
 
-## ############################################################
-## ## checkFilter:
-## ##
-## ## checks the filter argument and ensures that a list of Filter
-## ## object is returned
-## checkFilter <- function(x){
-##     if(is(x, "list")){
-##         if(length(x) == 0)
-##             return(x)
-##         ## check if all elements are Filter classes.
-##         if(!all(unlist(lapply(x, function(z){
-##             return((is(z, "AnnotationFilter") | is(z, "GRangesFilter")))
-##         }), use.names = FALSE)))
-##             stop("One of more elements in 'filter' are not filter objects!")
-##     }else{
-##         if(is(x, "AnnotationFilter") | is(x, "GRangesFilter")){
-##             x <- list(x)
-##         }else{
-##             stop("'filter' has to be a filter object or a list of",
-##                  " filter objects!")
-##         }
-##     }
-##     return(x)
-## }
-
 #' build the \emph{where} query for a \code{GRangedFilter}. Supported conditions
 #' are: \code{"start"}, \code{"end"}, \code{"equal"}, \code{"within"},
 #' \code{"any"}.

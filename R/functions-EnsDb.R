@@ -9,7 +9,7 @@
 #' @details Adding a filter to an \code{EnsDb} object causes this filter to be
 #'     permanently active. The filter will be used for all queries to the
 #'     databases and is added to all additional filters passed to the methods.
-#' 
+#'
 #' @param x An \code{EnsDb} object on which the filter(s) should be set.
 #'
 #' @param filter An \code{\link[AnnotationFilter]{AnnotationFilterList}},
@@ -63,10 +63,10 @@
 
 
 #' @aliases filter
-#' 
+#'
 #' @description \code{filter} filters an \code{EnsDb} object. \code{filter} is
 #'     an alias for the \code{addFilter} function.
-#' 
+#'
 #' @rdname global-filters
 filter <- function(x, filter = AnnotationFilterList()) {
     if (is(x, "EnsDb"))
@@ -75,4 +75,10 @@ filter <- function(x, filter = AnnotationFilterList()) {
         stop("ensembldb::filter requires an 'EnsDb' object as input. To call ",
              "the filter function from the stats or dplyr package use ",
              "stats::filter and dplyr::filter instead.")
+}
+
+.has_tx_name <- function(x) {
+    if (!is.na(res <- getProperty(x, "has_tx_name")))
+        res
+    else FALSE
 }

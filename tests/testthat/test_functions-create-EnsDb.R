@@ -15,7 +15,10 @@ test_that("ensDbFromGRanges works", {
                                organism="Homo_sapiens", skip = TRUE)
     )
     db <- EnsDb(DB)
+    expect_true(.has_tx_name(db))
     expect_equal(unname(genome(db)), "GRCh37")
+    txs <- transcripts(db)
+    expect_true(all(txs$tx_id != txs$tx_name))
 
     Test <- makeEnsembldbPackage(DB, destDir = tempdir(),
                                  version = "0.0.1", author = "J Rainer",

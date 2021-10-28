@@ -17,14 +17,14 @@
 #' privileges on a MySQL server, in which case the \code{\link{useMySQL}}
 #' method can be used to insert the annotations from an EnsDB package into
 #' a MySQL database.
-#' 
+#'
 #' @param x Either a character specifying the \emph{SQLite} database file, or
 #'     a \code{DBIConnection} to e.g. a MariaDB/MySQL database.
-#' 
+#'
 #' @return A \code{\linkS4class{EnsDb}} object.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @examples
 #' ## "Standard" way to create an EnsDb object:
 #' library(EnsDb.Hsapiens.v86)
@@ -76,6 +76,7 @@ EnsDb <- function(x){
     names(Tables) <- tables
     EDB <- new("EnsDb", ensdb = con, tables = Tables)
     EDB <- setProperty(EDB, dbSeqlevelsStyle="Ensembl")
+    EDB <- setProperty(EDB, has_tx_name = any(Tables$tx == "tx_name"))
     ## Add the db schema version to the properties.
     EDB <- setProperty(EDB, DBSCHEMAVERSION =
                                 .getMetaDataValue(con, "DBSCHEMAVERSION"))
@@ -89,13 +90,6 @@ EnsDb <- function(x){
         stop(OK)
     EDB
 }
-
-## loadEnsDb <- function(x) {
-##     ## con <- ensDb( x )
-##     ## EDB <- new( "EnsDb", ensdb=con )
-##     return(EnsDb(x))
-## }
-
 
 ## x is the connection to the database, name is the name of the entry to fetch
 .getMetaDataValue <- function(x, name){
@@ -400,13 +394,17 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                      order.type = "asc", group.by = NULL,
                      skip.order.check = FALSE, join = "suggested",
                      startWith = NULL) {
+    has_tx_name <- .has_tx_name(x)
     ## That's nasty stuff; for now we support the column tx_name, which we however
     ## don't have in the database. Thus, we are querying everything except that
     ## column and filling it later with the values from tx_id.
     fetchColumns <- columns
-    if(any(columns == "tx_name"))
-        fetchColumns <- unique(c("tx_id",
-                                 fetchColumns[fetchColumns != "tx_name"]))
+    if(any(columns == "tx_name")) {
+        if (has_tx_name) fetchColumns <- unique(c("tx_id", fetchColumns))
+        else
+            fetchColumns <- unique(
+                c("tx_id", fetchColumns[fetchColumns != "tx_name"]))
+    }
     if (!is(filter, "AnnotationFilterList"))
         stop("parameter 'filter' has to be an 'AnnotationFilterList'!")
     ## Add also the global filter if present.
@@ -449,7 +447,6 @@ removePrefix <- function(x, split=".", fixed=TRUE){
         ## cat("Query: ", Q, "\n")
         Res <- dbGetQuery(dbconn(x), Q)
     }
-    ## cat("Query:\n", Q, "\n")
     if(any(columns == "tx_cds_seq_start")) {
         if (!is.integer(Res[, "tx_cds_seq_start"])) {
             suppressWarnings(
@@ -466,7 +463,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                 ## column contains "NULL" if not defined and coordinates are
                 ## characters as.numeric transforms "NULL" into NA, and ensures
                 ## coords are numeric.
-                Res[ , "tx_cds_seq_end" ] <- as.integer(Res[ , "tx_cds_seq_end" ])
+                Res[ , "tx_cds_seq_end" ] <- as.integer(Res[ , "tx_cds_seq_end"])
             )
         }
     }
@@ -481,7 +478,7 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                 Res[, the_col] <- as.integer(Res[, the_col])
     }
     ## Resolving the "symlinks" again.
-    if(any(columns == "tx_name")) {
+    if (any(columns == "tx_name") && !has_tx_name) {
         Res <- data.frame(Res, tx_name = Res$tx_id, stringsAsFactors = FALSE)
     }
     if(any(columns == "symbol")) {
@@ -526,6 +523,40 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                               chromosome = c("seq_name", "seq_length",
                                              "is_circular"),
                               entrezgene = c("gene_id", "entrezid"),
+                              metadata = c("name", "value")),
+                          `2.1` = list(
+                              gene = c("gene_id", "gene_name",
+                                       "gene_biotype", "gene_seq_start",
+                                       "gene_seq_end", "seq_name", "seq_strand",
+                                       "seq_coord_system", "description",
+                                       "gene_id_version",
+                                       "canonical_transcript"),
+                              tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                                     "tx_seq_end", "tx_cds_seq_start",
+                                     "tx_cds_seq_end", "gene_id"),
+                              tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                              exon = c("exon_id", "exon_seq_start",
+                                       "exon_seq_end"),
+                              chromosome = c("seq_name", "seq_length",
+                                             "is_circular"),
+                              entrezgene = c("gene_id", "entrezid"),
+                              metadata = c("name", "value")),
+                          `2.2` = list(
+                              gene = c("gene_id", "gene_name",
+                                       "gene_biotype", "gene_seq_start",
+                                       "gene_seq_end", "seq_name", "seq_strand",
+                                       "seq_coord_system", "description",
+                                       "gene_id_version",
+                                       "canonical_transcript"),
+                              tx = c("tx_id", "tx_biotype", "tx_seq_start",
+                                     "tx_seq_end", "tx_cds_seq_start",
+                                     "tx_cds_seq_end", "tx_name", "gene_id"),
+                              tx2exon = c("tx_id", "exon_id", "exon_idx"),
+                              exon = c("exon_id", "exon_seq_start",
+                                       "exon_seq_end"),
+                              chromosome = c("seq_name", "seq_length",
+                                             "is_circular"),
+                              entrezgene = c("gene_id", "entrezid"),
                               metadata = c("name", "value"))
                           )
     .ENSDB_TABLES[[version]]
@@ -554,16 +585,28 @@ removePrefix <- function(x, split=".", fixed=TRUE){
                                                          "protein_domain_source",
                                                          "interpro_accession",
                                                          "prot_dom_start",
+                                                         "prot_dom_end")),
+                                  `2.1` = list(
+                                      protein = c("tx_id", "protein_id",
+                                                  "protein_sequence"),
+                                      uniprot = c("protein_id", "uniprot_id",
+                                                  "uniprot_db",
+                                                  "uniprot_mapping_type"),
+                                      protein_domain = c("protein_id",
+                                                         "protein_domain_id",
+                                                         "protein_domain_source",
+                                                         "interpro_accession",
+                                                         "prot_dom_start",
                                                          "prot_dom_end"))
                                   )
     .ENSDB_PROTEIN_TABLES[[version]]
 }
-    
+
 #' @description Extract the database schema version if available in the metadata
 #'     database column.
 #'
 #' @param x Can be either a connection object or an \code{EnsDb} object.
-#' 
+#'
 #' @noRd
 dbSchemaVersion <- function(x) {
     if (is(x, "EnsDb")) {
@@ -703,7 +746,8 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
     idxType <- c(chromosome = "unique", gene = "unique", gene = "", gene = "",
                  tx = "unique", tx = "", exon = "unique", tx2exon = "",
                  tx2exon = "")
-    if (as.numeric(dbSchemaVersion(con)) > 1) {
+    tbls <- dbListTables(con)
+    if (any(tbls == "entrezgene")) {
         indexCols <- c(indexCols,
                        entrezgene = "gene_id", entrezgene = "entrezid")
         idxType <- c(idxType, entrezgene = "", entrezgene = "")
@@ -748,27 +792,27 @@ feedEnsDb2MySQL <- function(x, mysql, verbose = TRUE) {
 #' method. EnsDb databases in a MariaDB/MySQL server follow the same naming
 #' conventions than EnsDb packages, with the exception that the name is all
 #' lower case and that each \code{"."} is replaced by \code{"_"}.
-#' 
+#'
 #' @param dbcon A \code{DBIConnection} object providing access to a
 #'     MariaDB/MySQL database. Either \code{dbcon} or all of the other
 #'     arguments have to be specified.
-#' 
+#'
 #' @param host Character specifying the host on which the MySQL server is
 #'     running.
-#' 
+#'
 #' @param port The port of the MariaDB/MySQL server (usually \code{3306}).
-#' 
+#'
 #' @param user The username for the MariaDB/MySQL server.
-#' 
+#'
 #' @param pass The password for the MariaDB/MySQL server.
-#' 
+#'
 #' @return A \code{data.frame} listing the database names, organism name
 #'     and Ensembl version of the EnsDb databases found on the server.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @seealso \code{\link{useMySQL}}
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(RMariaDB)
@@ -811,4 +855,3 @@ listEnsDbs <- function(dbcon, host, port, user, pass) {
         return("and")
     return(NULL)
 }
-
