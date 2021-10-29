@@ -29,7 +29,7 @@ EnsDb object."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/li
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.1</span>
       </span>
     </div>
 
@@ -163,8 +163,10 @@ gene names.</p></li>
 <li><p><code>GeneEndFilter</code>: filter based on the genomic end coordinate of genes.</p></li>
 <li><p><code>EntrezidFilter</code>: filter based on the genes' NCBI Entrezgene ID.</p></li>
 <li><p><code>TxIdFilter</code>: filter based on the Ensembld transcript ID.</p></li>
-<li><p><code>TxNameFilter</code>: filter based on the Ensembld transcript ID; no transcript
-names are provided in <code>EnsDb</code> databases.</p></li>
+<li><p><code>TxNameFilter</code>: filter based on the transcript name if available; if not
+available the data will be filtered on the transcript ID. The transcripts'
+<em>external name</em> is used as transcript name, but not for all transcripts
+this information is provided in Ensembl's Core databases.</p></li>
 <li><p><code>TxBiotypeFilter</code>: filter based on the transcripts' biotype.</p></li>
 <li><p><code>TxStartFilter</code>: filter based on the genomic start coordinate of the
 transcripts.</p></li>
