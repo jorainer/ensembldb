@@ -109,6 +109,8 @@ names of all filters and the corresponding field supported by the
 
 <span class="fu">TxSupportLevelFilter</span><span class="op">(</span><span class="va">value</span>, condition <span class="op">=</span> <span class="st">"=="</span><span class="op">)</span>
 
+<span class="fu">TxExternalNameFilter</span><span class="op">(</span><span class="va">value</span>, condition <span class="op">=</span> <span class="st">"=="</span><span class="op">)</span>
+
 <span class="co"># S4 method for GRangesFilter</span>
 <span class="fu">seqnames</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 
@@ -145,6 +147,7 @@ For <code>ProteinDomainSourceFilter</code>: A <code>ProteinDomainSourceFilter</c
 For <code>UniprotDbFilter</code>: A <code>UniprotDbFilter</code> object.
 For <code>UniprotMappingTypeFilter</code>: A <code>UniprotMappingTypeFilter</code> object.
 For <code>TxSupportLevel</code>: A <code>TxSupportLevel</code> object.
+For <code>TxExternalNameFilter</code>: A <code>TxExternalNameFilter</code> object.
 For <code>supportedFilters</code>: a <code>data.frame</code> with the names and
 the corresponding field of the supported filter classes.</p>
     </div>
@@ -163,10 +166,13 @@ gene names.</p></li>
 <li><p><code>GeneEndFilter</code>: filter based on the genomic end coordinate of genes.</p></li>
 <li><p><code>EntrezidFilter</code>: filter based on the genes' NCBI Entrezgene ID.</p></li>
 <li><p><code>TxIdFilter</code>: filter based on the Ensembld transcript ID.</p></li>
-<li><p><code>TxNameFilter</code>: filter based on the transcript name if available; if not
-available the data will be filtered on the transcript ID. The transcripts'
-<em>external name</em> is used as transcript name, but not for all transcripts
-this information is provided in Ensembl's Core databases.</p></li>
+<li><p><code>TxNameFilter</code>: to be compliant with <code>TxDb</code> object from the
+<code>GenomicFeatures</code> package <code>tx_name</code> in fact represents the Ensembl
+transcript ID. Thus, the the <code>tx_id</code> and <code>tx_name</code> columns contain the
+same information and the <code>TxIdFilter</code> and <code>TxNameFilter</code> are in fact
+identical. The names of transcripts (i.e. the <em>external name</em> field in
+Ensembl are stored in column <code>"tx_external_name"</code> (and which can be
+filtered using the <code>TxExternalNameFilter</code>.</p></li>
 <li><p><code>TxBiotypeFilter</code>: filter based on the transcripts' biotype.</p></li>
 <li><p><code>TxStartFilter</code>: filter based on the genomic start coordinate of the
 transcripts.</p></li>
@@ -210,7 +216,9 @@ only supported if the <code>EnsDb</code> provides protein annotations; use the
 <li><p><code>UniprotFilter</code>: filter based on Uniprot IDs. This filter is only
 supported if the <code>EnsDb</code> provides protein annotations; use the
 <code><a href="hasProteinData-EnsDb-method.html">hasProteinData()</a></code> method to check.</p></li>
-</ul><p>In addition, the following filters are defined by <code>ensembldb</code>:</p><ul><li><p><code>TxSupportLevel</code>: allows to filter results using the provided transcript
+</ul><p>In addition, the following filters are defined by <code>ensembldb</code>:</p><ul><li><p><code>TxExternalNameFilter</code>: filter based on the transcript's <em>external name</em>
+(if available).</p></li>
+<li><p><code>TxSupportLevel</code>: allows to filter results using the provided transcript
 support level. Support levels for transcripts are defined by Ensembl
 based on the available evidences for a transcript with 1 being the
 highest evidence grade and 5 the lowest level. This filter is only

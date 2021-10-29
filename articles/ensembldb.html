@@ -225,7 +225,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <li>
 <code>TxIdFilter</code>: filter on the Ensembl transcript identifiers.</li>
 <li>
-<code>TxNameFilter</code>: filter on the Ensembl transcript names (if available). These represent the <em>external name</em> of the transcripts as provided by Ensembl. The data is filtered on the transcript IDs if no transcript names are available in the database.</li>
+<code>TxNameFilter</code>: to be compliant with <code>TxDb</code> annotation resources from the <code>GenomicFeatures</code> package, the <code>tx_name</code> database column contains also the transcript IDs and hence the <code>TxNameFilter</code> is identical to the <code>TxIdFilter</code>. Transcript names (<em>external name</em> in the Ensembl databases) are provided in column <code>"tx_external_name"</code>.</li>
+<li>
+<code>TxExternalNameFilter</code>: filter based on the <em>transcript names</em> which are provided by Ensembl with the <em>external name</em> attribute (or are listed in the <code>"transcript_name"</code> field in GTF files.</li>
 <li>
 <code>TxStartFilter</code>: filter using the chromosomal start coordinate of transcripts.</li>
 </ul>
@@ -1482,7 +1484,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## |Supporting package: ensembldb</span>
 <span class="co">## |Db created by: ensembldb package from Bioconductor</span>
 <span class="co">## |script_version: 0.0.1</span>
-<span class="co">## |Creation time: Fri Oct 29 06:28:08 2021</span>
+<span class="co">## |Creation time: Fri Oct 29 14:04:30 2021</span>
 <span class="co">## |ensembl_version: 75</span>
 <span class="co">## |ensembl_host: unknown</span>
 <span class="co">## |Organism: Homo_sapiens</span>
@@ -1519,7 +1521,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The database consists of the following tables and attributes (the layout is also shown in Figure <a href="#orgfe7e95a">165</a>). Note that the protein-specific annotations might not be available in all <code>EnsDB</code> databases (e.g. such ones created with <code>ensembldb</code> version &lt; 1.7 or created from GTF or GFF files).</p>
 <ul>
 <li>
-<p><strong>gene</strong>: all gene specific annotations.</p>
+<strong>gene</strong>: all gene specific annotations.
 <ul>
 <li>
 <code>gene_id</code>: the Ensembl ID of the gene.</li>
@@ -1542,7 +1544,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>entrezgene</strong>: mapping of Ensembl genes to NCBI Entrezgene identifiers. Note that this mapping can be a one-to-many mapping.</p>
+<strong>entrezgene</strong>: mapping of Ensembl genes to NCBI Entrezgene identifiers. Note that this mapping can be a one-to-many mapping.
 <ul>
 <li>
 <code>gene_id</code>: the Ensembl gene ID.</li>
@@ -1551,29 +1553,24 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>tx</strong>: all transcript related annotations. Note that while no <code>tx_name</code> column is available in this database column, all methods to retrieve data from the database support also this column. The returned values are however the ID of the transcripts.</p>
+<strong>tx</strong>: all transcript related annotations. Note that while no <code>tx_name</code> column is available in this database column, all methods to retrieve data from the database support also this column. The returned values are however the ID of the transcripts.
 <ul>
+<li><p><code>tx_id</code>: the Ensembl transcript ID.</p></li>
+<li><p><code>tx_biotype</code>: the biotype of the transcript.</p></li>
+<li><p><code>tx_seq_start</code>: the start coordinate of the transcript.</p></li>
+<li><p><code>tx_seq_end</code>: the end coordinate of the transcript.</p></li>
+<li><p><code>tx_cds_seq_start</code>: the start coordinate of the coding region of the transcript (NULL for non-coding transcripts).</p></li>
+<li><p><code>tx_cds_seq_end</code>: the end coordinate of the coding region of the transcript.</p></li>
+<li><p><code>tx_external_name</code>: the <em>external name</em> of the transcript.</p></li>
+<li><p><code>gc_count</code>: from Ensembl release 98 on, the <strong>tx</strong> table contains also a column <code>gc_count</code> providing the transcript’s G-C content expressed as a percentage.</p></li>
 <li>
-<code>tx_id</code>: the Ensembl transcript ID.</li>
-<li>
-<code>tx_biotype</code>: the biotype of the transcript.</li>
-<li>
-<code>tx_seq_start</code>: the start coordinate of the transcript.</li>
-<li>
-<code>tx_seq_end</code>: the end coordinate of the transcript.</li>
-<li>
-<code>tx_cds_seq_start</code>: the start coordinate of the coding region of the transcript (NULL for non-coding transcripts).</li>
-<li>
-<code>tx_cds_seq_end</code>: the end coordinate of the coding region of the transcript.</li>
-<li>
-<code>gc_count</code>: from Ensembl release 98 on, the <strong>tx</strong> table contains also a column <code>gc_count</code> providing the transcript’s G-C content expressed as a percentage.</li>
-<li>
-<code>gene_id</code>: the gene to which the transcript belongs.</li>
-</ul>
+<p><code>gene_id</code>: the gene to which the transcript belongs.</p>
 <p><code>EnsDb</code> databases for more recent Ensembl releases have also a column <code>tx_support_level</code> providing the evidence level for a transcript (1 high evidence, 5 low evidence, NA no evidence calculated).</p>
 </li>
+</ul>
+</li>
 <li>
-<p><strong>exon</strong>: all exon related annotation.</p>
+<strong>exon</strong>: all exon related annotation.
 <ul>
 <li>
 <code>exon_id</code>: the Ensembl exon ID.</li>
@@ -1584,7 +1581,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>tx2exon</strong>: provides the n:m mapping between transcripts and exons.</p>
+<strong>tx2exon</strong>: provides the n:m mapping between transcripts and exons.
 <ul>
 <li>
 <code>tx_id</code>: the Ensembl transcript ID.</li>
@@ -1595,7 +1592,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>chromosome</strong>: provides some information about the chromosomes.</p>
+<strong>chromosome</strong>: provides some information about the chromosomes.
 <ul>
 <li>
 <code>seq_name</code>: the name of the sequence/chromosome.</li>
@@ -1606,7 +1603,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>protein</strong>: provides protein annotation for a (coding) transcript.</p>
+<strong>protein</strong>: provides protein annotation for a (coding) transcript.
 <ul>
 <li>
 <code>protein_id</code>: the Ensembl protein ID.</li>
@@ -1617,7 +1614,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>uniprot</strong>: provides the mapping from Ensembl protein ID(s) to Uniprot ID(s). Not all Ensembl proteins are annotated to Uniprot IDs, also, each Ensembl protein might be mapped to multiple Uniprot IDs.</p>
+<strong>uniprot</strong>: provides the mapping from Ensembl protein ID(s) to Uniprot ID(s). Not all Ensembl proteins are annotated to Uniprot IDs, also, each Ensembl protein might be mapped to multiple Uniprot IDs.
 <ul>
 <li>
 <code>protein_id</code>: the Ensembl protein ID.</li>
@@ -1630,7 +1627,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>protein_domain</strong>: provides protein domain annotations and mapping to proteins.</p>
+<strong>protein_domain</strong>: provides protein domain annotations and mapping to proteins.
 <ul>
 <li>
 <code>protein_id</code>: the Ensembl protein ID on which the protein domain is present.</li>
@@ -1647,14 +1644,14 @@ document.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li>
-<p><strong>metadata</strong>: some additional, internal, informations (Genome build, Ensembl version etc).</p>
+<strong>metadata</strong>: some additional, internal, informations (Genome build, Ensembl version etc).
 <ul>
 <li><code>name</code></li>
 <li><code>value</code></li>
 </ul>
 </li>
 <li>
-<p><em>virtual</em> columns:</p>
+<em>virtual</em> columns:
 <ul>
 <li>
 <code>symbol</code>: the database does not have such a database column, but it is still possible to use it in the <code>columns</code> parameter. This column is <em>symlinked</em> to the <code>gene_name</code> column.</li>
