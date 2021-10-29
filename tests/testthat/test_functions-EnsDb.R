@@ -57,6 +57,6 @@ test_that(".addFilter .dropFilter and .activeFilter work", {
     expect_equal(activeFilter(edb_2), NA)
 })
 
-test_that(".has_tx_name works", {
-    expect_false(.has_tx_name(edb))
+test_that(".has_tx_external_name works", {
+    expect_false(.has_tx_external_name(edb))
 })

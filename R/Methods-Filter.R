@@ -382,29 +382,24 @@ setMethod("ensDbQuery", "TxSupportLevelFilter",
               .queryForEnsDbWithTables(object, db, with.tables)
           })
 
-setMethod("ensDbColumn", "TxNameFilter",
+setMethod("ensDbColumn", "TxExternalNameFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
-                  callNextMethod()
-              else {
-                  if (.has_tx_name(db))
-                      "tx.tx_name"
-                  else callNextMethod()
-              }
+                  return(callNextMethod())
+              if (!.has_tx_external_name(db))
+                  stop("The 'EnsDb' database does not contain external ",
+                       "transcript names. A 'TxExternalNameFilter' can not ",
+                       "be used.")
+              callNextMethod()
           })
 
-setMethod("ensDbQuery", "TxNameFilter",
+setMethod("ensDbQuery", "TxExternalNameFilter",
           function(object, db, with.tables = character()) {
               if (missing(db))
-                  callNextMethod()
-              else {
-                  if (.has_tx_name(db))
-                      paste("tx.tx_name", .conditionForEnsDb(object),
-                            .valueForEnsDb(object))
-                  else {
-                      warning("Column 'tx_name' not available in the database,",
-                              " using 'tx_id' instead.")
-                      callNextMethod()
-                  }
-              }
+                  return(callNextMethod())
+              if (!.has_tx_external_name(db))
+                  stop("The 'EnsDb' database does not contain external ",
+                       "transcript names. A 'TxExternalNameFilter' can not ",
+                       "be used.")
+              .queryForEnsDbWithTables(object, db, with.tables)
           })

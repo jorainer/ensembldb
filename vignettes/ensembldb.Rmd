@@ -140,10 +140,14 @@ The supported filters are:
   the `listTxbiotypes` method to list all available biotypes.
 - `TxEndFilter`: filter using the chromosomal end coordinate of transcripts.
 - `TxIdFilter`: filter on the Ensembl transcript identifiers.
-- `TxNameFilter`: filter on the Ensembl transcript names (if available). These
-  represent the *external name* of the transcripts as provided by Ensembl. The
-  data is filtered on the transcript IDs if no transcript names are available in
-  the database.
+- `TxNameFilter`: to be compliant with `TxDb` annotation resources from the
+  `GenomicFeatures` package, the `tx_name` database column contains also the
+  transcript IDs and hence the `TxNameFilter` is identical to the
+  `TxIdFilter`. Transcript names (*external name* in the Ensembl databases) are
+  provided in column `"tx_external_name"`.
+- `TxExternalNameFilter`: filter based on the *transcript names* which are
+  provided by Ensembl with the *external name* attribute (or are listed in the
+  `"transcript_name"` field in GTF files.
 - `TxStartFilter`: filter using the chromosomal start coordinate of transcripts.
 
 In addition to the above listed *DNA-RNA-based* filters, *protein-specific*
@@ -1041,42 +1045,42 @@ shown in Figure [165](#orgfe7e95a)). Note that the protein-specific annotations
 might not be available in all `EnsDB` databases (e.g. such ones created with
 `ensembldb` version < 1.7 or created from GTF or GFF files).
 
--   **gene**: all gene specific annotations.
-    -   `gene_id`: the Ensembl ID of the gene.
-    -   `gene_name`: the name (symbol) of the gene.
-    -   `gene_biotype`: the biotype of the gene.
-    -   `gene_seq_start`: the start coordinate of the gene on the sequence (usually
-        a chromosome).
-    -   `gene_seq_end`: the end coordinate of the gene on the sequence.
-    -   `seq_name`: the name of the sequence (usually the chromosome name).
-    -   `seq_strand`: the strand on which the gene is encoded.
-    -   `seq_coord_system`: the coordinate system of the sequence.
-    -   `description`: the description of the gene.
+- **gene**: all gene specific annotations.
+  - `gene_id`: the Ensembl ID of the gene.
+  - `gene_name`: the name (symbol) of the gene.
+  - `gene_biotype`: the biotype of the gene.
+  - `gene_seq_start`: the start coordinate of the gene on the sequence (usually
+     a chromosome).
+  - `gene_seq_end`: the end coordinate of the gene on the sequence.
+  - `seq_name`: the name of the sequence (usually the chromosome name).
+  - `seq_strand`: the strand on which the gene is encoded.
+  - `seq_coord_system`: the coordinate system of the sequence.
+  - `description`: the description of the gene.
 
--   **entrezgene**: mapping of Ensembl genes to NCBI Entrezgene identifiers. Note that
-    this mapping can be a one-to-many mapping.
-    -   `gene_id`: the Ensembl gene ID.
-    -   `entrezid`: the NCBI Entrezgene ID.
+- **entrezgene**: mapping of Ensembl genes to NCBI Entrezgene identifiers. Note
+  that this mapping can be a one-to-many mapping.
+  - `gene_id`: the Ensembl gene ID.
+  - `entrezid`: the NCBI Entrezgene ID.
 
--   **tx**: all transcript related annotations. Note that while no `tx_name` column
-    is available in this database column, all methods to retrieve data from the
-    database support also this column. The returned values are however the ID of
-    the transcripts.
+- **tx**: all transcript related annotations. Note that while no `tx_name`
+  column is available in this database column, all methods to retrieve data from
+  the database support also this column. The returned values are however the ID
+  of the transcripts.
+  - `tx_id`: the Ensembl transcript ID.
+  - `tx_biotype`: the biotype of the transcript.
+  - `tx_seq_start`: the start coordinate of the transcript.
+  - `tx_seq_end`: the end coordinate of the transcript.
+  - `tx_cds_seq_start`: the start coordinate of the coding region of the
+     transcript (NULL for non-coding transcripts).
+  - `tx_cds_seq_end`: the end coordinate of the coding region of the
+     transcript.
+  - `tx_external_name`: the *external name* of the transcript.
+  - `gc_count`: from Ensembl release 98 on, the **tx** table contains also a
+    column `gc_count` providing the transcript's G-C content expressed as a
+    percentage.
+  - `gene_id`: the gene to which the transcript belongs.
 
-    -   `tx_id`: the Ensembl transcript ID.
-    -   `tx_biotype`: the biotype of the transcript.
-    -   `tx_seq_start`: the start coordinate of the transcript.
-    -   `tx_seq_end`: the end coordinate of the transcript.
-    -   `tx_cds_seq_start`: the start coordinate of the coding region of the
-        transcript (NULL for non-coding transcripts).
-    -   `tx_cds_seq_end`: the end coordinate of the coding region of the
-        transcript.
-	-   `gc_count`: from Ensembl release 98 on, the **tx** table contains also a
-	    column `gc_count` providing the transcript's G-C content expressed as a
-	    percentage.
-    -   `gene_id`: the gene to which the transcript belongs.
-
-    `EnsDb` databases for more recent Ensembl releases have also a column
+	`EnsDb` databases for more recent Ensembl releases have also a column
     `tx_support_level` providing the evidence level for a transcript (1 high
     evidence, 5 low evidence, NA no evidence calculated).
 

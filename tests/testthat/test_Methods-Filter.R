@@ -559,3 +559,17 @@ test_that("ensDbColumns,TxNameFilter", {
     expect_equal(unname(ensDbColumn(txf)), "tx_id")
     expect_equal(ensDbColumn(txf, edb), "tx.tx_id")
 })
+
+test_that("ensDbColumns,TxExternalNameFilter", {
+    txf <- TxExternalNameFilter("bla")
+    expect_equal(unname(ensDbColumn(txf)), "tx_external_name")
+    expect_error(ensDbColumn(txf, edb), "does not contain")
+    ## Other tests in "ensDbFromGRanges works" in test_functions-create-EnsDb.R
+})
+
+test_that("ensDbQuery,TxExternalNameFilter", {
+    txf <- TxExternalNameFilter("bla")
+    expect_equal(unname(ensDbQuery(txf)), "tx_external_name = 'bla'")
+    expect_error(ensDbQuery(txf, edb), "does not contain")
+    ## Other tests in "ensDbFromGRanges works" in test_functions-create-EnsDb.R
+})

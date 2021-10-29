@@ -77,8 +77,6 @@ filter <- function(x, filter = AnnotationFilterList()) {
              "stats::filter and dplyr::filter instead.")
 }
 
-.has_tx_name <- function(x) {
-    if (!is.na(res <- getProperty(x, "has_tx_name")))
-        res
-    else FALSE
+.has_tx_external_name <- function(x) {
+    any(listTables(x)$tx == "tx_external_name")
 }

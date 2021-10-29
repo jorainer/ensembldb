@@ -76,7 +76,6 @@ EnsDb <- function(x){
     names(Tables) <- tables
     EDB <- new("EnsDb", ensdb = con, tables = Tables)
     EDB <- setProperty(EDB, dbSeqlevelsStyle="Ensembl")
-    EDB <- setProperty(EDB, has_tx_name = any(Tables$tx == "tx_name"))
     ## Add the db schema version to the properties.
     EDB <- setProperty(EDB, DBSCHEMAVERSION =
                                 .getMetaDataValue(con, "DBSCHEMAVERSION"))
@@ -391,17 +390,13 @@ removePrefix <- function(x, split=".", fixed = TRUE) {
                      order.type = "asc", group.by = NULL,
                      skip.order.check = FALSE, join = "suggested",
                      startWith = NULL) {
-    has_tx_name <- .has_tx_name(x)
     ## That's nasty stuff; for now we support the column tx_name, which we however
     ## don't have in the database. Thus, we are querying everything except that
     ## column and filling it later with the values from tx_id.
     fetchColumns <- columns
-    if(any(columns == "tx_name")) {
-        if (has_tx_name) fetchColumns <- unique(c("tx_id", fetchColumns))
-        else
-            fetchColumns <- unique(
-                c("tx_id", fetchColumns[fetchColumns != "tx_name"]))
-    }
+    if(any(columns == "tx_name"))
+        fetchColumns <- unique(
+            c("tx_id", fetchColumns[fetchColumns != "tx_name"]))
     if (!is(filter, "AnnotationFilterList"))
         stop("parameter 'filter' has to be an 'AnnotationFilterList'!")
     ## Add also the global filter if present.
@@ -475,12 +470,10 @@ removePrefix <- function(x, split=".", fixed = TRUE) {
                 Res[, the_col] <- as.integer(Res[, the_col])
     }
     ## Resolving the "symlinks" again.
-    if (any(columns == "tx_name") && !has_tx_name) {
+    if (any(columns == "tx_name"))
         Res <- data.frame(Res, tx_name = Res$tx_id, stringsAsFactors = FALSE)
-    }
-    if(any(columns == "symbol")) {
+    if(any(columns == "symbol"))
         Res <- data.frame(Res, symbol = Res$gene_name, stringsAsFactors = FALSE)
-    }
     ## Ensure that the ordering is as requested.
     Res <- Res[, columns, drop=FALSE]
     Res
@@ -547,7 +540,8 @@ removePrefix <- function(x, split=".", fixed = TRUE) {
                                        "canonical_transcript"),
                               tx = c("tx_id", "tx_biotype", "tx_seq_start",
                                      "tx_seq_end", "tx_cds_seq_start",
-                                     "tx_cds_seq_end", "tx_name", "gene_id"),
+                                     "tx_cds_seq_end", "tx_external_name",
+                                     "gene_id"),
                               tx2exon = c("tx_id", "exon_id", "exon_idx"),
                               exon = c("exon_id", "exon_seq_start",
                                        "exon_seq_end"),

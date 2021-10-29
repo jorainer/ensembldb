@@ -58,10 +58,14 @@ setClass("EnsDb",
 #'
 #' - `TxIdFilter`: filter based on the Ensembld transcript ID.
 #'
-#' - `TxNameFilter`: filter based on the transcript name if available; if not
-#'   available the data will be filtered on the transcript ID. The transcripts'
-#'   *external name* is used as transcript name, but not for all transcripts
-#'   this information is provided in Ensembl's Core databases.
+#' - `TxNameFilter`: to be compliant with `TxDb` object from the
+#'   `GenomicFeatures` package `tx_name` in fact represents the Ensembl
+#'   transcript ID. Thus, the the `tx_id` and `tx_name` columns contain the
+#'   same information and the `TxIdFilter` and `TxNameFilter` are in fact
+#'   identical. The names of transcripts (i.e. the *external name* field in
+#'   Ensembl are stored in column `"tx_external_name"` (and which can be
+#'   filtered using the `TxExternalNameFilter`.
+#'
 #' - `TxBiotypeFilter`: filter based on the transcripts' biotype.
 #'
 #' - `TxStartFilter`: filter based on the genomic start coordinate of the
@@ -123,20 +127,28 @@ setClass("EnsDb",
 #'
 #' In addition, the following filters are defined by `ensembldb`:
 #'
+#' - `TxExternalNameFilter`: filter based on the transcript's *external name*
+#'   (if available).
+#'
 #' - `TxSupportLevel`: allows to filter results using the provided transcript
 #'   support level. Support levels for transcripts are defined by Ensembl
 #'   based on the available evidences for a transcript with 1 being the
 #'   highest evidence grade and 5 the lowest level. This filter is only
 #'   supported on `EnsDb` databases with a db schema version higher 2.1.
+#'
 #' - `UniprotDbFilter`: allows to filter results based on the specified Uniprot
 #'   database name(s).
+#'
 #' - `UniprotMappingTypeFilter`: allows to filter results based on the mapping
 #'   method/type that was used to assign Uniprot IDs to Ensembl protein IDs.
+#'
 #' - `ProtDomIdFilter`, `ProteinDomainIdFilter`: allows to retrieve entries
 #'   from the database matching the provided filter criteria based on their
 #'   protein domain ID (*protein_domain_id*).
+#'
 #' - `ProteinDomainSourceFilter`: filter results based on the source
 #'   (database/method) defining the protein domain (e.g. `"pfam"`).
+#'
 #' - `OnlyCodingTxFilter`: allows to retrieve entries only for protein coding
 #'   transcripts, i.e. transcripts with a CDS. This filter does not take any
 #'   input arguments.
@@ -401,3 +413,20 @@ TxSupportLevelFilter <- function(value, condition = "==") {
     new("TxSupportLevelFilter", condition = condition,
         value = as.integer(value))
 }
+#' @return For `TxExternalNameFilter`: A `TxExternalNameFilter` object.
+#'
+#' @md
+#'
+#' @rdname Filter-classes
+TxExternalNameFilter <- function(value, condition = "==") {
+    new("TxExternalNameFilter", condition = condition,
+        value = as.character(value))
+}
+#' @rdname Filter-classes
+setClass("TxExternalNameFilter",
+         contains = "CharacterFilter",
+         prototype = list(
+             condition = "==",
+             value = "",
+             field = "tx_external_name"
+         ))

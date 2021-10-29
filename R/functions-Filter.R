@@ -22,6 +22,7 @@
     tx_start = "tx_seq_start",
     tx_end = "tx_seq_end",
     tx_support_level = "tx_support_level",
+    tx_external_name = "tx_external_name",
     ## exon
     exon_id = "exon_id",
     exon_rank = "exon_idx",
@@ -50,6 +51,8 @@
               "symbol", "seq_name", "seq_strand", "gene_start", "gene_end",
               "tx_id", "tx_biotype", "tx_name", "tx_start", "tx_end",
               "exon_id", "exon_rank", "exon_start", "exon_end")
+    if (.has_tx_external_name(x))
+        flds <- c(flds, "tx_external_name")
     if (hasProteinData(x))
         flds <- c(flds, "protein_id", "uniprot", "uniprot_db",
                   "uniprot_mapping_type", "prot_dom_id",
@@ -174,7 +177,7 @@
                     inherits(z, "AnnotationFilter")
                 }), use.names = FALSE)))
                     stop("One of more elements in 'filter' are not ",
-                         "'AnnotationFilter' objects!")
+                         "'AnnotationFilter' objects!", call. = FALSE)
                 res <- as(res, "AnnotationFilterList")
                 res@logOp <- rep("&", (length(res) - 1))
             } else {
@@ -183,7 +186,7 @@
         } else {
             stop("'filter' has to be an 'AnnotationFilter', a list of ",
                  "'AnnotationFilter' object, an 'AnnotationFilterList' ",
-                 "or a valid filter expression!")
+                 "or a valid filter expression!", call. = FALSE)
         }
     }
     supp_filters <- supportedFilters(db)$filter
@@ -191,7 +194,7 @@
     if (!all(have_filters %in% supp_filters))
         stop("AnnotationFilter classes: ",
              paste(have_filters[!(have_filters %in% supp_filters)]),
-             " are not supported by EnsDb databases.")
+             " are not supported by this EnsDb database.", call. = FALSE)
     res
 }
 

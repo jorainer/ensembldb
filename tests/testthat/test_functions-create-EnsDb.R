@@ -15,16 +15,20 @@ test_that("ensDbFromGRanges works", {
                                organism="Homo_sapiens", skip = TRUE)
     )
     db <- EnsDb(DB)
-    expect_true(.has_tx_name(db))
+    expect_true(.has_tx_external_name(db))
     expect_equal(unname(genome(db)), "GRCh37")
     txs <- transcripts(db)
-    expect_true(all(txs$tx_id != txs$tx_name))
+    expect_true(all(txs$tx_id == txs$tx_name))
 
     Test <- makeEnsembldbPackage(DB, destDir = tempdir(),
                                  version = "0.0.1", author = "J Rainer",
                                  maintainer = "")
-    expect_true(ensembldb:::checkValidEnsDb(db))
-    expect_equal(ensDbColumn(TxNameFilter("a"), db), "tx.tx_name")
+    expect_true(checkValidEnsDb(db))
+    expect_equal(ensDbColumn(TxNameFilter("a"), db), "tx.tx_id")
+    expect_equal(ensDbColumn(TxExternalNameFilter("a"), db),
+                 "tx.tx_external_name")
+    expect_equal(ensDbQuery(TxExternalNameFilter("a"), db),
+                 "tx.tx_external_name = 'a'")
 })
 
 test_that("ensDbFromGtf and Gff works", {

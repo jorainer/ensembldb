@@ -167,8 +167,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
         })
         tmp$tx_support_level <- unlist(tsl, use.names = FALSE)
     }
-    if (any(colnames(tmp) == "tx_name"))
-        tmp$tx_name[which(tmp$tx_name == "")] <- NA_character_
+    if (any(colnames(tmp) == "tx_external_name"))
+        tmp$tx_external_name[which(tmp$tx_external_name == "")] <- NA_character_
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
     message("OK")
@@ -888,10 +888,10 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
         warning(mess)
     }
     colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id",
-                      "tx_biotype", "tx_name",
+                      "tx_biotype", "tx_external_name",
                       "tx_cds_seq_start", "tx_cds_seq_end")
     ## rearranging data.frame:
-    tx <- tx[ , c("tx_id", "tx_name", "tx_biotype", "tx_seq_start",
+    tx <- tx[ , c("tx_id", "tx_external_name", "tx_biotype", "tx_seq_start",
                   "tx_seq_end", "tx_cds_seq_start", "tx_cds_seq_end",
                   "gene_id")]
     ## Add transcript name.
