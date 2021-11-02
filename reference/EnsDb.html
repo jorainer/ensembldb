@@ -152,7 +152,7 @@ a MySQL database.</p>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Third way: connect to a MySQL database</span></span>
 <span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RMariaDB</span><span class="op">)</span></span>
+<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rmariadb.r-dbi.org" class="external-link">RMariaDB</a></span><span class="op">)</span></span>
 <span class="r-in"><span class="va">dbcon</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span><span class="fu">MySQL</span><span class="op">(</span><span class="op">)</span>, user <span class="op">=</span> <span class="va">my_user</span>, pass <span class="op">=</span> <span class="va">my_pass</span>,</span>
 <span class="r-in">    host <span class="op">=</span> <span class="va">my_host</span>, dbname <span class="op">=</span> <span class="st">"ensdb_hsapiens_v86"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu">EnsDb</span><span class="op">(</span><span class="va">dbcon</span><span class="op">)</span></span>
