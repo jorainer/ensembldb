@@ -16,12 +16,12 @@ test_that(".addFilter .dropFilter and .activeFilter work", {
     expect_equal(flts, ensembldb:::getProperty(edb_2, "FILTER"))
     expect_equal(flts, AnnotationFilter(~ tx_id == 3 &
                                             tx_biotype == "protein_coding"))
-    
+
     ## Errors
     expect_error(ensembldb:::.addFilter(edb, "blabla"))
     expect_error(ensembldb:::filter(edb, "blabla"))
     expect_error(ensembldb:::.addFilter(edb))
-    
+
     ## .dropFilter
     edb_2 <- ensembldb:::.dropFilter(edb_2)
     expect_equal(ensembldb:::.activeFilter(edb_2), NA)
@@ -47,13 +47,16 @@ test_that(".addFilter .dropFilter and .activeFilter work", {
     expect_equal(flts, ensembldb:::getProperty(edb_2, "FILTER"))
     expect_equal(flts, AnnotationFilter(~ tx_id == 3 &
                                             tx_biotype == "protein_coding"))
-    
+
     ## Errors
     expect_error(addFilter(edb, "blabla"))
     expect_error(addFilter(edb))
-    
+
     ## .dropFilter
     edb_2 <- dropFilter(edb_2)
     expect_equal(activeFilter(edb_2), NA)
 })
 
+test_that(".has_tx_external_name works", {
+    expect_false(.has_tx_external_name(edb))
+})

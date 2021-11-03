@@ -17,6 +17,8 @@
 \alias{UniprotMappingTypeFilter}
 \alias{TxSupportLevelFilter-class}
 \alias{TxSupportLevelFilter}
+\alias{TxExternalNameFilter}
+\alias{TxExternalNameFilter-class}
 \alias{seqnames,GRangesFilter-method}
 \alias{seqlevels,GRangesFilter-method}
 \alias{supportedFilters,EnsDb-method}
@@ -35,6 +37,8 @@ UniprotDbFilter(value, condition = "==")
 UniprotMappingTypeFilter(value, condition = "==")
 
 TxSupportLevelFilter(value, condition = "==")
+
+TxExternalNameFilter(value, condition = "==")
 
 \S4method{seqnames}{GRangesFilter}(x)
 
@@ -71,6 +75,8 @@ For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
 For \code{UniprotMappingTypeFilter}: A \code{UniprotMappingTypeFilter} object.
 
 For \code{TxSupportLevel}: A \code{TxSupportLevel} object.
+
+For \code{TxExternalNameFilter}: A \code{TxExternalNameFilter} object.
 
 For \code{supportedFilters}: a \code{data.frame} with the names and
 the corresponding field of the supported filter classes.
@@ -109,8 +115,13 @@ gene names.
 \item \code{GeneEndFilter}: filter based on the genomic end coordinate of genes.
 \item \code{EntrezidFilter}: filter based on the genes' NCBI Entrezgene ID.
 \item \code{TxIdFilter}: filter based on the Ensembld transcript ID.
-\item \code{TxNameFilter}: filter based on the Ensembld transcript ID; no transcript
-names are provided in \code{EnsDb} databases.
+\item \code{TxNameFilter}: to be compliant with \code{TxDb} object from the
+\code{GenomicFeatures} package \code{tx_name} in fact represents the Ensembl
+transcript ID. Thus, the the \code{tx_id} and \code{tx_name} columns contain the
+same information and the \code{TxIdFilter} and \code{TxNameFilter} are in fact
+identical. The names of transcripts (i.e. the \emph{external name} field in
+Ensembl are stored in column \code{"tx_external_name"} (and which can be
+filtered using the \code{TxExternalNameFilter}.
 \item \code{TxBiotypeFilter}: filter based on the transcripts' biotype.
 \item \code{TxStartFilter}: filter based on the genomic start coordinate of the
 transcripts.
@@ -162,6 +173,8 @@ supported if the \code{EnsDb} provides protein annotations; use the
 
 In addition, the following filters are defined by \code{ensembldb}:
 \itemize{
+\item \code{TxExternalNameFilter}: filter based on the transcript's \emph{external name}
+(if available).
 \item \code{TxSupportLevel}: allows to filter results using the provided transcript
 support level. Support levels for transcripts are defined by Ensembl
 based on the available evidences for a transcript with 1 being the

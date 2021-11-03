@@ -39,29 +39,49 @@ setClass("EnsDb",
 #' package:
 #'
 #' - `GeneIdFilter`: filter based on the Ensembl gene ID.
+#'
 #' - `GeneNameFilter`: filter based on the name of the gene as provided
 #'   Ensembl. In most cases this will correspond to the official gene symbol.
+#'
 #' - `SymbolFilter` filter based on the gene names. `EnsDb` objects don't
 #'   have a dedicated *symbol* column, the filtering is hence based on the
 #'   gene names.
+#'
 #' - `GeneBiotype`: filter based on the biotype of genes (e.g.
 #'   `"protein_coding"`).
+#'
 #' - `GeneStartFilter`: filter based on the genomic start coordinate of genes.
+#'
 #' - `GeneEndFilter`: filter based on the genomic end coordinate of genes.
+#'
 #' - `EntrezidFilter`: filter based on the genes' NCBI Entrezgene ID.
+#'
 #' - `TxIdFilter`: filter based on the Ensembld transcript ID.
-#' - `TxNameFilter`: filter based on the Ensembld transcript ID; no transcript
-#'   names are provided in `EnsDb` databases.
+#'
+#' - `TxNameFilter`: to be compliant with `TxDb` object from the
+#'   `GenomicFeatures` package `tx_name` in fact represents the Ensembl
+#'   transcript ID. Thus, the the `tx_id` and `tx_name` columns contain the
+#'   same information and the `TxIdFilter` and `TxNameFilter` are in fact
+#'   identical. The names of transcripts (i.e. the *external name* field in
+#'   Ensembl are stored in column `"tx_external_name"` (and which can be
+#'   filtered using the `TxExternalNameFilter`.
+#'
 #' - `TxBiotypeFilter`: filter based on the transcripts' biotype.
+#'
 #' - `TxStartFilter`: filter based on the genomic start coordinate of the
 #'   transcripts.
+#'
 #' - `TxEndFilter`: filter based on the genonic end coordinates of the
 #'   transcripts.
+#'
 #' - `ExonIdFilter`: filter based on Ensembl exon IDs.
+#'
 #' - `ExonRankFilter`: filter based on the index/rank of the exon within the
 #'   transcrips.
+#'
 #' - `ExonStartFilter`: filter based on the genomic start coordinates of the
 #'   exons.
+#'
 #' - `ExonEndFilter`: filter based on the genomic end coordinates of the exons.
 #'
 #' - `GRangesFilter`: Allows to fetch features within or overlapping specified
@@ -92,32 +112,43 @@ setClass("EnsDb",
 #'   more information.
 #'
 #' - `SeqNameFilter`: filter based on chromosome names.
+#'
 #' - `SeqStrandFilter`: filter based on the chromosome strand. The strand can
 #'   be specified with `value = "+"`, `value = "-"`, `value = -1` or
 #'   `value = 1`.
+#'
 #' - `ProteinIdFilter`: filter based on Ensembl protein IDs. This filter is
 #'   only supported if the `EnsDb` provides protein annotations; use the
 #'   [hasProteinData()] method to check.
+#'
 #' - `UniprotFilter`: filter based on Uniprot IDs. This filter is only
 #'   supported if the `EnsDb` provides protein annotations; use the
 #'   [hasProteinData()] method to check.
 #'
 #' In addition, the following filters are defined by `ensembldb`:
 #'
+#' - `TxExternalNameFilter`: filter based on the transcript's *external name*
+#'   (if available).
+#'
 #' - `TxSupportLevel`: allows to filter results using the provided transcript
 #'   support level. Support levels for transcripts are defined by Ensembl
 #'   based on the available evidences for a transcript with 1 being the
 #'   highest evidence grade and 5 the lowest level. This filter is only
 #'   supported on `EnsDb` databases with a db schema version higher 2.1.
+#'
 #' - `UniprotDbFilter`: allows to filter results based on the specified Uniprot
 #'   database name(s).
+#'
 #' - `UniprotMappingTypeFilter`: allows to filter results based on the mapping
 #'   method/type that was used to assign Uniprot IDs to Ensembl protein IDs.
+#'
 #' - `ProtDomIdFilter`, `ProteinDomainIdFilter`: allows to retrieve entries
 #'   from the database matching the provided filter criteria based on their
 #'   protein domain ID (*protein_domain_id*).
+#'
 #' - `ProteinDomainSourceFilter`: filter results based on the source
 #'   (database/method) defining the protein domain (e.g. `"pfam"`).
+#'
 #' - `OnlyCodingTxFilter`: allows to retrieve entries only for protein coding
 #'   transcripts, i.e. transcripts with a CDS. This filter does not take any
 #'   input arguments.
@@ -382,3 +413,20 @@ TxSupportLevelFilter <- function(value, condition = "==") {
     new("TxSupportLevelFilter", condition = condition,
         value = as.integer(value))
 }
+#' @return For `TxExternalNameFilter`: A `TxExternalNameFilter` object.
+#'
+#' @md
+#'
+#' @rdname Filter-classes
+TxExternalNameFilter <- function(value, condition = "==") {
+    new("TxExternalNameFilter", condition = condition,
+        value = as.character(value))
+}
+#' @rdname Filter-classes
+setClass("TxExternalNameFilter",
+         contains = "CharacterFilter",
+         prototype = list(
+             condition = "==",
+             value = "",
+             field = "tx_external_name"
+         ))

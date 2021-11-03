@@ -69,9 +69,9 @@ addFilterColumns <- function(cols, filter = AnnotationFilterList(), edb) {
             return(z@field)
         if (is(z, "AnnotationFilterList"))
             return(addFilterColumns(cols = cols, filter = z, edb))
-        return(ensDbColumn(z))
+        return(ensDbColumn(z, edb))
     }))
-    return(unique(c(cols, addC)))
+    return(unique(c(cols, removePrefix(addC))))
 }
 
 ############################################################
@@ -109,13 +109,13 @@ anyProteinColumns <- function(x){
 #' @description The \code{listProteinColumns} function allows to conveniently
 #'     extract all database columns containing protein annotations from
 #'     an \code{\linkS4class{EnsDb}} database.
-#' 
+#'
 #' @return The \code{listProteinColumns} function returns a character vector
 #'     with the column names containing protein annotations or throws an error
 #'     if no such annotations are available.
-#' 
+#'
 #' @rdname ProteinFunctionality
-#' 
+#'
 #' @examples
 #'
 #' ## List all columns containing protein annotations
@@ -136,11 +136,11 @@ listProteinColumns <- function(object) {
 ############################################################
 ## .ProteinsFromDataframe
 #' @param x \code{EnsDb} object.
-#' 
+#'
 #' @param data \code{data.frame} with the results from a call to the
 #'     \code{proteins} method; has to have required columns \code{"protein_id"}
 #'     and \code{"protein_sequence"}.
-#' 
+#'
 #' @noRd
 .ProteinsFromDataframe <- function(x, data) {
     if (!all(c("protein_id", "protein_sequence") %in% colnames(data)))
@@ -218,9 +218,9 @@ num2strand <- function(x){
 #'
 #' @param by \code{character(1)} defining the column by which the
 #'     \code{"entrezid"} column should be splitted.
-#' 
+#'
 #' @author Johannes Rainer
-#' 
+#'
 #' @noRd
 .collapseEntrezidInTable <- function(x, by = "gene_id") {
     ## Slow version: use unique call.

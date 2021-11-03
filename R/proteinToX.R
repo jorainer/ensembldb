@@ -118,7 +118,7 @@ proteinToTranscript <- function(x, db, id = "name",
     message(sum(!miss), " found")
     ## 2) ensure that the CDS matches the AA sequence length
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
-    cds_genome <- ensembldb:::.cds_matching_protein(db, cds_genome)
+    cds_genome <- .cds_matching_protein(db, cds_genome)
     are_ok <- vapply(cds_genome, function(z) {
         if (is(z, "GRangesList"))
             all(z[[1]]$cds_ok)

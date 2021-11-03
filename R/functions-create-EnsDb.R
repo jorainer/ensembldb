@@ -167,6 +167,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
         })
         tmp$tx_support_level <- unlist(tsl, use.names = FALSE)
     }
+    if (any(colnames(tmp) == "tx_external_name"))
+        tmp$tx_external_name[which(tmp$tx_external_name == "")] <- NA_character_
     dbWriteTable(con, name="tx", tmp, row.names=FALSE)
     rm(tmp)
     message("OK")
@@ -738,15 +740,6 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
 
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
     on.exit(suppressWarnings(dbDisconnect(con)))
-    ## ----------------------------
-    ## metadata table:
-    message("Processing metadata ... ", appendLF=FALSE)
-    Metadata <- buildMetadata(organism, version, host="unknown",
-                              sourceFile="GRanges object",
-                              genomeVersion=genomeVersion)
-    dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE,
-                 row.names=FALSE)
-    message("OK")
     ## Check if we've got column "type"
     if(!any(colnames(mcols(x)) == "type"))
         stop("The GRanges object lacks the required column 'type', sorry.")
@@ -826,7 +819,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     message("Processing transcripts ... ", appendLF=TRUE)
     ## want to have: tx_id, tx_biotype, tx_seq_start, tx_seq_end, tx_cds_seq_start,
     ##               tx_cds_seq_end, gene_id
-    wouldBeNice <- c("transcript_id", "gene_id", txBiotypeCol)
+    wouldBeNice <- c("transcript_id", "gene_id",
+                     txBiotypeCol, "transcript_name")
     dontHave <- wouldBeNice[!(wouldBeNice %in% gotColumns)]
     if(length(dontHave) > 0){
         mess <- paste0("I'm missing column(s): ", paste0(sQuote(dontHave),
@@ -866,7 +860,8 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
         colnames(tx) <- c(cn, dontHave)
     }
     ## Add columns for UTR
-    tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)), tx_cds_seq_end=rep(NA, nrow(tx)))
+    tx <- cbind(tx, tx_cds_seq_start=rep(NA, nrow(tx)),
+                tx_cds_seq_end=rep(NA, nrow(tx)))
     ## Process CDS...
     if(any(gotTypes == "CDS")){
         ## Only do that if we've got type == "CDS"!
@@ -893,10 +888,13 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
         warning(mess)
     }
     colnames(tx) <- c("tx_seq_start", "tx_seq_end", "tx_id", "gene_id",
-                      "tx_biotype", "tx_cds_seq_start", "tx_cds_seq_end")
+                      "tx_biotype", "tx_external_name",
+                      "tx_cds_seq_start", "tx_cds_seq_end")
     ## rearranging data.frame:
-    tx <- tx[ , c("tx_id", "tx_biotype", "tx_seq_start", "tx_seq_end",
-                  "tx_cds_seq_start", "tx_cds_seq_end", "gene_id")]
+    tx <- tx[ , c("tx_id", "tx_external_name", "tx_biotype", "tx_seq_start",
+                  "tx_seq_end", "tx_cds_seq_start", "tx_cds_seq_end",
+                  "gene_id")]
+    ## Add transcript name.
     ## write the table.
     OK <- .checkIntegerCols(tx)
     dbWriteTable(con, name="tx", tx, overwrite=TRUE, row.names=FALSE)
@@ -965,6 +963,16 @@ ensDbFromGRanges <- function(x, outfile, path, organism, genomeVersion,
     ## write the table.
     dbWriteTable(con, name="chromosome", chroms, overwrite=TRUE, row.names=FALSE)
     rm(genes)
+    message("OK")
+    ## ----------------------------
+    ## metadata table:
+    message("Processing metadata ... ", appendLF=FALSE)
+    Metadata <- buildMetadata(organism, version, host="unknown",
+                              sourceFile="GRanges object",
+                              genomeVersion=genomeVersion,
+                              schema = "1.0")
+    dbWriteTable(con, name="metadata", Metadata, overwrite=TRUE,
+                 row.names=FALSE)
     message("OK")
     message("Generating index ... ", appendLF=FALSE)
     ## generating all indices...
@@ -1063,7 +1071,7 @@ tryGetSeqinfoFromEnsembl <- function(organism, ensemblVersion, seqnames,
 }
 
 buildMetadata <- function(organism="", ensemblVersion="", genomeVersion="",
-                          host="", sourceFile=""){
+                          host="", sourceFile="", schema = "1.0"){
     MetaData <- data.frame(matrix(ncol=2, nrow=11))
     colnames(MetaData) <- c("name", "value")
     MetaData[1, ] <- c("Db type", "EnsDb")
@@ -1076,7 +1084,7 @@ buildMetadata <- function(organism="", ensemblVersion="", genomeVersion="",
     MetaData[8, ] <- c("ensembl_host", host)
     MetaData[9, ] <- c("Organism", organism )
     MetaData[10, ] <- c("genome_build", genomeVersion)
-    MetaData[11, ] <- c("DBSCHEMAVERSION", "1.0")
+    MetaData[11, ] <- c("DBSCHEMAVERSION", schema)
     MetaData[12, ] <- c("source_file", sourceFile)
     return(MetaData)
 }
