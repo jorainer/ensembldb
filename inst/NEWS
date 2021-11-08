@@ -1,3 +1,8 @@
+Changes in version 2.19.2
+
+- Restore backward compatibility (issue https://github.com/jorainer/ensembldb/issues/122).
+
+
 Changes in version 2.19.1
 
 - Add database column tx_name to store the external transcript names.
