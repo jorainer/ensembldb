@@ -1,3 +1,7 @@
+Changes in version 2.18.2
+
+- Restore backward compatibility (issue https://github.com/jorainer/ensembldb/issues/122).
+
 Changes in version 2.18.1
 
 - Add support for EnsDb column/field tx_external_name.
