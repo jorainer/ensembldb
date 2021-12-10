@@ -1,11 +1,11 @@
 pandoc: 2.14.0.3
-pkgdown: 1.9000.9000.9000
-pkgdown_sha: 8122179c440692487eda000d6542d7734a37d36d
+pkgdown: 2.0.1.9000
+pkgdown_sha: bbefae3575a7c2484810f9b3b60af4b1faf0d2f4
 articles:
   MySQL-backend: MySQL-backend.html
   coordinate-mapping-use-cases: coordinate-mapping-use-cases.html
   coordinate-mapping: coordinate-mapping.html
   ensembldb: ensembldb.html
   proteins: proteins.html
-last_built: 2021-11-08T16:31Z
+last_built: 2021-12-10T19:59Z
 

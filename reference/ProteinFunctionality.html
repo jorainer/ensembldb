@@ -27,7 +27,7 @@ The listProteinColumns function allows to conveniently
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.4</span>
       </span>
     </div>
 
@@ -91,7 +91,8 @@ The listProteinColumns function allows to conveniently
     an <code><a href="EnsDb-class.html">EnsDb</a></code> database.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for EnsDb</span>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for EnsDb</span>
 <span class="fu">proteins</span><span class="op">(</span>
   <span class="va">object</span>,
   columns <span class="op">=</span> <span class="fu"><a href="EnsDb-class.html">listColumns</a></span><span class="op">(</span><span class="va">object</span>, <span class="st">"protein"</span><span class="op">)</span>,
@@ -108,8 +109,8 @@ The listProteinColumns function allows to conveniently
 <span class="fu">listUniprotMappingTypes</span><span class="op">(</span><span class="va">object</span><span class="op">)</span>
 
 <span class="fu">listProteinColumns</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
@@ -161,11 +162,10 @@ The <code>listProteinColumns</code> function returns a character vector
     <h2>Author</h2>
     <p>Johannes Rainer</p>
     </div>
-    </div>
 
-    <div id="examples">
+    <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb" class="external-link">ensembldb</a></span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb" class="external-link">ensembldb</a></span><span class="op">)</span></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span></span>
 <span class="r-in"><span class="co">## Get all proteins from tha database for the gene ZBTB16, if protein</span></span>
@@ -218,7 +218,7 @@ The <code>listProteinColumns</code> function returns a character vector
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer></div>
