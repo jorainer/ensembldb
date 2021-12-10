@@ -1,3 +1,7 @@
+Changes in version 2.19.4
+
+- Fix issue with quotes in transcript names when importing transcript tables.
+
 Changes in version 2.19.2
 
 - Restore backward compatibility (issue https://github.com/jorainer/ensembldb/issues/122).

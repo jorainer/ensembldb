@@ -139,7 +139,8 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     message("Processing 'trancript' table ... ", appendLF = FALSE)
     ## process transcripts:
     tmp <- read.table(paste0(path, .Platform$file.sep, "ens_tx.txt"),
-                      sep="\t", as.is=TRUE, header=TRUE)
+                      sep="\t", as.is=TRUE, header=TRUE, quote = "",
+                      comment.char = "")
     ## Check that we have the expected number of rows:
     if (haveCounts)
         if (nrow(tmp) != counts[1, "tx"])
