@@ -243,6 +243,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
                                              "exon_idx", "tx_cds_seq_start",
                                              "tx_cds_seq_end", "prot_dom_start",
                                              "prot_dom_end")) {
+    if (!nrow(x)) return(TRUE)
     cols <- columns[columns %in% colnames(x)]
     if(length(cols) > 0) {
         sapply(cols, function(z) {
@@ -250,7 +251,7 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
                 stop("Column '", z,"' is not of type integer!")
         })
     }
-    return(TRUE)
+    TRUE
 }
 
 ####
