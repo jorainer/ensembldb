@@ -413,6 +413,27 @@ TxSupportLevelFilter <- function(value, condition = "==") {
     new("TxSupportLevelFilter", condition = condition,
         value = as.integer(value))
 }
+
+#' @rdname Filter-classes
+setClass("TxIsCanonicalFilter",
+         contains = "IntegerFilter",
+         prototype = list(
+             condition = "==",
+             value = 1L,
+             field = "tx_is_canonical"
+         ))
+#' @return For `TxIsCanonicalFilter`: A `TxIsCanonicalFilter` object.
+#'
+#' @md
+#'
+#' @rdname Filter-classes
+TxIsCanonicalFilter <- function(value, condition = "==") {
+    if (!is.numeric(value))
+        stop("Parameter 'value' has to be numeric")
+    new("TxIsCanonicalFilter", condition = condition,
+        value = as.integer(value))
+}
+
 #' @return For `TxExternalNameFilter`: A `TxExternalNameFilter` object.
 #'
 #' @md

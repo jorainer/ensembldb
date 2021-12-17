@@ -23,6 +23,7 @@
     tx_end = "tx_seq_end",
     tx_support_level = "tx_support_level",
     tx_external_name = "tx_external_name",
+    tx_is_canonical = "tx_is_canonical",
     ## exon
     exon_id = "exon_id",
     exon_rank = "exon_idx",
@@ -60,6 +61,8 @@
                   "protein_domain_source")
     if (any(listColumns(x) == "tx_support_level"))
         flds <- c(flds, "tx_support_level")
+    if (any(listColumns(x) == "tx_is_canonical"))
+        flds <- c(flds, "tx_is_canonical")
     sort(flds)
 }
 

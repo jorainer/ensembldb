@@ -1,3 +1,8 @@
+Changes in version 2.19.5
+
+- Add support for additional `tx_is_canonical` column and add
+  `TxIsCanonicalFilter` (issue https://github.com/jorainer/ensembldb/issues/123).
+
 Changes in version 2.19.4
 
 - Fix issue with quotes in transcript names when importing transcript tables.

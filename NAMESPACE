@@ -165,7 +165,8 @@ exportClasses(
               "UniprotMappingTypeFilter",
               "OnlyCodingTxFilter",
               "TxSupportLevelFilter",
-	      "TxExternalNameFilter"
+	      "TxExternalNameFilter",
+	      "TxIsCanonicalFilter"
               )
 ## Methods for EnsFilter
 exportMethods(
@@ -250,5 +251,6 @@ export(
     "ProteinDomainIdFilter",
     "ProteinDomainSourceFilter",
     "TxSupportLevelFilter",
-    "TxExternalNameFilter"
+    "TxExternalNameFilter",
+    "TxIsCanonicalFilter"
 )

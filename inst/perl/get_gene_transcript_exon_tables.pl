@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.8: * Add column tx_is_canonical to transcript table.
 ## version 0.3.7: * Add column tx_external_name to transcript table.
 ## version 0.3.6: * Add column canonical_transcript to gene table.
 ## version 0.3.5: * Add column gc_content to transcript table.
@@ -138,7 +139,7 @@ open(GENE , ">ens_gene.txt");
 print GENE "gene_id\tgene_name\tgene_biotype\tgene_seq_start\tgene_seq_end\tseq_name\tseq_strand\tseq_coord_system\tdescription\tgene_id_version\tcanonical_transcript\n";
 
 open(TRANSCRIPT , ">ens_tx.txt");
-print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\tgc_content\ttx_external_name\n";
+print TRANSCRIPT "tx_id\ttx_biotype\ttx_seq_start\ttx_seq_end\ttx_cds_seq_start\ttx_cds_seq_end\tgene_id\ttx_support_level\ttx_id_version\tgc_content\ttx_external_name\ttx_is_canonical\n";
 
 open(EXON , ">ens_exon.txt");
 print EXON "exon_id\texon_seq_start\texon_seq_end\n";
@@ -289,8 +290,12 @@ foreach my $gene_id (@gene_ids){
       if (!defined($tx_external_name)) {
 	$tx_external_name = "";
       }
+      my $is_canonical = $transcript->is_canonical;
+      if (!defined($is_canonical)) {
+	  $is_canonical = 0;
+      }
       ## write info.
-      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\t$gc_count\t$tx_external_name\n";
+      print TRANSCRIPT "$tx_id\t$tx_biotype\t$tx_seq_start\t$tx_seq_end\t$tx_cds_start\t$tx_cds_end\t$gene_id\t$tx_tsl\t$tx_id_version\t$gc_count\t$tx_external_name\t$is_canonical\n";
 
       ## Process proteins/translations (if possible)
       my $transl = $transcript->translation();

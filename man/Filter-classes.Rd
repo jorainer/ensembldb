@@ -17,6 +17,8 @@
 \alias{UniprotMappingTypeFilter}
 \alias{TxSupportLevelFilter-class}
 \alias{TxSupportLevelFilter}
+\alias{TxIsCanonicalFilter-class}
+\alias{TxIsCanonicalFilter}
 \alias{TxExternalNameFilter}
 \alias{TxExternalNameFilter-class}
 \alias{seqnames,GRangesFilter-method}
@@ -37,6 +39,8 @@ UniprotDbFilter(value, condition = "==")
 UniprotMappingTypeFilter(value, condition = "==")
 
 TxSupportLevelFilter(value, condition = "==")
+
+TxIsCanonicalFilter(value, condition = "==")
 
 TxExternalNameFilter(value, condition = "==")
 
@@ -75,6 +79,8 @@ For \code{UniprotDbFilter}: A \code{UniprotDbFilter} object.
 For \code{UniprotMappingTypeFilter}: A \code{UniprotMappingTypeFilter} object.
 
 For \code{TxSupportLevel}: A \code{TxSupportLevel} object.
+
+For \code{TxIsCanonicalFilter}: A \code{TxIsCanonicalFilter} object.
 
 For \code{TxExternalNameFilter}: A \code{TxExternalNameFilter} object.
 
