@@ -324,13 +324,13 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
     message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
     cds_genome <- .cds_matching_protein(db, cds_genome)
     are_ok <- unlist(lapply(cds_genome, function(z) {
-        if (is(z, "GRangesList"))
+        if (is(z, "GRangesList") & length(z) > 0)
             all(z[[1]]$cds_ok)
         else NA
     }))
+    message(sum(are_ok, na.rm = TRUE), "/", length(are_ok), " OK")
     are_ok <- are_ok[!is.na(are_ok)]
     ## We've got now a list of GRanges
-    message(sum(are_ok), "/", length(are_ok), " OK")
     ## Perform the mapping for each input range with each mapped cds
     res <- mapply(
         cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
