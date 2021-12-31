@@ -335,7 +335,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
     res <- mapply(
         cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
         FUN = function(gnm, cds, prt) {
-            if (is.null(gnm)) {
+            if (is.null(gnm) | !length(gnm)) {
                 GRanges()
             } else {
                 ## Unlist because we'd like to have a GRanges here. Will split
