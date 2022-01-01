@@ -335,7 +335,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
     res <- mapply(
         cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
         FUN = function(gnm, cds, prt) {
-            if (is.null(gnm) | !length(gnm)) {
+            if (!length(gnm)) { ## addressed NULL and empty elements
                 GRanges()
             } else {
                 ## Unlist because we'd like to have a GRanges here. Will split
@@ -343,8 +343,9 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
                 maps <- unlist(.to_genome(gnm, cds))
                 ## Don't want to have GRanges names!
                 names(maps) <- NULL
-                mcols(maps)$protein_start <- start(prt)
-                mcols(maps)$protein_end <- end(prt)
+                mcols(maps) <- cbind(mcols(maps),
+                                     protein_start = start(prt),
+                                     protein_end = end(prt))
                 maps[order(maps$exon_rank)]
             }
         })
