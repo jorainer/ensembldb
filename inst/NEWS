@@ -1,3 +1,8 @@
+Changes in version 2.18.3
+
+- `listColumns` does no longer report column names from the metadata database
+  table.
+
 Changes in version 2.18.2
 
 - Restore backward compatibility (issue https://github.com/jorainer/ensembldb/issues/122).

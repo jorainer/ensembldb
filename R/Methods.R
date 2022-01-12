@@ -311,7 +311,8 @@ setMethod("listTables", "EnsDb", function(x, ...){
 ## listColumns
 setMethod("listColumns", "EnsDb", function(x,
                                            table,
-                                           skip.keys=TRUE, ...){
+                                           skip.keys = TRUE,
+                                           metadata = FALSE, ...){
     if(length(x@tables)==0){
         tables <- dbListTables(dbconn(x))
         ## read the columns for these tables.
@@ -326,6 +327,8 @@ setMethod("listColumns", "EnsDb", function(x,
         x@tables <- Tables
     }
     Tab <- x@tables
+    if (!metadata)
+        Tab <- Tab[names(Tab) != "metadata"]
     ## Manually add tx_name as a "virtual" column; getWhat will insert
     ## the tx_id into that.
     Tab$tx <- unique(c(Tab$tx, "tx_name"))
