@@ -740,6 +740,10 @@ test_that("listColumns works", {
         res <- listColumns(edb, table = "protein_domain")
         expect_equal(res, ensembldb:::.ensdb_protein_tables(ensembldb:::dbSchemaVersion(dbconn(edb)))$protein_domain)
     }
+    res <- listColumns(edb)
+    expect_true(!any(res %in% c("name", "value")))
+    res <- listColumns(edb, metadata = TRUE)
+    expect_true(all(c("name", "value") %in% res))
 })
 
 test_that("cleanColumns works", {

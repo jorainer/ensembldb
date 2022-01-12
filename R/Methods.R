@@ -311,41 +311,43 @@ setMethod("listTables", "EnsDb", function(x, ...){
 ## listColumns
 setMethod("listColumns", "EnsDb", function(x,
                                            table,
-                                           skip.keys=TRUE, ...){
-    if(length(x@tables)==0){
+                                           skip.keys = TRUE,
+                                           metadata = FALSE, ...){
+    if (length(x@tables) == 0) {
         tables <- dbListTables(dbconn(x))
         ## read the columns for these tables.
-        Tables <- vector(length=length(tables), "list")
-        for(i in 1:length(Tables)){
-            Tables[[ i ]] <- colnames(dbGetQuery(dbconn(x),
-                                                 paste0("select * from ",
-                                                        tables[ i ],
-                                                        " limit 1")))
+        Tables <- vector(length = length(tables), "list")
+        for (i in 1:length(Tables)){
+            Tables[[i]] <- colnames(dbGetQuery(dbconn(x),
+                                               paste0("select * from ",
+                                                      tables[i],
+                                                      " limit 1")))
         }
         names(Tables) <- tables
         x@tables <- Tables
     }
     Tab <- x@tables
+    if (!metadata)
+        Tab <- Tab[names(Tab) != "metadata"]
     ## Manually add tx_name as a "virtual" column; getWhat will insert
     ## the tx_id into that.
     Tab$tx <- unique(c(Tab$tx, "tx_name"))
     ## Manually add the symbol as a "virtual" column.
     Tab$gene <- unique(c(Tab$gene, "symbol"))
-    if(!missing(table)){
+    if (!missing(table))
         columns <- unlist(Tab[names(Tab) %in% table], use.names = FALSE)
-    }else{
+    else
         columns <- unlist(Tab, use.names=FALSE)
-    }
-    if(skip.keys){
+    if (skip.keys) {
         ## remove everything that has a _pk or _fk...
-        idx <- grep(columns, pattern="_fk$")
+        idx <- grep(columns, pattern = "_fk$")
         if(length(idx) > 0)
             columns <- columns[ -idx ]
         idx <- grep(columns, pattern="_pk$")
         if(length(idx) > 0)
             columns <- columns[ -idx ]
     }
-    return(unique(columns))
+    unique(columns)
 })
 
 ############################################################

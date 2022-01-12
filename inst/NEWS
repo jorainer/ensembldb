@@ -1,3 +1,8 @@
+Changes in version 2.19.7
+
+- `listColumns` does no longer report columns from the metadata database table
+  (issue https://github.com/jorainer/ensembldb/issues/128).
+
 Changes in version 2.19.6
 
 - Fixes in `proteinToGenome`.

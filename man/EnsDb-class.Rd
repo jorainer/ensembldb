@@ -51,7 +51,7 @@
 
 \S4method{ensemblVersion}{EnsDb}(x)
 
-\S4method{listColumns}{EnsDb}(x, table, skip.keys=TRUE, ...)
+\S4method{listColumns}{EnsDb}(x, table, skip.keys = TRUE, metadata = FALSE, ...)
 
 \S4method{listGenebiotypes}{EnsDb}(x, ...)
 
@@ -82,6 +82,11 @@
 
   \item{...}{Additional arguments.
     Not used.
+  }
+
+  \item{metadata}{For \code{listColumns}: whether columns from the
+    metadata database column should also be returned. Defaults to
+    \code{metadata = FALSE}.
   }
 
   \item{object}{
@@ -262,7 +267,7 @@
   \code{\link{exonsBy}}, \code{\link{genes}},
   \code{\link{transcripts}},
   \code{\link{makeEnsemblSQLiteFromTables}}
-  
+
   \code{\link{addFilter}} for globally adding filters to an \code{EnsDb}
   object.
 
@@ -318,4 +323,3 @@ genes(EnsDb.Hsapiens.v86, filter=list(SeqNameFilter("X"),
 
 }
 \keyword{classes}
-
