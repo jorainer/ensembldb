@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.7</span>
       </span>
     </div>
 
@@ -109,9 +109,9 @@ document.addEventListener("DOMContentLoaded", function() {
     if (links[i].hostname != window.location.hostname)
       links[i].target = '_blank';
 });
-</script><div class="section level1">
-<h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
-</h1>
+</script><div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>The <code>ensembldb</code> package provides functions to create and use transcript centric annotation databases/packages. The annotation for the databases are directly fetched from Ensembl <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup> using their Perl API. The functionality and data is similar to that of the <code>TxDb</code> packages from the <code>GenomicFeatures</code> package, but, in addition to retrieve all gene/transcript models and annotations from the database, the <code>ensembldb</code> package provides also a filter framework allowing to retrieve annotations for specific entries like genes encoded on a chromosome region or transcript models of lincRNA genes. From version 1.7 on, <code>EnsDb</code> databases created by the <code>ensembldb</code> package contain also protein annotation data (see Section <a href="#org4707794">11</a> for the database layout and an overview of available attributes/columns). For more information on the use of the protein annotations refer to the <em>proteins</em> vignette.</p>
 <p>Another main goal of this package is to generate <em>versioned</em> annotation packages, i.e. annotation packages that are build for a specific Ensembl release, and are also named according to that (e.g. <code>EnsDb.Hsapiens.v86</code> for human gene definitions of the Ensembl code database version 86). This ensures reproducibility, as it allows to load annotations from a specific Ensembl release also if newer versions of annotation packages/releases are available. It also allows to load multiple annotation packages at the same time in order to e.g. compare gene models between Ensembl releases.</p>
 <p>In the example below we load an Ensembl based annotation package for Homo sapiens, Ensembl version 86. The <code>EnsDb</code> object providing access to the underlying SQLite database is bound to the variable name <code>EnsDb.Hsapiens.v86</code>.</p>
@@ -144,9 +144,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="fu"><a href="../reference/EnsDb-class.html">organism</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] "Homo sapiens"</span></code></pre>
 </div>
-<div class="section level1">
-<h1 id="using-ensembldb-annotation-packages-to-retrieve-specific-annotations">Using <code>ensembldb</code> annotation packages to retrieve specific annotations<a class="anchor" aria-label="anchor" href="#using-ensembldb-annotation-packages-to-retrieve-specific-annotations"></a>
-</h1>
+<div class="section level2">
+<h2 id="using-ensembldb-annotation-packages-to-retrieve-specific-annotations">Using <code>ensembldb</code> annotation packages to retrieve specific annotations<a class="anchor" aria-label="anchor" href="#using-ensembldb-annotation-packages-to-retrieve-specific-annotations"></a>
+</h2>
 <p>One of the strengths of the <code>ensembldb</code> package and the related <code>EnsDb</code> databases is its implementation of a filter framework that enables to efficiently extract data sub-sets from the databases. The <code>ensembldb</code> package supports most of the filters defined in the <code>AnnotationFilter</code> Bioconductor package and defines some additional filters specific to the data stored in <code>EnsDb</code> databases. Filters can be passed directly to all methods extracting data from an <code>EnsDb</code> (such as <code>genes</code>, <code>transcripts</code> or <code>exons</code>). Alternatively it is possible with the <code>addFilter</code> or <code>filter</code> functions to add a filter directly to an <code>EnsDb</code> which will then be used in all queries on that object.</p>
 <p>The <code>supportedFilters</code> method can be used to get an overview over all supported filter classes, each of them (except the <code>GRangesFilter</code>) working on a single column/field in the database.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -778,9 +778,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##   -------</span>
 <span class="co">##   seqinfo: 1 sequence from GRCh38 genome</span></code></pre>
 </div>
-<div class="section level1">
-<h1 id="extracting-genetranscriptexon-models-for-rnaseq-feature-counting">Extracting gene/transcript/exon models for RNASeq feature counting<a class="anchor" aria-label="anchor" href="#extracting-genetranscriptexon-models-for-rnaseq-feature-counting"></a>
-</h1>
+<div class="section level2">
+<h2 id="extracting-genetranscriptexon-models-for-rnaseq-feature-counting">Extracting gene/transcript/exon models for RNASeq feature counting<a class="anchor" aria-label="anchor" href="#extracting-genetranscriptexon-models-for-rnaseq-feature-counting"></a>
+</h2>
 <p>For the feature counting step of an RNAseq experiment, the gene or transcript models (defined by the chromosomal start and end positions of their exons) have to be known. To extract these from an Ensembl based annotation package, the <code>exonsBy</code>, <code>genesBy</code> and <code>transcriptsBy</code> methods can be used in an analogous way as in <code>TxDb</code> packages generated by the <code>GenomicFeatures</code> package. However, the <code>transcriptsBy</code> method does not, in contrast to the method in the <code>GenomicFeatures</code> package, allow to return transcripts by “cds”. While the annotation packages built by the <code>ensembldb</code> contain the chromosomal start and end coordinates of the coding region (for protein coding genes) they do not assign an ID to each CDS.</p>
 <p>A simple use case is to retrieve all genes encoded on chromosomes X and Y from the database.</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
@@ -879,9 +879,9 @@ document.addEventListener("DOMContentLoaded", function() {
                   <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">SeqNameFilter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">22</span>, <span class="st">"X"</span>, <span class="st">"Y"</span><span class="op">)</span><span class="op">)</span>,
                   <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneIdFilter</a></span><span class="op">(</span><span class="st">"ENSG%"</span>, <span class="st">"startsWith"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="retrieving-sequences-for-genetranscriptexon-models">Retrieving sequences for gene/transcript/exon models<a class="anchor" aria-label="anchor" href="#retrieving-sequences-for-genetranscriptexon-models"></a>
-</h1>
+<div class="section level2">
+<h2 id="retrieving-sequences-for-genetranscriptexon-models">Retrieving sequences for gene/transcript/exon models<a class="anchor" aria-label="anchor" href="#retrieving-sequences-for-genetranscriptexon-models"></a>
+</h2>
 <p>The methods to retrieve exons, transcripts and genes (i.e. <code>exons</code>, <code>transcripts</code> and <code>genes</code>) return by default <code>GRanges</code> objects that can be used to retrieve sequences using the <code>getSeq</code> method e.g. from BSgenome packages. The basic workflow is thus identical to the one for <code>TxDb</code> packages, however, it is not straight forward to identify the BSgenome package with the matching genomic sequence. Most BSgenome packages are named according to the genome build identifier used in UCSC which does not (always) match the genome build name used by Ensembl. Using the Ensembl version provided by the <code>EnsDb</code>, the correct genomic sequence can however be retrieved easily from the <code>AnnotationHub</code> using the <code>getGenomeTeoBitFile</code>. If no 2bit file matching the Ensembl version is available, the function tries to identify a file with the correct genome build from the <em>closest</em> Ensembl release and returns that instead.</p>
 <p>In the code block below we retrieve first the <code>TwoBitFile</code> with the genomic DNA sequence, extract the genomic start and end coordinates for all genes defined in the package, subset to genes encoded on sequences available in the <code>TwoBitFile</code> and extract all of their sequences. Note: these sequences represent the sequence between the chromosomal start and end coordinates of the gene.</p>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
@@ -968,9 +968,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [150]   792 <span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">GG</span><span style="color: #000000; background-color: #AFFFAF;">CCC</span><span style="color: #000000; background-color: #AFFFFF;">GGGG</span><span style="color: #000000; background-color: #AFFFAF;">CCCC</span><span style="color: #000000; background-color: #FFAFAF;">AA</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">AA</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #AFFFAF;">C</span>...<span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #AFFFAF;">CC</span><span style="color: #000000; background-color: #FFAFAF;">AAA</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">GG</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #FFAFAF;">AA</span> ENST00000629237</span>
 <span class="co">## [151]  1740 <span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFAFAF;">AAA</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFAF;">CC</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span>...<span style="color: #000000; background-color: #FFD7AF;">TTT</span><span style="color: #000000; background-color: #FFAFAF;">AA</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFAF;">CC</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">AA</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span><span style="color: #000000; background-color: #AFFFAF;">C</span><span style="color: #000000; background-color: #FFD7AF;">T</span><span style="color: #000000; background-color: #AFFFFF;">G</span><span style="color: #000000; background-color: #FFAFAF;">A</span> ENST00000634662</span></code></pre>
 </div>
-<div class="section level1">
-<h1 id="integrating-annotations-from-ensembl-based-ensdb-packages-with-ucsc-based-annotations">Integrating annotations from Ensembl based <code>EnsDb</code> packages with UCSC based annotations<a class="anchor" aria-label="anchor" href="#integrating-annotations-from-ensembl-based-ensdb-packages-with-ucsc-based-annotations"></a>
-</h1>
+<div class="section level2">
+<h2 id="integrating-annotations-from-ensembl-based-ensdb-packages-with-ucsc-based-annotations">Integrating annotations from Ensembl based <code>EnsDb</code> packages with UCSC based annotations<a class="anchor" aria-label="anchor" href="#integrating-annotations-from-ensembl-based-ensdb-packages-with-ucsc-based-annotations"></a>
+</h2>
 <p>Sometimes it might be useful to combine (Ensembl based) annotations from <code>EnsDb</code> packages/objects with annotations from other Bioconductor packages, that might base on UCSC annotations. To support such an integration of annotations, the <code>ensembldb</code> packages implements the <code>seqlevelsStyle</code> and <code>seqlevelsStyle&lt;-</code> from the <code>GenomeInfoDb</code> package that allow to change the style of chromosome naming. Thus, sequence/chromosome names other than those used by Ensembl can be used in, and are returned by, the queries to <code>EnsDb</code> objects as long as a mapping for them is provided by the <code>GenomeInfoDb</code> package (which provides a mapping mostly between UCSC, NCBI and Ensembl chromosome names for the <em>main</em> chromosomes).</p>
 <p>In the example below we change the seqnames style to UCSC.</p>
 <div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
@@ -1029,14 +1029,14 @@ document.addEventListener("DOMContentLoaded", function() {
 <div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-seqlevels.html">seqlevelsStyle</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"Ensembl"</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="interactive-annotation-lookup-using-the-shiny-web-app">Interactive annotation lookup using the <code>shiny</code> web app<a class="anchor" aria-label="anchor" href="#interactive-annotation-lookup-using-the-shiny-web-app"></a>
-</h1>
+<div class="section level2">
+<h2 id="interactive-annotation-lookup-using-the-shiny-web-app">Interactive annotation lookup using the <code>shiny</code> web app<a class="anchor" aria-label="anchor" href="#interactive-annotation-lookup-using-the-shiny-web-app"></a>
+</h2>
 <p>In addition to the <code>genes</code>, <code>transcripts</code> and <code>exons</code> methods it is possibly to search interactively for gene/transcript/exon annotations using the internal, <code>shiny</code> based, web application. The application can be started with the <code><a href="../reference/runEnsDbApp.html">runEnsDbApp()</a></code> function. The search results from this app can also be returned to the R workspace either as a <code>data.frame</code> or <code>GRanges</code> object.</p>
 </div>
-<div class="section level1">
-<h1 id="plotting-genetranscript-features-using-ensembldb-and-gviz-and-ggbio">Plotting gene/transcript features using <code>ensembldb</code> and <code>Gviz</code> and <code>ggbio</code><a class="anchor" aria-label="anchor" href="#plotting-genetranscript-features-using-ensembldb-and-gviz-and-ggbio"></a>
-</h1>
+<div class="section level2">
+<h2 id="plotting-genetranscript-features-using-ensembldb-and-gviz-and-ggbio">Plotting gene/transcript features using <code>ensembldb</code> and <code>Gviz</code> and <code>ggbio</code><a class="anchor" aria-label="anchor" href="#plotting-genetranscript-features-using-ensembldb-and-gviz-and-ggbio"></a>
+</h2>
 <p>The <code>Gviz</code> package provides functions to plot genes and transcripts along with other data on a genomic scale. Gene models can be provided either as a <code>data.frame</code>, <code>GRanges</code>, <code>TxDB</code> database, can be fetched from biomart and can also be retrieved from <code>ensembldb</code>.</p>
 <p>Below we generate a <code>GeneRegionTrack</code> fetching all transcripts from a certain region on chromosome Y.</p>
 <p>Note that if we want in addition to work also with BAM files that were aligned against DNA sequences retrieved from Ensembl or FASTA files representing genomic DNA sequences from Ensembl we should change the <code>ucscChromosomeNames</code> option from <code>Gviz</code> to <code>FALSE</code> (i.e. by calling <code>options(ucscChromosomeNames = FALSE)</code>). This is not necessary if we just want to retrieve gene models from an <code>EnsDb</code> object, as the <code>ensembldb</code> package internally checks the <code>ucscChromosomeNames</code> option and, depending on that, maps Ensembl chromosome names to UCSC chromosome names.</p>
@@ -1109,9 +1109,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/strand.html" class="external-link">strand</a></span><span class="op">(</span><span class="va">ska2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"*"</span>
 <span class="fu"><a href="https://rdrr.io/pkg/ggbio/man/autoplot-method.html" class="external-link">autoplot</a></span><span class="op">(</span><span class="va">edb</span>, <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GRangesFilter</a></span><span class="op">(</span><span class="va">ska2</span><span class="op">)</span>, names.expr <span class="op">=</span> <span class="st">"gene_name"</span><span class="op">)</span></code></pre></div>
 </div>
-<div class="section level1">
-<h1 id="using-ensdb-objects-in-the-annotationdbi-framework">Using <code>EnsDb</code> objects in the <code>AnnotationDbi</code> framework<a class="anchor" aria-label="anchor" href="#using-ensdb-objects-in-the-annotationdbi-framework"></a>
-</h1>
+<div class="section level2">
+<h2 id="using-ensdb-objects-in-the-annotationdbi-framework">Using <code>EnsDb</code> objects in the <code>AnnotationDbi</code> framework<a class="anchor" aria-label="anchor" href="#using-ensdb-objects-in-the-annotationdbi-framework"></a>
+</h2>
 <p>Most of the methods defined for objects extending the basic annotation package class <code>AnnotationDbi</code> are also defined for <code>EnsDb</code> objects (i.e. methods <code>columns</code>, <code>keytypes</code>, <code>keys</code>, <code>mapIds</code> and <code>select</code>). While these methods can be used analogously to basic annotation packages, the implementation for <code>EnsDb</code> objects also support the filtering framework of the <code>ensembldb</code> package.</p>
 <p>In the example below we first evaluate all the available columns and keytypes in the database and extract then the gene names for all genes encoded on chromosome X.</p>
 <div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
@@ -1142,13 +1142,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##  [7] "exon_seq_start"        "exon_seq_end"          "gene_name"            </span>
 <span class="co">## [10] "gene_biotype"          "gene_seq_start"        "gene_seq_end"         </span>
 <span class="co">## [13] "seq_strand"            "seq_coord_system"      "symbol"               </span>
-<span class="co">## [16] "name"                  "value"                 "tx_id"                </span>
-<span class="co">## [19] "protein_id"            "protein_sequence"      "protein_domain_id"    </span>
-<span class="co">## [22] "protein_domain_source" "interpro_accession"    "prot_dom_start"       </span>
-<span class="co">## [25] "prot_dom_end"          "tx_biotype"            "tx_seq_start"         </span>
-<span class="co">## [28] "tx_seq_end"            "tx_cds_seq_start"      "tx_cds_seq_end"       </span>
-<span class="co">## [31] "tx_name"               "exon_idx"              "uniprot_id"           </span>
-<span class="co">## [34] "uniprot_db"            "uniprot_mapping_type"</span></code></pre>
+<span class="co">## [16] "tx_id"                 "protein_id"            "protein_sequence"     </span>
+<span class="co">## [19] "protein_domain_id"     "protein_domain_source" "interpro_accession"   </span>
+<span class="co">## [22] "prot_dom_start"        "prot_dom_end"          "tx_biotype"           </span>
+<span class="co">## [25] "tx_seq_start"          "tx_seq_end"            "tx_cds_seq_start"     </span>
+<span class="co">## [28] "tx_cds_seq_end"        "tx_name"               "exon_idx"             </span>
+<span class="co">## [31] "uniprot_id"            "uniprot_db"            "uniprot_mapping_type"</span></code></pre>
 <div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## List all of the supported key types.</span>
 <span class="fu"><a href="https://rdrr.io/pkg/AnnotationDbi/man/AnnotationDb-class.html" class="external-link">keytypes</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
@@ -1268,9 +1267,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [13] "ENST00000615946" "ENST00000621302" "ENST00000620862"</span></code></pre>
 <p>Note that, if the filters are used, the ordering of the result does no longer match the ordering of the genes.</p>
 </div>
-<div class="section level1">
-<h1 id="important-notes">Important notes<a class="anchor" aria-label="anchor" href="#important-notes"></a>
-</h1>
+<div class="section level2">
+<h2 id="important-notes">Important notes<a class="anchor" aria-label="anchor" href="#important-notes"></a>
+</h2>
 <p>These notes might explain eventually unexpected results (and, more importantly, help avoiding them):</p>
 <ul>
 <li><p>The ordering of the results returned by the <code>genes</code>, <code>exons</code>, <code>transcripts</code> methods can be specified with the <code>order.by</code> parameter. The ordering of the results does however <strong>not</strong> correspond to the ordering of values in submitted filter objects. The exception is the <code>select</code> method. If a character vector of values or a single filter is passed with argument <code>keys</code> the ordering of results of this method matches the ordering of the key values or the values of the filter.</p></li>
@@ -1281,13 +1280,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <li><p>Since a single Ensembl gene ID might be mapped to multiple NCBI Entrezgene IDs methods such as <code>genes</code>, <code>transcripts</code> etc return a <code>list</code> in the <code>"entrezid"</code> column of the resulting result object.</p></li>
 </ul>
 </div>
-<div class="section level1">
-<h1 id="getting-or-building-ensdb-databasespackages">Getting or building <code>EnsDb</code> databases/packages<a class="anchor" aria-label="anchor" href="#getting-or-building-ensdb-databasespackages"></a>
-</h1>
-<p>Some of the code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, building <code>EnsDb</code> from alternative sources, like GFF or GTF files takes some time and thus also these examples are not directly executed when the vignette is build.</p>
 <div class="section level2">
-<h2 id="getting-ensdb-databases">Getting <code>EnsDb</code> databases<a class="anchor" aria-label="anchor" href="#getting-ensdb-databases"></a>
+<h2 id="getting-or-building-ensdb-databasespackages">Getting or building <code>EnsDb</code> databases/packages<a class="anchor" aria-label="anchor" href="#getting-or-building-ensdb-databasespackages"></a>
 </h2>
+<p>Some of the code in this section is not supposed to be automatically executed when the vignette is built, as this would require a working installation of the Ensembl Perl API, which is not expected to be available on each system. Also, building <code>EnsDb</code> from alternative sources, like GFF or GTF files takes some time and thus also these examples are not directly executed when the vignette is build.</p>
+<div class="section level3">
+<h3 id="getting-ensdb-databases">Getting <code>EnsDb</code> databases<a class="anchor" aria-label="anchor" href="#getting-ensdb-databases"></a>
+</h3>
 <p>Some <code>EnsDb</code> databases are available as <code>R</code> packages from Bioconductor and can be simply installed with the <code>install</code> function from the <code>BiocManager</code> package. The name of such annotation packages starts with <em>EnsDb</em> followed by the abbreviation of the organism and the Ensembl version on which the annotation bases. <code>EnsDb.Hsapiens.v86</code> provides thus an <code>EnsDb</code> database for homo sapiens with annotations from Ensembl version 86.</p>
 <p>Since Bioconductor version 3.5 <code>EnsDb</code> databases can also be retrieved directly from <code>AnnotationHub</code>.</p>
 <div class="sourceCode" id="cb109"><pre class="downlit sourceCode r">
@@ -1298,7 +1297,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## Query for all available EnsDb databases</span>
 <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="st">"EnsDb"</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## AnnotationHub with 2962 records</span>
-<span class="co">## # snapshotDate(): 2021-12-20</span>
+<span class="co">## # snapshotDate(): 2022-01-07</span>
 <span class="co">## # $dataprovider: Ensembl</span>
 <span class="co">## # $species: Homo sapiens, Xiphophorus maculatus, Xenopus tropicalis, Vicugna...</span>
 <span class="co">## # $rdataclass: EnsDb</span>
@@ -1325,7 +1324,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## What have we got</span>
 <span class="va">ahDb</span></code></pre></div>
 <pre><code><span class="co">## AnnotationHub with 1 record</span>
-<span class="co">## # snapshotDate(): 2021-12-20</span>
+<span class="co">## # snapshotDate(): 2022-01-07</span>
 <span class="co">## # names(): AH53251</span>
 <span class="co">## # $dataprovider: Ensembl</span>
 <span class="co">## # $species: Xiphophorus maculatus</span>
@@ -1349,12 +1348,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="va">gns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">genes</a></span><span class="op">(</span><span class="va">ahEdb</span><span class="op">)</span></code></pre></div>
 <p>We could even make an annotation package from this <code>EnsDb</code> object using the <code>makeEnsembldbPackage</code> and passing <code>dbfile(dbconn(ahEdb))</code> as <code>ensdb</code> argument.</p>
 </div>
-<div class="section level2">
-<h2 id="building-annotation-packages">Building annotation packages<a class="anchor" aria-label="anchor" href="#building-annotation-packages"></a>
-</h2>
 <div class="section level3">
-<h3 id="directly-from-ensembl-databases">Directly from Ensembl databases<a class="anchor" aria-label="anchor" href="#directly-from-ensembl-databases"></a>
+<h3 id="building-annotation-packages">Building annotation packages<a class="anchor" aria-label="anchor" href="#building-annotation-packages"></a>
 </h3>
+<div class="section level4">
+<h4 id="directly-from-ensembl-databases">Directly from Ensembl databases<a class="anchor" aria-label="anchor" href="#directly-from-ensembl-databases"></a>
+</h4>
 <p>The <code>fetchTablesFromEnsembl</code> function uses the Ensembl Perl API to retrieve the required annotations from an Ensembl database (e.g. from the main site <em>ensembldb.ensembl.org</em>). Thus, to use this functionality to build databases, the Ensembl Perl API needs to be installed (see <sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup> for details).</p>
 <p>Below we create an <code>EnsDb</code> database by fetching the required data directly from the Ensembl core databases. The <code>makeEnsembldbPackage</code> function is then used to create an annotation package from this <code>EnsDb</code> containing all human genes for Ensembl version 75.</p>
 <div class="sourceCode" id="cb114"><pre class="downlit sourceCode r">
@@ -1377,9 +1376,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <p>The generated package can then be build using <code>R CMD build EnsDb.Hsapiens.v75</code> and installed with <code>R CMD INSTALL EnsDb.Hsapiens.v75*</code>. Note that we could directly generate an <code>EnsDb</code> instance by loading the database file, i.e. by calling <code>edb &lt;- EnsDb(DBFile)</code> and work with that annotation object.</p>
 <p>To fetch and build annotation packages for plant genomes (e.g. arabidopsis thaliana), the <em>Ensembl genomes</em> should be specified as a host, i.e. setting <code>host</code> to “mysql-eg-publicsql.ebi.ac.uk”, <code>port</code> to <code>4157</code> and <code>species</code> to e.g. “arabidopsis thaliana”.</p>
 </div>
-<div class="section level3">
-<h3 id="from-a-gtf-or-gff-file">From a GTF or GFF file<a class="anchor" aria-label="anchor" href="#from-a-gtf-or-gff-file"></a>
-</h3>
+<div class="section level4">
+<h4 id="from-a-gtf-or-gff-file">From a GTF or GFF file<a class="anchor" aria-label="anchor" href="#from-a-gtf-or-gff-file"></a>
+</h4>
 <p>Alternatively, the <code>ensDbFromAH</code>, <code>ensDbFromGff</code>, <code>ensDbFromGRanges</code> and <code>ensDbFromGtf</code> functions allow to build EnsDb SQLite files from a <code>GRanges</code> object or GFF/GTF files from Ensembl (either provided as files or <em>via</em> <code>AnnotationHub</code>). These functions do not depend on the Ensembl Perl API, but require a working internet connection to fetch the chromosome lengths from Ensembl as these are not provided within GTF or GFF files. Also note that protein annotations are usually not available in GTF or GFF files, thus, such annotations will not be included in the generated <code>EnsDb</code> database - protein annotations are only available in <code>EnsDb</code> databases created with the Ensembl Perl API (such as the ones provided through <code>AnnotationHub</code> or as Bioconductor packages).</p>
 <p>In the next example we create an <code>EnsDb</code> database using the <code>AnnotationHub</code> package and load also the corresponding genomic DNA sequence matching the Ensembl version. We thus first query the <code>AnnotationHub</code> package for all resources available for <code>Mus musculus</code> and the Ensembl release 77. Next we create the <code>EnsDb</code> object from the appropriate <code>AnnotationHub</code> resource. We then use the <code>getGenomeTwoBitFile</code> method on the <code>EnsDb</code> to directly look up and retrieve the correct or best matching <code>TwoBitFile</code> with the genomic DNA sequence. At last we retrieve the sequences of all exons using the <code>getSeq</code> method.</p>
 <div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
@@ -1484,7 +1483,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## |Supporting package: ensembldb</span>
 <span class="co">## |Db created by: ensembldb package from Bioconductor</span>
 <span class="co">## |script_version: 0.0.1</span>
-<span class="co">## |Creation time: Sat Jan  1 12:54:24 2022</span>
+<span class="co">## |Creation time: Wed Jan 12 11:17:37 2022</span>
 <span class="co">## |ensembl_version: 75</span>
 <span class="co">## |ensembl_host: unknown</span>
 <span class="co">## |Organism: Homo_sapiens</span>
@@ -1515,9 +1514,9 @@ document.addEventListener("DOMContentLoaded", function() {
 </div>
 </div>
 </div>
-<div class="section level1">
-<h1 id="database-layout">Database layout<a id="org4707794"></a><a class="anchor" aria-label="anchor" href="#database-layout"></a>
-</h1>
+<div class="section level2">
+<h2 id="database-layout">Database layout<a id="org4707794"></a><a class="anchor" aria-label="anchor" href="#database-layout"></a>
+</h2>
 <p>The database consists of the following tables and attributes (the layout is also shown in Figure <a href="#orgfe7e95a">165</a>). Note that the protein-specific annotations might not be available in all <code>EnsDB</code> databases (e.g. such ones created with <code>ensembldb</code> version &lt; 1.7 or created from GTF or GFF files).</p>
 <ul>
 <li>
@@ -1665,12 +1664,12 @@ document.addEventListener("DOMContentLoaded", function() {
 <img src="images/dblayout.png" title="Database layout." alt=""><p class="caption">img</p>
 </div>
 </div>
-<div class="section level1">
-<h1 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
-</h1>
+<div class="section level2">
+<h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
+</h2>
 <div class="sourceCode" id="cb123"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## R Under development (unstable) (2021-12-30 r81418)</span>
+<pre><code><span class="co">## R Under development (unstable) (2022-01-07 r81454)</span>
 <span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">## Running under: Ubuntu 20.04.3 LTS</span>
 <span class="co">## </span>
@@ -1680,7 +1679,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## locale:</span>
 <span class="co">##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              </span>
 <span class="co">##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    </span>
-<span class="co">##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=C             </span>
+<span class="co">##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   </span>
 <span class="co">##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 </span>
 <span class="co">##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span>
 <span class="co">## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       </span>
@@ -1693,15 +1692,15 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##  [1] AnnotationHub_3.3.7                   </span>
 <span class="co">##  [2] BiocFileCache_2.3.3                   </span>
 <span class="co">##  [3] dbplyr_2.1.1                          </span>
-<span class="co">##  [4] Gviz_1.39.1                           </span>
+<span class="co">##  [4] Gviz_1.39.2                           </span>
 <span class="co">##  [5] BSgenome.Hsapiens.NCBI.GRCh38_1.3.1000</span>
 <span class="co">##  [6] BSgenome_1.63.3                       </span>
 <span class="co">##  [7] rtracklayer_1.55.3                    </span>
-<span class="co">##  [8] Biostrings_2.63.0                     </span>
+<span class="co">##  [8] Biostrings_2.63.1                     </span>
 <span class="co">##  [9] XVector_0.35.0                        </span>
 <span class="co">## [10] magrittr_2.0.1                        </span>
 <span class="co">## [11] EnsDb.Hsapiens.v86_2.99.0             </span>
-<span class="co">## [12] ensembldb_2.19.6                      </span>
+<span class="co">## [12] ensembldb_2.19.7                      </span>
 <span class="co">## [13] AnnotationFilter_1.19.0               </span>
 <span class="co">## [14] GenomicFeatures_1.47.5                </span>
 <span class="co">## [15] AnnotationDbi_1.57.1                  </span>
@@ -1709,18 +1708,18 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [17] GenomicRanges_1.47.5                  </span>
 <span class="co">## [18] GenomeInfoDb_1.31.1                   </span>
 <span class="co">## [19] IRanges_2.29.1                        </span>
-<span class="co">## [20] S4Vectors_0.33.8                      </span>
+<span class="co">## [20] S4Vectors_0.33.9                      </span>
 <span class="co">## [21] BiocGenerics_0.41.2                   </span>
 <span class="co">## [22] BiocStyle_2.23.1                      </span>
 <span class="co">## </span>
 <span class="co">## loaded via a namespace (and not attached):</span>
-<span class="co">##   [1] colorspace_2.0-2              rjson_0.2.20                 </span>
+<span class="co">##   [1] colorspace_2.0-2              rjson_0.2.21                 </span>
 <span class="co">##   [3] ellipsis_0.3.2                rprojroot_2.0.2              </span>
-<span class="co">##   [5] htmlTable_2.3.0               biovizBase_1.43.1            </span>
+<span class="co">##   [5] htmlTable_2.4.0               biovizBase_1.43.1            </span>
 <span class="co">##   [7] base64enc_0.1-3               fs_1.5.2                     </span>
 <span class="co">##   [9] dichromat_2.0-0               rstudioapi_0.13              </span>
 <span class="co">##  [11] bit64_4.0.5                   interactiveDisplayBase_1.33.0</span>
-<span class="co">##  [13] fansi_0.5.0                   xml2_1.3.3                   </span>
+<span class="co">##  [13] fansi_1.0.0                   xml2_1.3.3                   </span>
 <span class="co">##  [15] splines_4.2.0                 cachem_1.0.6                 </span>
 <span class="co">##  [17] knitr_1.37                    Formula_1.2-4                </span>
 <span class="co">##  [19] jsonlite_1.7.2                Rsamtools_2.11.0             </span>
@@ -1742,7 +1741,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##  [51] zlibbioc_1.41.0               scales_1.1.1                 </span>
 <span class="co">##  [53] VariantAnnotation_1.41.3      promises_1.2.0.1             </span>
 <span class="co">##  [55] ragg_1.2.1                    hms_1.1.1                    </span>
-<span class="co">##  [57] MatrixGenerics_1.7.0          ProtGenerics_1.27.1          </span>
+<span class="co">##  [57] MatrixGenerics_1.7.0          ProtGenerics_1.27.2          </span>
 <span class="co">##  [59] parallel_4.2.0                SummarizedExperiment_1.25.3  </span>
 <span class="co">##  [61] RColorBrewer_1.1-2            yaml_2.2.1                   </span>
 <span class="co">##  [63] curl_4.3.2                    gridExtra_2.3                </span>
@@ -1753,7 +1752,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##  [73] BiocVersion_3.15.0            highr_0.9                    </span>
 <span class="co">##  [75] BiocIO_1.5.0                  desc_1.4.0                   </span>
 <span class="co">##  [77] checkmate_2.0.0               filelock_1.0.2               </span>
-<span class="co">##  [79] BiocParallel_1.29.8           rlang_0.4.12                 </span>
+<span class="co">##  [79] BiocParallel_1.29.10          rlang_0.4.12                 </span>
 <span class="co">##  [81] pkgconfig_2.0.3               systemfonts_1.0.3            </span>
 <span class="co">##  [83] matrixStats_0.61.0            bitops_1.0-7                 </span>
 <span class="co">##  [85] evaluate_0.14                 lattice_0.20-45              </span>
@@ -1770,13 +1769,13 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [107] rmarkdown_2.11                jpeg_0.1-9                   </span>
 <span class="co">## [109] progress_1.2.2                data.table_1.14.2            </span>
 <span class="co">## [111] blob_1.2.2                    digest_0.6.29                </span>
-<span class="co">## [113] xtable_1.8-4                  httpuv_1.6.4                 </span>
+<span class="co">## [113] xtable_1.8-4                  httpuv_1.6.5                 </span>
 <span class="co">## [115] textshaping_0.3.6             munsell_0.5.0                </span>
 <span class="co">## [117] bslib_0.3.1</span></code></pre>
 </div>
-<div class="section level1">
-<h1 id="footnotes">Footnotes<a class="anchor" aria-label="anchor" href="#footnotes"></a>
-</h1>
+<div class="section level2">
+<h2 id="footnotes">Footnotes<a class="anchor" aria-label="anchor" href="#footnotes"></a>
+</h2>
 <p><sup><a id="fn.1" href="#fnr.1">1</a></sup><a href="http://www.ensembl.org" class="external-link uri">http://www.ensembl.org</a></p>
 <p><sup><a id="fn.2" href="#fnr.2">2</a></sup><a href="http://www.lrg-sequence.org" class="external-link uri">http://www.lrg-sequence.org</a></p>
 <p><sup><a id="fn.3" href="#fnr.3">3</a></sup><a href="http://www.ncbi.nlm.nih.gov/pubmed/23950696" class="external-link uri">http://www.ncbi.nlm.nih.gov/pubmed/23950696</a></p>

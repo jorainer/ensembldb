@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.7</span>
       </span>
     </div>
 
@@ -83,7 +83,7 @@
 <span class="fu">ensemblVersion</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 
 <span class="co"># S4 method for EnsDb</span>
-<span class="fu">listColumns</span><span class="op">(</span><span class="va">x</span>, <span class="va">table</span>, skip.keys<span class="op">=</span><span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span>
+<span class="fu">listColumns</span><span class="op">(</span><span class="va">x</span>, <span class="va">table</span>, skip.keys <span class="op">=</span> <span class="cn">TRUE</span>, metadata <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span>
 
 <span class="co"># S4 method for EnsDb</span>
 <span class="fu">listGenebiotypes</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span>
@@ -134,6 +134,10 @@
 <dl><dt>...</dt>
 <dd><p>Additional arguments.
     Not used.</p></dd>
+<dt>metadata</dt>
+<dd><p>For <code>listColumns</code>: whether columns from the
+    metadata database column should also be returned. Defaults to
+    <code>metadata = FALSE</code>.</p></dd>
 <dt>object</dt>
 <dd><p>For <code>organism</code>: an <code>EnsDb</code> instance.</p></dd>
 <dt>skip.keys</dt>
@@ -303,7 +307,7 @@
   <code><a href="makeEnsemblDbPackage.html">makeEnsembldbPackage</a></code>,
   <code><a href="EnsDb-exonsBy.html">exonsBy</a></code>, <code><a href="EnsDb-exonsBy.html">genes</a></code>,
   <code><a href="EnsDb-exonsBy.html">transcripts</a></code>,
-  <code><a href="makeEnsemblDbPackage.html">makeEnsemblSQLiteFromTables</a></code></p>  
+  <code><a href="makeEnsemblDbPackage.html">makeEnsemblSQLiteFromTables</a></code></p>
 <p><code><a href="global-filters.html">addFilter</a></code> for globally adding filters to an <code>EnsDb</code>
   object.</p></div>
     </div>

@@ -25,7 +25,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.7</span>
       </span>
     </div>
 
@@ -253,13 +253,12 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "exon_seq_start"        "exon_seq_end"          "gene_name"            </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [10] "gene_biotype"          "gene_seq_start"        "gene_seq_end"         </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [13] "seq_strand"            "seq_coord_system"      "symbol"               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16] "name"                  "value"                 "tx_id"                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19] "protein_id"            "protein_sequence"      "protein_domain_id"    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [22] "protein_domain_source" "interpro_accession"    "prot_dom_start"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "prot_dom_end"          "tx_biotype"            "tx_seq_start"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [28] "tx_seq_end"            "tx_cds_seq_start"      "tx_cds_seq_end"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31] "tx_name"               "exon_idx"              "uniprot_id"           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [34] "uniprot_db"            "uniprot_mapping_type" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16] "tx_id"                 "protein_id"            "protein_sequence"     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] "protein_domain_id"     "protein_domain_source" "interpro_accession"   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [22] "prot_dom_start"        "prot_dom_end"          "tx_biotype"           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "tx_seq_start"          "tx_seq_end"            "tx_cds_seq_start"     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [28] "tx_cds_seq_end"        "tx_name"               "exon_idx"             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31] "uniprot_id"            "uniprot_db"            "uniprot_mapping_type" </span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Retrieve all keys corresponding to transcript ids.</span></span>
 <span class="r-in"><span class="va">txids</span> <span class="op">&lt;-</span> <span class="fu">keys</span><span class="op">(</span><span class="va">edb</span>, keytype <span class="op">=</span> <span class="st">"TXID"</span><span class="op">)</span></span>
