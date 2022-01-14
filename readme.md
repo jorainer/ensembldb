@@ -10,4 +10,4 @@
 # `ensembldb`: build and use Ensembl-based annotation packages
 
 For more information please refer to
-the [vignettes/ensembldb.org](vignettes/ensembldb.org) file.
+the [vignettes/ensembldb.org](vignettes/ensembldb.Rmd) file.
