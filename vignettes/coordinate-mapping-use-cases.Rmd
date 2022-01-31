@@ -10,7 +10,7 @@ vignette: >
   %\VignetteIndexEntry{Use cases for coordinate mapping with ensembldb}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,Gviz}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,Gviz,Biostrings}
 bibliography: references.bib
 ---
 
@@ -302,6 +302,7 @@ in the `proteins` call.
 prt_seq <- proteins(edb, return.type = "AAStringSet",
                     filter = ~ protein_id == names(prt_pos[[1]]))
 ## Extract the amino acid at position 294
+library(Biostrings)
 subseq(prt_seq, start = 294, end = 294)
 ```
 

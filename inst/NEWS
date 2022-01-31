@@ -1,3 +1,7 @@
+Changes in version 2.19.8
+
+- Require package Biostrings in the coordinate mapping vignette.
+
 Changes in version 2.19.7
 
 - `listColumns` does no longer report columns from the metadata database table
