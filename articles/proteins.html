@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.19.9</span>
       </span>
     </div>
 
@@ -46,7 +46,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -88,7 +88,8 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Querying protein features</h1>
-                        <h4 data-toc-skip class="author">Johannes Rainer</h4>
+                        <h4 data-toc-skip class="author">Johannes
+Rainer</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/jorainer/ensembldb/blob/HEAD/vignettes/proteins.Rmd" class="external-link"><code>vignettes/proteins.Rmd</code></a></small>
@@ -112,30 +113,57 @@ document.addEventListener("DOMContentLoaded", function() {
 </script><div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>From Bioconductor release 3.5 on, <code>EnsDb</code> databases/packages created by the <code>ensembldb</code> package contain also, for transcripts with a coding regions, mappings between transcripts and proteins. Thus, in addition to the RNA/DNA-based features also the following protein related information is available:</p>
+<p>From Bioconductor release 3.5 on, <code>EnsDb</code>
+databases/packages created by the <code>ensembldb</code> package contain
+also, for transcripts with a coding regions, mappings between
+transcripts and proteins. Thus, in addition to the RNA/DNA-based
+features also the following protein related information is
+available:</p>
 <ul>
 <li>
-<code>protein_id</code>: the Ensembl protein ID. This is the primary ID for the proteins defined in Ensembl and each (protein coding) Ensembl transcript has one protein ID assigned to it.</li>
+<code>protein_id</code>: the Ensembl protein ID. This is the primary
+ID for the proteins defined in Ensembl and each (protein coding) Ensembl
+transcript has one protein ID assigned to it.</li>
 <li>
-<code>protein_sequence</code>: the amino acid sequence of a protein.</li>
+<code>protein_sequence</code>: the amino acid sequence of a
+protein.</li>
 <li>
-<code>uniprot_id</code>: the Uniprot ID for a protein. Note that not every Ensembl <code>protein_id</code> has an Uniprot ID, and each <code>protein_id</code> might be mapped to several <code>uniprot_id</code>. Also, the same Uniprot ID might be mapped to different <code>protein_id</code>.</li>
+<code>uniprot_id</code>: the Uniprot ID for a protein. Note that not
+every Ensembl <code>protein_id</code> has an Uniprot ID, and each
+<code>protein_id</code> might be mapped to several
+<code>uniprot_id</code>. Also, the same Uniprot ID might be mapped to
+different <code>protein_id</code>.</li>
 <li>
-<code>uniprot_db</code>: the name of the Uniprot database in which the feature is annotated. Can be either <em>SPTREMBL</em> or <em>SWISSPROT</em>.</li>
+<code>uniprot_db</code>: the name of the Uniprot database in which
+the feature is annotated. Can be either <em>SPTREMBL</em> or
+<em>SWISSPROT</em>.</li>
 <li>
-<code>uniprot_mapping_type</code>: the type of the mapping method that was used to assign the Uniprot ID to the Ensembl protein ID.</li>
+<code>uniprot_mapping_type</code>: the type of the mapping method
+that was used to assign the Uniprot ID to the Ensembl protein ID.</li>
 <li>
-<code>protein_domain_id</code>: the ID of the protein domain according to the source/analysis in/by which is was defined.</li>
+<code>protein_domain_id</code>: the ID of the protein domain
+according to the source/analysis in/by which is was defined.</li>
 <li>
-<code>protein_domain_source</code>: the source of the protein domain information, one of <em>pfscan</em>, <em>scanprosite</em>, <em>superfamily</em>, <em>pfam</em>, <em>prints</em>, <em>smart</em>, <em>pirsf</em> or <em>tigrfam</em>.</li>
+<code>protein_domain_source</code>: the source of the protein domain
+information, one of <em>pfscan</em>, <em>scanprosite</em>,
+<em>superfamily</em>, <em>pfam</em>, <em>prints</em>, <em>smart</em>,
+<em>pirsf</em> or <em>tigrfam</em>.</li>
 <li>
-<code>interpro_accession</code>: the Interpro accession ID of the protein domain (if available).</li>
+<code>interpro_accession</code>: the Interpro accession ID of the
+protein domain (if available).</li>
 <li>
-<code>prot_dom_start</code>: the start of the protein domain within the sequence of the protein.</li>
+<code>prot_dom_start</code>: the start of the protein domain within
+the sequence of the protein.</li>
 <li>
-<code>prot_dom_start</code>: the end position of the protein domain within the sequence of the protein.</li>
+<code>prot_dom_start</code>: the end position of the protein domain
+within the sequence of the protein.</li>
 </ul>
-<p>Thus, for protein coding transcripts, these annotations can be fetched from the database too, given that protein annotations are available. Note that only <code>EnsDb</code> databases created through the Ensembl Perl API contain protein annotation, while databases created using <code>ensDbFromAH</code>, <code>ensDbFromGff</code>, <code>ensDbFromGRanges</code> and <code>ensDbFromGtf</code> don’t.</p>
+<p>Thus, for protein coding transcripts, these annotations can be
+fetched from the database too, given that protein annotations are
+available. Note that only <code>EnsDb</code> databases created through
+the Ensembl Perl API contain protein annotation, while databases created
+using <code>ensDbFromAH</code>, <code>ensDbFromGff</code>,
+<code>ensDbFromGRanges</code> and <code>ensDbFromGtf</code> don’t.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jorainer/ensembldb" class="external-link">ensembldb</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span>
@@ -143,7 +171,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## Evaluate whether we have protein annotation available</span>
 <span class="fu"><a href="../reference/hasProteinData-EnsDb-method.html">hasProteinData</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] TRUE</span></code></pre>
-<p>If protein annotation is available, the additional tables and columns are also listed by the <code>listTables</code> and <code>listColumns</code> methods.</p>
+<p>If protein annotation is available, the additional tables and columns
+are also listed by the <code>listTables</code> and
+<code>listColumns</code> methods.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-class.html">listTables</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## $gene</span>
@@ -180,12 +210,17 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## </span>
 <span class="co">## $metadata</span>
 <span class="co">## [1] "name"  "value"</span></code></pre>
-<p>In the following sections we show examples how to 1) fetch protein annotations as additional columns to gene/transcript annotations, 2) fetch protein annotation data and 3) map proteins to the genome.</p>
+<p>In the following sections we show examples how to 1) fetch protein
+annotations as additional columns to gene/transcript annotations, 2)
+fetch protein annotation data and 3) map proteins to the genome.</p>
 </div>
 <div class="section level2">
 <h2 id="fetch-protein-annotation-for-genes-and-transcripts">Fetch protein annotation for genes and transcripts<a class="anchor" aria-label="anchor" href="#fetch-protein-annotation-for-genes-and-transcripts"></a>
 </h2>
-<p>Protein annotations for (protein coding) transcripts can be retrieved by simply adding the desired annotation columns to the <code>columns</code> parameter of the e.g. <code>genes</code> or <code>transcripts</code> methods.</p>
+<p>Protein annotations for (protein coding) transcripts can be retrieved
+by simply adding the desired annotation columns to the
+<code>columns</code> parameter of the e.g. <code>genes</code> or
+<code>transcripts</code> methods.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get also protein information for ZBTB16 transcripts</span>
 <span class="va">txs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/EnsDb-exonsBy.html">transcripts</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
@@ -233,7 +268,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##   ENST00000535509      ZBTB16</span>
 <span class="co">##   -------</span>
 <span class="co">##   seqinfo: 1 sequence from GRCh38 genome</span></code></pre>
-<p>The gene ZBTB16 has protein coding and non-coding transcripts, thus, we get the protein ID for the coding- and <code>NA</code> for the non-coding transcripts. Note also that we have a transcript targeted for nonsense mediated mRNA-decay with a protein ID associated with it, but no Uniprot ID.</p>
+<p>The gene ZBTB16 has protein coding and non-coding transcripts, thus,
+we get the protein ID for the coding- and <code>NA</code> for the
+non-coding transcripts. Note also that we have a transcript targeted for
+nonsense mediated mRNA-decay with a protein ID associated with it, but
+no Uniprot ID.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Subset to transcripts with tx_biotype other than protein_coding.</span>
 <span class="va">txs</span><span class="op">[</span><span class="va">txs</span><span class="op">$</span><span class="va">tx_biotype</span> <span class="op">!=</span> <span class="st">"protein_coding"</span>, <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uniprot_id"</span>, <span class="st">"tx_biotype"</span>,
@@ -255,7 +294,15 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##   ENST00000535509        retained_intron            &lt;NA&gt;</span>
 <span class="co">##   -------</span>
 <span class="co">##   seqinfo: 1 sequence from GRCh38 genome</span></code></pre>
-<p>While the mapping from a protein coding transcript to a Ensembl protein ID (column <code>protein_id</code>) is 1:1, the mapping between <code>protein_id</code> and <code>uniprot_id</code> can be n:m, i.e. each Ensembl protein ID can be mapped to 1 or more Uniprot IDs and each Uniprot ID can be mapped to more than one <code>protein_id</code> (and hence <code>tx_id</code>). This should be kept in mind if querying transcripts from the database fetching Uniprot related additional columns or even protein ID features, as in such cases a redundant list of transcripts is returned.</p>
+<p>While the mapping from a protein coding transcript to a Ensembl
+protein ID (column <code>protein_id</code>) is 1:1, the mapping between
+<code>protein_id</code> and <code>uniprot_id</code> can be n:m,
+i.e. each Ensembl protein ID can be mapped to 1 or more Uniprot IDs and
+each Uniprot ID can be mapped to more than one <code>protein_id</code>
+(and hence <code>tx_id</code>). This should be kept in mind if querying
+transcripts from the database fetching Uniprot related additional
+columns or even protein ID features, as in such cases a redundant list
+of transcripts is returned.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## List the protein IDs and uniprot IDs for the coding transcripts</span>
 <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">txs</span><span class="op">[</span><span class="va">txs</span><span class="op">$</span><span class="va">tx_biotype</span> <span class="op">==</span> <span class="st">"protein_coding"</span>,
@@ -269,7 +316,15 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## ENST00000535700 ENST00000535700 ENSP00000443013      F5H5Y7</span>
 <span class="co">## ENST00000392996 ENST00000392996 ENSP00000376721      Q05516</span>
 <span class="co">## ENST00000392996 ENST00000392996 ENSP00000376721  A0A024R3C6</span></code></pre>
-<p>Some of the n:m mappings for Uniprot IDs can be resolved by restricting either to entries from one Uniprot database (<em>SPTREMBL</em> or <em>SWISSPROT</em>) or to mappings of a certain type of mapping method. The corresponding filters are the <code>UniprotDbFilter</code> and the <code>UniprotMappingTypeFilter</code> (using the <code>uniprot_db</code> and <code>uniprot_mapping_type</code> columns of the <code>uniprot</code> database table). In the example below we restrict the result to Uniprot IDs with the mapping type <em>DIRECT</em>.</p>
+<p>Some of the n:m mappings for Uniprot IDs can be resolved by
+restricting either to entries from one Uniprot database
+(<em>SPTREMBL</em> or <em>SWISSPROT</em>) or to mappings of a certain
+type of mapping method. The corresponding filters are the
+<code>UniprotDbFilter</code> and the
+<code>UniprotMappingTypeFilter</code> (using the <code>uniprot_db</code>
+and <code>uniprot_mapping_type</code> columns of the
+<code>uniprot</code> database table). In the example below we restrict
+the result to Uniprot IDs with the mapping type <em>DIRECT</em>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## List all uniprot mapping types in the database.</span>
 <span class="fu"><a href="../reference/ProteinFunctionality.html">listUniprotMappingTypes</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
@@ -297,9 +352,22 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## ENST00000535700      ZBTB16               DIRECT</span>
 <span class="co">## ENST00000392996      ZBTB16               DIRECT</span>
 <span class="co">## ENST00000539918      ZBTB16               DIRECT</span></code></pre>
-<p>For this example the use of the <code>UniprotMappingTypeFilter</code> resolved the multiple mapping of Uniprot IDs to Ensembl protein IDs, but the Uniprot ID <em>Q05516</em> is still assigned to the two Ensembl protein IDs <em>ENSP00000338157</em> and <em>ENSP00000376721</em>.</p>
-<p>All protein annotations can also be added as <em>metadata columns</em> to the results of the <code>genes</code>, <code>exons</code>, <code>exonsBy</code>, <code>transcriptsBy</code>, <code>cdsBy</code>, <code>fiveUTRsByTranscript</code> and <code>threeUTRsByTranscript</code> methods by specifying the desired column names with the <code>columns</code> parameter. For non coding transcripts <code>NA</code> will be reported in the protein annotation columns.</p>
-<p>In addition to retrieve protein annotations from the database, we can also use protein data to filter the results. In the example below we fetch for example all genes from the database that have a certain protein domain in the protein encoded by any of its transcripts.</p>
+<p>For this example the use of the <code>UniprotMappingTypeFilter</code>
+resolved the multiple mapping of Uniprot IDs to Ensembl protein IDs, but
+the Uniprot ID <em>Q05516</em> is still assigned to the two Ensembl
+protein IDs <em>ENSP00000338157</em> and <em>ENSP00000376721</em>.</p>
+<p>All protein annotations can also be added as <em>metadata
+columns</em> to the results of the <code>genes</code>,
+<code>exons</code>, <code>exonsBy</code>, <code>transcriptsBy</code>,
+<code>cdsBy</code>, <code>fiveUTRsByTranscript</code> and
+<code>threeUTRsByTranscript</code> methods by specifying the desired
+column names with the <code>columns</code> parameter. For non coding
+transcripts <code>NA</code> will be reported in the protein annotation
+columns.</p>
+<p>In addition to retrieve protein annotations from the database, we can
+also use protein data to filter the results. In the example below we
+fetch for example all genes from the database that have a certain
+protein domain in the protein encoded by any of its transcripts.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get all genes encoded on chromosome 11 which protein contains </span>
 <span class="co">## a certain protein domain.</span>
@@ -310,12 +378,21 @@ document.addEventListener("DOMContentLoaded", function() {
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">gns</span><span class="op">$</span><span class="va">gene_name</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [1] "ABTB2"  "BTBD18" "KBTBD3" "KBTBD4" "KCTD21" "KLHL35" "ZBTB16" "ZBTB3" </span>
 <span class="co">## [9] "ZBTB44"</span></code></pre>
-<p>So, in total we got 152 genes with that protein domain. In addition to the <code>ProtDomIdFilter</code>, also the <code>ProteinidFilter</code> and the <code>UniprotidFilter</code> can be used to query the database for entries matching conditions on their protein ID or Uniprot ID.</p>
+<p>So, in total we got 152 genes with that protein domain. In addition
+to the <code>ProtDomIdFilter</code>, also the
+<code>ProteinidFilter</code> and the <code>UniprotidFilter</code> can be
+used to query the database for entries matching conditions on their
+protein ID or Uniprot ID.</p>
 </div>
 <div class="section level2">
-<h2 id="use-methods-from-the-annotationdbi-package-to-query-protein-annotation">Use methods from the <code>AnnotationDbi</code> package to query protein annotation<a class="anchor" aria-label="anchor" href="#use-methods-from-the-annotationdbi-package-to-query-protein-annotation"></a>
+<h2 id="use-methods-from-the-annotationdbi-package-to-query-protein-annotation">Use methods from the <code>AnnotationDbi</code> package to query
+protein annotation<a class="anchor" aria-label="anchor" href="#use-methods-from-the-annotationdbi-package-to-query-protein-annotation"></a>
 </h2>
-<p>The <code>select</code>, <code>keys</code> and <code>mapIds</code> methods from the <code>AnnotationDbi</code> package can also be used to query <code>EnsDb</code> objects for protein annotations. Supported columns and key types are returned by the <code>columns</code> and <code>keytypes</code> methods.</p>
+<p>The <code>select</code>, <code>keys</code> and <code>mapIds</code>
+methods from the <code>AnnotationDbi</code> package can also be used to
+query <code>EnsDb</code> objects for protein annotations. Supported
+columns and key types are returned by the <code>columns</code> and
+<code>keytypes</code> methods.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Show all columns that are provided by the database</span>
 <span class="fu"><a href="https://rdrr.io/pkg/AnnotationDbi/man/AnnotationDb-class.html" class="external-link">columns</a></span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></code></pre></div>
@@ -339,7 +416,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [10] "SEQNAME"             "SEQSTRAND"           "SYMBOL"             </span>
 <span class="co">## [13] "TXBIOTYPE"           "TXID"                "TXNAME"             </span>
 <span class="co">## [16] "UNIPROTID"</span></code></pre>
-<p>Below we fetch all Uniprot IDs annotated to the gene <em>ZBTB16</em>.</p>
+<p>Below we fetch all Uniprot IDs annotated to the gene
+<em>ZBTB16</em>.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/EnsDb-AnnotationDbi.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="st">"ZBTB16"</span>, keytype <span class="op">=</span> <span class="st">"GENENAME"</span>,
        columns <span class="op">=</span> <span class="st">"UNIPROTID"</span><span class="op">)</span></code></pre></div>
@@ -350,7 +428,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## 4   ZBTB16     F5H6C3</span>
 <span class="co">## 5   ZBTB16     F5H5Y7</span>
 <span class="co">## 6   ZBTB16     H0YGW2</span></code></pre>
-<p>This returns us all Uniprot IDs of all proteins encoded by the gene’s transcripts. One of the transcripts from ZBTB16, while having a CDS and being annotated to a protein, does not have an Uniprot ID assigned (thus <code>NA</code> is returned by the above call). As we see below, this transcript is targeted for non sense mediated mRNA decay.</p>
+<p>This returns us all Uniprot IDs of all proteins encoded by the gene’s
+transcripts. One of the transcripts from ZBTB16, while having a CDS and
+being annotated to a protein, does not have an Uniprot ID assigned (thus
+<code>NA</code> is returned by the above call). As we see below, this
+transcript is targeted for non sense mediated mRNA decay.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Call select, this time providing a GeneNameFilter.</span>
 <span class="fu"><a href="../reference/EnsDb-AnnotationDbi.html">select</a></span><span class="op">(</span><span class="va">edb</span>, keys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
@@ -365,13 +447,23 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## 7          protein_coding A0A024R3C6 ENSP00000376721   ZBTB16</span>
 <span class="co">## 8 nonsense_mediated_decay     H0YGW2 ENSP00000445047   ZBTB16</span>
 <span class="co">## 9    processed_transcript       &lt;NA&gt;            &lt;NA&gt;   ZBTB16</span></code></pre>
-<p>Note also that we passed this time a <code>GeneMameFilter</code> with the <code>keys</code> parameter.</p>
+<p>Note also that we passed this time a <code>GeneMameFilter</code> with
+the <code>keys</code> parameter.</p>
 </div>
 <div class="section level2">
 <h2 id="retrieve-proteins-from-the-database">Retrieve proteins from the database<a class="anchor" aria-label="anchor" href="#retrieve-proteins-from-the-database"></a>
 </h2>
-<p>Proteins can be fetched using the dedicated <code>proteins</code> method that returns, unlike DNA/RNA-based methods like <code>genes</code> or <code>transcripts</code>, not a <code>GRanges</code> object by default, but a <code>DataFrame</code> object. Alternatively, results can be returned as a <code>data.frame</code> or as an <code>AAStringSet</code> object from the <code>Biobase</code> package. Note that this might change in future releases if a more appropriate object to represent protein annotations becomes available.</p>
-<p>In the code chunk below we fetch all protein annotations for the gene <em>ZBTB16</em>.</p>
+<p>Proteins can be fetched using the dedicated <code>proteins</code>
+method that returns, unlike DNA/RNA-based methods like
+<code>genes</code> or <code>transcripts</code>, not a
+<code>GRanges</code> object by default, but a <code>DataFrame</code>
+object. Alternatively, results can be returned as a
+<code>data.frame</code> or as an <code>AAStringSet</code> object from
+the <code>Biobase</code> package. Note that this might change in future
+releases if a more appropriate object to represent protein annotations
+becomes available.</p>
+<p>In the code chunk below we fetch all protein annotations for the gene
+<em>ZBTB16</em>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get all proteins and return them as an AAStringSet</span>
 <span class="va">prts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
@@ -384,7 +476,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [3]   148 MDLTKMGMIQLQNPSHPTGLLCK...QASDDNDTEATMADGGAEEEEDR ENSP00000443013</span>
 <span class="co">## [4]   673 MDLTKMGMIQLQNPSHPTGLLCK...GHKPEEIPPDWRIEKTYLYLCYV ENSP00000376721</span>
 <span class="co">## [5]    55 XGGLLPQGFIQRELFSKLGELAV...GEQCSVCGVELPDNEAVEQHRVF ENSP00000445047</span></code></pre>
-<p>Besides the amino acid sequence, the <code>prts</code> contains also additional annotations that can be accessed with the <code>mcols</code> method (metadata columns). All additional columns provided with the parameter <code>columns</code> are also added to the <code>mcols</code> <code>DataFrame</code>.</p>
+<p>Besides the amino acid sequence, the <code>prts</code> contains also
+additional annotations that can be accessed with the <code>mcols</code>
+method (metadata columns). All additional columns provided with the
+parameter <code>columns</code> are also added to the <code>mcols</code>
+<code>DataFrame</code>.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">prts</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## DataFrame with 5 rows and 3 columns</span>
@@ -395,8 +491,14 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## ENSP00000443013 ENST00000535700 ENSP00000443013      ZBTB16</span>
 <span class="co">## ENSP00000376721 ENST00000392996 ENSP00000376721      ZBTB16</span>
 <span class="co">## ENSP00000445047 ENST00000539918 ENSP00000445047      ZBTB16</span></code></pre>
-<p>Note that the <code>proteins</code> method will retrieve only gene/transcript annotations of transcripts encoding a protein. Thus annotations for the non-coding transcripts of the gene <em>ZBTB16</em>, that were returned by calls to <code>genes</code> or <code>transcripts</code> in the previous section are not fetched.</p>
-<p>Querying in addition Uniprot identifiers or protein domain data will result at present in a redundant list of proteins as shown in the code block below.</p>
+<p>Note that the <code>proteins</code> method will retrieve only
+gene/transcript annotations of transcripts encoding a protein. Thus
+annotations for the non-coding transcripts of the gene <em>ZBTB16</em>,
+that were returned by calls to <code>genes</code> or
+<code>transcripts</code> in the previous section are not fetched.</p>
+<p>Querying in addition Uniprot identifiers or protein domain data will
+result at present in a redundant list of proteins as shown in the code
+block below.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## Get also protein domain annotations in addition to the protein annotations.</span>
 <span class="va">pd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ProteinFunctionality.html">proteins</a></span><span class="op">(</span><span class="va">edb</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">GeneNameFilter</a></span><span class="op">(</span><span class="st">"ZBTB16"</span><span class="op">)</span>,
@@ -416,7 +518,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [79]   673 MDLTKMGMIQLQNPSHPTGLLCK...HKPEEIPPDWRIEKTYLYLCYV ENSP00000376721</span>
 <span class="co">## [80]   673 MDLTKMGMIQLQNPSHPTGLLCK...HKPEEIPPDWRIEKTYLYLCYV ENSP00000376721</span>
 <span class="co">## [81]    55 XGGLLPQGFIQRELFSKLGELAV...EQCSVCGVELPDNEAVEQHRVF ENSP00000445047</span></code></pre>
-<p>The result contains one row/element for each protein domain in each of the proteins. The number of protein domains per protein and the <code>mcols</code> are shown below.</p>
+<p>The result contains one row/element for each protein domain in each
+of the proteins. The number of protein domains per protein and the
+<code>mcols</code> are shown below.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## The number of protein domains per protein:</span>
 <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pd</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -466,21 +570,28 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## ENSP00000376721          624      ZBTB16</span>
 <span class="co">## ENSP00000376721          652      ZBTB16</span>
 <span class="co">## ENSP00000445047           NA      ZBTB16</span></code></pre>
-<p>As we can see each protein can have several protein domains with the start and end coordinates within the amino acid sequence being reported in columns <code>prot_dom_start</code> and <code>prot_dom_end</code>. Also, not all Ensembl protein IDs, like <code>protein_id</code> <em>ENSP00000445047</em> are mapped to an Uniprot ID or have protein domains.</p>
+<p>As we can see each protein can have several protein domains with the
+start and end coordinates within the amino acid sequence being reported
+in columns <code>prot_dom_start</code> and <code>prot_dom_end</code>.
+Also, not all Ensembl protein IDs, like <code>protein_id</code>
+<em>ENSP00000445047</em> are mapped to an Uniprot ID or have protein
+domains.</p>
 </div>
 <div class="section level2">
 <h2 id="map-peptide-features-within-proteins-to-the-genome">Map peptide features within proteins to the genome<a class="anchor" aria-label="anchor" href="#map-peptide-features-within-proteins-to-the-genome"></a>
 </h2>
-<p>The <em>coordinate-mapping.Rmd</em> vignette provides a detailed description of all functions that allow to map between genomic, transcript and protein coordinates.</p>
+<p>The <em>coordinate-mapping.Rmd</em> vignette provides a detailed
+description of all functions that allow to map between genomic,
+transcript and protein coordinates.</p>
 </div>
 <div class="section level2">
 <h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
-<pre><code><span class="co">## R Under development (unstable) (2022-01-27 r81578)</span>
+<pre><code><span class="co">## R Under development (unstable) (2022-03-10 r81874)</span>
 <span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span>
-<span class="co">## Running under: Ubuntu 20.04.3 LTS</span>
+<span class="co">## Running under: Ubuntu 20.04.4 LTS</span>
 <span class="co">## </span>
 <span class="co">## Matrix products: default</span>
 <span class="co">## BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so</span>
@@ -498,11 +609,11 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">## [8] base     </span>
 <span class="co">## </span>
 <span class="co">## other attached packages:</span>
-<span class="co">##  [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.19.8         </span>
-<span class="co">##  [3] AnnotationFilter_1.19.0   GenomicFeatures_1.47.7   </span>
+<span class="co">##  [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.19.9         </span>
+<span class="co">##  [3] AnnotationFilter_1.19.0   GenomicFeatures_1.47.12  </span>
 <span class="co">##  [5] AnnotationDbi_1.57.1      Biobase_2.55.0           </span>
-<span class="co">##  [7] GenomicRanges_1.47.6      GenomeInfoDb_1.31.3      </span>
-<span class="co">##  [9] IRanges_2.29.1            S4Vectors_0.33.10        </span>
+<span class="co">##  [7] GenomicRanges_1.47.6      GenomeInfoDb_1.31.5      </span>
+<span class="co">##  [9] IRanges_2.29.1            S4Vectors_0.33.11        </span>
 <span class="co">## [11] BiocGenerics_0.41.2       BiocStyle_2.23.1         </span>
 <span class="co">## </span>
 <span class="co">## loaded via a namespace (and not attached):</span>
@@ -512,43 +623,43 @@ document.addEventListener("DOMContentLoaded", function() {
 <span class="co">##  [7] progress_1.2.2              httr_1.4.2                 </span>
 <span class="co">##  [9] rprojroot_2.0.2             tools_4.2.0                </span>
 <span class="co">## [11] bslib_0.3.1                 utf8_1.2.2                 </span>
-<span class="co">## [13] R6_2.5.1                    lazyeval_0.2.2             </span>
-<span class="co">## [15] DBI_1.1.2                   tidyselect_1.1.1           </span>
+<span class="co">## [13] R6_2.5.1                    DBI_1.1.2                  </span>
+<span class="co">## [15] lazyeval_0.2.2              tidyselect_1.1.2           </span>
 <span class="co">## [17] prettyunits_1.1.1           bit_4.0.4                  </span>
 <span class="co">## [19] curl_4.3.2                  compiler_4.2.0             </span>
-<span class="co">## [21] textshaping_0.3.6           cli_3.1.1                  </span>
-<span class="co">## [23] xml2_1.3.3                  desc_1.4.0                 </span>
+<span class="co">## [21] textshaping_0.3.6           cli_3.2.0                  </span>
+<span class="co">## [23] xml2_1.3.3                  desc_1.4.1                 </span>
 <span class="co">## [25] DelayedArray_0.21.2         rtracklayer_1.55.3         </span>
-<span class="co">## [27] bookdown_0.24               sass_0.4.0                 </span>
+<span class="co">## [27] bookdown_0.25               sass_0.4.0                 </span>
 <span class="co">## [29] rappdirs_0.3.3              pkgdown_2.0.2.9000         </span>
-<span class="co">## [31] systemfonts_1.0.3           stringr_1.4.0              </span>
+<span class="co">## [31] systemfonts_1.0.4           stringr_1.4.0              </span>
 <span class="co">## [33] digest_0.6.29               Rsamtools_2.11.0           </span>
-<span class="co">## [35] rmarkdown_2.11              XVector_0.35.0             </span>
+<span class="co">## [35] rmarkdown_2.13              XVector_0.35.0             </span>
 <span class="co">## [37] pkgconfig_2.0.3             htmltools_0.5.2            </span>
 <span class="co">## [39] MatrixGenerics_1.7.0        dbplyr_2.1.1               </span>
-<span class="co">## [41] fastmap_1.1.0               rlang_1.0.0                </span>
-<span class="co">## [43] RSQLite_2.2.9               jquerylib_0.1.4            </span>
-<span class="co">## [45] BiocIO_1.5.0                generics_0.1.1             </span>
-<span class="co">## [47] jsonlite_1.7.3              BiocParallel_1.29.12       </span>
-<span class="co">## [49] dplyr_1.0.7                 RCurl_1.98-1.5             </span>
+<span class="co">## [41] fastmap_1.1.0               rlang_1.0.2                </span>
+<span class="co">## [43] RSQLite_2.2.10              jquerylib_0.1.4            </span>
+<span class="co">## [45] BiocIO_1.5.0                generics_0.1.2             </span>
+<span class="co">## [47] jsonlite_1.8.0              BiocParallel_1.29.17       </span>
+<span class="co">## [49] dplyr_1.0.8                 RCurl_1.98-1.6             </span>
 <span class="co">## [51] magrittr_2.0.2              GenomeInfoDbData_1.2.7     </span>
-<span class="co">## [53] Matrix_1.4-0                Rcpp_1.0.8                 </span>
+<span class="co">## [53] Matrix_1.4-0                Rcpp_1.0.8.3               </span>
 <span class="co">## [55] fansi_1.0.2                 lifecycle_1.0.1            </span>
-<span class="co">## [57] stringi_1.7.6               yaml_2.2.2                 </span>
+<span class="co">## [57] stringi_1.7.6               yaml_2.3.5                 </span>
 <span class="co">## [59] SummarizedExperiment_1.25.3 zlibbioc_1.41.0            </span>
 <span class="co">## [61] BiocFileCache_2.3.4         grid_4.2.0                 </span>
 <span class="co">## [63] blob_1.2.2                  parallel_4.2.0             </span>
-<span class="co">## [65] crayon_1.4.2                lattice_0.20-45            </span>
-<span class="co">## [67] Biostrings_2.63.1           hms_1.1.1                  </span>
+<span class="co">## [65] crayon_1.5.0                lattice_0.20-45            </span>
+<span class="co">## [67] Biostrings_2.63.2           hms_1.1.1                  </span>
 <span class="co">## [69] KEGGREST_1.35.0             knitr_1.37                 </span>
-<span class="co">## [71] pillar_1.6.5                rjson_0.2.21               </span>
-<span class="co">## [73] biomaRt_2.51.2              XML_3.99-0.8               </span>
-<span class="co">## [75] glue_1.6.1                  evaluate_0.14              </span>
+<span class="co">## [71] pillar_1.7.0                rjson_0.2.21               </span>
+<span class="co">## [73] biomaRt_2.51.3              XML_3.99-0.9               </span>
+<span class="co">## [75] glue_1.6.2                  evaluate_0.15              </span>
 <span class="co">## [77] BiocManager_1.30.16         png_0.1-7                  </span>
 <span class="co">## [79] vctrs_0.3.8                 purrr_0.3.4                </span>
 <span class="co">## [81] assertthat_0.2.1            cachem_1.0.6               </span>
-<span class="co">## [83] xfun_0.29                   restfulr_0.0.13            </span>
-<span class="co">## [85] ragg_1.2.1                  tibble_3.1.6               </span>
+<span class="co">## [83] xfun_0.30                   restfulr_0.0.13            </span>
+<span class="co">## [85] ragg_1.2.2                  tibble_3.1.6               </span>
 <span class="co">## [87] GenomicAlignments_1.31.2    memoise_2.0.1              </span>
 <span class="co">## [89] ellipsis_0.3.2</span></code></pre>
 </div>
@@ -571,7 +682,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.9000.</p>
 </div>
 
       </footer>
