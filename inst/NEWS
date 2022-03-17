@@ -1,3 +1,7 @@
+Changes in version 2.19.9
+
+- `seqlevelsStyle` allows to provide a custom mapping data frame.
+
 Changes in version 2.19.8
 
 - Require package Biostrings in the coordinate mapping vignette.

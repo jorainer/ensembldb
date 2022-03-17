@@ -31,7 +31,10 @@
     For \code{seqlevelsStyle<-}: a character string specifying the
     seqlevels style that should be set. Use the
     \code{supportedSeqlevelsStyle} to list all available and supported
-    seqlevel styles.
+    seqlevel styles. As an alternative, it is also possible to submit a
+    \code{data.frame} with custom mapping. This needs to have two
+    columns, one of them being called \code{"Ensembl"} with the original
+    chromosome names and another column with the new names.
   }
 
   \item{x}{
@@ -55,7 +58,9 @@
       Change the style of the seqlevels in which results returned from
       the \code{EnsDb} object are encoded. Changing the seqlevels helps
       integrating annotations from \code{EnsDb} objects e.g. with
-      annotations from packages that base on UCSC annotations.
+      annotations from packages that base on UCSC annotations. The
+      function also supports using/defining custom mappings by
+      submitting a mapping \code{data.frame} (see examples below).
     }
 
     \item{supportedSeqlevelsStyles}{
@@ -120,13 +125,18 @@ options(ensembldb.seqnameNotFound = NA)
 
 seqlevels(edb)
 
-## Restoring the original setting.
+## Defining custom mapping for chromosome names. The `data.frame` should have
+## one column named `"Ensembl"` with the original name and an additional column
+## with the new names
+mymap <- data.frame(Ensembl = c(4, 7, 9, 10),
+                    myway = c("a", "b", "c", "d"))
+seqlevelsStyle(edb) <- mymap
+seqlevels(edb)
+
+## This allows us also to rename individual chromosomes but keeping all
+## original names for the others.
 options(ensembldb.seqnameNotFound = "ORIGINAL")
+seqlevels(edb)
 
 }
 \keyword{classes}
-
-
-
-
-

@@ -609,6 +609,29 @@ options(ensembldb.seqnameNotFound = "ORIGINAL")
 
 ```
 
+As an alternative, `seqlevelsStyle` for `EnsDb` supports also to define custom
+renaming. Below we thus define a `data.frame` with new names for some specific
+chromosomes. A column `"Ensembl"` is expected to contain the original chromosome
+names and the second column the new names. In the example below we simply want
+to rename some selected chromosomes, thus we define the mapping `data.frame` and
+pass that to the `seqlevelsStyle` method.
+
+```{r}
+mymap <- data.frame(
+    Ensembl = c(1, 21, "X", "Y"),
+    myway = c("one", "twentyone", "chrX", "chrY")
+)
+seqlevelsStyle(edb) <- mymap
+```
+
+With that we have now chromosomes 1, 21, X and Y renamed to the new
+names. Below we list the last 6 values showing the new names for chromosomes X
+and Y.
+
+```{r}
+tail(seqlevels(edb))
+```
+
 At last changing the seqname style to the default value `"Ensembl"`.
 
 ```{r  seqlevelsStyle-restore }

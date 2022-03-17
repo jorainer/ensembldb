@@ -16,17 +16,17 @@
 ##  If a seqname can not be mapped NA will be returned.
 ####------------------------------------------------------------
 setMethod("formatSeqnamesForQuery", "EnsDb", function(x, sn, ifNotFound){
-    return(.formatSeqnameByStyleForQuery(x, sn, ifNotFound))
+    .formatSeqnameByStyleForQuery(x, sn, ifNotFound)
 })
 ## Little helper function that returns eventually the argument.
 ## Returns MISSING if the argument was not set.
-.getSeqnameNotFoundOption <- function(){
+.getSeqnameNotFoundOption <- function() {
     notFound <- "MISSING"
     if(any(names(options()) == .ENSOPT.SEQNOTFOUND)){
         notFound <- getOption(.ENSOPT.SEQNOTFOUND)
         ## Do some sanity checks?
     }
-    return(notFound)
+    notFound
 }
 .formatSeqnameByStyleForQuery <- function(x, sn, ifNotFound){
     ## Fixing ifNotFound, allowing that this can be set using options.
@@ -77,7 +77,7 @@ setMethod("formatSeqnamesForQuery", "EnsDb", function(x, sn, ifNotFound){
         }
         warning(theMess, warnMess)
     }
-    return(mapped)
+    mapped
 }
 setMethod("formatSeqnamesFromQuery", "EnsDb", function(x, sn, ifNotFound){
     return(.formatSeqnameByStyleFromQuery(x, sn, ifNotFound))
@@ -163,34 +163,54 @@ setMethod("seqlevelsStyle", "EnsDb", function(x){
         st <- "Ensembl"
     return(st)
 })
-setReplaceMethod("seqlevelsStyle", "EnsDb", function(x, value){
-    if(value == dbSeqlevelsStyle(x)){
-        ## Not much to do; that's absolutely fine.
-        x <- setProperty(x, seqlevelsStyle=value)
-    }else{
-        ## Have to check whether I have the mapping available in GenomeInfoDb, if not
-        ## -> throw an error.
-        dbStyle <- dbSeqlevelsStyle(x)
-        ## Note that both, the db seqlevel style and the style have to be available!
-        ## Check if we could use the mapping provided by GenomeInfoDb.
-        genSt <- try(genomeStyles(organism(x)), silent=TRUE)
-        if(is(genSt, "try-error")){
-            stop("No mapping of seqlevel styles available in GenomeInfoDb for",
-                 " species ", organism(x), "! Please refer to the Vignette of the",
-                 " GenomeInfoDb package if you would like to provide this mapping.")
+
+#' set seq level style for an EnsDb.
+#'
+#' @param x `EnsDb` object
+#'
+#' @param value either `character(1)` defining the style (needs to be one of
+#'     the supported ones from `GenomeInfoDb`) or a `data.frame` defining the
+#'     mapping between the seq levels of `x` and the new *custom* style.
+#'
+#' @noRd
+setReplaceMethod("seqlevelsStyle", "EnsDb", function(x, value) {
+    if (is.data.frame(value)) {
+        cn <- colnames(value)
+        if (!any(cn == "Ensembl"))
+            stop("If a 'data.frame' is submitted with 'seqlevelsStyle' one",
+                 " column needs to be named \"Ensembl\".", .call = FALSE)
+        if (ncol(value) < 2)
+            stop("'value' needs to have at least two columns.",
+                 .call = FALSE)
+        ## Use first non-Ensembl colname as "seqlevel style"
+        sls <- cn[cn != "Ensembl"][1L]
+        x <- setProperty(x, seqlevelsStyle = sls)
+        x <- setProperty(x, genomeStyle = list(value))
+    } else {
+        if (value == dbSeqlevelsStyle(x)) {
+            x <- setProperty(x, seqlevelsStyle=value)
+        } else {
+            dbStyle <- dbSeqlevelsStyle(x)
+            genSt <- try(genomeStyles(organism(x)), silent=TRUE)
+            if(is(genSt, "try-error"))
+                stop("No mapping of seqlevel styles available in GenomeInfoDb ",
+                     "for species ", organism(x), "! Please refer to the ",
+                     "Vignette of the GenomeInfoDb package if you would like ",
+                     "to provide this mapping.")
+            if (!any(colnames(genSt) == value)) {
+                stop("The provided seqlevels style is not known to ",
+                     "GenomeInfoDb!")
+            }
+            if (!any(colnames(genSt) == dbStyle)) {
+                stop("The seqlevels style of the database (", dbStyle,
+                     ") is not known to GenomeInfoDb!")
+            }
+            ## If we got that far it should be OK
+            x <- setProperty(x, seqlevelsStyle=value)
+            x <- setProperty(x, genomeStyle=list(genSt))
         }
-        if(!any(colnames(genSt) == value)){
-            stop("The provided seqlevels style is not known to GenomeInfoDb!")
-        }
-        if(!any(colnames(genSt) == dbStyle)){
-            stop("The seqlevels style of the database (", dbStyle,
-                 ") is not known to GenomeInfoDb!")
-        }
-        ## If we got that far it should be OK
-        x <- setProperty(x, seqlevelsStyle=value)
-        x <- setProperty(x, genomeStyle=list(genSt))
     }
-    return(x)
+    x
 })
 
 ####============================================================
