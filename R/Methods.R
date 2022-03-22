@@ -1453,7 +1453,7 @@ setMethod(
                                               type = "any"),
                     columns = "tx_id", return.type = "data.frame")$tx_id
                 if (!length(tids))
-                    return(grg)
+                    return(GRanges())
                 filter <- AnnotationFilterList(filter, TxIdFilter(tids))
             }else{
                 stop("Either all or none of arguments 'chromosome', 'start' and",
