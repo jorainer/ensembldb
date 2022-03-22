@@ -1443,12 +1443,14 @@ setMethod(
             if(all(c(!is.null(chromosome), !is.null(start), !is.null(end)))){
                 ## Fix eventually provided UCSC chromosome names:
                 chromosome <- ucscToEns(chromosome)
-                ## Define a GRangesFilter to include all features that overlap
-                ## that region.
-                grg <- GRangesFilter(GRanges(seqnames = chromosome,
-                                             ranges = IRanges(start, end)),
-                                     feature = "tx", type = "any")
-                tids <- transcripts(x, filter = grg, columns = "tx_id")$tx_id
+                grg <- GRanges(seqnames = chromosome,
+                               ranges = IRanges(start, end))
+                tids <- transcripts(
+                    x, filter = GRangesFilter(grg, feature = "tx",
+                                              type = "any"),
+                    columns = "tx_id", return.type = "data.frame")$tx_id
+                if (!length(tids))
+                    return(grg)
                 filter <- AnnotationFilterList(filter, TxIdFilter(tids))
             }else{
                 stop("Either all or none of arguments 'chromosome', 'start' and",
