@@ -1,3 +1,8 @@
+Changes in version 2.18.4
+
+- Fix issue in `getGeneRegionTrackForGviz` if no transcripts were found within
+  the provided genomic range (issue https://github.com/jorainer/ensembldb/issues/132).
+
 Changes in version 2.18.3
 
 - `listColumns` does no longer report column names from the metadata database
