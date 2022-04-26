@@ -1121,7 +1121,12 @@ might not be available in all `EnsDB` databases (e.g. such ones created with
 -   **chromosome**: provides some information about the chromosomes.
     -   `seq_name`: the name of the sequence/chromosome.
     -   `seq_length`: the length of the sequence.
-    -   `is_circular`: whether the sequence in circular.
+    -   `is_circular`: whether the sequence in circular. Note that the Ensembl
+        Perl API does not correctly define/return this information (see [issue
+        86](https://github.com/jorainer/ensembldb/issues/86)) and a value of
+        `0` is provided for all chromosomes. The `seqinfo` method on `EnsDb`
+        objects manually sets `isCircular` to `TRUE` for chromosomes named
+        `"MT"`.
 
 -   **protein**: provides protein annotation for a (coding) transcript.
     -   `protein_id`: the Ensembl protein ID.

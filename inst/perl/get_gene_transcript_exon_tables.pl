@@ -217,10 +217,9 @@ foreach my $gene_id (@gene_ids){
       if (defined $tmp_version and length $tmp_version) {
 	$coord_system_version = $tmp_version;
       }
-      # my $chr_slice_again = $slice_adaptor->fetch_by_region('chromosome', $chrom);
-      # if(defined($chr_slice_again)){
-      # 	$coord_system_version = $chr_slice_again->coord_system()->version();
-      # }
+      # print "$name: circular:$is_circular\n";
+      # my $tmp = $slice_adaptor->fetch_by_region('chromosome', $chrom);
+      # print "circular: ".$tmp->is_circular."\n";
     }
 
     ## get information for the gene.

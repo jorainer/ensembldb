@@ -60,3 +60,12 @@ test_that(".addFilter .dropFilter and .activeFilter work", {
 test_that(".has_tx_external_name works", {
     expect_false(.has_tx_external_name(edb))
 })
+
+test_that(".fix_is_circular works", {
+    x <- data.frame(is_circular = 0L, seq_name = c("A", "B", "C", "D", "MT"))
+    res <- .fix_is_circular(x)
+    expect_equal(res$is_circular, c(0L, 0L, 0L, 0L, 1L))
+
+    res <- .fix_is_circular(x, c("D", "A", "Z"))
+    expect_equal(res$is_circular, c(1L, 0L, 0L, 1L, 0L))
+})

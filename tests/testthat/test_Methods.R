@@ -655,6 +655,9 @@ test_that("seqinfo and seqlevels work", {
     chrs <- dbGetQuery(dbconn(edb), "select seq_name from chromosome")[, 1]
     expect_true(all(sl %in% chrs))
     expect_true(all(seqlevels(si) %in% chrs))
+    expect_true(any(isCircular(si)))
+    res <- si["MT"]
+    expect_true(isCircular(res))
 })
 
 test_that("ensVersionFromSourceUrl works", {
