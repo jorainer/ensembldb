@@ -80,3 +80,19 @@ filter <- function(x, filter = AnnotationFilterList()) {
 .has_tx_external_name <- function(x) {
     any(listTables(x)$tx == "tx_external_name")
 }
+
+#' Fix for the incorrect/failing is_circular information from Ensembl. If the
+#' chromosome matches a certain pattern replace it with `TRUE`, otherwise use
+#' the info from the chromosome table.
+#'
+#' @param x `data.frame` with a column `"seq_name"` and one `"is_circular"`.
+#'
+#' @param mt_pattern `character` defining chromosome names expected to be
+#'     circular.
+#'
+#' @return `data.frame` with the *fixed* is_circular information.
+#' @noRd
+.fix_is_circular <- function(x, mt_pattern = "MT") {
+    x$is_circular[x$seq_name %in% mt_pattern] <- 1
+    x
+}

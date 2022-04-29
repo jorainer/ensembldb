@@ -138,13 +138,14 @@ setMethod("getMetadataValue", "EnsDb", function(x, name){
 ############################################################
 ## seqinfo
 setMethod("seqinfo", "EnsDb", function(x){
-    Chrs <- dbGetQuery(dbconn(x), "select * from chromosome")
+    Chrs <- .fix_is_circular(dbGetQuery(dbconn(x), "select * from chromosome"))
     Chr.build <- .getMetaDataValue(dbconn(x), "genome_build")
     Chrs$seq_name <- formatSeqnamesFromQuery(x, Chrs$seq_name)
-    SI <- Seqinfo(seqnames=Chrs$seq_name,
-                  seqlengths=Chrs$seq_length,
-                  isCircular=Chrs$is_circular==1, genome=Chr.build)
-    return(SI)
+    SI <- Seqinfo(seqnames = Chrs$seq_name,
+                  seqlengths = Chrs$seq_length,
+                  isCircular = Chrs$is_circular == 1,
+                  genome = Chr.build)
+    SI
 })
 
 ############################################################
