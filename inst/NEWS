@@ -1,4 +1,4 @@
-Changes in version xxxx
+Changes in version 2.21.1
 
 - Since *is circular* flag for chromosomes extracted using the Ensembl Perl API
   is always `FALSE`: manually set `isCircular` to `TRUE` for chromosome(s)
