@@ -185,7 +185,8 @@ genomeToProtein <- function(x, db) {
     if (is.null(names(txs)))
         names(txs) <- ""
     prts <- transcriptToProtein(txs, db)
-    mcols(prts) <- cbind(mcols(prts)[, c("tx_id", "cds_ok")], mcols(txs))
+    mcols(prts) <- cbind(mcols(prts)[, c("tx_id", "cds_ok")],
+                         mcols(txs)[, colnames(mcols(txs)) != "tx_id"])
     prts <- split(prts, int_ids)
     names(prts) <- NULL
     ## Prune the result by removing non-mappable regions from each element
