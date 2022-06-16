@@ -1,3 +1,7 @@
+Changes in version 2.20.2
+
+- Avoid duplicated column `"tx_id"` in `genomeToProtein` (issue #136).
+
 Changes in version 2.20.1
 
 - Since *is circular* flag for chromosomes extracted using the Ensembl Perl API
