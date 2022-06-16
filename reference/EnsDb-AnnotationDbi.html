@@ -25,7 +25,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -102,15 +102,22 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p>(In alphabetic order)</p>
+    
+
+
+<p>(In alphabetic order)</p>
 <dl><dt>column</dt>
 <dd><p>For <code>mapIds</code>: the column to search on, i.e. from which values
     should be retrieved.</p></dd>
-<dt>columns</dt>
+
+
+  <dt>columns</dt>
 <dd><p>For <code>select</code>: the columns from which values should be
     retrieved. Use the <code>columns</code> method to list all possible
     columns.</p></dd>
-<dt>keys</dt>
+
+
+  <dt>keys</dt>
 <dd><p>The keys/ids for which data should be retrieved from the
     database. This can be either a character vector of keys/IDs, a
     single filter object extending
@@ -118,26 +125,38 @@
     filters <code><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilterList.html" class="external-link">AnnotationFilterList</a></code> or a
     <code>formula</code> representing a filter expression (see
     <code><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">AnnotationFilter</a></code> for more details).</p></dd>
-<dt>keytype</dt>
+
+
+  <dt>keytype</dt>
 <dd><p>For <code>mapIds</code> and <code>select</code>: the type (column) that matches
     the provided keys. This argument does not have to be specified if
     argument <code>keys</code> is a filter object extending
     <code>AnnotationFilter</code> or a <code>list</code> of such objects.</p>
 <p>For <code>keys</code>: which keys should be returned from the database.</p></dd>
-<dt>filter</dt>
+
+
+  <dt>filter</dt>
 <dd><p>For <code>keys</code>: either a single object extending
     <code>AnnotationFilter</code> or a list of such object to
     retrieve only specific keys from the database.</p></dd>
-<dt>multiVals</dt>
+
+
+  <dt>multiVals</dt>
 <dd><p>What should <code>mapIds</code> do when there are multiple values that
     could be returned? Options are: <code>"first"</code> (default), <code>"list"</code>,
     <code>"filter"</code>, <code>"asNA"</code>. See
     <code>mapIds</code> in the <code>AnnotationDbi</code> package  
     for a detailed description.</p></dd>
-<dt>x</dt>
+
+
+  <dt>x</dt>
 <dd><p>The <code>EnsDb</code> object.</p></dd>
-<dt>...</dt>
+
+
+  <dt>...</dt>
 <dd><p>Not used.</p></dd>
+
+
 </dl></div>
     <div id="methods-and-functions">
     <h2>Methods and Functions</h2>
@@ -205,7 +224,9 @@
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>See method description above.</p>
+    
+
+<p>See method description above.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -435,7 +456,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

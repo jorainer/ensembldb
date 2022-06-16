@@ -27,7 +27,7 @@ The listProteinColumns function allows to conveniently
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -115,36 +115,55 @@ The listProteinColumns function allows to conveniently
     <h2>Arguments</h2>
     <dl><dt>object</dt>
 <dd><p>The <code><a href="EnsDb-class.html">EnsDb</a></code> object.</p></dd>
+
+
 <dt>columns</dt>
 <dd><p>For <code>proteins</code>: character vector defining the columns to
 be extracted from the database. Can be any column(s) listed by the
 <code><a href="EnsDb-class.html">listColumns</a></code> method.</p></dd>
+
+
 <dt>filter</dt>
 <dd><p>For <code>proteins</code>: A filter object extending
 <code>AnnotationFilter</code> or a list of such objects to select
 specific entries from the database. See <code><a href="Filter-classes.html">Filter-classes</a></code> for
 a documentation of available filters and use
 <code><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">supportedFilters</a></code> to get the full list of supported filters.</p></dd>
+
+
 <dt>order.by</dt>
 <dd><p>For <code>proteins</code>: a character vector specifying the
 column(s) by which the result should be ordered.</p></dd>
+
+
 <dt>order.type</dt>
 <dd><p>For <code>proteins</code>: if the results should be ordered
 ascending (<code>order.type = "asc"</code>) or descending
 (<code>order.type = "desc"</code>)</p></dd>
+
+
 <dt>return.type</dt>
 <dd><p>For <code>proteins</code>: character of lenght one specifying
 the type of the returned object. Can be either <code>"DataFrame"</code>,
 <code>"data.frame"</code> or <code>"AAStringSet"</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The <code>proteins</code> method returns protein related annotations from
+    
+
+<p>The <code>proteins</code> method returns protein related annotations from
     an <code><a href="EnsDb-class.html">EnsDb</a></code> object with its <code>return.type</code> argument
-    allowing to define the type of the returned object. Note that if
-<code>return.type = "AAStringSet"</code> additional annotation columns are
-    stored in a <code>DataFrame</code> that can be accessed with the <code>mcols</code>    method on the returned object.
-The <code>listProteinColumns</code> function returns a character vector
+    allowing to define the type of the returned object. Note that if</p>
+<p></p>
+<p><code>return.type = "AAStringSet"</code> additional annotation columns are
+    stored in a <code>DataFrame</code> that can be accessed with the <code>mcols</code></p>
+
+
+<p>method on the returned object.</p>
+
+
+<p>The <code>listProteinColumns</code> function returns a character vector
     with the column names containing protein annotations or throws an error
     if no such annotations are available.</p>
     </div>
@@ -218,7 +237,7 @@ The <code>listProteinColumns</code> function returns a character vector
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

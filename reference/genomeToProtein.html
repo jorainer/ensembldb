@@ -25,7 +25,7 @@ negative coordinates (i.e. a start position of -1) is returned."><!-- mathjax --
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -96,12 +96,17 @@ negative coordinates (i.e. a start position of -1) is returned.</p>
     <dl><dt>x</dt>
 <dd><p><code>GRanges</code> with the genomic coordinates that should be mapped to
 within-protein coordinates.</p></dd>
+
+
 <dt>db</dt>
 <dd><p><code>EnsDb</code> object.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>IRangesList</code> with each element representing the mapping of one of the
+    
+
+<p>An <code>IRangesList</code> with each element representing the mapping of one of the
 <code>GRanges</code> in <code>x</code> (i.e. the length of the <code>IRangesList</code> is <code>length(x)</code>).
 Each element in <code>IRanges</code> provides the coordinates within the protein
 sequence, names being the (Ensembl) IDs of the protein. The ID of the
@@ -112,8 +117,10 @@ columns <code>"cds_ok"</code> indicates whether the length of the CDS matches th
 length of the encoded protein. Coordinates for which <code>cds_ok = FALSE</code> should
 be taken with caution, as they might not be correct. Metadata columns
 <code>"seq_start"</code>, <code>"seq_end"</code>, <code>"seq_name"</code> and <code>"seq_strand"</code> provide the
-provided genomic coordinates.
-For genomic coordinates that can not be mapped to within-protein sequences
+provided genomic coordinates.</p>
+
+
+<p>For genomic coordinates that can not be mapped to within-protein sequences
 an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
     </div>
     <div id="details">
@@ -167,64 +174,64 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 <span class="r-in"><span class="co">## The genomic coordinates can be mapped to several transcripts (and hence</span></span>
 <span class="r-in"><span class="co">## proteins).</span></span>
 <span class="r-in"><span class="va">res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 4 ranges and 9 metadata columns:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 4 ranges and 8 metadata columns:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       start       end     width |           tx_id    cds_ok</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000335505         1         2         2 | ENST00000334060      TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370987         1         2         2 | ENST00000381575      TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990         1         2         2 | ENST00000381578      TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016         1         2         2 | ENST00000554971      TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                             tx_id         exon_id exon_rank seq_start   seq_end</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;character&gt;     &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000335505 ENST00000334060 ENSE00001489177         2    630898    630902</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370987 ENST00000381575 ENSE00001489169         1    630898    630902</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990 ENST00000381578 ENSE00001489177         2    630898    630902</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016 ENST00000554971 ENSE00001489169         1    630898    630902</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      seq_name  seq_strand</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;character&gt; &lt;character&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000335505           X           *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370987           X           *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990           X           *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016           X           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                           exon_id exon_rank seq_start   seq_end    seq_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000335505 ENSE00001489177         2    630898    630902           X</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370987 ENSE00001489169         1    630898    630902           X</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990 ENSE00001489177         2    630898    630902           X</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016 ENSE00001489169         1    630898    630902           X</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                    seq_strand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000335505           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370987           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016           *</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## The stop codon is not translated, thus the mapping for the second</span></span>
 <span class="r-in"><span class="co">## GRanges fails</span></span>
 <span class="r-in"><span class="va">res</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 2 ranges and 9 metadata columns:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        start       end     width |           tx_id    cds_ok           tx_id</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 2 ranges and 8 metadata columns:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        start       end     width |           tx_id    cds_ok         exon_id</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;     &lt;character&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           -1        -1         1 | ENST00000381578      &lt;NA&gt; ENST00000381578</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           -1        -1         1 | ENST00000554971      &lt;NA&gt; ENST00000554971</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            exon_id exon_rank seq_start   seq_end    seq_name  seq_strand</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; &lt;character&gt; &lt;character&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ENSE00001489174         6    644636    644636           X           *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ENSE00002438186         5    644636    644636           X           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           -1        -1         1 | ENST00000381578      &lt;NA&gt; ENSE00001489174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           -1        -1         1 | ENST00000554971      &lt;NA&gt; ENSE00002438186</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    exon_rank seq_start   seq_end    seq_name  seq_strand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; &lt;character&gt; &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            6    644636    644636           X           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            5    644636    644636           X           *</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## The 3rd GRanges is mapped to the last amino acid.</span></span>
 <span class="r-in"><span class="va">res</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 2 ranges and 9 metadata columns:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 2 ranges and 8 metadata columns:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                       start       end     width |           tx_id    cds_ok</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; |     &lt;character&gt; &lt;logical&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990       292       292         1 | ENST00000381578      TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016       292       292         1 | ENST00000554971      TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                             tx_id         exon_id exon_rank seq_start   seq_end</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;character&gt;     &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990 ENST00000381578 ENSE00001489174         6    644633    644633</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016 ENST00000554971 ENSE00002438186         5    644633    644633</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      seq_name  seq_strand</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;character&gt; &lt;character&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990           X           *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016           X           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                           exon_id exon_rank seq_start   seq_end    seq_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                       &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990 ENSE00001489174         6    644633    644633           X</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016 ENSE00002438186         5    644633    644633           X</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                    seq_strand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000370990           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ENSP00000452016           *</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co">## Mapping of intronic positions fail</span></span>
 <span class="r-in"><span class="va">res</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 1 range and 9 metadata columns:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        start       end     width |       tx_id    cds_ok       tx_id</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;logical&gt; &lt;character&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           -1        -1         1 |                  &lt;NA&gt;        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        exon_id exon_rank seq_start   seq_end    seq_name  seq_strand</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;character&gt; &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; &lt;character&gt; &lt;character&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;NA&gt;      &lt;NA&gt;    634829    634831           X           *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IRanges object with 1 range and 8 metadata columns:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        start       end     width |       tx_id    cds_ok     exon_id exon_rank</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt; | &lt;character&gt; &lt;logical&gt; &lt;character&gt; &lt;integer&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           -1        -1         1 |                  &lt;NA&gt;        &lt;NA&gt;      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    seq_start   seq_end    seq_name  seq_strand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;integer&gt; &lt;integer&gt; &lt;character&gt; &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       634829    634831           X           *</span>
 </code></pre></div>
     </div>
   </div>
@@ -239,7 +246,7 @@ an <code>IRanges</code> with a start coordinate of -1 is returned.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

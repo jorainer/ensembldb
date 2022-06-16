@@ -24,7 +24,7 @@ mismatch between protein and transcript sequences."><!-- mathjax --><script src=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -95,19 +95,28 @@ mismatch between protein and transcript sequences.</p>
 <dd><p><code>IRanges</code> with the coordinates within the protein(s). The
 object has also to provide some means to identify the protein (see
 details).</p></dd>
+
+
 <dt>db</dt>
 <dd><p><code>EnsDb</code> object to be used to retrieve genomic coordinates of
 encoding transcripts.</p></dd>
+
+
 <dt>id</dt>
 <dd><p><code>character(1)</code> specifying where the protein identifier can be
 found. Has to be either <code>"name"</code> or one of <code>colnames(mcols(prng))</code>.</p></dd>
+
+
 <dt>idType</dt>
 <dd><p><code>character(1)</code> defining what type of IDs are provided. Has to
 be one of <code>"protein_id"</code> (default), <code>"uniprot_id"</code> or <code>"tx_id"</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>IRangesList</code>, each element being the mapping results for one of the input
+    
+
+<p><code>IRangesList</code>, each element being the mapping results for one of the input
 ranges in <code>x</code>. Each element is a <code>IRanges</code> object with the positions within
 the encoding transcript (relative to the start of the transcript, which
 includes the 5' UTR). The transcript ID is reported as the name of each
@@ -115,8 +124,10 @@ includes the 5' UTR). The transcript ID is reported as the name of each
 protein identifier is annotated to more than one Ensembl protein ID (which
 can be the case if Uniprot IDs are provided). If the coordinates can not be
 mapped (because the protein identifier is unknown to the database) an
-<code>IRanges</code> with negative coordinates is returned.
-The following metadata columns are available in each <code>IRanges</code> in the result:</p><ul><li><p><code>"protein_id"</code>: the ID of the Ensembl protein for which the within-protein
+<code>IRanges</code> with negative coordinates is returned.</p>
+
+
+<p>The following metadata columns are available in each <code>IRanges</code> in the result:</p><ul><li><p><code>"protein_id"</code>: the ID of the Ensembl protein for which the within-protein
 coordinates were mapped to the genome.</p></li>
 <li><p><code>"tx_id"</code>: the Ensembl transcript ID of the encoding transcript.</p></li>
 <li><p><code>"cds_ok"</code>: contains <code>TRUE</code> if the length of the CDS matches the length
@@ -268,7 +279,7 @@ use these as input for the mapping function.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

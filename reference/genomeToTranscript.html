@@ -22,7 +22,7 @@ See examples for details."><!-- mathjax --><script src="https://cdnjs.cloudflare
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -90,17 +90,24 @@ See examples for details.</p>
     <dl><dt>x</dt>
 <dd><p><code>GRanges</code> object with the genomic coordinates that should be
 mapped.</p></dd>
+
+
 <dt>db</dt>
 <dd><p><code>EnsDb</code> object.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An <code>IRangesList</code> with length equal to <code>length(x)</code>. Each element providing
+    
+
+<p>An <code>IRangesList</code> with length equal to <code>length(x)</code>. Each element providing
 the mapping(s) to position within any encoded transcripts at the respective
 genomic location as an <code>IRanges</code> object. An <code>IRanges</code> with negative start
 coordinates is returned, if the provided genomic coordinates are not
-completely within the genomic coordinates of an exon.
-The ID of the exon and its rank (index of the exon in the transcript) are
+completely within the genomic coordinates of an exon.</p>
+
+
+<p>The ID of the exon and its rank (index of the exon in the transcript) are
 provided in the result's <code>IRanges</code> metadata columns as well as the genomic
 position of <code>x</code>.</p>
     </div>
@@ -244,7 +251,7 @@ genomic coordinates can not be mapped to a transcript.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

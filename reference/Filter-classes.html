@@ -29,7 +29,7 @@ EnsDb object."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/li
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -129,30 +129,60 @@ names of all filters and the corresponding field supported by the
     <dl><dt>value</dt>
 <dd><p>The value(s) for the filter. For <code>GRangesFilter</code> it has to be a
 <code>GRanges</code> object.</p></dd>
+
+
 <dt>condition</dt>
 <dd><p><code>character(1)</code> specifying the <em>condition</em> of the
 filter. For <code>character</code>-based filters (such as
 <code>GeneIdFilter</code>) <code>"=="</code>, <code>"!="</code>, <code>"startsWith"</code> and <code>"endsWith"</code> are
 supported. Allowed values for <code>integer</code>-based filters (such as
 <code>GeneStartFilter</code>) are <code>"=="</code>, <code>"!="</code>, <code>"&lt;"</code>. <code>"&lt;="</code>, <code>"&gt;"</code> and <code>"&gt;="</code>.</p></dd>
+
+
 <dt>x</dt>
 <dd><p>For <code>seqnames</code>, <code>seqlevels</code>: a <code>GRangesFilter</code> object.</p></dd>
+
+
 <dt>object</dt>
 <dd><p>For <code>supportedFilters</code>: an <code>EnsDb</code> object.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>For <code>supportedFilters</code>: currently not used.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>For <code>ProtDomIdFilter</code>: A <code>ProtDomIdFilter</code> object.
-For <code>ProteinDomainIdFilter</code>: A <code>ProteinDomainIdFilter</code> object.
-For <code>ProteinDomainSourceFilter</code>: A <code>ProteinDomainSourceFilter</code>object.
-For <code>UniprotDbFilter</code>: A <code>UniprotDbFilter</code> object.
-For <code>UniprotMappingTypeFilter</code>: A <code>UniprotMappingTypeFilter</code> object.
-For <code>TxSupportLevel</code>: A <code>TxSupportLevel</code> object.
-For <code>TxIsCanonicalFilter</code>: A <code>TxIsCanonicalFilter</code> object.
-For <code>TxExternalNameFilter</code>: A <code>TxExternalNameFilter</code> object.
-For <code>supportedFilters</code>: a <code>data.frame</code> with the names and
+    
+
+<p>For <code>ProtDomIdFilter</code>: A <code>ProtDomIdFilter</code> object.</p>
+
+
+<p>For <code>ProteinDomainIdFilter</code>: A <code>ProteinDomainIdFilter</code> object.</p>
+
+
+<p>For <code>ProteinDomainSourceFilter</code>: A <code>ProteinDomainSourceFilter</code></p>
+
+
+<p>object.</p>
+
+
+<p>For <code>UniprotDbFilter</code>: A <code>UniprotDbFilter</code> object.</p>
+
+
+<p>For <code>UniprotMappingTypeFilter</code>: A <code>UniprotMappingTypeFilter</code> object.</p>
+
+
+<p>For <code>TxSupportLevel</code>: A <code>TxSupportLevel</code> object.</p>
+
+
+<p>For <code>TxIsCanonicalFilter</code>: A <code>TxIsCanonicalFilter</code> object.</p>
+
+
+<p>For <code>TxExternalNameFilter</code>: A <code>TxExternalNameFilter</code> object.</p>
+
+
+<p>For <code>supportedFilters</code>: a <code>data.frame</code> with the names and
 the corresponding field of the supported filter classes.</p>
     </div>
     <div id="details">
@@ -580,7 +610,7 @@ filter objects.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

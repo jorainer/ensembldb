@@ -27,7 +27,7 @@ and end coordinates are reported for each input range."><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -101,19 +101,28 @@ and end coordinates are reported for each input range.</p>
 <dd><p><code>IRanges</code> with the coordinates within the protein(s). The
 object has also to provide some means to identify the protein (see
 details).</p></dd>
+
+
 <dt>db</dt>
 <dd><p><code>EnsDb</code> object to be used to retrieve genomic coordinates of
 encoding transcripts.</p></dd>
+
+
 <dt>id</dt>
 <dd><p><code>character(1)</code> specifying where the protein identifier can be
 found. Has to be either <code>"name"</code> or one of <code>colnames(mcols(prng))</code>.</p></dd>
+
+
 <dt>idType</dt>
 <dd><p><code>character(1)</code> defining what type of IDs are provided. Has to
 be one of <code>"protein_id"</code> (default), <code>"uniprot_id"</code> or <code>"tx_id"</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code>list</code>, each element being the mapping results for one of the input
+    
+
+<p><code>list</code>, each element being the mapping results for one of the input
 ranges in <code>x</code> and names being the IDs used for the mapping. Each
 element can be either a:</p><ul><li><p><code>GRanges</code> object with the genomic coordinates calculated on the
 protein-relative coordinates for the respective Ensembl protein (stored in
@@ -332,7 +341,7 @@ Sebastian Gibb</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>

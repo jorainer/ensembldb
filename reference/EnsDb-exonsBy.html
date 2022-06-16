@@ -22,7 +22,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.2</span>
       </span>
     </div>
 
@@ -145,17 +145,24 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p>(In alphabetic order)</p>
+    
+
+
+<p>(In alphabetic order)</p>
 <dl><dt>...</dt>
 <dd><p>For <code>promoters</code>: additional arguments to be passed to the
     <code>transcripts</code> method. For <code>intronsByTranscript</code>:
     additional arguments such as <code>filter</code>.</p></dd>
-<dt>aggregateGenes</dt>
+
+
+  <dt>aggregateGenes</dt>
 <dd><p>For <code>disjointExons</code>: When <code>FALSE</code> (default) exon fragments
     that overlap multiple genes are dropped. When <code>TRUE</code>, all
     fragments are kept and the <code>gene_id</code> metadata column includes
     all gene IDs that overlap the exon fragment.</p></dd>
-<dt>by</dt>
+
+
+  <dt>by</dt>
 <dd><p>For <code>exonsBy</code>: wheter exons sould be fetched by genes
     or by transcripts; as in the corresponding function of the
     <code>GenomicFeatures</code> package.
@@ -166,7 +173,9 @@
     <code>GenomicFeatures</code> package is currently not implemented.
     For <code>cdsBy</code>: whether cds should be fetched by transcript of by
     gene.</p></dd>
-<dt>columns</dt>
+
+
+  <dt>columns</dt>
 <dd><p>Columns to be retrieved from the database tables.</p>
 <p>Default values for <code>genes</code>  are all columns from the <code>gene</code>
     database table, for <code>exons</code> and <code>exonsBy</code> the column names of
@@ -179,10 +188,14 @@
     column names).</p>
 <p>For <code>cdsBy</code>: this argument is only supported for for
     <code>by="tx"</code>.</p></dd>
-<dt>downstream</dt>
+
+
+  <dt>downstream</dt>
 <dd><p>For method <code>promoters</code>: the number of nucleotides downstream of
     the transcription start site that should be included in the promoter region.</p></dd>
-<dt>filter</dt>
+
+
+  <dt>filter</dt>
 <dd><p>A filter describing which results to retrieve from the database. Can
     be a single object extending
     <code><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">AnnotationFilter</a></code>, an
@@ -192,32 +205,46 @@
     <code><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">AnnotationFilter</a></code> for more
     details). Use the <code>supportedFilters</code> method to get an
     overview of supported filter classes and related fields.</p></dd>
-<dt>includeTranscripts</dt>
+
+
+  <dt>includeTranscripts</dt>
 <dd><p>For <code>disjointExons</code>: When <code>TRUE</code> (default) a
     <code>tx_name</code> metadata column is included that lists all transcript
     IDs that overlap the exon fragment. Note: this is different to the
     <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/disjointExons.html" class="external-link">disjointExons</a></code> function in the
     <code>GenomicFeatures</code> package, that lists the transcript names, not
     IDs.</p></dd>
-<dt>maxgap</dt>
+
+
+  <dt>maxgap</dt>
 <dd><p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: see
     <code>exonsByOverlaps</code> in <code>GenomicFeatures</code> for more
     information.</p></dd>
-<dt>minoverlap</dt>
+
+
+  <dt>minoverlap</dt>
 <dd><p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: see
     <code>exonsByOverlaps</code> in <code>GenomicFeatures</code> for more
     information.</p></dd>
-<dt>order.by</dt>
+
+
+  <dt>order.by</dt>
 <dd><p>Character vector specifying the column(s) by which the result should
     be ordered. This can be either in the form of
     <code>"gene_id, seq_name"</code> or <code>c("gene_id", "seq_name")</code>.</p></dd>
-<dt>order.type</dt>
+
+
+  <dt>order.type</dt>
 <dd><p>If the results should be ordered ascending
     (<code>asc</code>, default) or descending (<code>desc</code>).</p></dd>
-<dt>ranges</dt>
+
+
+  <dt>ranges</dt>
 <dd><p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: a
     <code>GRanges</code> object specifying the genomic regions.</p></dd>
-<dt>return.type</dt>
+
+
+  <dt>return.type</dt>
 <dd><p>Type of the returned object. Can be either
     <code>"data.frame"</code>, <code>"DataFrame"</code> or <code>"GRanges"</code>. In the
     latter case the return object will be a <code>GRanges</code> object with
@@ -225,20 +252,30 @@
     the feature (gene, transcript or exon, depending whether <code>genes</code>,
     <code>transcripts</code> or <code>exons</code> was called). All additional
     columns are added as metadata columns to the GRanges object.</p></dd>
-<dt>type</dt>
+
+
+  <dt>type</dt>
 <dd><p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: see
     <code>exonsByOverlaps</code> in <code>GenomicFeatures</code> for more
     information.</p></dd>
-<dt>upstream</dt>
+
+
+  <dt>upstream</dt>
 <dd><p>For method <code>promoters</code>: the number of nucleotides upstream of
     the transcription start site that should be included in the promoter region.</p></dd>
-<dt>use.names</dt>
+
+
+  <dt>use.names</dt>
 <dd><p>For <code>cdsBy</code> and <code>exonsBy</code>: only for <code>by="gene"</code>: use
     the names of the genes instead of their IDs as names of the resulting
     <code>GRangesList</code>.</p></dd>
-<dt>x</dt>
+
+
+  <dt>x</dt>
 <dd><p>For <code>toSAF</code> a <code>GRangesList</code> object.
     For all other methods an <code>EnsDb</code> instance.</p></dd>
+
+
 </dl></div>
     <div id="methods-and-functions">
     <h2>Methods and Functions</h2>
@@ -466,36 +503,68 @@
     </div>
     <div id="value">
     <h2>Value</h2>
-    <p>For <code>exons</code>, <code>transcripts</code> and <code>genes</code>,
-  a <code>data.frame</code>, <code>DataFrame</code>  or a <code>GRanges</code>, depending on the value of the
-<code>return.type</code> parameter. The result is ordered as specified by
-  the parameter <code>order.by</code> or, if not provided, by <code>seq_name</code>  and chromosomal start coordinate, but NOT by any ordering of values in
-  eventually submitted filter objects.
-  For <code>exonsBy</code>, <code>transcriptsBy</code>:
-  a <code>GRangesList</code>, depending on the value of the
-<code>return.type</code> parameter. The results are ordered by the value of the
-<code>by</code> parameter.
-  For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: a
-<code>GRanges</code> with the exons or transcripts overlapping the specified
-  regions.
-  For <code>toSAF</code>: a <code>data.frame</code> with column names
-<code>"GeneID"</code> (the group name from the <code>GRangesList</code>, i.e. the
+    
+
+<p>For <code>exons</code>, <code>transcripts</code> and <code>genes</code>,
+  a <code>data.frame</code>, <code>DataFrame</code></p>
+
+
+<p>or a <code>GRanges</code>, depending on the value of the</p>
+<p></p>
+<p><code>return.type</code> parameter. The result is ordered as specified by
+  the parameter <code>order.by</code> or, if not provided, by <code>seq_name</code></p>
+
+
+<p>and chromosomal start coordinate, but NOT by any ordering of values in
+  eventually submitted filter objects.</p>
+
+
+<p>For <code>exonsBy</code>, <code>transcriptsBy</code>:
+  a <code>GRangesList</code>, depending on the value of the</p>
+<p></p>
+<p><code>return.type</code> parameter. The results are ordered by the value of the</p>
+<p></p>
+<p><code>by</code> parameter.</p>
+
+
+<p>For <code>exonsByOverlaps</code> and <code>transcriptsByOverlaps</code>: a</p>
+<p></p>
+<p><code>GRanges</code> with the exons or transcripts overlapping the specified
+  regions.</p>
+
+
+<p>For <code>toSAF</code>: a <code>data.frame</code> with column names</p>
+<p></p>
+<p><code>"GeneID"</code> (the group name from the <code>GRangesList</code>, i.e. the
   ID by which the <code>GRanges</code> are split), <code>"Chr"</code> (the seqnames
-  from the <code>GRanges</code>), <code>"Start"</code> (the start coordinate),
-<code>"End"</code> (the end coordinate) and <code>"Strand"</code> (the strand).
-  For <code>disjointExons</code>: a <code>GRanges</code> of non-overlapping exon
-  parts.
-  For <code>cdsBy</code>: a <code>GRangesList</code> with <code>GRanges</code> per either
+  from the <code>GRanges</code>), <code>"Start"</code> (the start coordinate),</p>
+<p></p>
+<p><code>"End"</code> (the end coordinate) and <code>"Strand"</code> (the strand).</p>
+
+
+<p>For <code>disjointExons</code>: a <code>GRanges</code> of non-overlapping exon
+  parts.</p>
+
+
+<p>For <code>cdsBy</code>: a <code>GRangesList</code> with <code>GRanges</code> per either
   transcript or exon specifying the start and end coordinates of the
-  coding region of the transcript or gene.
-  For <code>fiveUTRsByTranscript</code>: a <code>GRangesList</code> with
-<code>GRanges</code> for each protein coding transcript representing the
+  coding region of the transcript or gene.</p>
+
+
+<p>For <code>fiveUTRsByTranscript</code>: a <code>GRangesList</code> with</p>
+<p></p>
+<p><code>GRanges</code> for each protein coding transcript representing the
   start and end coordinates of full or partial exons that constitute the
-  5' untranslated region of the transcript.
-  For <code>threeUTRsByTranscript</code>: a <code>GRangesList</code> with
-<code>GRanges</code> for each protein coding transcript representing the
+  5' untranslated region of the transcript.</p>
+
+
+<p>For <code>threeUTRsByTranscript</code>: a <code>GRangesList</code> with</p>
+<p></p>
+<p><code>GRanges</code> for each protein coding transcript representing the
   start and end coordinates of full or partial exons that constitute the
   3' untranslated region of the transcript.</p>
+
+
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -1023,7 +1092,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.9000.</p>
 </div>
 
       </footer></div>
