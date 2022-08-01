@@ -1,3 +1,8 @@
+Changes in version 2.21.3
+
+- Add minimal required Ensembl API version for certain data fields
+  (stable_id_version). Issue https://github.com/jorainer/ensembldb/issues/139
+
 Changes in version 2.21.1
 
 - Since *is circular* flag for chromosomes extracted using the Ensembl Perl API

@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.9: * Don't query stable_id_version for Ensembl release < 75.
 ## version 0.3.8: * Add column tx_is_canonical to transcript table.
 ## version 0.3.7: * Add column tx_external_name to transcript table.
 ## version 0.3.6: * Add column canonical_transcript to gene table.
@@ -38,6 +39,7 @@ use Bio::EnsEMBL::Registry;
 use List::MoreUtils qw/ uniq /;
 my $script_version = "0.3.7";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
+my $min_stable_id_version_version = 87; # minimal Ensembl version for ->stable_id_version
 
 ## connecting to the ENSEMBL data base
 use Bio::EnsEMBL::Registry;
@@ -227,7 +229,10 @@ foreach my $gene_id (@gene_ids){
     if(!defined($gene_external_name)){
       $gene_external_name="";
     }
-    my $gene_id_version = $gene->stable_id_version;
+    my $gene_id_version = "NULL";
+    if ($ensembl_version_num >= $min_stable_id_version_version) {
+	$gene_id_version = $gene->stable_id_version;
+    }
     my $gene_biotype = $gene->biotype;
     my $gene_seq_start = $gene->start;
     my $gene_seq_end = $gene->end;
@@ -270,7 +275,10 @@ foreach my $gene_id (@gene_ids){
 	$tx_cds_end = "NULL";
       }
       my $tx_id = $transcript->stable_id;
-      my $tx_id_version = $transcript->stable_id_version;
+      my $tx_id_version = "NULL";
+      if ($ensembl_version_num >= $min_stable_id_version_version) {
+	  $tx_id_version = $transcript->stable_id_version;
+      }
       my $tx_biotype = $transcript->biotype;
       my $tx_seq_start = $transcript->start;
       my $tx_seq_end = $transcript->end;
