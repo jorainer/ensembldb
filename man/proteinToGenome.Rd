@@ -2,9 +2,10 @@
 % Please edit documentation in R/proteinToX.R
 \name{proteinToGenome}
 \alias{proteinToGenome}
+\alias{proteinToGenome,EnsDb-method}
 \title{Map within-protein coordinates to genomic coordinates}
 \usage{
-proteinToGenome(x, db, id = "name", idType = "protein_id")
+\S4method{proteinToGenome}{EnsDb}(x, db, id = "name", idType = "protein_id")
 }
 \arguments{
 \item{x}{\code{IRanges} with the coordinates within the protein(s). The
@@ -132,6 +133,10 @@ res[[1]]
 res[[2]]
 }
 \seealso{
+\code{\link[GenomicFeatures]{proteinToGenome}} in the
+\pkg{GenomicFeatures} package for methods that operate on a
+TxDb or GRangesList object.
+
 Other coordinate mapping functions: 
 \code{\link{cdsToTranscript}()},
 \code{\link{genomeToProtein}()},

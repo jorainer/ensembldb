@@ -175,6 +175,10 @@ proteinToTranscript <- function(x, db, id = "name",
 
 #' @title Map within-protein coordinates to genomic coordinates
 #'
+#' @name proteinToGenome
+#'
+#' @aliases proteinToGenome proteinToGenome,EnsDb-method
+#'
 #' @description
 #'
 #' `proteinToGenome` maps protein-relative coordinates to genomic coordinates
@@ -264,6 +268,10 @@ proteinToTranscript <- function(x, db, id = "name",
 #'
 #' @family coordinate mapping functions
 #'
+#' @seealso \code{\link[GenomicFeatures]{proteinToGenome}} in the
+#'     \pkg{GenomicFeatures} package for methods that operate on a
+#'     TxDb or GRangesList object.
+#'
 #' @author Johannes Rainer based on initial code from Laurent Gatto and
 #'     Sebastian Gibb
 #'
@@ -305,7 +313,8 @@ proteinToTranscript <- function(x, db, id = "name",
 #'
 #' ## The coordinates within the second protein span two exons
 #' res[[2]]
-proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
+setMethod("proteinToGenome", "EnsDb",
+  function(x, db, id = "name", idType = "protein_id") {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
@@ -356,7 +365,7 @@ proteinToGenome <- function(x, db, id = "name", idType = "protein_id") {
             split(z, f = z$protein_id)
         else z
     })
-}
+  })
 
 #' @description Convert within-protein coordinates to transcript (CDS) relative
 #'    coordinates.

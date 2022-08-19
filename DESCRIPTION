@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.21.3
+Version: 2.21.4
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre"),
@@ -45,7 +45,7 @@ Depends:
     R (>= 3.5.0),
     BiocGenerics (>= 0.15.10),
     GenomicRanges (>= 1.31.18),
-    GenomicFeatures (>= 1.29.10),
+    GenomicFeatures (>= 1.49.6),
     AnnotationFilter (>= 1.5.2)
 Suggests:
     BiocStyle,
@@ -95,4 +95,4 @@ Collate:
     'zzz.R'
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
