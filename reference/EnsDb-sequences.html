@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.4</span>
       </span>
     </div>
 
@@ -74,11 +74,11 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="co"># S4 method for EnsDb</span>
-<span class="fu">getGenomeFaFile</span><span class="op">(</span><span class="va">x</span>, pattern<span class="op">=</span><span class="st">"dna.toplevel.fa"</span><span class="op">)</span>
-
-<span class="co"># S4 method for EnsDb</span>
-<span class="fu">getGenomeTwoBitFile</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for EnsDb</span></span>
+<span><span class="fu">getGenomeFaFile</span><span class="op">(</span><span class="va">x</span>, pattern<span class="op">=</span><span class="st">"dna.toplevel.fa"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for EnsDb</span></span>
+<span><span class="fu">getGenomeTwoBitFile</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -155,22 +155,22 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="co">## Loading an EnsDb for Ensembl version 86 (genome GRCh38):</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in">    <span class="co">## Retrieve a TwoBitFile with the gneomic DNA sequence matching the organism,</span></span>
-<span class="r-in">    <span class="co">## genome release version and, if possible, the Ensembl version of the</span></span>
-<span class="r-in">    <span class="co">## EnsDb object.</span></span>
-<span class="r-in">    <span class="va">Dna</span> <span class="op">&lt;-</span> <span class="fu">getGenomeTwoBitFile</span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></span>
-<span class="r-in">    <span class="co">## Extract the transcript sequence for all transcripts encoded on chromosome</span></span>
-<span class="r-in">    <span class="co">## Y.</span></span>
-<span class="r-in">    <span class="co">##extractTranscriptSeqs(Dna, edb, filter=SeqNameFilter("Y"))</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Loading an EnsDb for Ensembl version 86 (genome GRCh38):</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edb</span> <span class="op">&lt;-</span> <span class="va">EnsDb.Hsapiens.v86</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="co">## Retrieve a TwoBitFile with the gneomic DNA sequence matching the organism,</span></span></span>
+<span class="r-in"><span>    <span class="co">## genome release version and, if possible, the Ensembl version of the</span></span></span>
+<span class="r-in"><span>    <span class="co">## EnsDb object.</span></span></span>
+<span class="r-in"><span>    <span class="va">Dna</span> <span class="op">&lt;-</span> <span class="fu">getGenomeTwoBitFile</span><span class="op">(</span><span class="va">edb</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co">## Extract the transcript sequence for all transcripts encoded on chromosome</span></span></span>
+<span class="r-in"><span>    <span class="co">## Y.</span></span></span>
+<span class="r-in"><span>    <span class="co">##extractTranscriptSeqs(Dna, edb, filter=SeqNameFilter("Y"))</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>

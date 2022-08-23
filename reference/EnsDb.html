@@ -19,7 +19,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.4</span>
       </span>
     </div>
 
@@ -76,7 +76,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">EnsDb</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">EnsDb</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -110,9 +110,9 @@ a MySQL database.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## "Standard" way to create an EnsDb object:</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">EnsDb.Hsapiens.v86</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## "Standard" way to create an EnsDb object:</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">EnsDb.Hsapiens.v86</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">EnsDb.Hsapiens.v86</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> EnsDb for Ensembl:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Backend: SQLite</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Db type: EnsDb</span>
@@ -130,11 +130,11 @@ a MySQL database.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | No. of genes: 63970.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | No. of transcripts: 216741.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Protein data available.</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Alternatively, provide the full file name of a SQLite database file</span></span>
-<span class="r-in"><span class="va">dbfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/EnsDb.Hsapiens.v86.sqlite"</span>, package <span class="op">=</span> <span class="st">"EnsDb.Hsapiens.v86"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu">EnsDb</span><span class="op">(</span><span class="va">dbfile</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">edb</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Alternatively, provide the full file name of a SQLite database file</span></span></span>
+<span class="r-in"><span><span class="va">dbfile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/EnsDb.Hsapiens.v86.sqlite"</span>, package <span class="op">=</span> <span class="st">"EnsDb.Hsapiens.v86"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu">EnsDb</span><span class="op">(</span><span class="va">dbfile</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edb</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> EnsDb for Ensembl:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Backend: SQLite</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Db type: EnsDb</span>
@@ -152,14 +152,14 @@ a MySQL database.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | No. of genes: 63970.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | No. of transcripts: 216741.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Protein data available.</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Third way: connect to a MySQL database</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rmariadb.r-dbi.org" class="external-link">RMariaDB</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="va">dbcon</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span><span class="fu">MySQL</span><span class="op">(</span><span class="op">)</span>, user <span class="op">=</span> <span class="va">my_user</span>, pass <span class="op">=</span> <span class="va">my_pass</span>,</span>
-<span class="r-in">    host <span class="op">=</span> <span class="va">my_host</span>, dbname <span class="op">=</span> <span class="st">"ensdb_hsapiens_v86"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu">EnsDb</span><span class="op">(</span><span class="va">dbcon</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Third way: connect to a MySQL database</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rmariadb.r-dbi.org" class="external-link">RMariaDB</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dbcon</span> <span class="op">&lt;-</span> <span class="fu">dbConnect</span><span class="op">(</span><span class="fu">MySQL</span><span class="op">(</span><span class="op">)</span>, user <span class="op">=</span> <span class="va">my_user</span>, pass <span class="op">=</span> <span class="va">my_pass</span>,</span></span>
+<span class="r-in"><span>    host <span class="op">=</span> <span class="va">my_host</span>, dbname <span class="op">=</span> <span class="st">"ensdb_hsapiens_v86"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu">EnsDb</span><span class="op">(</span><span class="va">dbcon</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>

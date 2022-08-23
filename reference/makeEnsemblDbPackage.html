@@ -29,7 +29,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.4</span>
       </span>
     </div>
 
@@ -96,25 +96,25 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">ensDbFromAH</span><span class="op">(</span><span class="va">ah</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>, <span class="va">version</span><span class="op">)</span>
-
-<span class="fu">ensDbFromGRanges</span><span class="op">(</span><span class="va">x</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>,
-                 <span class="va">version</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ensDbFromGff</span><span class="op">(</span><span class="va">gff</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>,
-             <span class="va">version</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">ensDbFromGtf</span><span class="op">(</span><span class="va">gtf</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>,
-             <span class="va">version</span>, <span class="va">...</span><span class="op">)</span>
-
-<span class="fu">fetchTablesFromEnsembl</span><span class="op">(</span><span class="va">version</span>, <span class="va">ensemblapi</span>, user<span class="op">=</span><span class="st">"anonymous"</span>,
-                       host<span class="op">=</span><span class="st">"ensembldb.ensembl.org"</span>, pass<span class="op">=</span><span class="st">""</span>,
-                       port<span class="op">=</span><span class="fl">5306</span>, species<span class="op">=</span><span class="st">"human"</span><span class="op">)</span>
-
-<span class="fu">makeEnsemblSQLiteFromTables</span><span class="op">(</span>path<span class="op">=</span><span class="st">"."</span>, <span class="va">dbname</span><span class="op">)</span>
-
-<span class="fu">makeEnsembldbPackage</span><span class="op">(</span><span class="va">ensdb</span>, <span class="va">version</span>, <span class="va">maintainer</span>, <span class="va">author</span>,
-                     destDir<span class="op">=</span><span class="st">"."</span>, license<span class="op">=</span><span class="st">"Artistic-2.0"</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ensDbFromAH</span><span class="op">(</span><span class="va">ah</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>, <span class="va">version</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ensDbFromGRanges</span><span class="op">(</span><span class="va">x</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>,</span>
+<span>                 <span class="va">version</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ensDbFromGff</span><span class="op">(</span><span class="va">gff</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>,</span>
+<span>             <span class="va">version</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ensDbFromGtf</span><span class="op">(</span><span class="va">gtf</span>, <span class="va">outfile</span>, <span class="va">path</span>, <span class="va">organism</span>, <span class="va">genomeVersion</span>,</span>
+<span>             <span class="va">version</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fetchTablesFromEnsembl</span><span class="op">(</span><span class="va">version</span>, <span class="va">ensemblapi</span>, user<span class="op">=</span><span class="st">"anonymous"</span>,</span>
+<span>                       host<span class="op">=</span><span class="st">"ensembldb.ensembl.org"</span>, pass<span class="op">=</span><span class="st">""</span>,</span>
+<span>                       port<span class="op">=</span><span class="fl">5306</span>, species<span class="op">=</span><span class="st">"human"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">makeEnsemblSQLiteFromTables</span><span class="op">(</span>path<span class="op">=</span><span class="st">"."</span>, <span class="va">dbname</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">makeEnsembldbPackage</span><span class="op">(</span><span class="va">ensdb</span>, <span class="va">version</span>, <span class="va">maintainer</span>, <span class="va">author</span>,</span>
+<span>                     destDir<span class="op">=</span><span class="st">"."</span>, license<span class="op">=</span><span class="st">"Artistic-2.0"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -319,58 +319,58 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## get all human gene/transcript/exon annotations from Ensembl (75)</span></span>
-<span class="r-in">    <span class="co">## the resulting tables will be stored by default to the current working</span></span>
-<span class="r-in">    <span class="co">## directory; if the correct Ensembl api (version 75) is defined in the</span></span>
-<span class="r-in">    <span class="co">## PERL5LIB environment variable, the ensemblapi parameter can also be omitted.</span></span>
-<span class="r-in">    <span class="fu">fetchTablesFromEnsembl</span><span class="op">(</span><span class="fl">75</span>,</span>
-<span class="r-in">                           ensemblapi<span class="op">=</span><span class="st">"/home/bioinfo/ensembl/75/API/ensembl/modules"</span>,</span>
-<span class="r-in">                           species<span class="op">=</span><span class="st">"human"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## These tables can then be processed to generate a SQLite database</span></span>
-<span class="r-in">    <span class="co">## containing the annotations</span></span>
-<span class="r-in">    <span class="va">DBFile</span> <span class="op">&lt;-</span> <span class="fu">makeEnsemblSQLiteFromTables</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## and finally we can generate the package</span></span>
-<span class="r-in">    <span class="fu">makeEnsembldbPackage</span><span class="op">(</span>ensdb<span class="op">=</span><span class="va">DBFile</span>, version<span class="op">=</span><span class="st">"0.0.1"</span>,</span>
-<span class="r-in">                         maintainer<span class="op">=</span><span class="st">"Johannes Rainer &lt;johannes.rainer@eurac.edu&gt;"</span>,</span>
-<span class="r-in">                         author<span class="op">=</span><span class="st">"J Rainer"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## Build an annotation database form a GFF file from Ensembl.</span></span>
-<span class="r-in">    <span class="co">## ftp://ftp.ensembl.org/pub/release-83/gff3/rattus_norvegicus</span></span>
-<span class="r-in">    <span class="va">gff</span> <span class="op">&lt;-</span> <span class="st">"Rattus_norvegicus.Rnor_6.0.83.gff3.gz"</span></span>
-<span class="r-in">    <span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromGff</span><span class="op">(</span>gff<span class="op">=</span><span class="va">gff</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">edb</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## Build an annotation file from a GTF file.</span></span>
-<span class="r-in">    <span class="co">## the GTF file can be downloaded from</span></span>
-<span class="r-in">    <span class="co">## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/</span></span>
-<span class="r-in">    <span class="va">gtffile</span> <span class="op">&lt;-</span> <span class="st">"Homo_sapiens.GRCh37.75.gtf.gz"</span></span>
-<span class="r-in">    <span class="co">## generate the SQLite database file</span></span>
-<span class="r-in">    <span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromGtf</span><span class="op">(</span>gtf<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">ensemblhost</span>, <span class="va">gtffile</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## load the DB file directly</span></span>
-<span class="r-in">    <span class="va">EDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in">    <span class="co">## Alternatively, we could fetch a GTF file directly from AnnotationHub</span></span>
-<span class="r-in">    <span class="co">## and build the database from that:</span></span>
-<span class="r-in">    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in">    <span class="co">## Query for all GTF files from Ensembl for Ensembl version 81</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ensembl"</span>, <span class="st">"release-81"</span>, <span class="st">"GTF"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in">    <span class="co">## We could get the one from e.g. Bos taurus:</span></span>
-<span class="r-in">    <span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromAH</span><span class="op">(</span><span class="va">ah</span><span class="op">[</span><span class="st">"AH47941"</span><span class="op">]</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span>
-<span class="r-in">    <span class="va">edb</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Generate a sqlite database for genes encoded on chromosome Y</span></span>
-<span class="r-in"><span class="va">chrY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"chrY"</span>, package<span class="op">=</span><span class="st">"ensembldb"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">DBFile</span> <span class="op">&lt;-</span> <span class="fu">makeEnsemblSQLiteFromTables</span><span class="op">(</span>path<span class="op">=</span><span class="va">chrY</span> ,dbname<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## get all human gene/transcript/exon annotations from Ensembl (75)</span></span></span>
+<span class="r-in"><span>    <span class="co">## the resulting tables will be stored by default to the current working</span></span></span>
+<span class="r-in"><span>    <span class="co">## directory; if the correct Ensembl api (version 75) is defined in the</span></span></span>
+<span class="r-in"><span>    <span class="co">## PERL5LIB environment variable, the ensemblapi parameter can also be omitted.</span></span></span>
+<span class="r-in"><span>    <span class="fu">fetchTablesFromEnsembl</span><span class="op">(</span><span class="fl">75</span>,</span></span>
+<span class="r-in"><span>                           ensemblapi<span class="op">=</span><span class="st">"/home/bioinfo/ensembl/75/API/ensembl/modules"</span>,</span></span>
+<span class="r-in"><span>                           species<span class="op">=</span><span class="st">"human"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## These tables can then be processed to generate a SQLite database</span></span></span>
+<span class="r-in"><span>    <span class="co">## containing the annotations</span></span></span>
+<span class="r-in"><span>    <span class="va">DBFile</span> <span class="op">&lt;-</span> <span class="fu">makeEnsemblSQLiteFromTables</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## and finally we can generate the package</span></span></span>
+<span class="r-in"><span>    <span class="fu">makeEnsembldbPackage</span><span class="op">(</span>ensdb<span class="op">=</span><span class="va">DBFile</span>, version<span class="op">=</span><span class="st">"0.0.1"</span>,</span></span>
+<span class="r-in"><span>                         maintainer<span class="op">=</span><span class="st">"Johannes Rainer &lt;johannes.rainer@eurac.edu&gt;"</span>,</span></span>
+<span class="r-in"><span>                         author<span class="op">=</span><span class="st">"J Rainer"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## Build an annotation database form a GFF file from Ensembl.</span></span></span>
+<span class="r-in"><span>    <span class="co">## ftp://ftp.ensembl.org/pub/release-83/gff3/rattus_norvegicus</span></span></span>
+<span class="r-in"><span>    <span class="va">gff</span> <span class="op">&lt;-</span> <span class="st">"Rattus_norvegicus.Rnor_6.0.83.gff3.gz"</span></span></span>
+<span class="r-in"><span>    <span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromGff</span><span class="op">(</span>gff<span class="op">=</span><span class="va">gff</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">edb</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## Build an annotation file from a GTF file.</span></span></span>
+<span class="r-in"><span>    <span class="co">## the GTF file can be downloaded from</span></span></span>
+<span class="r-in"><span>    <span class="co">## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/</span></span></span>
+<span class="r-in"><span>    <span class="va">gtffile</span> <span class="op">&lt;-</span> <span class="st">"Homo_sapiens.GRCh37.75.gtf.gz"</span></span></span>
+<span class="r-in"><span>    <span class="co">## generate the SQLite database file</span></span></span>
+<span class="r-in"><span>    <span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromGtf</span><span class="op">(</span>gtf<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">ensemblhost</span>, <span class="va">gtffile</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## load the DB file directly</span></span></span>
+<span class="r-in"><span>    <span class="va">EDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co">## Alternatively, we could fetch a GTF file directly from AnnotationHub</span></span></span>
+<span class="r-in"><span>    <span class="co">## and build the database from that:</span></span></span>
+<span class="r-in"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co">## Query for all GTF files from Ensembl for Ensembl version 81</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ensembl"</span>, <span class="st">"release-81"</span>, <span class="st">"GTF"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co">## We could get the one from e.g. Bos taurus:</span></span></span>
+<span class="r-in"><span>    <span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromAH</span><span class="op">(</span><span class="va">ah</span><span class="op">[</span><span class="st">"AH47941"</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">edb</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Generate a sqlite database for genes encoded on chromosome Y</span></span></span>
+<span class="r-in"><span><span class="va">chrY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"chrY"</span>, package<span class="op">=</span><span class="st">"ensembldb"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">DBFile</span> <span class="op">&lt;-</span> <span class="fu">makeEnsemblSQLiteFromTables</span><span class="op">(</span>path<span class="op">=</span><span class="va">chrY</span> ,dbname<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Processing 'chromosome' table ... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> OK</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Processing 'gene' table ... </span>
@@ -385,10 +385,10 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> OK</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking validity of the database ... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> OK</span>
-<span class="r-in"><span class="co">## load this database:</span></span>
-<span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DBFile</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">edb</span></span>
+<span class="r-in"><span><span class="co">## load this database:</span></span></span>
+<span class="r-in"><span><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DBFile</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">edb</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> EnsDb for Ensembl:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Backend: SQLite</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |Db type: EnsDb</span>
@@ -404,12 +404,12 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> |DBSCHEMAVERSION: 1.0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | No. of genes: 495.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> | No. of transcripts: 731.</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Generate a sqlite database from a GRanges object specifying</span></span>
-<span class="r-in"><span class="co">## genes encoded on chromosome Y</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"YGRanges.RData"</span>, package<span class="op">=</span><span class="st">"ensembldb"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">Y</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Generate a sqlite database from a GRanges object specifying</span></span></span>
+<span class="r-in"><span><span class="co">## genes encoded on chromosome Y</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"YGRanges.RData"</span>, package<span class="op">=</span><span class="st">"ensembldb"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">Y</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GRanges object with 7155 ranges and 16 metadata columns:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          seqnames            ranges strand |               source       type</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |             &lt;factor&gt;   &lt;factor&gt;</span>
@@ -465,9 +465,9 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [7155]           1 ENSE00001794473        &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   -------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   seqinfo: 1 sequence from GRCh37 genome</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromGRanges</span><span class="op">(</span><span class="va">Y</span>, path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, version<span class="op">=</span><span class="fl">75</span>,</span>
-<span class="r-in">                       organism<span class="op">=</span><span class="st">"Homo_sapiens"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">DB</span> <span class="op">&lt;-</span> <span class="fu">ensDbFromGRanges</span><span class="op">(</span><span class="va">Y</span>, path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, version<span class="op">=</span><span class="fl">75</span>,</span></span>
+<span class="r-in"><span>                       organism<span class="op">=</span><span class="st">"Homo_sapiens"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Processing genes ... </span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span> I'm missing column(s): 'entrezid'. The corresponding database column(s) will be empty!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  Attribute availability:</span>
@@ -497,9 +497,9 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> OK</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking exons ... </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> OK</span>
-<span class="r-in"><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"></span>
+<span class="r-in"><span><span class="va">edb</span> <span class="op">&lt;-</span> <span class="fu"><a href="EnsDb.html">EnsDb</a></span><span class="op">(</span><span class="va">DB</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
