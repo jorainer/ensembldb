@@ -1,3 +1,7 @@
+Changes in version 2.21.5
+
+- Fix spell mistakes (thanks to Mike Love).
+
 Changes in version 2.21.3
 
 - Add minimal required Ensembl API version for certain data fields
