@@ -1,5 +1,5 @@
 ---
-title: "Generating an using Ensembl based annotation packages"
+title: "Generating and using Ensembl based annotation packages"
 author: "Johannes Rainer"
 graphics: yes
 package: ensembldb
@@ -476,7 +476,7 @@ sequence. Most BSgenome packages are named according to the genome build
 identifier used in UCSC which does not (always) match the genome build name used
 by Ensembl. Using the Ensembl version provided by the `EnsDb`, the correct genomic
 sequence can however be retrieved easily from the `AnnotationHub` using the
-`getGenomeTeoBitFile`. If no 2bit file matching the Ensembl version is available,
+`getGenomeTwoBitFile`. If no 2bit file matching the Ensembl version is available,
 the function tries to identify a file with the correct genome build from the
 *closest* Ensembl release and returns that instead.
 
