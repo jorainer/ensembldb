@@ -12,7 +12,7 @@ vignette: >
   %\VignetteIndexEntry{Generating an using Ensembl based annotation packages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,AnnotationHub,ggbio,Gviz,magrittr}
+  %\VignetteDepends{ensembldb,EnsDb.Hsapiens.v86,BiocStyle,AnnotationHub,ggbio,Gviz}
 ---
 
 ```{r biocstyle, echo = FALSE, results = "asis", message = FALSE}
@@ -221,13 +221,12 @@ the form *column name* followed by the logical condition.
 Alternatively, `EnsDb` objects can be filtered directly using the `filter`
 function. In the example below we use the `filter` function to filter the
 `EnsDb` object and pass that filtered database to the `transcripts` method using
-the `%>%` from the `magrittr` package.
+the `|>` (pile operator).
 
 ```{r transcripts-filter, message = FALSE}
-library(magrittr)
-
-edb %>% filter(~ symbol == "BCL2" & tx_biotype != "protein_coding") %>%
-    transcripts
+edb |>
+filter(~ symbol == "BCL2" & tx_biotype != "protein_coding") |>
+transcripts()
 ```
 
 Adding a filter to an `EnsDb` enables this filter (globally) on all subsequent
@@ -453,15 +452,16 @@ formatted `data.frame` as the `GeneID`. In the example below this would be the
 Ensembl gene IDs, while the start, end coordinates (along with the strand and
 chromosomes) are those of the the exons.
 
-In addition, the `disjointExons` function (similar to the one defined in
-`GenomicFeatures`) can be used to generate a `GRanges` of non-overlapping exon
-parts which can be used in the `DEXSeq` package.
+Also functions from the `GenomicFeatures` package can be applied to `EnsDb`
+databases, such as the `exonicParts` function to extract a `GRanges` of
+non-overlapping exon parts which can be used in the `DEXSeq` package.
 
 ```{r disjointExons, message = FALSE, eval = FALSE}
 ## Create a GRanges of non-overlapping exon parts.
-DJE <- disjointExons(edb, filter = AnnotationFilterList(
-			      SeqNameFilter(c(1:22, "X", "Y")),
-			      GeneIdFilter("ENSG%", "startsWith")))
+edb_sub <- filter(edb, filter = AnnotationFilterList(
+                           SeqNameFilter(c(1:22, "X", "Y")),
+                           GeneIdFilter("ENSG%", "startsWith")))
+DJE <- exonicParts(edb_sub)
 ```
 
 
@@ -721,7 +721,8 @@ lincs <- getGeneRegionTrackForGviz(edb, chromosome = "chrY",
 				   filter = GeneBiotypeFilter("lincRNA"))
 
 plotTracks(list(gat, GeneRegionTrack(protCod, name = "protein coding"),
-		GeneRegionTrack(lincs, name = "lincRNAs")), transcriptAnnotation = "symbol")
+		GeneRegionTrack(lincs, name = "lincRNAs")),
+        transcriptAnnotation = "symbol")
 
 ## At last we change the seqlevels style again to Ensembl
 seqlevelsStyle <- "Ensembl"
@@ -803,7 +804,7 @@ select(edb, keys = c("BCL2", "BCL2L11"), keytype = "GENENAME",
 
 ## Use the filtering system of ensembldb
 select(edb, keys = ~ gene_name %in% c("BCL2", "BCL2L11") &
-		tx_biotype == "protein_coding",
+                tx_biotype == "protein_coding",
        columns = c("GENEID", "GENENAME", "TXID", "TXBIOTYPE"))
 
 ```
@@ -1020,7 +1021,7 @@ Y
 
 ## Create the EnsDb database file
 DB <- ensDbFromGRanges(Y, path = tempdir(), version = 75,
-		       organism = "Homo_sapiens")
+                       organism = "Homo_sapiens")
 
 ## Load the database
 edb <- EnsDb(DB)

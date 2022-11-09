@@ -1,3 +1,7 @@
+Changes in version 2.23.1
+
+- Remove disjointExons method.
+
 Changes in version 2.21.5
 
 - Fix spell mistakes (thanks to Mike Love).

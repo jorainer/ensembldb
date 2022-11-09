@@ -525,17 +525,6 @@ test_that("toSaf works", {
     expect_identical(saf2, saf)
 })
 
-test_that("disjointExons works", {
-    dje <- disjointExons(edb, filter = GenenameFilter("ZBTB16"))
-    exns <- exons(edb, filter = GenenameFilter("ZBTB16"))
-    ## Expect that dje is shorter than exns, since overlapping exon parts have
-    ## been fused.
-    expect_true(length(dje) < length(exns))
-    dje <- disjointExons(edb, filter = GenenameFilter("ZBTB16"),
-                         aggregateGenes = TRUE)
-    expect_true(length(dje) < length(exns))
-})
-
 test_that("getGeneRegionTrackForGviz works", {
     res <- getGeneRegionTrackForGviz(edb, filter = GenenameFilter("ZBTB16"))
     expect_true(all(res$feature %in%

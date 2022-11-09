@@ -1,7 +1,6 @@
 \name{exonsBy}
 \Rdversion{1.1}
 \docType{class}
-\alias{disjointExons,EnsDb-method}
 \alias{cdsBy}
 \alias{cdsBy,EnsDb-method}
 \alias{fiveUTRsByTranscript,EnsDb-method}
@@ -67,9 +66,6 @@
         filter = AnnotationFilterList(), order.by, order.type = "asc",
         return.type = "GRanges")
 
-\S4method{disjointExons}{EnsDb}(x, aggregateGenes = FALSE,
-        includeTranscripts = TRUE, filter = AnnotationFilterList(), ...)
-
 \S4method{cdsBy}{EnsDb}(x, by = c("tx", "gene"), columns = NULL,
         filter = AnnotationFilterList(), use.names = FALSE)
 
@@ -90,13 +86,6 @@
     For \code{promoters}: additional arguments to be passed to the
     \code{transcripts} method. For \code{intronsByTranscript}:
     additional arguments such as \code{filter}.
-  }
-
-  \item{aggregateGenes}{
-    For \code{disjointExons}: When \code{FALSE} (default) exon fragments
-    that overlap multiple genes are dropped. When \code{TRUE}, all
-    fragments are kept and the \code{gene_id} metadata column includes
-    all gene IDs that overlap the exon fragment.
   }
 
   \item{by}{
@@ -145,15 +134,6 @@
     \code{\link[AnnotationFilter]{AnnotationFilter}} for more
     details). Use the \code{\link{supportedFilters}} method to get an
     overview of supported filter classes and related fields.
-  }
-
-  \item{includeTranscripts}{
-    For \code{disjointExons}: When \code{TRUE} (default) a
-    \code{tx_name} metadata column is included that lists all transcript
-    IDs that overlap the exon fragment. Note: this is different to the
-    \code{\link[GenomicFeatures]{disjointExons}} function in the
-    \code{GenomicFeatures} package, that lists the transcript names, not
-    IDs.
   }
 
   \item{maxgap}{
@@ -218,6 +198,12 @@
 
 }
 \section{Methods and Functions}{
+
+  Note that many methods and functions from the \code{GenomicFeatures}
+  package can also be used for \code{EnsDb} objects (such as
+  \code{\link[GenomicFeatures]{exonicParts}},
+  \code{\link[GenomicFeatures]{intronicParts}} etc).
+
   \describe{
 
     \item{exons}{
@@ -299,15 +285,6 @@
       that column \code{"entrezid"} is a \code{list} of Entrezgene
       identifiers to accomodate the potential 1:n mapping between
       Ensembl genes and Entrezgene IDs.
-    }
-
-    \item{disjointExons}{
-      This method is identical to
-      \code{\link[GenomicFeatures]{disjointExons}} defined in the
-      \code{GenomicFeatures} package. It creates a \code{GRanges} of
-      non-overlapping exon parts with metadata columns of \code{gene_id}
-      and \code{exonic_part}. Exon parts that overlap more than one gene
-      can be dropped with \code{aggregateGenes=FALSE}.
     }
 
     \item{cdsBy}{
@@ -428,9 +405,6 @@
   ID by which the \code{GRanges} are split), \code{"Chr"} (the seqnames
   from the \code{GRanges}), \code{"Start"} (the start coordinate),
   \code{"End"} (the end coordinate) and \code{"Strand"} (the strand).
-
-  For \code{disjointExons}: a \code{GRanges} of non-overlapping exon
-  parts.
 
   For \code{cdsBy}: a \code{GRangesList} with \code{GRanges} per either
   transcript or exon specifying the start and end coordinates of the

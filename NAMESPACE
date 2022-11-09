@@ -178,7 +178,6 @@ exportMethods(
 ## Methods for class EnsDb:
 exportMethods("cdsBy",
               "dbconn",
-              "disjointExons",
               "ensemblVersion",
               "exons",
               "exonsBy",
