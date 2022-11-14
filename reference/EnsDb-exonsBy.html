@@ -22,7 +22,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ensembldb</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.21.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.23.1</span>
       </span>
     </div>
 
@@ -124,10 +124,6 @@
 <span>        return.type <span class="op">=</span> <span class="st">"GRanges"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for EnsDb</span></span>
-<span><span class="fu">disjointExons</span><span class="op">(</span><span class="va">x</span>, aggregateGenes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>        includeTranscripts <span class="op">=</span> <span class="cn">TRUE</span>, filter <span class="op">=</span> <span class="fu">AnnotationFilterList</span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for EnsDb</span></span>
 <span><span class="fu">cdsBy</span><span class="op">(</span><span class="va">x</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tx"</span>, <span class="st">"gene"</span><span class="op">)</span>, columns <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>        filter <span class="op">=</span> <span class="fu">AnnotationFilterList</span><span class="op">(</span><span class="op">)</span>, use.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
@@ -153,13 +149,6 @@
 <dd><p>For <code>promoters</code>: additional arguments to be passed to the
     <code>transcripts</code> method. For <code>intronsByTranscript</code>:
     additional arguments such as <code>filter</code>.</p></dd>
-
-
-  <dt>aggregateGenes</dt>
-<dd><p>For <code>disjointExons</code>: When <code>FALSE</code> (default) exon fragments
-    that overlap multiple genes are dropped. When <code>TRUE</code>, all
-    fragments are kept and the <code>gene_id</code> metadata column includes
-    all gene IDs that overlap the exon fragment.</p></dd>
 
 
   <dt>by</dt>
@@ -205,15 +194,6 @@
     <code><a href="https://rdrr.io/pkg/AnnotationFilter/man/AnnotationFilter.html" class="external-link">AnnotationFilter</a></code> for more
     details). Use the <code>supportedFilters</code> method to get an
     overview of supported filter classes and related fields.</p></dd>
-
-
-  <dt>includeTranscripts</dt>
-<dd><p>For <code>disjointExons</code>: When <code>TRUE</code> (default) a
-    <code>tx_name</code> metadata column is included that lists all transcript
-    IDs that overlap the exon fragment. Note: this is different to the
-    <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/disjointExons.html" class="external-link">disjointExons</a></code> function in the
-    <code>GenomicFeatures</code> package, that lists the transcript names, not
-    IDs.</p></dd>
 
 
   <dt>maxgap</dt>
@@ -279,7 +259,13 @@
 </dl></div>
     <div id="methods-and-functions">
     <h2>Methods and Functions</h2>
-    <p></p><dl><dt>exons</dt>
+    
+
+<p>Note that many methods and functions from the <code>GenomicFeatures</code>
+  package can also be used for <code>EnsDb</code> objects (such as
+  <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/exonicParts.html" class="external-link">exonicParts</a></code>,
+  <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/exonicParts.html" class="external-link">intronicParts</a></code> etc).</p>
+<p></p><dl><dt>exons</dt>
 <dd><p>Retrieve exon information from the database. Additional
       columns from transcripts or genes associated with the exons can be specified
       and are added to the respective exon annotation.</p></dd>
@@ -358,15 +344,6 @@
       that column <code>"entrezid"</code> is a <code>list</code> of Entrezgene
       identifiers to accomodate the potential 1:n mapping between
       Ensembl genes and Entrezgene IDs.</p></dd>
-
-
-    <dt>disjointExons</dt>
-<dd><p>This method is identical to
-      <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/disjointExons.html" class="external-link">disjointExons</a></code> defined in the
-      <code>GenomicFeatures</code> package. It creates a <code>GRanges</code> of
-      non-overlapping exon parts with metadata columns of <code>gene_id</code>
-      and <code>exonic_part</code>. Exon parts that overlap more than one gene
-      can be dropped with <code>aggregateGenes=FALSE</code>.</p></dd>
 
 
     <dt>cdsBy</dt>
@@ -540,10 +517,6 @@
   from the <code>GRanges</code>), <code>"Start"</code> (the start coordinate),</p>
 <p></p>
 <p><code>"End"</code> (the end coordinate) and <code>"Strand"</code> (the strand).</p>
-
-
-<p>For <code>disjointExons</code>: a <code>GRanges</code> of non-overlapping exon
-  parts.</p>
 
 
 <p>For <code>cdsBy</code>: a <code>GRangesList</code> with <code>GRanges</code> per either
