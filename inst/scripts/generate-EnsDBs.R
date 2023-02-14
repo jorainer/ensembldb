@@ -16,15 +16,14 @@ listCoreDbsInFolder <- function(ftp_folder) {
         stop("Argument 'ftp_folder' missing!")
     folders <- unlist(strsplit(getURL(ftp_folder,
                                       dirlistonly = TRUE), split = "\n"))
-    res <- t(sapply(folders, function(z) {
-        tmp <- unlist(strsplit(z, split = "_"))
-        return(c(folder = z,
-                 organism = paste0(tmp[1:2], collapse = "_"),
-                 type = tmp[3],
-                 version = paste0(tmp[4:length(tmp)], collapse = "_")))
-    }))
-    return(res[which(res[, "type"] == "core"), ])
+    folders <- folders[grep("_core_", folders)]
+    res <- lapply(folders, function(z) {
+        tmp <- unlist(strsplit(z, split = "_core_"))
+        c(folder = z, organism = tmp[1L], type = "core", version = tmp[2])
+    })
+    do.call(rbind, res)
 }
+
 
 #' @description Creates an EnsDb for the specified species by first downloading
 #'     the corresponding MySQL database from Ensembl, installing it and
@@ -70,17 +69,6 @@ createEnsDbForSpecies <- function(ftp_folder,
     if (missing(ftp_folder))
         ftp_folder <- paste0(base_url, "/release-", ens_version, "/mysql/")
     res <- listCoreDbsInFolder(ftp_folder)
-
-    folders <- unlist(strsplit(getURL(ftp_folder,
-                                      dirlistonly = TRUE), split = "\n"))
-    res <- t(sapply(folders, function(z) {
-        tmp <- unlist(strsplit(z, split = "_"))
-        return(c(folder = z,
-                 organism = paste0(tmp[1:2], collapse = "_"),
-                 type = tmp[3],
-                 version = paste0(tmp[4:length(tmp)], collapse = "_")))
-    }))
-    res <- res[which(res[, "type"] == "core"), ]
     if (nrow(res) == 0)
         stop("No directories found!")
     if (missing(species))
