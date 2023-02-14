@@ -86,11 +86,12 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     info <- read.table(paste0(path, .Platform$file.sep, "ens_metadata.txt"),
                        sep="\t", as.is=TRUE, header=TRUE)
     species <- .organismName(info[ info$name=="Organism", "value" ])
+    genm <- sub("_v(\\d.*)", "", info[info$name == "genome_build", "value"])
     ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
     if(missing(dbname)){
         dbname <- paste0(
-            "EnsDb.", .abbrevOrganismName(species), ".v",
-            info[ info$name=="ensembl_version", "value" ], ".sqlite")
+            "EnsDb.", .abbrevOrganismName(species), genm, ".v",
+            info[info$name == "ensembl_version", "value"], ".sqlite")
     }
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
     ## write information table
