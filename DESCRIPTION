@@ -94,4 +94,4 @@ Collate:
     'zzz.R'
 biocViews: Genetics, AnnotationData, Sequencing, Coverage
 License: LGPL
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
