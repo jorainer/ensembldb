@@ -3,6 +3,7 @@
 library(RCurl)
 library(RMariaDB)
 library(ensembldb)
+options(timeout = 3600)
 
 #' @description Get core database names from the specified folder.
 #'

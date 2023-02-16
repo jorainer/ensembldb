@@ -1,7 +1,6 @@
 Changes in version 2.23.2
 
-- Include genome assembly in EnsDb database name to support export of EnsDb
-  for mouse strains etc.
+- Fix SQLite database names to include also the subspecies.
 
 Changes in version 2.23.1
 

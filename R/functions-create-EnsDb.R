@@ -5,13 +5,15 @@
 ## this simply makes the first character uppercase
 .organismName <- function(x){
     substring(x, 1, 1) <- toupper(substring(x, 1, 1))
-    return(x)
+    x
 }
 
 .abbrevOrganismName <- function(organism){
   spc <- unlist(strsplit(organism, "_|[[:space:]]"))
-  ## this assumes a binomial nomenclature has been maintained.
-  return(paste0(substr(spc[[1]], 1, 1), spc[[2]]))
+  res <- paste0(substr(spc[[1]], 1, 1), spc[[2]])
+  if (length(spc) > 2)
+      res <- paste0(c(res, spc[3:length(spc)]), collapse = "_")
+  res
 }
 
 ## x has to be the connection to the database.
@@ -85,14 +87,14 @@ makeEnsemblSQLiteFromTables <- function(path=".", dbname){
     ## read information
     info <- read.table(paste0(path, .Platform$file.sep, "ens_metadata.txt"),
                        sep="\t", as.is=TRUE, header=TRUE)
-    species <- .organismName(info[ info$name=="Organism", "value" ])
-    genb <- info[info$name == "genome_build", "value"]
-    ##substring(species, 1, 1) <- toupper(substring(species, 1, 1))
-    if(missing(dbname)){
+    if (any(info$name == "species"))
+        species <- .organismName(info[info$name == "species", "value"])
+    else
+        species <- .organismName(info[info$name == "Organism", "value"])
+    if(missing(dbname))
         dbname <- paste0(
-            "EnsDb.", .abbrevOrganismName(species), ".", genb, ".v",
+            "EnsDb.", .abbrevOrganismName(species), ".v",
             info[info$name == "ensembl_version", "value"], ".sqlite")
-    }
     con <- dbConnect(dbDriver("SQLite"), dbname=dbname)
     ## write information table
     dbWriteTable(con, name="metadata", info, row.names=FALSE)

@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 #####################################
+## version 0.3.10:* Store also the species and common name ot info.txt.
 ## version 0.3.9: * Don't query stable_id_version for Ensembl release < 75.
 ## version 0.3.8: * Add column tx_is_canonical to transcript table.
 ## version 0.3.7: * Add column tx_external_name to transcript table.
@@ -37,7 +38,7 @@ use Bio::EnsEMBL::ApiVersion;
 use Bio::EnsEMBL::Registry;
 ## unification function for arrays
 use List::MoreUtils qw/ uniq /;
-my $script_version = "0.3.7";
+my $script_version = "0.3.10";
 my $min_tsl_version = 87;   ## The minimal required Ensembl version providing support for the tsl method.
 my $min_stable_id_version_version = 87; # minimal Ensembl version for ->stable_id_version
 
@@ -382,6 +383,8 @@ print INFO "Organism\t$scientific_name\n";
 print INFO "taxonomy_id\t$taxonomy_id\n";
 print INFO "genome_build\t$coord_system_version\n";
 print INFO "DBSCHEMAVERSION\t2.2\n";
+print INFO "common_name\t$common_name\n";
+print INFO "species\t$species\n";
 
 print COUNTS "$count_gene\t$count_tx\t$count_exon\t$count_protein\n";
 
