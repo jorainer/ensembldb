@@ -1,3 +1,7 @@
+Changes in version 2.24.1
+
+- Avoid reading ftp file from Ensembl in unit test.
+
 Changes in version 2.23.2
 
 - Fix SQLite database names to include also the subspecies.
