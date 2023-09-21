@@ -246,15 +246,15 @@ test_that(".read_lines_compressed works", {
     fl <- system.file("gtf/Devosia_geojensis.ASM96941v1.32.gtf.gz",
                       package = "ensembldb")
     res <- readLines(fl, n = 10)
+    expect_equal(res[1L], "#!genome-build ASM96941v1")
 
-    res_2 <- .read_lines_compressed(fl, n = 10)
+    res_2 <- ensembldb:::.read_lines_compressed(fl, n = 10)
     expect_equal(res_2[1L], "#!genome-build ASM96941v1")
 
     fl <- paste0(
         "ftp://ftp.ensembl.org/pub/release-102/gtf/",
         "homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz"
     )
-    expect_warning(res <- readLines(fl, n = 2))
-    res_2 <- .read_lines_compressed(fl, n = 2)
+    res_2 <- ensembldb:::.read_lines_compressed(fl, n = 2)
     expect_equal(res_2[1L], "#!genome-build GRCh38.p13")
 })
