@@ -1,3 +1,7 @@
+Changes in version 2.25.1
+
+- Fix unit test avoiding to read ftp file twice.
+
 Changes in version 2.23.2
 
 - Fix SQLite database names to include also the subspecies.
