@@ -250,11 +250,4 @@ test_that(".read_lines_compressed works", {
 
     res_2 <- ensembldb:::.read_lines_compressed(fl, n = 10)
     expect_equal(res_2[1L], "#!genome-build ASM96941v1")
-
-    fl <- paste0(
-        "ftp://ftp.ensembl.org/pub/release-102/gtf/",
-        "homo_sapiens/Homo_sapiens.GRCh38.102.gtf.gz"
-    )
-    res_2 <- ensembldb:::.read_lines_compressed(fl, n = 2)
-    expect_equal(res_2[1L], "#!genome-build GRCh38.p13")
 })

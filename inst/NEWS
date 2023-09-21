@@ -1,6 +1,6 @@
 Changes in version 2.25.1
 
-- Fix unit test avoiding to read ftp file twice.
+- Skip reading gtf file from Ensembl ftp server in unit test.
 
 Changes in version 2.23.2
 
