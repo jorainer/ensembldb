@@ -357,11 +357,33 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' res[[3]]
 #'
 #' res
+#' ## If you are tring to map a huge list of transcript-relative coordinates 
+#' ## to genomic level, you shall use pre-loaded exons GRangesList to replace 
+#' ## the SQLite db edbx
+#' 
+#' exons <- exonsBy(EnsDb.Hsapiens.v86)
+#' 
+#' ## Below is just a lazy demo of querying 10^4 transcript-relative coordinates
+#' ## without any pre-splitting 
+#' 
+#' txpos <-  IRanges(
+#'     start = rep(1,10000), 
+#'     end = rep(30,10000),
+#'     names = c(rep('ENST00000486554',9999),'some',
+#'     note = rep('something',10000))
+#' 
+#' res_temp <- mclapply(1:1000, function(ind){
+#'     transcriptToGenome_byu(txpos[ind], exons)
+#' }, mc.preschedule = T, mc.cores = 100)
+#' 
+#' res <- do.call(c,res_temp)
+#' 
+#' 
 transcriptToGenome <- function(x, db, id = "name") {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
-    if (missing(db) || !is(db, "EnsDb"))
-        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    if (missing(db) || !(is(db, "EnsDb") || is(db,"CompressedGRangesList")))
+        stop("Argument 'db' is required and has to be an 'EnsDb' object or 'CompressedGRangesList' object") # load the exons priorly to allow spontaneous query since SQLite does not support 
     res <- .tx_to_genome(x, db, id = id)
     not_found <- sum(lengths(res) == 0)
     if (not_found > 0)
@@ -379,14 +401,24 @@ transcriptToGenome <- function(x, db, id = "name") {
     if (any(is.null(ids)))
         stop("One or more of the provided IDs are NULL", call. = FALSE)
     names(x) <- ids
-    exns <- exonsBy(db, filter = TxIdFilter(unique(ids)))
+    if(is(db, "EnsDb")) {
+        exns <- exonsBy(db, filter = TxIdFilter(unique(ids)))
+    } else {
+        tryCatch({
+            exns <- db[names(db) %in% unique(ids)]
+        }, error = function(e){
+            exns <- GRangesList()
+        })
+        
+    }
     ## Loop over x
     res <- lapply(split(x, f = 1:length(x)), function(z) {
         if (any(names(exns) == names(z))) {
             gen_map <- .to_genome(exns[[names(z)]], z)
             if (length(gen_map)) {
                 mcols(gen_map) <- DataFrame(mcols(gen_map), tx_start = start(z),
-                                            tx_end = end(z))
+                                            tx_end = end(z)) # preserve the metadata from the targeted tx
+                if(!is.null(mcols(z))) mcols(gen_map) <- DataFrame(mcols(gen_map), mcols(z))
                 gen_map[order(gen_map$exon_rank)]
             } else GRanges()
         } else GRanges()
