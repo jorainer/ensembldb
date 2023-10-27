@@ -365,6 +365,7 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' 
 #' ## Below is just a lazy demo of querying 10^4 transcript-relative coordinates
 #' ## without any pre-splitting 
+#' library(parallel)
 #' 
 #' txpos <-  IRanges(
 #'     start = rep(1,10000), 
@@ -372,9 +373,9 @@ transcriptToProtein <- function(x, db, id = "name") {
 #'     names = c(rep('ENST00000486554',9999),'some',
 #'     note = rep('something',10000))
 #' 
-#' res_temp <- mclapply(1:1000, function(ind){
-#'     transcriptToGenome_byu(txpos[ind], exons)
-#' }, mc.preschedule = T, mc.cores = 100)
+#' res_temp <- mclapply(1:10000, function(ind){
+#'     transcriptToGenome(txpos[ind], exons)
+#' }, mc.preschedule = T, mc.cores = detectCores() - 1)
 #' 
 #' res <- do.call(c,res_temp)
 #' 
@@ -383,7 +384,7 @@ transcriptToGenome <- function(x, db, id = "name") {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
     if (missing(db) || !(is(db, "EnsDb") || is(db,"CompressedGRangesList")))
-        stop("Argument 'db' is required and has to be an 'EnsDb' object or 'CompressedGRangesList' object") # load the exons priorly to allow spontaneous query since SQLite does not support 
+        stop("Argument 'db' is required and has to be an 'EnsDb' object or a 'CompressedGRangesList' object") # load the exons priorly to allow spontaneous query since SQLite does not support 
     res <- .tx_to_genome(x, db, id = id)
     not_found <- sum(lengths(res) == 0)
     if (not_found > 0)
@@ -407,7 +408,7 @@ transcriptToGenome <- function(x, db, id = "name") {
         tryCatch({
             exns <- db[names(db) %in% unique(ids)]
         }, error = function(e){
-            exns <- GRangesList()
+            exns <<- GRangesList()
         })
         
     }
