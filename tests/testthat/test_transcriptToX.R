@@ -140,6 +140,14 @@ test_that(".tx_to_genome works", {
     expect_equal(as.character(strand(res[[6]])), "+")
     expect_equal(as.character(seqnames(res[[6]])), "Y")
 
+    ## add pre-load data test 
+    exons <- exonsBy(edbx)
+    res_preload <- unlist(ensembldb:::.tx_to_genome(rng, exons))
+    res_unlisted <- unlist(res)
+    res_unlisted$tx_id <- NULL
+    seqlevels(res_preload) <- seqlevels(res_unlisted)
+    expect_equal(res_unlisted, res_preload)
+
     ## wrong ID and range outside tx
     rng <- IRanges(start = c(501, 200, 1), end = c(505, 1200, 5),
                    names = c("ENST00000486554", "ENST00000486554", "B"))
@@ -149,6 +157,13 @@ test_that(".tx_to_genome works", {
     seqlevels(a) <- seqlevels(b)
     expect_equal(a, b)
     expect_equal(lengths(res_2), c(ENST00000486554 = 2, ENST00000486554 = 0,
+                                   B = 0))
+    ## add pre-load data test 
+    expect_warning(res_3 <- ensembldb:::.tx_to_genome(rng, exons))
+    c <- unlist(res_3[1])
+    seqlevels(res_preload) <- seqlevels(c)
+    expect_equal(res_preload, res_preload)
+    expect_equal(lengths(res_3), c(ENST00000486554 = 2, ENST00000486554 = 0,
                                    B = 0))
 })
 
@@ -186,7 +201,40 @@ test_that("transcriptToGenome works", {
 
     x <- IRanges(start = c(256, 2), end = c(265, 12000),
                  names = c("ENST00000381578", "ENST00000381578"))
-    res <- transcriptToGenome(x, edbx)
+    expect_warning(res <- transcriptToGenome(x, edbx)) # indeed warn expected
+    expect_equal(lengths(res), c(ENST00000381578 = 2, ENST00000381578 = 0))
+    
+    ## add pre-load data test 
+    exons <- exonsBy(edbx)
+    x <- IRanges(start = c(259, 1, 259), end = c(260, 4, 261),
+                names = c("ENST00000381578", "some", "ENST00000381578"))
+    expect_warning(res <- transcriptToGenome(x, exons))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == length(x))
+    expect_true(length(res[[2]]) == 0)
+    expect_equal(names(res), names(x))
+    expect_equal(start(res[[1]]), start(res[[3]]))
+    expect_equal(end(res[[1]])[1], end(res[[3]])[1])
+    expect_equal(end(res[[1]])[2] + 1, end(res[[3]])[2])
+
+    expect_warning(res <- transcriptToGenome(x[2], exons))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 1)
+
+    expect_warning(res <- transcriptToGenome(x[c(2, 2)], exons))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 2)
+
+    res <- transcriptToGenome(x[1], exons)
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 1)
+    expect_true(length(res[[1]]) == 2)
+
+    x <- IRanges(start = c(256, 2), end = c(265, 12000),
+                 names = c("ENST00000381578", "ENST00000381578"),
+                 info = 'ORFs')
+    expect_warning(res <- transcriptToGenome(x, exons)) 
+    expect_true(res$ENST00000381578$info[1] == 'ORFs')
     expect_equal(lengths(res), c(ENST00000381578 = 2, ENST00000381578 = 0))
 })
 

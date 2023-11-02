@@ -297,8 +297,17 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' nucleotide of the **transcript**, not the **CDS**. CDS-relative coordinates
 #' have to be converted to transcript-relative positions first with the
 #' [cdsToTranscript()] function.
+#' 
+#' @param x `IRanges` with the coordinates within the transcript. Coordinates
+#'     are counted from the start of the transcript (including the 5' UTR). The
+#'     Ensembl IDs of the corresponding transcripts have to be provided either
+#'     as `names` of the `IRanges`, or in one of its metadata columns.
 #'
-#' @inheritParams transcriptToProtein
+#' @param db `EnsDb` object or pre-loaded exons 'CompressedGRangesList' object 
+#'     using exonsBy().
+#'
+#' @param id `character(1)` specifying where the transcript identifier can be
+#'     found. Has to be either `"name"` or one of `colnames(mcols(prng))`.
 #'
 #' @return
 #'
@@ -363,14 +372,14 @@ transcriptToProtein <- function(x, db, id = "name") {
 #' 
 #' exons <- exonsBy(EnsDb.Hsapiens.v86)
 #' 
-#' ## Below is just a lazy demo of querying 10^4 transcript-relative coordinates
-#' ## without any pre-splitting 
+#' ## Below is just a lazy demo of querying 10^4 transcript-relative 
+#' ## coordinates without any pre-splitting 
 #' library(parallel)
 #' 
 #' txpos <-  IRanges(
 #'     start = rep(1,10000), 
 #'     end = rep(30,10000),
-#'     names = c(rep('ENST00000486554',9999),'some',
+#'     names = c(rep('ENST00000486554',9999),'some'),
 #'     note = rep('something',10000))
 #' 
 #' res_temp <- mclapply(1:10000, function(ind){
@@ -384,7 +393,7 @@ transcriptToGenome <- function(x, db, id = "name") {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
     if (missing(db) || !(is(db, "EnsDb") || is(db,"CompressedGRangesList")))
-        stop("Argument 'db' is required and has to be an 'EnsDb' object or a 'CompressedGRangesList' object") # load the exons priorly to allow spontaneous query since SQLite does not support 
+        stop("Argument 'db' is required and has to be an 'EnsDb' object or a 'CompressedGRangesList' object") # load the exons priorly to allow spontaneous query since RSQLite does not support 
     res <- .tx_to_genome(x, db, id = id)
     not_found <- sum(lengths(res) == 0)
     if (not_found > 0)
