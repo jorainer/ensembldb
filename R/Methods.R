@@ -937,6 +937,9 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
             stop("Argument 'transcripts' has to be an 'GRanges' object")
         if (identical(integer(0),grep('T[0-9]', names(exons)[[1]])))
             stop("Argument 'exons' has to be by 'tx'.")
+        ## Check if x is a formula and eventually translate it.
+        if (is(filter, "formula"))
+            filter <- AnnotationFilter(filter)
         tryCatch({
             filter_type <- filter@field
             filter_tx <- filter@value
