@@ -441,17 +441,17 @@ test_that("lengthOf works", {
     expect_identical(lenY, lenY2)
     ## Just using the transcriptLengths
 
-    res <- ensembldb:::.transcriptLengths(edb, filter = GenenameFilter("ZBTB16"))
-    res_2 <- lengthOf(edb, "tx", filter = GenenameFilter("ZBTB16"))
+    res <- ensembldb:::.transcriptLengths(edb, filter = GeneNameFilter("ZBTB16"))
+    res_2 <- lengthOf(edb, "tx", filter = GeneNameFilter("ZBTB16")) ## 'GenenameFilter' is deprecated.
     expect_identical(sort(res$tx_len), unname(sort(res_2)))
     ## also cds lengths etc.
-    res <- ensembldb:::.transcriptLengths(edb, filter = GenenameFilter("ZBTB16"),
+    res <- ensembldb:::.transcriptLengths(edb, filter = GeneNameFilter("ZBTB16"),
                                           with.cds_len = TRUE,
                                           with.utr5_len = TRUE,
                                           with.utr3_len = TRUE)
     expect_identical(colnames(res), c("tx_id", "gene_id", "nexon", "tx_len",
                                       "cds_len", "utr5_len", "utr3_len"))
-    tx <- transcripts(edb, filter = list(GenenameFilter("ZBTB16"),
+    tx <- transcripts(edb, filter = list(GeneNameFilter("ZBTB16"),
                                          TxBiotypeFilter("protein_coding")))
     expect_true(all(!is.na(res[names(tx), "cds_len"])))
     expect_equal(unname(res[names(tx), "tx_len"]),
@@ -471,6 +471,27 @@ test_that("lengthOf works", {
     expect_equal(res[names(fives), "utr5_len"], unname(sum(width(fives))))
     expect_equal(res[names(threes), "utr3_len"], unname(sum(width(threes))))
     expect_equal(res[names(cdss), "cds_len"], unname(sum(width(cdss))))
+
+    ## Preloaded data test for tx_id only filter
+    exons <- exonsBy(edbx)
+    transcripts <- transcripts(edbx)
+    res_1 <- ensembldb:::.transcriptLengths(edbx, with.cds_len = TRUE,
+                                          with.utr5_len = TRUE,
+                                          with.utr3_len = TRUE,
+                                          exons = exons,
+                                          transcripts = transcripts)
+    expect_error(ensembldb:::.transcriptLengths(edbx, with.cds_len = TRUE,
+                                                with.utr5_len = TRUE,
+                                                with.utr3_len = TRUE,
+                                                exons = exons,
+                                                transcripts = exons))
+
+    expect_error(ensembldb:::.transcriptLengths(edbx, with.cds_len = TRUE,
+                                                with.utr5_len = TRUE,
+                                                with.utr3_len = TRUE,
+                                                exons = exons,
+                                                transcripts = exons))
+    expect_equal(res,res_1)
 })
 
 
