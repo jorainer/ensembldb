@@ -71,6 +71,7 @@ test_that(".tx_to_protein works",  {
     mcols(x)$id <- "ENST00000381578"
     res_a <- .tx_to_protein(x, edbx, id = "id")
     res_b <- .txs_to_proteins(x, edbx, id = "id")
+    mcols(res_b) <- mcols(res_b)[1:4]
     expect_equal(res_a, res_b)
 
     ## Multiple input.
@@ -83,6 +84,16 @@ test_that(".tx_to_protein works",  {
     expect_warning(res_a <- .tx_to_protein(x, edbx))
     expect_warning(res_b <- .txs_to_proteins(x, edbx))
     expect_equal(res_a, res_b)
+
+    ## Preloaded data test
+    proteins <- proteins(edbx)
+    exons <- exonsBy(edbx)
+    transcripts <- transcripts(edbx)
+    expect_warning(res_c <- .txs_to_proteins(x, edbx, 
+                                             proteins = proteins, 
+                                             exons = exons, 
+                                             transcripts = transcripts))
+    expect_equal(res_c, res_b)
 })
 
 test_that("transcriptToProtein works", {
@@ -100,6 +111,25 @@ test_that("transcriptToProtein works", {
     res <- transcriptToProtein(x, edbx, id = "id")
     expect_equal(start(res), 1)
     expect_equal(end(res), 1)
+
+    ## Preloaded data test
+
+    proteins <- proteins(edbx)
+    exons <- exonsBy(edbx)
+    transcripts <- transcripts(edbx)
+    expect_error(transcriptToProtein(x, edbx, id = "id", 
+                                     exons = exons, 
+                                     transcripts = transcripts))
+    expect_error(transcriptToProtein(x, edbx, 
+                                     proteins = proteins, 
+                                     exons = exons, 
+                                     transcripts = transcripts))
+    expect_error(transcriptToProtein(x, edbx, id = "id", 
+                                     proteins = proteins, 
+                                     exons = proteins, 
+                                     transcripts = transcripts))
+    res2 <- transcriptToProtein(x, edbx, id = "id", proteins = proteins, exons = exons, transcripts = transcripts)
+    expect_equal(res2, res)
 })
 
 test_that(".tx_to_genome works", {
