@@ -547,7 +547,16 @@ transcriptToGenome <- function(x, db, id = "name") {
 #' ## ENST00000590515 does not encode a protein and thus -1 is returned
 #' ## The coordinates within ENST00000333681 are outside the CDS and thus also
 #' ## -1 is reported.
-transcriptToCds <- function(x, db, id = "name") {
+#' 
+#' ## Meanwhile, this function can be called in parallel processes if you preload
+#' ## the exons and transcripts database.
+#' 
+#' exons <- exonsBy(EnsDb.Hsapiens.v86)
+#' transcripts <- transcripts(EnsDb.Hsapiens.v86)
+#' 
+#' transcriptToCds(txcoords, EnsDb.Hsapiens.v86, exons = exons,transcripts = transcripts)
+transcriptToCds <- function(x, db, id = "name",
+                            exons = NA, transcripts = NA) {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
@@ -558,7 +567,9 @@ transcriptToCds <- function(x, db, id = "name") {
     else ids <- mcols(x)[, id]
     tx_lens <- .transcriptLengths(db, with.utr5_len = TRUE,
                                   with.cds_len = TRUE,
-                                  filter = ~ tx_id %in% ids)
+                                  filter = ~ tx_id %in% ids,
+                                  exons = exons, ## Pass the preloaded
+                                  transcripts = transcripts)
     mcols(x)$tx_start <- start(x)
     mcols(x)$tx_end <- end(x)
     start(x) <- -1

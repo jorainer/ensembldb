@@ -308,6 +308,46 @@ test_that("transcriptToCds works", {
     expect_warning(res <- transcriptToCds(txcoords, edb18))
     expect_true(all(start(res) < 0))
     expect_true(all(end(res) < 0))
+
+    ## Preloaded data test
+    exons <- exonsBy(edb18)
+    transcripts <- transcripts(edb18)
+    expect_error(transcriptToCds(db = edb18, exons = exons,transcripts = transcripts))
+    ## 1) unknown tx ids
+    txcoords <- IRanges(start = c(4, 3), width = c(1, 1), names = c("a", "b"))
+    expect_error(transcriptToCds(x = txcoords))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_true(all(start(res) == -1))
+    expect_true(all(end(res) == -1))
+    ## 2) all tx not coding
+    txcoords <- IRanges(start = c(132, 133), end = c(323, 323),
+                        names = rep("ENST00000590515", 2))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_true(all(start(res) == -1))
+    expect_true(all(end(res) == -1))
+    ## 3) some tx not coding
+    ## 4) coordinate not within coding
+    txcoords <- IRanges(start = c(1463, 3, 143, 147, 1463), width = 1,
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955",
+                                  "ENST00000398117"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1, -1, -1, 1, 1))
+    expect_equal(end(res), c(1, -1, -1, 1, 1))
+    expect_equal(res[1], res[5])
+    ## End position outside of CDS
+    txcoords <- IRanges(start = c(1463, 3, 143, 147), width = c(4, 1, 1, 765),
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1, -1, -1, -1))
+    expect_equal(end(res), c(4, -1, -1, -1))
+    txcoords <- IRanges(start = c(3, 143, 147), width = c(1, 1, 765),
+                        names = c("ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_true(all(start(res) < 0))
+    expect_true(all(end(res) < 0))
 })
 
 test_that("cdsToTranscript works", {
