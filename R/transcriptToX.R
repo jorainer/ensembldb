@@ -661,7 +661,16 @@ transcriptToCds <- function(x, db, id = "name",
 #' ## coordinates
 #' transcriptToGenome(cdsToTranscript(pkp2, EnsDb.Hsapiens.v86),
 #'     EnsDb.Hsapiens.v86)
-cdsToTranscript <- function(x, db, id = "name") {
+#' 
+#' ## Meanwhile, this function can be called in parallel processes if you preload
+#' ## the exons and transcripts database.
+#' 
+#' exons <- exonsBy(EnsDb.Hsapiens.v86)
+#' transcripts <- transcripts(EnsDb.Hsapiens.v86)
+#' 
+#' cdsToTranscript(txcoords, EnsDb.Hsapiens.v86, exons = exons,transcripts = transcripts)
+cdsToTranscript <- function(x, db, id = "name",
+                            exons = NA, transcripts = NA) {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
@@ -672,7 +681,9 @@ cdsToTranscript <- function(x, db, id = "name") {
     else ids <- mcols(x)[, id]
     tx_lens <- .transcriptLengths(db, with.utr5_len = TRUE,
                                   with.cds_len = TRUE,
-                                  filter = ~ tx_id %in% ids)
+                                  filter = ~ tx_id %in% ids,
+                                  exons = exons, ## Pass the preloaded
+                                  transcripts = transcripts)
     mcols(x)$cds_start <- start(x)
     mcols(x)$cds_end <- end(x)
     start(x) <- -1

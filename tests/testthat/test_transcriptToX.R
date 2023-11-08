@@ -384,6 +384,44 @@ test_that("cdsToTranscript works", {
     res <- getSeq(BSgenome.Hsapiens.NCBI.GRCh38, unlist(gnm))
     exp <- c("G", "C", "C", "C", "T")
     expect_equal(exp, unname(as.character(res)))
+    
+    ## Preloaded data test
+    exons <- exonsBy(EnsDb.Hsapiens.v86)
+    transcripts <- transcripts(EnsDb.Hsapiens.v86)
+
+    edb18 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "18")
+    expect_error(cdsToTranscript())
+    expect_error(cdsToTranscript(db = edb18, exons = exons,transcripts = transcripts))
+    txcoords <- IRanges(start = c(4, 3, 143, 147), width = 1,
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_error(cdsToTranscript(x = txcoords))
+    expect_warning(res <- cdsToTranscript(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1466, 902, -1, 293))
+
+    txcoords <- IRanges(start = c(4, 3, 50000, 147), width = 1,
+                        names = c("ENST00000398117", "ENST00000398117",
+                                  "ENST00000398117", "b"))
+    expect_warning(res <- cdsToTranscript(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1466, 1465, -1, -1))
+
+    ## Map variants:
+    ## ENST00000070846:c.1643DelG
+    ## ENST00000070846:c.1881DelC
+    ## ENST00000379802:c.6995C>A
+    ## ENST00000261590:c.1088C>T
+    ## ENST00000261590:c.561T>G
+    rngs <- IRanges(start = c(1643, 1881, 6995, 1088, 561), width = 1,
+                    names = c("ENST00000070846", "ENST00000070846",
+                              "ENST00000379802", "ENST00000261590",
+                              "ENST00000261590"))
+    rngs_tx <- cdsToTranscript(rngs, EnsDb.Hsapiens.v86, exons = exons,transcripts = transcripts)
+    gnm <- transcriptToGenome(rngs_tx, exons)
+
+    library(BSgenome.Hsapiens.NCBI.GRCh38)
+    res <- getSeq(BSgenome.Hsapiens.NCBI.GRCh38, unlist(gnm))
+    exp <- c("G", "C", "C", "C", "T")
+    expect_equal(exp, unname(as.character(res)))
 })
 
 test_that(".ids_message works", {
