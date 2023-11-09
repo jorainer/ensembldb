@@ -263,7 +263,7 @@ test_that("genomeToProtein works", {
     names(gnm) <- c("a", "b", "c", "d")
     expect_error(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons))
     expect_error(res <- genomeToProtein(gnm, edbx, exons = exons))
-    expect_error(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = exons))
+    expect_warning(expect_error(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = exons)))
     expect_warning(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = transcripts))
     expect_true(is(res, "IRangesList"))
     expect_equal(length(res), 4)
