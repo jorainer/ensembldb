@@ -437,7 +437,7 @@ setMethod("proteinToGenome", "EnsDb",
 #'
 #' Use one query to fetch CDS for all (unique) input IDs. If input IDs are
 #' Uniprot identifiers we have to perform additional checks and data
-#' re-organizations because one transript (and thus CDS) can be associated
+#' re-organizations because one transcript (and thus CDS) can be associated
 #' with multiple Uniprot identifiers.
 #'
 #' @param x `EnsDb` object.
