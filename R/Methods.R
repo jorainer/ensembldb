@@ -929,8 +929,11 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
                                exons = NA, transcripts = NA) {
     ## The preloaded data option is currently only for the coordinates mapping
     ## functions, therefore the filter is "tx_id" only.
-    preloaded <- !identical(exons,NA) & !identical(transcripts,NA)
-    if(preloaded){
+    preload_ranges_missing <- which(c(
+        identical(exons,NA),
+        identical(transcripts,NA)
+    ))
+    if(identical(integer(0), preload_ranges_missing)){
         if (!is(exons, "CompressedGRangesList"))
             stop("Argument 'exons' has to be a 'CompressedGRangesList' object")
         if (!is(transcripts, "GRanges"))
@@ -956,14 +959,21 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
         }, error = function(e){
             allTxs <<- GRanges()
         })
-    } else {
+    } else if (length(preload_ranges_missing) == 2){
         filter <- .processFilterParam(filter, x)
         allTxs <- transcripts(x, filter = filter)        
+    } else {
+        stop(paste(
+            "Argument", 
+            c("'exons'", "'transcripts'")[preload_ranges_missing],
+            'missing.'
+            , sep = " "
+        ))
     }
     if (length(allTxs) == 0)
         return(data.frame(tx_id = character(), gene_id = character(),
                           nexon = integer(), tx_len = integer()))
-    if(preloaded){
+    if(identical(integer(0), preload_ranges_missing)){
         exns <- exons[match(allTxs$tx_id, names(exons))]
     } else {
         exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
