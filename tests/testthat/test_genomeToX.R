@@ -252,4 +252,98 @@ test_that("genomeToProtein works", {
                                     names = c("good1","bad1")))
     expect_warning(res <- genomeToProtein(grg, edb_2))
     expect_equal(length(res), length(grg))
+
+    ## Preloaded data test
+    proteins <- proteins(edb)
+    exons <- exonsBy(edb)
+    transcripts <- transcripts(edb)
+
+    gnm <- GRanges("X", IRanges(start = c(630898, 644636, 644633, 634829),
+                                width = c(5, 1, 1, 3)))
+    names(gnm) <- c("a", "b", "c", "d")
+    expect_error(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons))
+    expect_error(res <- genomeToProtein(gnm, edbx, exons = exons))
+    expect_error(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = exons))
+    expect_warning(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_true(is(res, "IRangesList"))
+    expect_equal(length(res), 4)
+    ## Elements 2 and 4 can not be mapped
+    expect_equal(start(res[[2]]), c(-1, -1))
+    expect_equal(start(res[[4]]), c(-1))
+    ## Check that order is correct
+    expect_true(mcols(res[[1]])$seq_start[1] == 630898)
+    expect_true(mcols(res[[2]])$seq_start[1] == 644636)
+    expect_true(mcols(res[[3]])$seq_start[1] == 644633)
+    expect_true(mcols(res[[4]])$seq_start[1] == 634829)
+    ## Check coords within the protein:
+    expect_true(start(res[[1]])[1] == 1)
+    expect_true(end(res[[1]])[1] == 2)
+    prt <- proteins(edbx, filter = ProteinIdFilter(names(res[[3]])[1]))
+    expect_equal(start(res[[3]])[1], nchar(prt$protein_sequence))
+
+    ## 2) ENST00000486554, - strand, nt 1-3
+    ## gnm <- GRanges("X:106959629-106959631")
+    gnm <- GRanges("X:107716399-107716401")
+    expect_warning(res <- genomeToProtein(gnm, db = edbx, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_true(is(res, "IRangesList"))
+    expect_true(length(res) == length(gnm))
+
+    ## gnm <- GRanges("X:106959629-106959931")
+    gnm <- GRanges("X:107716399-107716701")
+    expect_warning(res <- genomeToProtein(gnm, db = edbx, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_true(is(res, "IRangesList"))
+    expect_true(length(res) == length(gnm))
+    expect_true(start(res[[1]]) < 0)
+
+    ## ENST00000486554
+    ## 106959629:3: first 3 nt of transcript
+    ## 106959629:700: spans exon 1 and part of intron 1
+    ## 106959130:2: first two nt of CDS.
+    ## 106957979:1 first nt in exon 2, second amino acid.
+    ## gnm <- GRanges("X", IRanges(start = c(106959629, 106959629, 106959130,
+    ##                                       106957979),
+    ##                             width = c(3, 700, 2, 1)))
+    gnm <- GRanges("X", IRanges(start = c(107716399, 107716399, 107715900,
+                                          107714749),
+                                width = c(3, 700, 2, 1)))
+    expect_warning(res <- genomeToProtein(gnm, db = edbx, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_true(is(res, "IRangesList"))
+    expect_true(all(start(res[[1]]) < 0))
+    expect_true(all(start(res[[2]]) < 0))
+    expect_equal(start(res[[3]]["ENSP00000425414"]), 1)
+    expect_equal(width(res[[3]]["ENSP00000425414"]), 1)
+    expect_equal(start(res[[4]]["ENSP00000425414"]), 2)
+    expect_equal(width(res[[4]]["ENSP00000425414"]), 1)
+
+    ## gnm <- GRanges("X", IRanges(start = 106959130, width = 2))
+    gnm <- GRanges("X", IRanges(start = 107715900, width = 2))
+    expect_warning(res <- genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_true(is(res, "IRangesList"))
+    expect_true(length(res) == length(gnm))
+    expect_equal(start(res[[1]]["ENSP00000425414"]), 1)
+    expect_false(mcols(res[[1]]["ENSP00000425414"])$cds_ok)
+
+    ## That's from issue #69
+    library(EnsDb.Hsapiens.v86)
+    library(testthat)
+    edb_2 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "19")
+
+    ## grg <- GRanges(Rle(c("chr19")), IRanges(51920103, width=1, names = "good1"))
+    grg <- GRanges(Rle(c("chr19")), IRanges(51416849, width=1, names = "good1"))
+    expect_warning(genomeToProtein(grg, db = edb_2, proteins = proteins, exons = exons, transcripts = transcripts))
+    edb_2 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "chr19")
+    seqlevelsStyle(edb_2) <- "UCSC"
+
+    proteins <- proteins(edb_2)   
+    exons <- exonsBy(edb_2)
+    transcripts <- transcripts(edb_2)
+    expect_warning(res <- genomeToProtein(grg, db = edb_2, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_true(length(res[[1]]) == 4)
+
+    ## grg <- GRanges("chr19", IRanges(c(51920103, 51919998), width = 1,
+    ##                                 names = c("good1","bad1")))
+    grg <- GRanges("chr19", IRanges(c(51416849, 51416744), width = 1,
+                                    names = c("good1","bad1")))
+    expect_warning(res <- genomeToProtein(grg, edb_2, proteins = proteins, exons = exons, transcripts = transcripts))
+    expect_equal(length(res), length(grg))
 })

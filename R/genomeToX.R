@@ -145,6 +145,8 @@ genomeToTranscript <- function(x, db) {
 #'     within-protein coordinates.
 #'
 #' @param db `EnsDb` object.
+#' 
+#' @inheritParams transcriptToProtein
 #'
 #' @return
 #'
@@ -204,17 +206,44 @@ genomeToTranscript <- function(x, db) {
 #'
 #' ## Mapping of intronic positions fail
 #' res[[4]]
-genomeToProtein <- function(x, db) {
+#' 
+#' ## Meanwhile, this function can be called in parallel processes if you preload
+#' ## the protein, exons and transcripts database.
+#' 
+#' proteins <- proteins(edbx)
+#' exons <- exonsBy(edbx)
+#' transcripts <- transcripts(edbx)
+#' 
+#' genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = transcripts)
+genomeToProtein <- function(x, db, proteins = NA, exons = NA, transcripts = NA) {
     if (missing(x) || !is(x, "GRanges"))
         stop("Argument 'x' is required and has to be a 'GRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
         stop("Argument 'db' is required and has to be an 'EnsDb' object")
-    txs <- genomeToTranscript(x, db)
+    preload_ranges_missing <- which(c(
+        identical(proteins,NA),
+        identical(exons,NA),
+        identical(transcripts,NA)
+    ))
+    if(identical(integer(0), preload_ranges_missing))
+        txs <- genomeToTranscript(x, exons)
+    else if (length(preload_ranges_missing) == 3) {
+        txs <- genomeToTranscript(x, db)
+    } else {
+        stop(paste(
+            "Argument", 
+            c("'proteins'", "'exons'", "'transcripts'")[preload_ranges_missing],
+            'missing.'
+            , sep = " "
+        ))
+    }
     int_ids <- rep(1:length(txs), lengths(txs))
     txs <- unlist(txs, use.names = FALSE)
     if (is.null(names(txs)))
         names(txs) <- ""
-    prts <- transcriptToProtein(txs, db)
+    if (identical(integer(0), preload_ranges_missing))
+        prts <- transcriptToProtein(txs, db, proteins = proteins, exons = exons, transcripts = transcripts)
+    else prts <- transcriptToProtein(txs, db)
     mcols(prts) <- cbind(mcols(prts)[, c("tx_id", "cds_ok")],
                          mcols(txs)[, colnames(mcols(txs)) != "tx_id"])
     prts <- split(prts, int_ids)
