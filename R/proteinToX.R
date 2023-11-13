@@ -464,7 +464,7 @@ setMethod("proteinToGenome", "EnsDb",
         tx_id <- split(map$tx_id, map[, idType])
     } else {
         tx_id <- id
-        split(tx_id, id)
+        tx_id <- split(tx_id, id)
     }
     if (length(tx_id)) {
         suppressWarnings(
