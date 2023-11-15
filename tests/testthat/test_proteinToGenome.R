@@ -76,6 +76,41 @@ test_that(".cds_for_id and .cds_matching_protein work", {
     expect_equal(unname(lengths(clnd)), c(1, 0, 1))
     expect_true(all(clnd[[1]][[1]]$cds_ok))
     expect_true(all(clnd[[3]][[1]]$cds_ok == FALSE))
+
+    ## Preloaded data test
+    cds <- cdsBy(edb,columns = c(listColumns(edb,'tx'),'protein_id','uniprot_id','protein_sequence'))
+
+    ## Use protein_id
+    expect_warning(res <- ensembldb:::.cds_for_id2(cds, prts))
+    expect_equal(names(res), prts)
+    expect_equal(names(res[[1]]), txs[1])
+    expect_equal(names(res[[3]]), txs[2])
+    expect_true(is.null(res[[2]]))
+
+    ## Use tx_id
+    expect_warning(res <- ensembldb:::.cds_for_id2(cds,txs,idType = 'tx_id'))
+    expect_equal(names(res), txs)
+    expect_equal(res[[1]][[1]]$protein_id[1], prts[1])
+
+    ## Use uniprot_id
+    unis <- c("Q9NPH5", "Q8TD30", "H0YIP2")
+    unis_counts <- c(10, 2, 1)
+    res <- ensembldb:::.cds_for_id2(cds, unis, idType = "uniprot_id")
+    expect_equal(unname(lengths(res)), unis_counts)
+    expect_equal(names(res), unis)
+
+    ## Run .cds_matching_protein on the results to avoid re-querying.
+    ## H0YIP2_HUMAN has incomplete 5' and 3' CDS.
+    expect_warning(clnd <- ensembldb:::.cds_matching_protein(edb,res))
+    expect_warning(clnd_preload <- ensembldb:::.cds_matching_protein(res))
+    expect_equal(clnd,clnd_preload)
+
+    ## ENSP00000437716 encoding transcript has an incomplete 3' CDS
+    cds <- cdsBy(edb,columns = c(listColumns(edb,'tx'),'protein_id','protein_sequence'))
+    res_preload <- ensembldb:::.cds_for_id2(cds, prts)
+    expect_warning(clnd <- ensembldb:::.cds_matching_protein(edb, res_preload))
+    expect_warning(clnd_preload <- ensembldb:::.cds_matching_protein(res_preload))
+    expect_equal(clnd, clnd_preload)
 })
 
 test_that("proteinToGenome works", {
@@ -126,6 +161,23 @@ test_that("proteinToGenome works", {
     expect_equal(res[[4]]$exon_rank, c(2, 3, 4, 5))
     expect_true(all(res[[4]]$cds_ok))
 
+    ## Preloaded data test
+    cds <- cdsBy(edb,columns = c('tx_id','uniprot_id','protein_id','protein_sequence'))
+    expect_warning(res <- proteinToGenome(prngs, cds))
+    expect_true(all(sapply(res, function(z) sum(width(z))) %% 3 == 0))
+    ## Manually check for the ranges here.
+    ## ENSP00000418169, SYP, encoded by ENST00000479808, - strand
+    ## coords cds: 23 -> 67, 24 -> 72
+    ## exon 1 width 49, 5' UTR: 13nt long. 36 nt
+    ## exon 2 width 66. relative pos is 31nt in exon 2
+    ## exon 2 starts: 49,055,492 [nt1], [nt31] is 49055492 - 30 = 49055462
+    expect_equal(end(res[[2]]), 49199003)
+    expect_equal(start(res[[2]]), 49199003 - 5)
+    expect_equal(res[[2]]$protein_id, "ENSP00000418169")
+    expect_equal(res[[2]]$tx_id, "ENST00000479808")
+    expect_equal(res[[2]]$exon_rank, 2)
+    expect_true(res[[2]]$cds_ok)
+
     ## Uniprot identifier
     ## ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
     ids <- c("D6RDZ7", "O15266", "Q9HBJ8", "unexistant")
@@ -134,6 +186,27 @@ test_that("proteinToGenome works", {
 
     expect_warning(res <- proteinToGenome(prngs, edbx, idType = "uniprot_id"))
     ## Now, expect elements 1 and 2 to be a GRangesList and not a GRanges.
+    expect_true(is(res[[1]], "GRanges"))
+    expect_true(is(res[[2]], "GRangesList"))
+    expect_true(is(res[[3]], "GRanges"))
+    expect_true(is(res[[4]], "GRanges"))
+    expect_true(length(res[[4]]) == 0)
+    res <- res[1:3]
+    expect_true(all(unlist(lapply(res, function(z) sum(width(z)))) %% 3 == 0))
+    ## We've got multi-mapping here
+    expect_equal(unname(lengths(res)), c(1, 4, 2))
+    ## Although we have different proteins, all coords are the same
+    strts <- unlist(start(res[[1]]))
+    expect_true(all(strts == strts[1]))
+    nds <- unlist(end(res[[1]]))
+    expect_true(all(nds == nds[1]))
+    strts <- unlist(start(res[[2]]))
+    expect_true(all(strts == strts[1]))
+    nds <- unlist(end(res[[2]]))
+    expect_true(all(nds == nds[1]))
+
+    ## Preloaded data test
+    expect_warning(res <- proteinToGenome(prngs, cds,idType = "uniprot_id"))
     expect_true(is(res[[1]], "GRanges"))
     expect_true(is(res[[2]], "GRangesList"))
     expect_true(is(res[[3]], "GRanges"))
