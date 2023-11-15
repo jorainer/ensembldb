@@ -149,6 +149,8 @@ proteinToTranscript <- function(x, db, id = "name",
                 else mc$protein_id <- names(prt)
                 ir <- IRanges(start = -1, width = 1)
                 mcols(ir) <- mc
+                if(!is.null(mcols(prt))) 
+                    mcols(ir) <- cbind(mcols(ir),mcols(prt))
                 ir
             } else {
                 ids <- names(gnm)
@@ -167,6 +169,8 @@ proteinToTranscript <- function(x, db, id = "name",
                 if (idType == "uniprot_id")
                     mc$uniprot_id <- names(prt)
                 mcols(res) <- mc
+                if(!is.null(mcols(prt))) 
+                    mcols(res) <- cbind(mcols(res),mcols(prt))
                 res
             }
         }), "IRangesList")
