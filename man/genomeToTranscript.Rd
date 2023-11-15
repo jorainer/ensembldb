@@ -10,7 +10,8 @@ genomeToTranscript(x, db)
 \item{x}{\code{GRanges} object with the genomic coordinates that should be
 mapped.}
 
-\item{db}{\code{EnsDb} object.}
+\item{db}{\code{EnsDb} object or pre-loaded exons 'CompressedGRangesList' object
+using exonsBy().}
 }
 \value{
 An \code{IRangesList} with length equal to \code{length(x)}. Each element providing
@@ -70,6 +71,35 @@ gnm <- GRanges("X", IRanges(start = c(644635, 107716399, 107716399),
 ## The result of the mapping is an IRangesList each element providing the
 ## within-transcript coordinates for each input region
 genomeToTranscript(gnm, edbx)
+
+## If you are tring to calculate within-transcript coordinates of a huge 
+## list of genomic region, you shall use pre-loaded exons GRangesList to  
+## replace the SQLite db edbx
+ 
+## Below is just a lazy demo of querying 10^4 genomic region 
+library(parallel)
+
+gnm <- rep(GRanges("X:107715899-107715901"),10000)
+
+exons <- exonsBy(EnsDb.Hsapiens.v86)
+
+## You can pre-define the exons region to further accelerate the code.
+
+exons <- exonsBy(
+    EnsDb.Hsapiens.v86, by = "tx",
+    filter = AnnotationFilterList(
+        SeqNameFilter(as.character(unique(seqnames(gnm)))),
+        GeneStartFilter(max(end(gnm)), condition = "<="),
+        GeneEndFilter(min(start(gnm)), condition = ">=")
+    )
+)
+
+res_temp <- mclapply(1:10000, function(ind){
+    genomeToTranscript(gnm[ind], exons)
+}, mc.preschedule = T, mc.cores = detectCores() - 1)
+
+res <- do.call(c,res_temp)
+
 }
 \seealso{
 Other coordinate mapping functions: 

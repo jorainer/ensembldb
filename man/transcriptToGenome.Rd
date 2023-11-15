@@ -12,7 +12,8 @@ are counted from the start of the transcript (including the 5' UTR). The
 Ensembl IDs of the corresponding transcripts have to be provided either
 as \code{names} of the \code{IRanges}, or in one of its metadata columns.}
 
-\item{db}{\code{EnsDb} object.}
+\item{db}{\code{EnsDb} object or pre-loaded exons 'CompressedGRangesList' object
+using exonsBy().}
 
 \item{id}{\code{character(1)} specifying where the transcript identifier can be
 found. Has to be either \code{"name"} or one of \code{colnames(mcols(prng))}.}
@@ -71,6 +72,29 @@ length(res)
 res[[3]]
 
 res
+## If you are tring to map a huge list of transcript-relative coordinates 
+## to genomic level, you shall use pre-loaded exons GRangesList to replace 
+## the SQLite db edbx
+
+exons <- exonsBy(EnsDb.Hsapiens.v86)
+
+## Below is just a lazy demo of querying 10^4 transcript-relative 
+## coordinates without any pre-splitting 
+library(parallel)
+
+txpos <-  IRanges(
+    start = rep(1,10000), 
+    end = rep(30,10000),
+    names = c(rep('ENST00000486554',9999),'some'),
+    note = rep('something',10000))
+
+res_temp <- mclapply(1:10000, function(ind){
+    transcriptToGenome(txpos[ind], exons)
+}, mc.preschedule = T, mc.cores = detectCores() - 1)
+
+res <- do.call(c,res_temp)
+
+
 }
 \seealso{
 \code{\link[=cdsToTranscript]{cdsToTranscript()}} and \code{\link[=transcriptToCds]{transcriptToCds()}} for the mapping between
