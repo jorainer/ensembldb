@@ -2,6 +2,10 @@
 
 #' @title Map protein-relative coordinates to positions within the transcript
 #'
+#' @name proteinToTranscript
+#'
+#' @aliases proteinToTranscript proteinToTranscript,EnsDb-method
+#' 
 #' @description
 #'
 #' `proteinToTranscript` maps protein-relative coordinates to positions within
@@ -100,8 +104,11 @@
 #'
 #' ## The result for the region within the second protein
 #' res[[2]]
-proteinToTranscript <- function(x, db, id = "name",
-                                idType = "protein_id") {
+setGeneric("proteinToTranscript", signature="db",
+    function(x, db, ...) standardGeneric("proteinToTranscript")
+)
+setMethod("proteinToTranscript", "EnsDb",
+  function(x, db, id = "name", idType = "protein_id") {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
@@ -174,8 +181,126 @@ proteinToTranscript <- function(x, db, id = "name",
                 res
             }
         }), "IRangesList")
-}
+})
 
+#' @rdname proteinToTranscript
+#'
+#' @aliases proteinToTranscript proteinToTranscript,Preloaded-method
+#'
+#' @inheritParams proteinToGenome
+#' 
+#' @param fiveUTR
+#'
+#' @family coordinate mapping functions
+#'
+#' @author Johannes Rainer
+#'
+#' @md
+#'
+#' @examples
+#'
+#' ## Meanwhile, this function can be called in parallel processes if you preload
+#' ## the CDS data with desired data columns and fiveUTR data
+#' 
+#' cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','uniprot_id','protein_sequence'))
+#' cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','protein_sequence'))
+#' cds <- cdsBy(edbx,columns = c('tx_id','protein_id','protein_sequence'))
+#'
+#' fiveUTR <- fiveUTRsByTranscript(edbx)
+#' 
+#' ## Define an IRange with protein-relative coordinates within a protein for
+#' ## the gene SYP
+#' syp <- IRanges(start = 4, end = 17)
+#' names(syp) <- "ENSP00000418169"
+#' res <- proteinToTranscript(syp, cds, fiveUTR = fiveUTR)
+#' res
+#' ## Positions 4 to 17 within the protein span are encoded by the region
+#' ## from nt 23 to 64.
+#'
+#' ## Perform the mapping for multiple proteins identified by their Uniprot
+#' ## IDs.
+#' ids <- c("O15266", "Q9HBJ8", "unexistant")
+#' prngs <- IRanges(start = c(13, 43, 100), end = c(21, 80, 100))
+#' names(prngs) <- ids
+#'
+#' res <- proteinToTranscript(prngs, cds, idType = "uniprot_id", fiveUTR = fiveUTR)
+setMethod("proteinToTranscript", "CompressedGRangesList",
+  function(x, db, id = "name", idType = "protein_id", fiveUTR) {
+    if (missing(x) || !is(x, "IRanges"))
+        stop("Argument 'x' is required and has to be an 'IRanges' object")
+    if (missing(db) || !is(db, "CompressedGRangesList"))
+        stop("Argument 'db' is required and has to be an 'CompressedGRangesList' object")
+    if (missing(fiveUTR) || !is(fiveUTR, "CompressedGRangesList"))
+        stop("Argument 'fiveUTR' is required and has to be an 'CompressedGRangesList' object")
+    coords_cds <- .proteinCoordsToTx(x)
+    ## 1) retrieve CDS for each protein
+    message("Fetching CDS for ", length(x), " proteins ... ",
+            appendLF = FALSE)
+    cds_genome <- .cds_for_id_range(db, x, id = id, idType = idType)
+    miss <- lengths(cds_genome) == 0
+    if (any(miss))
+        warning("No CDS found for: ", paste0(names(cds_genome)[miss],
+                                             collapse = ", "))
+    message(sum(!miss), " found")
+    ## 2) ensure that the CDS matches the AA sequence length
+    message("Checking CDS and protein sequence lengths ... ", appendLF = FALSE)
+    cds_genome <- .cds_matching_protein(cds_genome)
+    are_ok <- vapply(cds_genome, function(z) {
+        if (is(z, "GRangesList"))
+            all(z[[1]]$cds_ok)
+        else NA
+    }, FUN.VALUE = logical(1))
+    are_ok <- are_ok[!is.na(are_ok)]
+    ## We've got now a list of GRanges
+    message(sum(are_ok), "/", length(are_ok), " OK")
+    ## Get for each transcript it's 5' UTR and add its width to the coords_cds
+    tx_ids <- unique(unlist(lapply(cds_genome, names), use.names = FALSE))
+    if (length(tx_ids)) {
+        five_utr <- fiveUTR[names(fiveUTR) %in% tx_ids]
+        ## Calculate 5' widths for these
+        five_width <- sum(width(five_utr))
+    }
+    as(mapply(
+        cds_genome, as(coords_cds, "IRangesList"), split(x, 1:length(x)),
+        FUN = function(gnm, cds, prt) {
+            if (is.null(gnm)) {
+                ## Define the metadata columns
+                mc <- DataFrame(protein_id = NA_character_,
+                                tx_id = NA_character_,
+                                cds_ok = NA,
+                                protein_start = start(prt),
+                                protein_end = end(prt))
+                if (idType == "uniprot_id")
+                    mc$uniprot_id <- names(prt)
+                else mc$protein_id <- names(prt)
+                ir <- IRanges(start = -1, width = 1)
+                mcols(ir) <- mc
+                if(!is.null(mcols(prt))) 
+                    mcols(ir) <- cbind(mcols(ir),mcols(prt))
+                ir
+            } else {
+                ids <- names(gnm)
+                res <- IRanges(start = start(cds) + five_width[ids],
+                               end = end(cds) + five_width[ids],
+                               names = ids)
+                ## Populate mcols
+                mc <- DataFrame(
+                    protein_id = unlist(
+                        lapply(gnm, function(z) z$protein_id[1])),
+                    tx_id = ids,
+                    cds_ok = gnm[[1]]$cds_ok[1],
+                    protein_start = start(prt),
+                    protein_end = end(prt)
+                )
+                if (idType == "uniprot_id")
+                    mc$uniprot_id <- names(prt)
+                mcols(res) <- mc
+                if(!is.null(mcols(prt))) 
+                    mcols(res) <- cbind(mcols(res),mcols(prt))
+                res
+            }
+        }), "IRangesList")
+})
 
 #' @title Map within-protein coordinates to genomic coordinates
 #'

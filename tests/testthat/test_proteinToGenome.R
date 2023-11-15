@@ -254,6 +254,13 @@ test_that("proteinToTranscript works", {
     expect_equal(start(tx_rel[["ENSP00000217901"]]), (197L + 7L))
     expect_equal(start(tx_rel[["ENSP00000425155"]]), (86L + 92L + 31L))
 
+    ## Preloaded data test
+
+    cds <- cdsBy(edb, columns = c('tx_id','protein_id','uniprot_id','protein_sequence'))
+    fiveUTR <- fiveUTRsByTranscript(edb)
+    expect_warning(tx_rel_preload <- proteinToTranscript(prng, cds, fiveUTR = fiveUTR))
+    expect_equal(tx_rel_preload,tx_rel)
+
     ## Now for Uniprot...
     ## ids <- c("D6RDZ7_HUMAN", "SHOX_HUMAN", "TMM27_HUMAN", "unexistant")
     ids <- c("D6RDZ7", "O15266", "Q9HBJ8", "unexistant")
@@ -268,6 +275,12 @@ test_that("proteinToTranscript works", {
     expect_equal(unique(lens[2:5]), width(prngs)[2] * 3)
     expect_equal(unique(lens[6]), width(prngs)[3] * 3)
 
+    ## Preloaded data test
+    expect_warning(tx_rel_preload <- proteinToTranscript(prngs, cds,
+        idType = "uniprot_id", 
+        fiveUTR = fiveUTR))
+    expect_equal(tx_rel_preload,tx_rel)
+
     ## Mapping fails for all...
     ids <- c("a", "unexistant")
     prngs <- IRanges(start = c(1, 13), end = c(2, 21))
@@ -276,6 +289,11 @@ test_that("proteinToTranscript works", {
     expect_warning(res <- proteinToTranscript(prngs, edb))
     expect_true(is(res, "IRangesList"))
     expect_equal(unlist(unname(start(res))), c(-1, -1))
+
+    ## Preloaded data test
+    expect_warning(res_preload <- proteinToTranscript(prngs, cds, 
+        fiveUTR = fiveUTR))
+    expect_equal(res_preload,res)
 })
 
 test_that(".cds_for_id_range works", {
