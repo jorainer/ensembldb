@@ -341,8 +341,10 @@ setMethod("proteinToGenome", "EnsDb",
     are_ok <- are_ok[!is.na(are_ok)]
     ## We've got now a list of GRanges
     ## Perform the mapping for each input range with each mapped cds
+    x_IRangesList <- as(x, "IRangesList") ## preserve the metadata
+    x_IRangesList@unlistData@elementMetadata <- x@elementMetadata
     res <- mapply(
-        cds_genome, as(coords_cds, "IRangesList"), as(x, "IRangesList"),
+        cds_genome, as(coords_cds, "IRangesList"), x_IRangesList,
         FUN = function(gnm, cds, prt) {
             if (!length(gnm)) { ## addresses NULL and empty elements
                 GRanges()
@@ -355,6 +357,8 @@ setMethod("proteinToGenome", "EnsDb",
                 mcols(maps) <- cbind(mcols(maps),
                                      protein_start = start(prt),
                                      protein_end = end(prt))
+                if(!is.null(mcols(prt))) 
+                    mcols(maps) <- cbind(mcols(maps),mcols(prt))
                 maps[order(maps$exon_rank)]
             }
         })
