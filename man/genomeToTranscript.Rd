@@ -76,10 +76,10 @@ genomeToTranscript(gnm, edbx)
 ## list of genomic region, you shall use pre-loaded exons GRangesList to  
 ## replace the SQLite db edbx
  
-## Below is just a lazy demo of querying 10^4 genomic region 
+## Below is just a lazy demo of querying multiple genomic region 
 library(parallel)
 
-gnm <- rep(GRanges("X:107715899-107715901"),10000)
+gnm <- rep(GRanges("X:107715899-107715901"),10)
 
 exons <- exonsBy(EnsDb.Hsapiens.v86)
 
@@ -94,12 +94,20 @@ exons <- exonsBy(
     )
 )
 
-res_temp <- mclapply(1:10000, function(ind){
-    genomeToTranscript(gnm[ind], exons)
-}, mc.preschedule = T, mc.cores = detectCores() - 1)
+## only run in Linux ## 
+# res_temp <- mclapply(1:10, function(ind){
+#     genomeToTranscript(gnm[ind], exons)
+# }, mc.preschedule = TRUE, mc.cores = detectCores() - 1)
 
-res <- do.call(c,res_temp)
+# res <- do.call(c,res_temp)
 
+cl <- makeCluster(detectCores() - 1)
+clusterExport(cl,c('genomeToTranscript','gnm','exons'))
+
+res <- parLapply(cl,1:10,function(ind){
+   genomeToTranscript(gnm[ind], exons)
+})
+stopCluster(cl)
 }
 \seealso{
 Other coordinate mapping functions: 
