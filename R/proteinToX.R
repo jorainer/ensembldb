@@ -206,8 +206,8 @@ setMethod("proteinToTranscript", "EnsDb",
 #' ## the CDS data with desired data columns and fiveUTR data
 #' 
 #' cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','uniprot_id','protein_sequence'))
-#' cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','protein_sequence'))
-#' cds <- cdsBy(edbx,columns = c('tx_id','protein_id','protein_sequence'))
+#' # cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','protein_sequence'))
+#' # cds <- cdsBy(edbx,columns = c('tx_id','protein_id','protein_sequence'))
 #'
 #' fiveUTR <- fiveUTRsByTranscript(edbx)
 #' 
@@ -520,8 +520,8 @@ setMethod("proteinToGenome", "EnsDb",
 #' ## Meanwhile, this function can be called in parallel processes if you preload
 #' ## the CDS data with desired data columns
 #' cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','uniprot_id','protein_sequence'))
-#' cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','protein_sequence'))
-#' cds <- cdsBy(edbx,columns = c('tx_id','protein_id','protein_sequence'))
+#' # cds <- cdsBy(edbx,columns = c(listColumns(edbx,'tx'),'protein_id','protein_sequence'))
+#' # cds <- cdsBy(edbx,columns = c('tx_id','protein_id','protein_sequence'))
 #' ## Define an IRange with protein-relative coordinates within a protein for
 #' ## the gene SYP
 #' syp <- IRanges(start = 4, end = 17)

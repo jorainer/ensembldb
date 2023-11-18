@@ -441,18 +441,23 @@ transcriptToProtein <- function(x, db, id = "name", proteins = NA,exons = NA, tr
 #' library(parallel)
 #' 
 #' txpos <-  IRanges(
-#'     start = rep(1,10000), 
-#'     end = rep(30,10000),
-#'     names = c(rep('ENST00000486554',9999),'some'),
-#'     note = rep('something',10000))
+#'     start = rep(1,10), 
+#'     end = rep(30,10),
+#'     names = c(rep('ENST00000486554',9),'some'),
+#'     note = rep('something',10))
 #' 
-#' res_temp <- mclapply(1:10000, function(ind){
+#' ## only run in Linux ## 
+#' # res_temp <- mclapply(1:10, function(ind){
+#' #     transcriptToGenome(txpos[ind], exons)
+#' # }, mc.preschedule = TRUE, mc.cores = detectCores() - 1)
+#' 
+#' # res <- do.call(c,res_temp)
+#' cl <- makeCluster(detectCores() - 1)
+#' clusterExport(cl,c('transcriptToGenome','txpos','exons'))
+#' res <- parLapply(cl,1:10,function(ind){
 #'     transcriptToGenome(txpos[ind], exons)
-#' }, mc.preschedule = T, mc.cores = detectCores() - 1)
-#' 
-#' res <- do.call(c,res_temp)
-#' 
-#' 
+#' })
+#' stopCluster(cl)
 transcriptToGenome <- function(x, db, id = "name") {
     if (missing(x) || !is(x, "IRanges"))
         stop("Argument 'x' is required and has to be an 'IRanges' object")
