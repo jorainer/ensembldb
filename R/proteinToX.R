@@ -39,6 +39,8 @@
 #'
 #' @inheritParams proteinToGenome
 #' 
+#' @param ... Further arguments to be passed on.
+#' 
 #' @return
 #'
 #' `IRangesList`, each element being the mapping results for one of the input
@@ -849,6 +851,8 @@ setMethod(".cds_for_id2", "CompressedGRangesList",
 #' @param x `EnsDb` object.
 #'
 #' @param cds `GRangesList`
+#' 
+#' @param ... Further arguments to be passed on..
 #'
 #' @return `list` of `GRangesList`s with one list element per input protein,
 #'    and the `GRangesList` containing the CDS of all matching (or one not
