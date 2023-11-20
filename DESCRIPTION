@@ -20,10 +20,13 @@ Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   person(given = "Laurent", family = "Gatto",
 	   email = "lg390@cam.ac.uk",
 	   role = "ctb",
-	   comment = c(ORCID = "0000-0002-1520-2268")))
+	   comment = c(ORCID = "0000-0002-1520-2268")),
+       person(given = "Boyu", family = "Yu",
+	   email = "boyu.yu.tim@gmail.com",
+	   role = "ctb"))
 Author: Johannes Rainer <johannes.rainer@eurac.edu> with contributions
-	from Tim Triche, Sebastian Gibb, Laurent Gatto and
-	Christian Weichenberger.
+	from Tim Triche, Sebastian Gibb, Laurent Gatto 
+	Christian Weichenberger and Boyu Yu.
 Maintainer: Johannes Rainer <johannes.rainer@eurac.edu>
 URL: https://github.com/jorainer/ensembldb
 BugReports: https://github.com/jorainer/ensembldb/issues

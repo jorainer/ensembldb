@@ -71,6 +71,7 @@ test_that(".tx_to_protein works",  {
     mcols(x)$id <- "ENST00000381578"
     res_a <- .tx_to_protein(x, edbx, id = "id")
     res_b <- .txs_to_proteins(x, edbx, id = "id")
+    mcols(res_b) <- mcols(res_b)[1:4]
     expect_equal(res_a, res_b)
 
     ## Multiple input.
@@ -83,6 +84,16 @@ test_that(".tx_to_protein works",  {
     expect_warning(res_a <- .tx_to_protein(x, edbx))
     expect_warning(res_b <- .txs_to_proteins(x, edbx))
     expect_equal(res_a, res_b)
+
+    ## Preloaded data test
+    proteins <- proteins(edbx)
+    exons <- exonsBy(edbx)
+    transcripts <- transcripts(edbx)
+    expect_warning(res_c <- .txs_to_proteins(x, edbx, 
+                                             proteins = proteins, 
+                                             exons = exons, 
+                                             transcripts = transcripts))
+    expect_equal(res_c, res_b)
 })
 
 test_that("transcriptToProtein works", {
@@ -100,6 +111,25 @@ test_that("transcriptToProtein works", {
     res <- transcriptToProtein(x, edbx, id = "id")
     expect_equal(start(res), 1)
     expect_equal(end(res), 1)
+
+    ## Preloaded data test
+
+    proteins <- proteins(edbx)
+    exons <- exonsBy(edbx)
+    transcripts <- transcripts(edbx)
+    expect_error(transcriptToProtein(x, edbx, id = "id", 
+                                     exons = exons, 
+                                     transcripts = transcripts))
+    expect_error(transcriptToProtein(x, edbx, 
+                                     proteins = proteins, 
+                                     exons = exons, 
+                                     transcripts = transcripts))
+    expect_error(transcriptToProtein(x, edbx, id = "id", 
+                                     proteins = proteins, 
+                                     exons = proteins, 
+                                     transcripts = transcripts))
+    res2 <- transcriptToProtein(x, edbx, id = "id", proteins = proteins, exons = exons, transcripts = transcripts)
+    expect_equal(res2, res)
 })
 
 test_that(".tx_to_genome works", {
@@ -140,6 +170,14 @@ test_that(".tx_to_genome works", {
     expect_equal(as.character(strand(res[[6]])), "+")
     expect_equal(as.character(seqnames(res[[6]])), "Y")
 
+    ## add pre-load data test 
+    exons <- exonsBy(edbx)
+    res_preload <- unlist(ensembldb:::.tx_to_genome(rng, exons))
+    res_unlisted <- unlist(res)
+    res_unlisted$tx_id <- NULL
+    seqlevels(res_preload) <- seqlevels(res_unlisted)
+    expect_equal(res_unlisted, res_preload)
+
     ## wrong ID and range outside tx
     rng <- IRanges(start = c(501, 200, 1), end = c(505, 1200, 5),
                    names = c("ENST00000486554", "ENST00000486554", "B"))
@@ -149,6 +187,13 @@ test_that(".tx_to_genome works", {
     seqlevels(a) <- seqlevels(b)
     expect_equal(a, b)
     expect_equal(lengths(res_2), c(ENST00000486554 = 2, ENST00000486554 = 0,
+                                   B = 0))
+    ## add pre-load data test 
+    expect_warning(res_3 <- ensembldb:::.tx_to_genome(rng, exons))
+    c <- unlist(res_3[1])
+    seqlevels(res_preload) <- seqlevels(c)
+    expect_equal(res_preload, res_preload)
+    expect_equal(lengths(res_3), c(ENST00000486554 = 2, ENST00000486554 = 0,
                                    B = 0))
 })
 
@@ -186,7 +231,40 @@ test_that("transcriptToGenome works", {
 
     x <- IRanges(start = c(256, 2), end = c(265, 12000),
                  names = c("ENST00000381578", "ENST00000381578"))
-    res <- transcriptToGenome(x, edbx)
+    expect_warning(res <- transcriptToGenome(x, edbx)) # indeed warn expected
+    expect_equal(lengths(res), c(ENST00000381578 = 2, ENST00000381578 = 0))
+    
+    ## add pre-load data test 
+    exons <- exonsBy(edbx)
+    x <- IRanges(start = c(259, 1, 259), end = c(260, 4, 261),
+                names = c("ENST00000381578", "some", "ENST00000381578"))
+    expect_warning(res <- transcriptToGenome(x, exons))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == length(x))
+    expect_true(length(res[[2]]) == 0)
+    expect_equal(names(res), names(x))
+    expect_equal(start(res[[1]]), start(res[[3]]))
+    expect_equal(end(res[[1]])[1], end(res[[3]])[1])
+    expect_equal(end(res[[1]])[2] + 1, end(res[[3]])[2])
+
+    expect_warning(res <- transcriptToGenome(x[2], exons))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 1)
+
+    expect_warning(res <- transcriptToGenome(x[c(2, 2)], exons))
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 2)
+
+    res <- transcriptToGenome(x[1], exons)
+    expect_true(is(res, "GRangesList"))
+    expect_true(length(res) == 1)
+    expect_true(length(res[[1]]) == 2)
+
+    x <- IRanges(start = c(256, 2), end = c(265, 12000),
+                 names = c("ENST00000381578", "ENST00000381578"),
+                 info = 'ORFs')
+    expect_warning(res <- transcriptToGenome(x, exons)) 
+    expect_true(res$ENST00000381578$info[1] == 'ORFs')
     expect_equal(lengths(res), c(ENST00000381578 = 2, ENST00000381578 = 0))
 })
 
@@ -230,6 +308,46 @@ test_that("transcriptToCds works", {
     expect_warning(res <- transcriptToCds(txcoords, edb18))
     expect_true(all(start(res) < 0))
     expect_true(all(end(res) < 0))
+
+    ## Preloaded data test
+    exons <- exonsBy(edb18)
+    transcripts <- transcripts(edb18)
+    expect_error(transcriptToCds(db = edb18, exons = exons,transcripts = transcripts))
+    ## 1) unknown tx ids
+    txcoords <- IRanges(start = c(4, 3), width = c(1, 1), names = c("a", "b"))
+    expect_error(transcriptToCds(x = txcoords))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_true(all(start(res) == -1))
+    expect_true(all(end(res) == -1))
+    ## 2) all tx not coding
+    txcoords <- IRanges(start = c(132, 133), end = c(323, 323),
+                        names = rep("ENST00000590515", 2))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_true(all(start(res) == -1))
+    expect_true(all(end(res) == -1))
+    ## 3) some tx not coding
+    ## 4) coordinate not within coding
+    txcoords <- IRanges(start = c(1463, 3, 143, 147, 1463), width = 1,
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955",
+                                  "ENST00000398117"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1, -1, -1, 1, 1))
+    expect_equal(end(res), c(1, -1, -1, 1, 1))
+    expect_equal(res[1], res[5])
+    ## End position outside of CDS
+    txcoords <- IRanges(start = c(1463, 3, 143, 147), width = c(4, 1, 1, 765),
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1, -1, -1, -1))
+    expect_equal(end(res), c(4, -1, -1, -1))
+    txcoords <- IRanges(start = c(3, 143, 147), width = c(1, 1, 765),
+                        names = c("ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_warning(res <- transcriptToCds(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_true(all(start(res) < 0))
+    expect_true(all(end(res) < 0))
 })
 
 test_that("cdsToTranscript works", {
@@ -261,6 +379,44 @@ test_that("cdsToTranscript works", {
                               "ENST00000261590"))
     rngs_tx <- cdsToTranscript(rngs, EnsDb.Hsapiens.v86)
     gnm <- transcriptToGenome(rngs_tx, EnsDb.Hsapiens.v86)
+
+    library(BSgenome.Hsapiens.NCBI.GRCh38)
+    res <- getSeq(BSgenome.Hsapiens.NCBI.GRCh38, unlist(gnm))
+    exp <- c("G", "C", "C", "C", "T")
+    expect_equal(exp, unname(as.character(res)))
+    
+    ## Preloaded data test
+    exons <- exonsBy(EnsDb.Hsapiens.v86)
+    transcripts <- transcripts(EnsDb.Hsapiens.v86)
+
+    edb18 <- filter(EnsDb.Hsapiens.v86, filter = ~ seq_name == "18")
+    expect_error(cdsToTranscript())
+    expect_error(cdsToTranscript(db = edb18, exons = exons,transcripts = transcripts))
+    txcoords <- IRanges(start = c(4, 3, 143, 147), width = 1,
+                        names = c("ENST00000398117", "ENST00000333681",
+                                  "ENST00000590515", "ENST00000589955"))
+    expect_error(cdsToTranscript(x = txcoords))
+    expect_warning(res <- cdsToTranscript(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1466, 902, -1, 293))
+
+    txcoords <- IRanges(start = c(4, 3, 50000, 147), width = 1,
+                        names = c("ENST00000398117", "ENST00000398117",
+                                  "ENST00000398117", "b"))
+    expect_warning(res <- cdsToTranscript(txcoords, edb18, exons = exons,transcripts = transcripts))
+    expect_equal(start(res), c(1466, 1465, -1, -1))
+
+    ## Map variants:
+    ## ENST00000070846:c.1643DelG
+    ## ENST00000070846:c.1881DelC
+    ## ENST00000379802:c.6995C>A
+    ## ENST00000261590:c.1088C>T
+    ## ENST00000261590:c.561T>G
+    rngs <- IRanges(start = c(1643, 1881, 6995, 1088, 561), width = 1,
+                    names = c("ENST00000070846", "ENST00000070846",
+                              "ENST00000379802", "ENST00000261590",
+                              "ENST00000261590"))
+    rngs_tx <- cdsToTranscript(rngs, EnsDb.Hsapiens.v86, exons = exons,transcripts = transcripts)
+    gnm <- transcriptToGenome(rngs_tx, exons)
 
     library(BSgenome.Hsapiens.NCBI.GRCh38)
     res <- getSeq(BSgenome.Hsapiens.NCBI.GRCh38, unlist(gnm))

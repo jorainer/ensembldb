@@ -925,15 +925,61 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
 ##  For EnsDb: calls the .transcriptLengths function.
 .transcriptLengths <- function(x, with.cds_len = FALSE, with.utr5_len = FALSE,
                                with.utr3_len = FALSE,
-                               filter = AnnotationFilterList()) {
-    filter <- .processFilterParam(filter, x)
-    allTxs <- transcripts(x, filter = filter)
+                               filter = AnnotationFilterList(), 
+                               exons = NA, transcripts = NA) {
+    ## The preloaded data option is currently only for the coordinates mapping
+    ## functions, therefore the filter is "tx_id" only.
+    preload_ranges_missing <- which(c(
+        identical(exons,NA),
+        identical(transcripts,NA)
+    ))
+    if(identical(integer(0), preload_ranges_missing)){
+        if (!is(exons, "CompressedGRangesList"))
+            stop("Argument 'exons' has to be a 'CompressedGRangesList' object")
+        if (!is(transcripts, "GRanges"))
+            stop("Argument 'transcripts' has to be an 'GRanges' object")
+        if (identical(integer(0),grep('T[0-9]', names(exons)[[1]])))
+            stop("Argument 'exons' has to be by 'tx'.")
+        ## Check if x is a formula and eventually translate it.
+        if (is(filter, "formula"))
+            filter <- AnnotationFilter(filter)
+        tryCatch({
+            filter_type <- filter@field
+            filter_tx <- filter@value
+        }, error = function(e){
+            message("No filter detected, all transcripts will be returned")
+            filter_tx <<- names(transcripts)
+        })
+        if (exists('filter_type')){
+            if (filter_type != "tx_id")
+                stop("Filter must be 'tx_id'.")            
+        }
+        tryCatch({
+            allTxs <- transcripts[names(transcripts) %in% unique(filter_tx)]
+        }, error = function(e){
+            allTxs <<- GRanges()
+        })
+    } else if (length(preload_ranges_missing) == 2){
+        filter <- .processFilterParam(filter, x)
+        allTxs <- transcripts(x, filter = filter)        
+    } else {
+        stop(paste(
+            "Argument", 
+            c("'exons'", "'transcripts'")[preload_ranges_missing],
+            'missing.'
+            , sep = " "
+        ))
+    }
     if (length(allTxs) == 0)
         return(data.frame(tx_id = character(), gene_id = character(),
                           nexon = integer(), tx_len = integer()))
-    exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
-    ## Match ordering
-    exns <- exns[match(allTxs$tx_id, names(exns))]
+    if(identical(integer(0), preload_ranges_missing)){
+        exns <- exons[match(allTxs$tx_id, names(exons))]
+    } else {
+        exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
+        ## Match ordering
+        exns <- exns[match(allTxs$tx_id, names(exns))]        
+    }
     ## Calculate length of transcripts.
     txLengths <- sum(width(exns))
     ## Calculate no. of exons.

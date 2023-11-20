@@ -26,7 +26,8 @@
 #' @param x `GRanges` object with the genomic coordinates that should be
 #'     mapped.
 #'
-#' @param db `EnsDb` object.
+#' @param db `EnsDb` object or pre-loaded exons 'CompressedGRangesList' object 
+#'     using exonsBy().
 #'
 #' @return
 #'
@@ -75,11 +76,48 @@
 #' ## The result of the mapping is an IRangesList each element providing the
 #' ## within-transcript coordinates for each input region
 #' genomeToTranscript(gnm, edbx)
+#' 
+#' ## If you are tring to calculate within-transcript coordinates of a huge 
+#' ## list of genomic region, you shall use pre-loaded exons GRangesList to  
+#' ## replace the SQLite db edbx
+#'  
+#' ## Below is just a lazy demo of querying multiple genomic region 
+#' library(parallel)
+#' 
+#' gnm <- rep(GRanges("X:107715899-107715901"),10)
+#' 
+#' exons <- exonsBy(EnsDb.Hsapiens.v86)
+#' 
+#' ## You can pre-define the exons region to further accelerate the code.
+#' 
+#' exons <- exonsBy(
+#'     EnsDb.Hsapiens.v86, by = "tx",
+#'     filter = AnnotationFilterList(
+#'         SeqNameFilter(as.character(unique(seqnames(gnm)))),
+#'         GeneStartFilter(max(end(gnm)), condition = "<="),
+#'         GeneEndFilter(min(start(gnm)), condition = ">=")
+#'     )
+#' )
+#' 
+#' ## only run in Linux ## 
+#' # res_temp <- mclapply(1:10, function(ind){
+#' #     genomeToTranscript(gnm[ind], exons)
+#' # }, mc.preschedule = TRUE, mc.cores = detectCores() - 1)
+#' 
+#' # res <- do.call(c,res_temp)
+#' 
+#' cl <- makeCluster(detectCores() - 1)
+#' clusterExport(cl,c('genomeToTranscript','gnm','exons'))
+#' 
+#' res <- parLapply(cl,1:10,function(ind){
+#'    genomeToTranscript(gnm[ind], exons)
+#' })
+#' stopCluster(cl)
 genomeToTranscript <- function(x, db) {
     if (missing(x) || !is(x, "GRanges"))
         stop("Argument 'x' is required and has to be a 'GRanges' object")
-    if (missing(db) || !is(db, "EnsDb"))
-        stop("Argument 'db' is required and has to be an 'EnsDb' object")
+    if (missing(db) || !(is(db, "EnsDb") || is(db,"CompressedGRangesList"))) 
+        stop("Argument 'db' is required and has to be an 'EnsDb' object or a 'CompressedGRangesList' object") # load the exons priorly
     res <- .genome_to_tx(x, db)
     if (is(res, "IRanges"))
         res <- IRangesList(res)
@@ -115,6 +153,8 @@ genomeToTranscript <- function(x, db) {
 #'     within-protein coordinates.
 #'
 #' @param db `EnsDb` object.
+#' 
+#' @inheritParams transcriptToProtein
 #'
 #' @return
 #'
@@ -174,17 +214,44 @@ genomeToTranscript <- function(x, db) {
 #'
 #' ## Mapping of intronic positions fail
 #' res[[4]]
-genomeToProtein <- function(x, db) {
+#' 
+#' ## Meanwhile, this function can be called in parallel processes if you preload
+#' ## the protein, exons and transcripts database.
+#' 
+#' proteins <- proteins(edbx)
+#' exons <- exonsBy(edbx)
+#' transcripts <- transcripts(edbx)
+#' 
+#' genomeToProtein(gnm, edbx, proteins = proteins, exons = exons, transcripts = transcripts)
+genomeToProtein <- function(x, db, proteins = NA, exons = NA, transcripts = NA) {
     if (missing(x) || !is(x, "GRanges"))
         stop("Argument 'x' is required and has to be a 'GRanges' object")
     if (missing(db) || !is(db, "EnsDb"))
         stop("Argument 'db' is required and has to be an 'EnsDb' object")
-    txs <- genomeToTranscript(x, db)
+    preload_ranges_missing <- which(c(
+        identical(proteins,NA),
+        identical(exons,NA),
+        identical(transcripts,NA)
+    ))
+    if(identical(integer(0), preload_ranges_missing))
+        txs <- genomeToTranscript(x, exons)
+    else if (length(preload_ranges_missing) == 3) {
+        txs <- genomeToTranscript(x, db)
+    } else {
+        stop(paste(
+            "Argument", 
+            c("'proteins'", "'exons'", "'transcripts'")[preload_ranges_missing],
+            'missing.'
+            , sep = " "
+        ))
+    }
     int_ids <- rep(1:length(txs), lengths(txs))
     txs <- unlist(txs, use.names = FALSE)
     if (is.null(names(txs)))
         names(txs) <- ""
-    prts <- transcriptToProtein(txs, db)
+    if (identical(integer(0), preload_ranges_missing))
+        prts <- transcriptToProtein(txs, db, proteins = proteins, exons = exons, transcripts = transcripts)
+    else prts <- transcriptToProtein(txs, db)
     mcols(prts) <- cbind(mcols(prts)[, c("tx_id", "cds_ok")],
                          mcols(txs)[, colnames(mcols(txs)) != "tx_id"])
     prts <- split(prts, int_ids)
@@ -215,8 +282,10 @@ genomeToProtein <- function(x, db) {
 #'
 #' @noRd
 .genome_to_tx_ranges <- function(genome, exns) {
+    genome_gr <- as(genome, "GRangesList") # preserve the metadata
+    genome_gr@unlistData@elementMetadata <- genome@elementMetadata
     IRangesList(unlist(
-        lapply(as(genome, "GRangesList"), FUN = function(rgn, exns) {
+        lapply(genome_gr, FUN = function(rgn, exns) {
             if (length(exns)) {
                 ints <- pintersect(exns, rgn, drop.nohit.ranges = TRUE,
                                    ignore.strand = FALSE)
@@ -248,6 +317,7 @@ genomeToProtein <- function(x, db) {
                             seq_name = as.character(seqnames(rgn)),
                             seq_strand = as.character(strand(rgn))
                         )
+                        if(!is.null(mcols(rgn))) dfrm <- DataFrame(dfrm, mcols(rgn))
                         mcols(irng) <- dfrm
                         irng
                     }, MoreArgs = list(rgn = rgn), USE.NAMES = FALSE)
@@ -261,6 +331,7 @@ genomeToProtein <- function(x, db) {
                                    seq_start = start(rgn), seq_end = end(rgn),
                                    seq_name = as.character(seqnames(rgn)),
                                    seq_strand = as.character(strand(rgn)))
+                if(!is.null(mcols(rgn))) metad <- DataFrame(metad, mcols(rgn))
                 empty_rng <- IRanges(start = -1, width = 1)
                 mcols(empty_rng) <- metad
                 empty_rng
@@ -275,7 +346,7 @@ genomeToProtein <- function(x, db) {
 #' checks if the region is completely included in an exons and returns
 #' the position within the transcript for that exon.
 #'
-#' @param db `EnsDb`.
+#' @param db `EnsDb` or 'CompressedGRangesList' 
 #'
 #' @param genome `GRanges`
 #'
@@ -315,12 +386,16 @@ genomeToProtein <- function(x, db) {
 #' ## Example with two genes, on two strands!
 .genome_to_tx <- function(genome, db) {
     ## Get exonsBy for all input ranges.
-    exns <- exonsBy(db, by = "tx",
-                    filter = AnnotationFilterList(
-                        SeqNameFilter(as.character(unique(seqnames(genome)))),
-                        GeneStartFilter(max(end(genome)), condition = "<="),
-                        GeneEndFilter(min(start(genome)), condition = ">=")
-                        ))
+    if(is(db, "EnsDb")){
+        exns <- exonsBy(
+            db, by = "tx",
+            filter = AnnotationFilterList(
+                SeqNameFilter(as.character(unique(seqnames(genome)))),
+                GeneStartFilter(max(end(genome)), condition = "<="),
+                GeneEndFilter(min(start(genome)), condition = ">=")
+            )
+        )
+    } else exns <- db
     res <- .genome_to_tx_ranges(genome, exns)
     if (!is.null(names(genome)))
         names(res) <- names(genome)
