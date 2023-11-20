@@ -1,3 +1,8 @@
+Changes in version 2.25.2
+
+- Functions for coordinate mapping gain support for pre-loaded genomic ranges
+  hence enabling parallel processing support (contribution from Boyu Yu).
+
 Changes in version 2.25.1
 
 - Skip reading gtf file from Ensembl ftp server in unit test.
