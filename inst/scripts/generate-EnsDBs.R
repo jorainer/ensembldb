@@ -84,6 +84,7 @@ createEnsDbForSpecies <- function(ftp_folder,
     res <- res[species, , drop = FALSE]
     if (length(species) == 0)
         stop("No database for any provided species found!")
+    res <- .solve_multi_genome_versions(res) # to ensure we're having one database per species
     ## (2) Process each species
     message("Going to process ", nrow(res), " species.")
     for (i in 1:nrow(res)) {
@@ -97,6 +98,23 @@ createEnsDbForSpecies <- function(ftp_folder,
         message("Done with species: ", res[i, "organism"], ", ",
                 nrow(res) - i, " left.")
     }
+}
+
+.solve_multi_genome_versions <- function(x) {
+    x <- split.data.frame(x, x[, "organism"])
+    x <- lapply(x, function(z) {
+        if (nrow(z) > 1) {
+            message("Found ", nrow(z), " databases for ", z[1, "organism"])
+            vrsn <- vapply(strsplit(z[, "version"], "_"),
+                           function(y) as.integer(y[2]), 1L)
+            message("Choosing ", z[which.max(vrsn), "folder"])
+            z[which.max(vrsn), , drop = FALSE]
+        }
+        else z
+    })
+    x <- do.call(rbind, x)
+    rownames(x) <- x[, "organism"]
+    x
 }
 
 #' @description This function performs the actual tasks of downloading the
@@ -240,7 +258,7 @@ installEnsemblDb <- function(dir, host = "localhost", dbname, user, pass,
     if (missing(user))
         stop("Argument 'user' missing!")
     ## Eventually unzip the files...
-    tmp <- system(paste0("gunzip ", dir, "/*.gz"))
+    tmp <- system(paste0("gunzip -f ", dir, "/*.gz"))
     ## Create the database
     if (length(port))
         con <- dbConnect(MariaDB(), host = host, user = user, pass = pass,
