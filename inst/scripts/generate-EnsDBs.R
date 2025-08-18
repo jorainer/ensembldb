@@ -305,6 +305,40 @@ createPackagesFromSQLite <- function(dir = ".", author, maintainer, version) {
     }
 }
 
+#' These are organisms for which orgdb databases are available. will focus on
+#' these and create others on request.
+#'
+#' @noRd
+.SELECTED_SPECIES <- c(
+    ## "bos_taurus",
+    ## "caenorhabditis_elegans",
+    ## "canis_lupus_familiaris",
+    ## "danio_rerio",
+    ## "drosophila_melanogaster",
+    ## "gallus_gallus",
+    ## "homo_sapiens",
+    ## "macaca_mulatta",
+    ## "mus_musculus",
+    ## "pan_troglodytes",
+    ## "rattus_norvegicus",
+    ## "saccharomyces_cerevisiae",
+    ## "sus_scrofa",
+    "xenopus_tropicalis"
+)
+
+create_annotationhub_dbs <- function(ens_version = integer(),
+                                     species = sort(.SELECTED_SPECIES),
+                                     user = character(),
+                                     host = character(),
+                                     pass = character(),
+                                     port = 3306) {
+    createEnsDbForSpecies(ens_version = ens_version, species = species,
+                          user = user, host = host, pass = pass,
+                          port = port)
+}
+
+create_annotationhub_dbs(ens_version = 114, user = "jo", host = "localhost",
+                         pass = "jo123")
 
 ## ftpf <- paste0("ftp://ftp.ensembl.org/pub/release-86/mysql/",
 ##                "anas_platyrhynchos_core_86_1")
