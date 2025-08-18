@@ -1,3 +1,7 @@
+Changes in version 2.33.2
+
+- Update description to create `EnsDb` databases using the docker image.
+
 Changes in version 2.29.1
 
 - Improve documentation of `proteinToGenome()` and require named `IRanges` as

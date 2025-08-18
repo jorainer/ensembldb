@@ -862,22 +862,22 @@ help avoiding them):
 
 # Getting or building `EnsDb` databases/packages
 
-Some of the code in this section is not supposed to be automatically executed
-when the vignette is built, as this would require a working installation of the
-Ensembl Perl API, which is not expected to be available on each system. Also,
-building `EnsDb` from alternative sources, like GFF or GTF files takes some time
-and thus also these examples are not directly executed when the vignette is
-build.
+**Important update**: starting with Ensembl release 114 we are no longer
+providing `EnsDb` databases for **every** species and **every** Ensembl
+release. If you need annotations for a certain species, open an issue on the
+*ensembldb* [github repository](https://github.com/jorainer/ensembldb). As an
+alternative, we are now providing a *docker* image that can be used to create
+an `EnsDb` (see further below).
 
 
 ## Getting `EnsDb` databases
 
-Some `EnsDb` databases are available as `R` packages from Bioconductor and can be
-simply installed with the `install` function from the `BiocManager` package. The
-name of such annotation packages starts with *EnsDb* followed by the abbreviation
-of the organism and the Ensembl version on which the annotation
-bases. `EnsDb.Hsapiens.v86` provides thus an `EnsDb` database for homo sapiens with
-annotations from Ensembl version 86.
+Some `EnsDb` databases are available as `R` packages from Bioconductor and can
+be simply installed with the `install` function from the `BiocManager`
+package. The name of such annotation packages starts with *EnsDb* followed by
+the abbreviation of the organism and the Ensembl version on which the annotation
+bases. `EnsDb.Hsapiens.v86` provides thus an `EnsDb` database for homo sapiens
+with annotations from Ensembl version 86.
 
 Since Bioconductor version 3.5 `EnsDb` databases can also be retrieved directly
 from `AnnotationHub`.
@@ -917,149 +917,36 @@ We could even make an annotation package from this `EnsDb` object using the
 
 ## Building annotation packages
 
+`EnsDb` databases can be created using a dedicated *docker* image that contains
+the required R installation as well as the Ensembl Perl API for a particular
+Ensembl release. As a requirement, [docker](https://www.docker.com/) needs to be
+installed on the system.
 
-### Directly from Ensembl databases
-
-The `fetchTablesFromEnsembl` function uses the Ensembl Perl API
-to retrieve the required annotations from an Ensembl database (e.g. from the
-main site *ensembldb.ensembl.org*). Thus, to use this functionality to build
-databases, the Ensembl Perl API needs to be installed (see <sup><a id="fnr.5" class="footref" href="#fn.5">5</a></sup> for details).
-
-Below we create an `EnsDb` database by fetching the required data directly from
-the Ensembl core databases. The `makeEnsembldbPackage` function is then used to
-create an annotation package from this `EnsDb` containing all human genes for
-Ensembl version 75.
-
-```{r  edb-from-ensembl, message = FALSE, eval = FALSE }
-library(ensembldb)
-
-## get all human gene/transcript/exon annotations from Ensembl (75)
-## the resulting tables will be stored by default to the current working
-## directory
-fetchTablesFromEnsembl(75, species = "human")
-
-## These tables can then be processed to generate a SQLite database
-## containing the annotations (again, the function assumes the required
-## txt files to be present in the current working directory)
-DBFile <- makeEnsemblSQLiteFromTables()
-
-## and finally we can generate the package
-makeEnsembldbPackage(ensdb = DBFile, version = "0.99.12",
-                     maintainer = "Johannes Rainer <johannes.rainer@eurac.edu>",
-                     author = "J Rainer")
+To create an `EnsDb` SQLite database file for *c elegans* and Ensembl release
+114 use:
 
 ```
-
-The generated package can then be build using `R CMD build EnsDb.Hsapiens.v75`
-and installed with `R CMD INSTALL EnsDb.Hsapiens.v75*`.  Note that we could
-directly generate an `EnsDb` instance by loading the database file, i.e. by
-calling `edb <- EnsDb(DBFile)` and work with that annotation object.
-
-To fetch and build annotation packages for plant genomes (e.g. arabidopsis
-thaliana), the *Ensembl genomes* should be specified as a host, i.e. setting
-`host` to "mysql-eg-publicsql.ebi.ac.uk", `port` to `4157` and `species` to
-e.g. "arabidopsis thaliana".
-
-
-### From a GTF or GFF file
-
-Alternatively, the `ensDbFromAH`, `ensDbFromGff`, `ensDbFromGRanges` and `ensDbFromGtf`
-functions allow to build EnsDb SQLite files from a `GRanges` object or GFF/GTF
-files from Ensembl (either provided as files or *via* `AnnotationHub`). These
-functions do not depend on the Ensembl Perl API, but require a working internet
-connection to fetch the chromosome lengths from Ensembl as these are not
-provided within GTF or GFF files. Also note that protein annotations are usually
-not available in GTF or GFF files, thus, such annotations will not be included
-in the generated `EnsDb` database - protein annotations are only available in
-`EnsDb` databases created with the Ensembl Perl API (such as the ones provided
-through `AnnotationHub` or as Bioconductor packages).
-
-In the next example we create an `EnsDb` database using the `AnnotationHub` package
-and load also the corresponding genomic DNA sequence matching the Ensembl
-version. We thus first query the `AnnotationHub` package for all resources
-available for `Mus musculus` and the Ensembl release 77. Next we create the `EnsDb`
-object from the appropriate `AnnotationHub` resource.  We then use the
-`getGenomeTwoBitFile` method on the `EnsDb` to directly look up and retrieve the
-correct or best matching `TwoBitFile` with the genomic DNA sequence. At last we
-retrieve the sequences of all exons using the `getSeq` method.
-
-```{r  gtf-gff-edb, message = FALSE, eval = FALSE }
-## Load the AnnotationHub data.
-library(AnnotationHub)
-ah <- AnnotationHub()
-
-## Query all available files for Ensembl release 77 for
-## Mus musculus.
-query(ah, c("Mus musculus", "release-77"))
-
-## Get the resource for the gtf file with the gene/transcript definitions.
-Gtf <- ah["AH28822"]
-## Create a EnsDb database file from this.
-DbFile <- ensDbFromAH(Gtf)
-## We can either generate a database package, or directly load the data
-edb <- EnsDb(DbFile)
-
-
-## Identify and get the TwoBit object with the genomic DNA sequence matching
-## the EnsDb annotation.
-Dna <- getGenomeTwoBitFile(edb)
-## We next retrieve the sequence of all exons on chromosome Y.
-exons <- exons(edb, filter = SeqNameFilter("Y"))
-exonSeq <- getSeq(Dna, exons)
-
+docker run -v /tmp:/ensdb_dir jorainer/ensdb_docker:release_114 caenorhabditis_elegans
 ```
 
-In the example below we load a `GRanges` containing gene definitions for genes
-encoded on chromosome Y and generate a `EnsDb` SQLite database from that
-information.
+Where `-v /tmp:/ensdb_dir` defines the path where the resulting SQLite file will
+be stored to (i.e., to a directory */tmp*).
 
-```{r  EnsDb-from-Y-GRanges, message = FALSE, eval = use_network}
-## Generate a sqlite database from a GRanges object specifying
-## genes encoded on chromosome Y
-load(system.file("YGRanges.RData", package = "ensembldb"))
-Y
-
-## Create the EnsDb database file
-DB <- ensDbFromGRanges(Y, path = tempdir(), version = 75,
-                       organism = "Homo_sapiens")
-
-## Load the database
-edb <- EnsDb(DB)
-edb
+To create an `EnsDb` for species provided through
+[ensemblgenomes](https://ensemblgenomes.org/) the base ftp server url containing
+the respective annotation database dumps needs to be specified. Note also that
+Ensemblgenomes and Ensembl use different release version numbers. The command
+below creates an `EnsDb` for the fungus *Aspergillus nidulans*. Note also the
+trailing */* for the FTP server directory.
 
 ```
-
-Alternatively we can build the annotation database using the `ensDbFromGtf`
-`ensDbFromGff` functions, that extract most of the required data from a GTF
-respectively GFF (version 3) file which can be downloaded from Ensembl
-(e.g. from <ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens> for human gene
-definitions from Ensembl version 75; for plant genomes etc, files can be
-retrieved from <ftp://ftp.ensemblgenomes.org>). All information except the
-chromosome lengths, the NCBI Entrezgene IDs and protein annotations can be
-extracted from these GTF files. The function also tries to retrieve chromosome
-length information automatically from Ensembl.
-
-Below we create the annotation from a gtf file that we fetch directly from Ensembl.
-
-```{r  EnsDb-from-GTF, message = FALSE, eval = FALSE }
-library(ensembldb)
-
-## the GTF file can be downloaded from
-## ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/
-gtffile <- "Homo_sapiens.GRCh37.75.gtf.gz"
-## generate the SQLite database file
-DB <- ensDbFromGtf(gtf = gtffile)
-
-## load the DB file directly
-EDB <- EnsDb(DB)
-
-## alternatively, build the annotation package
-## and finally we can generate the package
-makeEnsembldbPackage(ensdb = DB, version = "0.99.12",
-                     maintainer = "Johannes Rainer <johannes.rainer@eurac.edu>",
-                     author = "J Rainer")
-
+docker run -v /tmp:/ensdb_dir jorainer/ensdb_docker:release_114
+aspergillus_nidulans ftp://ftp.ensemblgenomes.org/pub/release-61/fungi/mysql/
 ```
+
+Note that for each Ensembl release a specific (different) docker image needs to
+be used (e.g., the `:release_114` in the command above specifies to use the
+docker image for Ensembl release 114).
 
 
 # Database layout<a id="org4707794"></a>
