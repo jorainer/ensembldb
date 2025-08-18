@@ -23,13 +23,14 @@ importMethodsFrom("AnnotationDbi",
                   "keytypes",
                   "mapIds",
                   "select")
-importFrom("GenomeInfoDb",
+importFrom("Seqinfo",
            "Seqinfo",
            "isCircular",
            "genome",
            "seqlengths",
            "seqnames",
-           "seqlevels",
+           "seqlevels")
+importFrom("GenomeInfoDb",
            "keepSeqlevels",
            "seqlevelsStyle",
            "seqlevelsStyle<-",
@@ -223,11 +224,12 @@ exportMethods("columns",
               "keys",
               "select",
               "mapIds")
+## Methods for Seqinfo
+exportMethods("seqlevels")
 ## Methods for GenomeInfoDb and related stuff
 exportMethods("seqlevelsStyle",
               "seqlevelsStyle<-",
-              "supportedSeqlevelsStyles",
-              "seqlevels")
+              "supportedSeqlevelsStyles")
 
 ## Constructor functions:
 export(

@@ -1,7 +1,7 @@
 Package: ensembldb
 Type: Package
 Title: Utilities to create and use Ensembl-based annotation databases
-Version: 2.29.1
+Version: 2.33.1
 Authors@R: c(person(given = "Johannes", family = "Rainer",
 	   email = "johannes.rainer@eurac.edu",
 	   role = c("aut", "cre"),
@@ -35,20 +35,21 @@ Imports:
     RSQLite (>= 1.1),
     DBI,
     Biobase,
-    GenomeInfoDb,
+    Seqinfo,
+    GenomeInfoDb (>= 1.45.5),
     AnnotationDbi (>= 1.31.19),
-    rtracklayer,
+    rtracklayer (>= 1.69.1),
     S4Vectors (>= 0.23.10),
     Rsamtools,
     IRanges (>= 2.13.24),
     ProtGenerics,
-    Biostrings (>= 2.47.9),
+    Biostrings (>= 2.77.2),
     curl
 Depends:
     R (>= 3.5.0),
     BiocGenerics (>= 0.15.10),
-    GenomicRanges (>= 1.31.18),
-    GenomicFeatures (>= 1.49.6),
+    GenomicRanges (>= 1.61.1),
+    GenomicFeatures (>= 1.61.4),
     AnnotationFilter (>= 1.5.2)
 Suggests:
     BiocStyle,
