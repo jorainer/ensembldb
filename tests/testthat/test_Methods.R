@@ -976,3 +976,10 @@ test_that("intronsByTranscript works", {
     expect_equal(names(exns), names(res))
     expect_equal(lengths(res), lengths(exns) - 1)
 })
+
+test_that("genome<-,EnsDb works", {
+    e2 <- edb
+    genome(e2) <- "AAAA"
+    expect_equal(.genome_version(e2), "AAAA")
+    expect_true(all(genome(e2) == "AAAA"))
+})

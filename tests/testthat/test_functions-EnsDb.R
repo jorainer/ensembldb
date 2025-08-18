@@ -69,3 +69,8 @@ test_that(".fix_is_circular works", {
     res <- .fix_is_circular(x, c("D", "A", "Z"))
     expect_equal(res$is_circular, c(1L, 0L, 0L, 1L, 0L))
 })
+
+test_that(".genome_version works", {
+    e2 <- edb
+    expect_equal(.genome_version(e2), "GRCh38")
+})

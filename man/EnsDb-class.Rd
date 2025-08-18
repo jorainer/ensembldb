@@ -30,6 +30,7 @@
 \alias{returnFilterColumns,EnsDb-method}
 \alias{returnFilterColumns<-}
 \alias{returnFilterColumns<-,EnsDb-method}
+\alias{genome<-,EnsDb-method}
 
 \title{Basic usage of an Ensembl based annotation database}
 \description{
@@ -50,6 +51,8 @@
 \S4method{dbconn}{EnsDb}(x)
 
 \S4method{ensemblVersion}{EnsDb}(x)
+
+\S4method{genome}{EnsDb}(x) <- value
 
 \S4method{listColumns}{EnsDb}(x, table, skip.keys = TRUE, metadata = FALSE, ...)
 
@@ -108,6 +111,8 @@
     For \code{returnFilterColumns}: a logical of length one specifying
     whether columns that are used for eventual filters should also be
     returned.
+    For \code{genome<-}: a \code{character} of length 1 defining the
+    Genome version used.
   }
 
   \item{x}{
@@ -143,6 +148,11 @@
 
     \item{ensemblVersion}{
       Returns the Ensembl version on which the package was built.
+    }
+
+    \item{genome<-}{
+      Allows to manually set/change the Genome version. Should be used
+      with care.
     }
 
     \item{listColumns}{

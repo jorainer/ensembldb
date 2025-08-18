@@ -27,6 +27,7 @@ importFrom("Seqinfo",
            "Seqinfo",
            "isCircular",
            "genome",
+           "genome<-",
            "seqlengths",
            "seqnames",
            "seqlevels")

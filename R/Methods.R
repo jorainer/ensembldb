@@ -139,7 +139,7 @@ setMethod("getMetadataValue", "EnsDb", function(x, name){
 ## seqinfo
 setMethod("seqinfo", "EnsDb", function(x){
     Chrs <- .fix_is_circular(dbGetQuery(dbconn(x), "select * from chromosome"))
-    Chr.build <- .getMetaDataValue(dbconn(x), "genome_build")
+    Chr.build <- .genome_version(x)
     Chrs$seq_name <- formatSeqnamesFromQuery(x, Chrs$seq_name)
     SI <- Seqinfo(seqnames = Chrs$seq_name,
                   seqlengths = Chrs$seq_length,
@@ -925,7 +925,7 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
 ##  For EnsDb: calls the .transcriptLengths function.
 .transcriptLengths <- function(x, with.cds_len = FALSE, with.utr5_len = FALSE,
                                with.utr3_len = FALSE,
-                               filter = AnnotationFilterList(), 
+                               filter = AnnotationFilterList(),
                                exons = NA, transcripts = NA) {
     ## The preloaded data option is currently only for the coordinates mapping
     ## functions, therefore the filter is "tx_id" only.
@@ -952,7 +952,7 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
         })
         if (exists('filter_type')){
             if (filter_type != "tx_id")
-                stop("Filter must be 'tx_id'.")            
+                stop("Filter must be 'tx_id'.")
         }
         tryCatch({
             allTxs <- transcripts[names(transcripts) %in% unique(filter_tx)]
@@ -961,10 +961,10 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
         })
     } else if (length(preload_ranges_missing) == 2){
         filter <- .processFilterParam(filter, x)
-        allTxs <- transcripts(x, filter = filter)        
+        allTxs <- transcripts(x, filter = filter)
     } else {
         stop(paste(
-            "Argument", 
+            "Argument",
             c("'exons'", "'transcripts'")[preload_ranges_missing],
             'missing.'
             , sep = " "
@@ -978,7 +978,7 @@ setMethod("lengthOf", "EnsDb", function(x, of="gene",
     } else {
         exns <- exonsBy(x, filter = TxIdFilter(allTxs$tx_id))
         ## Match ordering
-        exns <- exns[match(allTxs$tx_id, names(exns))]        
+        exns <- exns[match(allTxs$tx_id, names(exns))]
     }
     ## Calculate length of transcripts.
     txLengths <- sum(width(exns))
@@ -1698,6 +1698,13 @@ setReplaceMethod("returnFilterColumns", "EnsDb", function(x, value) {
         stop("'value' has to be a logical of length 1!")
     x <- setProperty(x, returnFilterColumns=value)
     return(x)
+})
+
+setReplaceMethod("genome", "EnsDb", function(x, value) {
+    if (length(value) != 1L)
+        stop("'value' is expected to be a character of lenght 1")
+    x <- setProperty(x, GENOME_VERSION = value)
+    x
 })
 
 ############################################################

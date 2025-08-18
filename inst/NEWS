@@ -1,3 +1,7 @@
+Changes in version 2.33.3
+
+- Add `genome<-` method to support manually setting the genome build version.
+
 Changes in version 2.33.2
 
 - Update description to create `EnsDb` databases using the docker image.

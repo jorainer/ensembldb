@@ -96,3 +96,9 @@ filter <- function(x, filter = AnnotationFilterList()) {
     x$is_circular[x$seq_name %in% mt_pattern] <- 1
     x
 }
+
+.genome_version <- function(x) {
+    if (is.na(gv <- getProperty(x, "GENOME_VERSION")))
+        .getMetaDataValue(dbconn(x), "genome_build")
+    else gv
+}
