@@ -146,13 +146,16 @@ createEnsDbForSpecies <- function(ftp_folder,
 #' @param dropDb Whether the Ensembl core database should be deleted once the
 #'     EnsDb has been created.
 #'
+#' @param dropIntermediateFiles `logical(1)` whether intermediate tab delimited
+#'     txt files should be dropped.
+#'
 #' @author Johannes Rainer
 #'
 #' @noRd
 processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
                               host = "localhost",
                               pass, port = NULL, local_tmp = tempdir(),
-                              dropDb = TRUE) {
+                              dropDb = TRUE, dropIntermediateFiles = TRUE) {
     if (missing(ftp_folder))
         stop("'ftp_folder' has to be specified!")
     if (missing(user))
@@ -173,7 +176,8 @@ processOneSpecies <- function(ftp_folder, ens_version = 86, species, user,
     fetchTablesFromEnsembl(version = ens_version, species = species,
                            user = user, host = host, pass = pass, port = port)
     DBFile <- makeEnsemblSQLiteFromTables()
-    unlink("*.txt")
+    if (dropIntermediateFiles)
+        unlink("*.txt")
     ## (5) Delete the database.
     if (dropDb) {
         if (length(port))
