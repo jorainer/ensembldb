@@ -341,8 +341,8 @@ create_annotationhub_dbs <- function(ens_version = integer(),
                           port = port)
 }
 
-create_annotationhub_dbs(ens_version = 114, user = "jo", host = "localhost",
-                         pass = "jo123")
+## create_annotationhub_dbs(ens_version = 114, user = "jo", host = "localhost",
+##                          pass = "jo123")
 
 ## ftpf <- paste0("ftp://ftp.ensembl.org/pub/release-86/mysql/",
 ##                "anas_platyrhynchos_core_86_1")
