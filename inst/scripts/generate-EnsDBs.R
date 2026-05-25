@@ -309,67 +309,40 @@ createPackagesFromSQLite <- function(dir = ".", author, maintainer, version) {
     }
 }
 
-#' These are organisms for which orgdb databases are available. will focus on
-#' these and create others on request.
-#'
-#' @noRd
-.SELECTED_SPECIES <- c(
-    ## "bos_taurus",
-    ## "caenorhabditis_elegans",
-    ## "canis_lupus_familiaris",
-    ## "danio_rerio",
-    ## "drosophila_melanogaster",
-    ## "gallus_gallus",
-    ## "homo_sapiens",
-    ## "macaca_mulatta",
-    ## "mus_musculus",
-    ## "pan_troglodytes",
-    ## "rattus_norvegicus",
-    ## "saccharomyces_cerevisiae",
-    ## "sus_scrofa",
-    "xenopus_tropicalis"
-)
+## #' These are organisms for which orgdb databases are available. will focus on
+## #' these and create others on request.
+## #'
+## #' @noRd
+## .SELECTED_SPECIES <- c(
+##     ## "bos_taurus",
+##     ## "caenorhabditis_elegans",
+##     ## "canis_lupus_familiaris",
+##     ## "danio_rerio",
+##     ## "drosophila_melanogaster",
+##     ## "gallus_gallus",
+##     ## "homo_sapiens",
+##     ## "macaca_mulatta",
+##     ## "mus_musculus",
+##     ## "pan_troglodytes",
+##     ## "rattus_norvegicus",
+##     ## "saccharomyces_cerevisiae",
+##     ## "sus_scrofa",
+##     "xenopus_tropicalis"
+## )
 
-create_annotationhub_dbs <- function(ens_version = integer(),
-                                     species = sort(.SELECTED_SPECIES),
-                                     user = character(),
-                                     host = character(),
-                                     pass = character(),
-                                     port = 3306) {
-    createEnsDbForSpecies(ens_version = ens_version, species = species,
-                          user = user, host = host, pass = pass,
-                          port = port)
-}
+## create_annotationhub_dbs <- function(ens_version = integer(),
+##                                      species = sort(.SELECTED_SPECIES),
+##                                      user = character(),
+##                                      host = character(),
+##                                      pass = character(),
+##                                      port = 3306) {
+##     createEnsDbForSpecies(ens_version = ens_version, species = species,
+##                           user = user, host = host, pass = pass,
+##                           port = port)
+## }
 
 ## create_annotationhub_dbs(ens_version = 114, user = "jo", host = "localhost",
 ##                          pass = "jo123")
-
-## ftpf <- paste0("ftp://ftp.ensembl.org/pub/release-86/mysql/",
-##                "anas_platyrhynchos_core_86_1")
-## local_dir <- tempdir()
-## downloadFilesFromFtpFolder(ftpf, dest = local_dir)
-## installEnsemblDb(dir = local_dir, host = "localhost", user = "jo",
-##                  pass = "jo123", dbname = "anas_platyrhynchos_core_86_1")
-## fls <- dir(local_dir, full.names = TRUE)
-## res <- sapply(fls, unlink)
-
-## fetchTablesFromEnsembl(86, species = "anas_platyrhynchos", user = "jo",
-##                        host = "localhost", pass = "jo123", port = 3306)
-## DBFile <- makeEnsemblSQLiteFromTables()
-## unlink("*.txt")
-
-## system.time(fetchTablesFromEnsembl(86, species = "anas_platyrhynchos"))
-
-
-## ftpf <- paste0("ftp://ftp.ensembl.org/pub/release-86/mysql/",
-##                "homo_sapiens_core_86_38")
-## local_dir <- tempdir()
-## processOneSpecies(ftp_folder = ftpf, version = 86,
-##                   species = "homo_sapiens", user = "jo",
-##                   host = "localhost",
-##                   pass = "jo123", port = 3306, local_tmp = local_dir,
-##                   dropDb = FALSE)
-
 
 ## Add an issue:
 ## + Fix problem of non-defined sequence type "chromosome" in anas platyrhynchos
