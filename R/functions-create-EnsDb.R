@@ -33,10 +33,10 @@
 ## retrieve Ensembl data
 ## save all files to local folder.
 ## returns the path where files have been saved to.
-fetchTablesFromEnsembl <- function(version, ensemblapi, user="anonymous",
-                                   host="ensembldb.ensembl.org", pass="",
-                                   port=5306, species="human"){
-    if(missing(version))
+fetchTablesFromEnsembl <- function(version, ensemblapi, user = "anonymous",
+                                   host = "ensembldb.ensembl.org", pass = "",
+                                   port = 5306, species = "human"){
+    if (missing(version))
         stop("The version of the Ensembl database has to be provided!")
     ## setting the stage for perl:
     fn <- system.file("perl", "get_gene_transcript_exon_tables.pl",
@@ -45,8 +45,10 @@ fetchTablesFromEnsembl <- function(version, ensemblapi, user="anonymous",
     ## replacing white spaces with _
     species <- gsub(species, pattern=" ", replacement="_")
 
-    cmd <- paste0("perl ", fn, " -s ", species," -e ", version,
-                  " -U ", user, " -H ", host, " -p ", port, " -P ", pass)
+    cmd <- paste0("perl ", fn, " -s ", shQuote(species),
+                  " -e ", shQuote(version), " -U ", shQuote(user),
+                  " -H ", shQuote(host), " -p ", shQuote(port),
+                  " -P ", shQuote(pass))
     if(!missing(ensemblapi)){
         Sys.setenv(ENS=ensemblapi)
     }
