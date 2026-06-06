@@ -116,18 +116,18 @@
 #' @noRd
 .valueForEnsDb <- function(x) {
     vals <- unique(value(x))
-    if (is(x, "CharacterFilter")) {
-        vals <- sQuote(gsub(unique(vals), pattern = "'", replacement = "''"))
-    }
+    vals <- gsub(vals, pattern = "'", replacement = "''", fixed = TRUE)
+    if (is(x, "CharacterFilter"))
+        vals <- sQuote(vals)
     if (length(vals) > 1)
         vals <- paste0("(",  paste0(vals, collapse = ","), ")")
     ## Process the like/startsWith/endsWith
     if (condition(x) == "startsWith")
-        vals <- paste0("'", unique(x@value), "%'")
+        vals <- paste0("'", gsub("'", "", vals, fixed = TRUE), "%'")
     if (condition(x) == "endsWith")
-        vals <- paste0("'%", unique(x@value), "'")
+        vals <- paste0("'%", gsub("'", "", vals, fixed = TRUE), "'")
     if (condition(x) == "contains")
-        vals <- paste0("'%", unique(x@value), "%'")
+        vals <- paste0("'%", gsub("'", "", vals, fixed = TRUE), "%'")
     vals
 }
 
@@ -248,7 +248,7 @@ isProteinFilter <- function(x) {
 #'
 #' @return A character with the corresponding \emph{where} query.
 #' @noRd
-buildWhereForGRanges <- function(grf, columns, db = NULL){
+buildWhereForGRanges <- function(grf, columns, db = NULL) {
     condition <- condition(grf)
     if (!(condition %in% c("start", "end", "within", "equal", "any")))
         stop("'condition' ", condition, " not supported. Condition (type) can ",
@@ -261,11 +261,11 @@ buildWhereForGRanges <- function(grf, columns, db = NULL){
              "'start', 'end', 'seqname', 'strand'!")
     ## Build the query to fetch all features that are located within the range
     quers <- sapply(as(value(grf), "GRangesList"), function(z) {
-        if (!is.null(db)) {
+        if (!is.null(db))
             seqn <- formatSeqnamesForQuery(db, as.character(seqnames(z)))
-        } else {
+        else
             seqn <- as.character(seqnames(z))
-        }
+        seqn <- gsub("'", "", seqn, fixed = TRUE)
         ## start: start, seqname and strand have to match.
         if (condition == "start") {
             query <- paste0(columns["start"], "=", start(z), " and ",
