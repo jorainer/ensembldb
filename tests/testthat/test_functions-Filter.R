@@ -66,7 +66,12 @@ test_that(".valueForEnsDb works", {
     expect_equal(ensembldb:::.valueForEnsDb(smb), "'%a'")
     ## Tests for numeric filters
     fl <- GeneStartFilter(4)
-    expect_equal(ensembldb:::.valueForEnsDb(fl), 4)
+    expect_equal(ensembldb:::.valueForEnsDb(fl), "4")
+    ## Tests for SQL_INJECTION
+    smb <- SymbolFilter("a'very bad things")
+    expect_equal(ensembldb:::.valueForEnsDb(smb), "'a''very bad things'")
+    smb <- SymbolFilter("a'very bad things", condition = "startsWith")
+    expect_equal(ensembldb:::.valueForEnsDb(smb), "'avery bad things%'")
 })
 
 test_that(".queryForEnsDb works", {
@@ -147,7 +152,7 @@ test_that(".processFilterParam works", {
     res <- ensembldb:::.processFilterParam(gif, db = edb)
     expect_true(is(res, "AnnotationFilterList"))
     expect_equal(res[[1]], gif)
-    
+
     ## - list of filters
     snf <- SeqNameFilter("X")
     res <- ensembldb:::.processFilterParam(list(gif, snf), edb)
@@ -156,7 +161,7 @@ test_that(".processFilterParam works", {
     expect_equal(res[[1]], gif)
     expect_equal(res[[2]], snf)
     expect_equal(res@logOp, "&")
-    
+
     ## - AnnotationFilterList
     afl <- AnnotationFilterList(gif, snf, logicOp = "|")
     res <- ensembldb:::.processFilterParam(afl, edb)
@@ -166,7 +171,7 @@ test_that(".processFilterParam works", {
     res <- ensembldb:::.processFilterParam(afl, edb)
     expect_true(is(res, "AnnotationFilterList"))
     expect_equal(afl, res)
-    
+
     ## - filter expression
     res <- ensembldb:::.processFilterParam(~ gene_id != "BCL2" |
                                                seq_name == "X", edb)
@@ -188,7 +193,7 @@ test_that(".processFilterParam works", {
     expect_error(ensembldb:::.processFilterParam(~ gene_bla == "14", edb))
     ## Errors for filters that are not supported.
     expect_error(ensembldb:::.processFilterParam(CdsEndFilter(123), edb))
-    
+
     ## Same with calls from within a function.
     testFun <- function(filter = AnnotationFilterList()) {
         ensembldb:::.processFilterParam(filter, db = edb)
@@ -206,7 +211,7 @@ test_that(".processFilterParam works", {
     res <- testFun(filter = AnnotationFilterList(GenenameFilter("BCL2")))
     expect_true(is(res, "AnnotationFilterList"))
     expect_equal(res[[1]], GenenameFilter("BCL2"))
-    
+
     gene <- "ZBTB16"
     otherFun <- function(gn) {
         testFun(filter = GenenameFilter(gn))
@@ -223,7 +228,7 @@ test_that("setFeatureInGRangesFilter works", {
     expect_equal(res[[3]]@feature, "tx")
     res <- ensembldb:::setFeatureInGRangesFilter(afl2, feature = "tx")
     expect_equal(res[[2]]@feature, "tx")
-    expect_equal(res[[1]][[3]]@feature, "tx")    
+    expect_equal(res[[1]][[3]]@feature, "tx")
 })
 
 test_that(".AnnottionFilterClassNames works", {
@@ -275,7 +280,7 @@ test_that(".filterFields works", {
     expect_true(!any(res == "g_ranges"))
     expect_true(any(res == "gene_name"))
     ## Still support for GenenameFilter
-    expect_true(any(res == "genename"))    
+    expect_true(any(res == "genename"))
 })
 
 test_that(".supportedFilters works", {

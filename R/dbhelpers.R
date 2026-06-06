@@ -91,9 +91,9 @@ EnsDb <- function(x){
 }
 
 ## x is the connection to the database, name is the name of the entry to fetch
-.getMetaDataValue <- function(x, name){
-    return(dbGetQuery(x, paste0("select value from metadata where name='",
-                                name, "'"))[ 1, 1])
+.getMetaDataValue <- function(x, name) {
+    dbGetQuery(x, "select value from metadata where name=?",
+               params = list(name))[1, 1]
 }
 
 ############################################################
@@ -308,8 +308,9 @@ addRequiredTables <- function(x, tab){
 ## startWith: optional table from which the join should start.
 .buildQuery <- function(x, columns, filter = AnnotationFilterList(),
                         order.by = "", order.type = "asc", group.by,
-                        skip.order.check=FALSE, return.all.columns = TRUE,
+                        skip.order.check = FALSE, return.all.columns = TRUE,
                         join = "suggested", startWith = NULL) {
+    order.type <- match.arg(tolower(order.type), c("asc", "desc"))
     resultcolumns <- columns    ## just to remember what we really want to give back
     ## 1) get all column names from the filters also removing the prefix.
     if (!is(filter, "AnnotationFilterList"))

@@ -401,8 +401,9 @@ ensDbFromGtf <- function(gtf, outfile, path, organism, genomeVersion,
     ## updating the Metadata information...
     lite <- dbDriver("SQLite")
     con <- dbConnect(lite, dbname = dbname)
-    bla <- dbExecute(con, paste0("update metadata set value='",
-                                 gtfFilename, "' where name='source_file';"))
+    tmp <- dbExecute(
+        con, "update metadata set value=? where name='source_file';",
+        params = list(gtfFilename))
     dbDisconnect(con)
     return(dbname)
 }

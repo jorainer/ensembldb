@@ -1,3 +1,19 @@
+Changes in version 2.37.3
+
+- Fix security issues reported by the Bioconductor Security Audit:
+  - `.valueForEnsDb()`: replace single quotes to avoid SQL injection.
+  - `ensDbQuery()` for `SeqNameFilter`: remove all single quotes from sequence
+    names to avoid SQL injection; chromosome names are not expected to contain
+    single quotes.
+  - `buildWhereForGRanges()`: remove all single quotes form sequence names to
+    avoid SQL injection.
+  - `ensDbFromGtf()`: use a parameterized query for `gtfFilename` to avoid SQL
+    injection.
+  - `.buildQuery()`: check parameter `order.type` for correct values to avoid
+    potential SQL injection.
+  - `.getMetaDataValue()`: use a parameterized query to avoid potential SQL
+    injection.
+
 Changes in version 2.37.2
 
 - Fix first security issues reported by the Bioconductor Security Audit:

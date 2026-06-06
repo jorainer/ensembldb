@@ -141,8 +141,8 @@ setMethod("ensDbQuery", "SeqNameFilter",
                   clmn <- unlist(prefixColumns(db, clmn,
                                                with.tables = with.tables))
               }
-              ## o Quote the values.
-              vals <- sQuote(vals)
+              ## o Quote the values; no ' expected/allowed in chromosome names.
+              vals <- sQuote(gsub("'", "", vals, fixed = TRUE))
               ## o Concatenate values.
               if (length(vals) > 1)
                   vals <- paste0("(", paste0(vals, collapse = ","), ")")
